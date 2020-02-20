@@ -1,0 +1,58 @@
+##########################
+# Rosechat Messages File #
+##########################
+
+# The prefix for all messages. #
+Prefix: "&8[&cRosewood&8]&c"
+
+# The prefix for a broadcast. #
+Broadcast-Message: "&8[&cBroadcast&8]&c %message%"
+
+# The message sent when a player does not have permission. #
+No-Permission: "%prefix% You do not have permission to do this!"
+
+# The message sent when a player needs to include a player in /msg. #
+Choose-Player: "%prefix% Please choose a player."
+
+# The message sent when a player needs to include a message in /msg. #
+Enter-Message: "%prefix% Please enter a message."
+
+# The message sent when a player is trying to message a player who is not online. #
+Player-not-Online: "%prefix% This player is not online!"
+
+# The message sent when an argument does not exist. #
+Invalid-Argument: "%prefix% This argument is invalid!"
+
+# The message sent when a caps message is not sent. #
+Blocked-Caps-Message: "%prefix% Your message contained too many capital letters!"
+
+# The message sent when a spam message is not sent. #
+Blocked-Spam-Message: "%prefix% Please do not spam!"
+
+# The message sent when a language message is not sent. #
+Blocked-Language-Message: "%prefix% &cYou used a bad word. :("
+
+# The messages sent when a player toggles sound. #
+Toggle-Sound-On: "%prefix% &7You have now enabled sounds when receiving messages."
+Toggle-Sound-Off: "%prefix% &7You have now disabled sounds when receiving messages."
+
+# The messages sent when a player toggles staffchat. #
+Toggle-StaffChat-On: "%prefix% &7You have now enabled staffchat."
+Toggle-StaffChat-Off: "%prefix% &7You have now disabled staffchat."
+
+# The messages sent when a player toggles socialspy. #
+Toggle-SocialSpy-On: "%prefix% &7You have now enabled social spy."
+Toggle-SocialSpy-Off: "%prefix% &7You have now disabled social spy."
+
+# The prefix sent when a message is spied on. #
+SocialSpy-Message: "&8[&6SocialSpy&8] &c[%sender% &c-> %target%&c] &f%message%"
+
+# The message sent when a player has no one to reply to. #
+No-Reply: "%prefix% There is no one to reply to..."
+
+# The message sent when a player tries to message a player without messages enabled. #
+Cannot-Message: "%prefix% You cannot message this player."
+
+# The message sent when a player toggles messages. #
+Toggle-Messages-On: "%prefix% &7You have now enabled messages."
+Toggle-Messages-Off: "%prefix% &7You have now disabled messages."

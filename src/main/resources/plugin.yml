@@ -1,0 +1,78 @@
+name: Rosechat
+author: Lilac <3
+version: 1.0.0
+api-version: 1.14
+description: Customized chat plugin for Rosewood.
+main: me.lilac.rosechat.Rosechat
+softdepend: [PlaceholderAPI, Vault, Essentials]
+commands:
+  rosechat:
+    aliases: [rc]
+    description: Main command for Rosechat.
+  message:
+    aliases: [msg, whisper, tell, m]
+    description: Message another player.
+  reply:
+    aliases: [r]
+    description: Reply to a player.
+  staffchat:
+    aliases: [sc, ac]
+    description: Talk privately to other staff.
+  broadcast:
+    aliases: [bc]
+    description: Broadcasts a message to the entire server.
+  togglesound:
+    aliases: [togglesounds]
+    description: Toggles sounds from playing when receiving a message or broadcast.
+  socialspy:
+    aliases: [ss]
+    description: Toggles social spy.
+  messagetoggle:
+    aliases: [msgtoggle, togglemsg, togglemessage]
+    description: Toggles messages.
+permissions:
+  rosechat.*:
+    description: All permissions for Rosechat.
+    children:
+      - rosechat.admin
+      - rosechat.staffchat
+      - rosechat.color
+      - rosechat.format
+      - rosechat.broadcast
+      - rosechat.bypass.*
+      - rosechat.togglesound
+      - rosechat.message
+      - rosechat.messagetoggle
+      - rosechat.socialspy
+  rosechat.admin:
+    description: Admin permission for Rosechat.
+  rosechat.staffchat:
+    description: Gives access to staffchat read and send.
+  rosechat.color:
+    description: Allows players to use colour codes in chat.
+  rosechat.format:
+    description: Allows players to use formatting codes in chat.
+  rosechat.broadcast:
+    description: Allows players to broadcast a message.
+  rosechat.bypass.*:
+    description: Allows players to bypass filters.
+    children:
+      - rosechat.bypass.spam
+      - rosechat.bypass.caps
+      - rosechat.bypass.language
+  rosechat.bypass.spam:
+    description: Allows players to bypass the spam filter.
+  rosechat.bypass.caps:
+    description: Allows players to bypass the caps filter.
+  rosechat.bypass.language:
+    description: Allows players to bypass the language filter.
+  rosechat.togglesound:
+    description: Allows players to toggle notification sounds.
+  rosechat.message:
+    description: Allows players to send a message.
+  rosechat.reply:
+    description: Allows players to reply to a message.
+  rosechat.messagetoggle:
+    description: Allows players to toggle messages.
+  rosechat.socialspy:
+    description: Allows players to see others messages.

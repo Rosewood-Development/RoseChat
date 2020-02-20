@@ -1,0 +1,133 @@
+###############################
+# Rosechat Configuration File #
+###############################
+# Version 1.0.0 #
+#################
+
+# Should the plugin check for a message full of capital letters? #
+Caps-Check: true
+
+# Should the plugin lowercase capital messages? #
+# If false, the message will not be sent. #
+Lowercase-Caps: true
+
+# Should the plugin check for multiple of the same message? #
+Spam-Check: true
+
+# Messages that will be blocked. #
+# Format: bad message:replace with. #
+# If there is no ':', the message will not be sent. #
+Blocked-Messages:
+  - faggot:******
+  - loser:emily
+  - multiple words:hecc yeah
+
+# Use https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html for sounds. #
+# The sound sent when a player receives a message. #
+Message-Sound: BLOCK_NOTE_BLOCK_PLING
+
+# The sound sent when a broadcast is sent. #
+Broadcast-Sound: BLOCK_NOTE_BLOCK_HARP
+
+# The format of the chat. #
+# Define placeholders under Custom-Placeholders. #
+# Only placeholders can be used, no other characters. #
+Chat-Format: "{prefix}{player}{extra}{message}"
+
+# The format of a /message to another player. #
+Message-Sent-Format: "{left-bracket}{player}{arrow}{msg-receive}{right-bracket}{message}"
+
+# The format of a /message from another player. #
+Message-Received-Format: "{left-bracket}{player}{arrow}{msg-receive}{right-bracket}{message}"
+
+# The format of the staffchat. #
+StaffChat-Format: "{staffchat-prefix}{player}{extra}{message}"
+
+# Custom Placeholders for the formats. #
+# Allows text, hover events, click events, and placeholders from Placeholder API. #
+# Use the placeholder %message% for the sent message. #
+Custom-Placeholders:
+  # This defines the {prefix} placeholder.
+  prefix:
+    # Text is mandatory. A placeholder will not work without it. #
+    text:
+      # Should the plugin use groups for this placeholder? #
+      # If it is not using groups, it will use default. #
+      # If the player is not in any of the groups, it will use the default. #
+      use-groups: true
+      default: "%luckperms_prefix%"
+      groups:
+        admin: "&8[&4&lAdmin&8] "
+        default: "&7"
+    # This tells the plugin that the placeholder is using a hover event. #
+    # Hover events show text and can have multiple lines. #
+    hover:
+      use-groups: true
+      default:
+        - "&7Username: &f%player_name%"
+        - "&7Balance: &a$%vault_eco_balance_formatted%"
+      groups:
+        admin:
+          - "&7Username: &f%player_name%"
+          - "&7Balance: &a$%vault_eco_balance_formatted%"
+          - "&7&oAdmins r rly cool"
+    # This tells the plugin that the placeholder is using a click event. #
+    # An action is what to do when the message is clicked. #
+    # The extra is what will be done. Example can be seen below. #
+    # Possible Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL #
+    click:
+      use-groups: true
+      default-action: SUGGEST_COMMAND
+      default-extra: "/msg %player_name% "
+      groups:
+        admin:
+          action: RUN_COMMAND
+          extra: "/msg %player_name% I love u"
+  player:
+    text:
+      use-groups: false
+      default: "%essentials_nickname%"
+    hover:
+      use-groups: false
+      default:
+        - "&7Click to Kill"
+    click:
+      use-groups: false
+      default-action: RUN_COMMAND
+      default-extra: "/kill %player_name%"
+  extra:
+    text:
+      use-groups: true
+      default: "&8: "
+      groups:
+        admin: " &8>> "
+  message:
+    text:
+      use-groups: true
+      default: "&e%message%"
+      groups:
+        admin: "&c%message%"
+  left-bracket:
+    text:
+      default: "&c["
+  msg-receive:
+    text:
+      default: "%otherplayer_displayname_{player}%"
+    hover:
+      default:
+        - "&eClick to Message"
+    click:
+      default-action: SUGGEST_COMMAND
+      default-extra: "/msg %otherplayer_getname_{player}% "
+  arrow:
+    text:
+      default: " &c-> "
+  right-bracket:
+    text:
+      default: "&c] &f"
+  staffchat-prefix:
+    text:
+      default: "&8[&cStaffChat&8] &f"
+    hover:
+      default:
+        - "&e&oStaffChat r also cool"
