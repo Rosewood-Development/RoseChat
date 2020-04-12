@@ -1,7 +1,18 @@
-####################################
 # Rosechat Data File. Do not edit. #
-####################################
-StaffChat: []
-Sounds-Off: []
-Social-Spy: []
-Messages-Off: []
+using-staffchat: []
+sounds-disabled: []
+using-social-spy: []
+using-group-spy: []
+using-world-spy: []
+messages-disabled: []
+player-channels: []
+groups:
+  test-group:
+    prefix: "[Test]"
+    players: []
+    mail:
+      messages:
+        1:
+          text: ""
+          sender: ""
+          unread: []

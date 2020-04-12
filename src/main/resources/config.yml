@@ -1,68 +1,128 @@
-###############################
-# Rosechat Configuration File #
-###############################
-# Version 1.0.0 #
-#################
+#######################################
+# Rosechat General Configuration File #
+#######################################
 
-# Should the plugin check for a message full of capital letters? #
-Caps-Check: true
+options:
+  # Should the plugin check for a message full of capital letters? #
+  caps-check: true
 
-# Should the plugin lowercase capital messages? #
-# If false, the message will not be sent. #
-Lowercase-Caps: true
+  # Should the plugin lowercase capital messages? #
+  # If false, the message will not be sent. Disable caps-check to send messages full of capital letters. #
+  lowercase-caps: true
 
-# Should the plugin check for multiple of the same message? #
-Spam-Check: true
+  # Should the plugin check for multiple of the same message? #
+  spam-check: true
 
-# Messages that will be blocked. #
-# Format: bad message:replace with. #
-# If there is no ':', the message will not be sent. #
-Blocked-Messages:
-  - faggot:******
-  - loser:emily
-  - multiple words:hecc yeah
+  # What should the plugin do when URLs are sent in chat? #
+  # Options: LIGHT_CENSOR - Removes the periods in the message, #
+  # HEAVY_CENSOR - Removes the prefix (www./https://) and suffix (.com, .org), #
+  # BLOCK - Stops the message from being sent, #
+  # NOTHING - Players are allowed to send URLs in chat. #
+  url-check: LIGHT_CENSOR
 
-# Use https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html for sounds. #
-# The sound sent when a player receives a message. #
-Message-Sound: BLOCK_NOTE_BLOCK_PLING
+  # If the message contains these words, the words will be replaced. #
+  # Format: contains:replace with #
+  # Message filtering will never be perfect, 'assassin' will not be censored, but neither will 'stupidass'.
+  replaced-messages:
+    - fuck:f***
+    - bitch:dog
+    - ass:butt
 
-# The sound sent when a broadcast is sent. #
-Broadcast-Sound: BLOCK_NOTE_BLOCK_HARP
+  # If the message contains these words, the message will not be sent. #
+  blocked-messages:
+    - faggot
 
-# The format of the chat. #
-# Define placeholders under Custom-Placeholders. #
-# Only placeholders can be used, no other characters. #
-Chat-Format: "{prefix}{player}{extra}{message}"
+  # The sound sent when a player receives a message. #
+  # Use https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html for sounds. #
+  # Can be 'none'. #
+  message-sound: BLOCK_NOTE_BLOCK_PLING
 
-# The format of a /message to another player. #
-Message-Sent-Format: "{left-bracket}{player}{arrow}{msg-receive}{right-bracket}{message}"
+  # The sound sent when a broadcast is sent. #
+  # Can be 'none'. #
+  broadcast-sound: BLOCK_NOTE_BLOCK_HARP
 
-# The format of a /message from another player. #
-Message-Received-Format: "{left-bracket}{player}{arrow}{msg-receive}{right-bracket}{message}"
+  # Should tagging be enabled? #
+  # Tagging allows players to @<playername> to ping a specific player. #
+  tagging: true
 
-# The format of the staffchat. #
-StaffChat-Format: "{staffchat-prefix}{player}{extra}{message}"
+  # The sound sent when a player receives a a tag. #
+  # Can be 'none'. #
+  tag-sound: BLOCK_NOTE_BLOCK_PLING
 
-# Custom Placeholders for the formats. #
-# Allows text, hover events, click events, and placeholders from Placeholder API. #
+  # How a tag is defined. #
+  tag-prefix: "@"
+
+  # The radius of the radius chat channel. #
+  # Can be set to 0 for a one-person channel. #
+  chat-radius: 200
+
+formats:
+
+  # The format of the chat. #
+  # Define placeholders under custom-placeholders. #
+  # Only placeholders can be used, no other characters. #
+  chat-format: "{prefix}{player}{extra}{message}"
+
+  # The format of a /message send to another player. #
+  message-sent-format: "{left-bracket}{player}{arrow}{receiver}{right-bracket}{message}"
+
+  # The format of a /message sent from another player. #
+  message-received-format: "{left-bracket}{player}{arrow}{receiver}{right-bracket}{message}"
+
+  # The format of the staff chat. #
+  staff-chat-format: "{staff-prefix}{player}{extra}{message}"
+
+  # The format of a tag. #
+  tagging-format: "{tag}"
+
+  # The format of a spied message. #
+  social-spy-format: "{spy-prefix}{spy-players}{message}"
+
+  # The format of a broadcast. #
+  global-broadcast-format: "{broadcast-prefix}{message}"
+
+  # The format of a per-world broadcast. #
+  world-broadcast-format: "{broadcast-world-prefix}{message}"
+
+  # The format of the radius chat, when a player is far away from the sender. #
+  radius-format-far: "{player}{extra}{far-color}{message}"
+
+  # The format of the radius chat, when a player is a medium distance away from the sender. #
+  radius-format-medium: "{player}{extra}{medium-color}{message}"
+
+  # The format of the radius chat, when a player is near the sender. #
+  radius-format-near: "{player}{extra}{near-color}{message}"
+
+  # The format of a per-world message. #
+  per-world-format: "{world}{player}{extra}{message}"
+
+  # The format of a group message. #
+  group-format: "{group}{player}{extra}{message}"
+
+  # The format of a spied group message. #
+  group-spy-format: "{spy-prefix}{group}{player}{extra}{message}"
+
+  # The format of a spied world message. #
+  world-spy-format: "{spy-prefix}{world}{player}{extra}{message}"
+
+# Custom placeholders for the different formats. #
+# Allows text, hover events, click events, and placeholders from PlaceholderAPI. #
 # Use the placeholder %message% for the sent message. #
-Custom-Placeholders:
-  # This defines the {prefix} placeholder.
+custom-placeholders:
+
+  # This defines the {prefix} placeholder. #
   prefix:
     # Text is mandatory. A placeholder will not work without it. #
     text:
-      # Should the plugin use groups for this placeholder? #
-      # If it is not using groups, it will use default. #
-      # If the player is not in any of the groups, it will use the default. #
-      use-groups: true
+      # If the player is not in any groups specified, it will use the default. #
+      # If no groups are specified, it will use the default. #
       default: "%luckperms_prefix%"
       groups:
-        admin: "&8[&4&lAdmin&8] "
+        admin: "&8[&4&lAdmin&8]"
         default: "&7"
     # This tells the plugin that the placeholder is using a hover event. #
     # Hover events show text and can have multiple lines. #
     hover:
-      use-groups: true
       default:
         - "&7Username: &f%player_name%"
         - "&7Balance: &a$%vault_eco_balance_formatted%"
@@ -70,64 +130,115 @@ Custom-Placeholders:
         admin:
           - "&7Username: &f%player_name%"
           - "&7Balance: &a$%vault_eco_balance_formatted%"
-          - "&7&oAdmins r rly cool"
+          - "&cClick to Message"
     # This tells the plugin that the placeholder is using a click event. #
-    # An action is what to do when the message is clicked. #
-    # The extra is what will be done. Example can be seen below. #
+    # An 'action' is what to do when the message is clicked. #
+    # The 'extra' is what will be executed. #
     # Possible Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL #
     click:
-      use-groups: true
-      default-action: SUGGEST_COMMAND
-      default-extra: "/msg %player_name% "
+      default-action: RUN_COMMAND
+      default-extra: "/msg %player_name% <3"
       groups:
         admin:
-          action: RUN_COMMAND
-          extra: "/msg %player_name% I love u"
+          action: SUGGEST_COMMAND
+          extra: "/msg %player_name% Help, "
+
   player:
     text:
-      use-groups: false
-      default: "%essentials_nickname%"
+      default: "%essentials_nickname"
     hover:
-      use-groups: false
-      default:
-        - "&7Click to Kill"
+      default: "&eClick to Message"
     click:
-      use-groups: false
-      default-action: RUN_COMMAND
-      default-extra: "/kill %player_name%"
+      default-action: SUGGEST_COMMAND
+      default-extra: "/msg %player_name% "
+
+  # It is recommended that message colors are specified in the extra placeholder. #
+  # This is so things like radius chat colors are included before the message. #
   extra:
     text:
-      use-groups: true
-      default: "&8: "
+      default: " &8: &f"
       groups:
-        admin: " &8>> "
+        admin: " &8>> &e"
+
   message:
     text:
-      use-groups: true
-      default: "&e%message%"
-      groups:
-        admin: "&c%message%"
+      default: "%message%"
+
   left-bracket:
     text:
       default: "&c["
-  msg-receive:
+
+  right-bracket:
     text:
-      default: "%otherplayer_displayname_{player}%"
+      default: "&c]"
+
+  # The %other_player% placeholder must be used to specify that it is not the sender. #
+  receiver:
+    text:
+      default: "%other_player_essentials_nickname%"
     hover:
       default:
         - "&eClick to Message"
     click:
       default-action: SUGGEST_COMMAND
-      default-extra: "/msg %otherplayer_getname_{player}% "
+      default-extra: "/msg %other_player_player_name% "
+
   arrow:
     text:
       default: " &c-> "
-  right-bracket:
+
+  staff-prefix:
     text:
-      default: "&c] &f"
-  staffchat-prefix:
-    text:
-      default: "&8[&cStaffChat&8] &f"
+      default: "&8[&cStaffChat&8] "
     hover:
       default:
-        - "&e&oStaffChat r also cool"
+        - "A chat channel for only staff members."
+
+  tag:
+    text:
+      default: "&e@%other_player_player_name%"
+
+  spy-prefix:
+    text:
+      default: "&e[SocialSpy&e]"
+
+  spy-players:
+    text:
+      default: "&e[%player_name% &e-> %other_player_player_name%&e]"
+
+  broadcast-prefix:
+    text:
+      default: "&c[&8Broadcast&c] "
+
+  broadcast-world-prefix:
+    text:
+      default: "&c[&8%player_world% Broadcast&c]"
+    # Options that may be used in placeholders. #
+    options:
+      # This capitalises the text, useful for worlds as they're usually lowercase, e.g. world -> World. #
+      capitalise: true
+      # This replaces underscores with spaces, useful for worlds as they usually have underscores, e.g. the_nether -> The Nether. #
+      replace_underscore: true
+
+  far-color:
+    text:
+      default: "&8"
+
+  medium-color:
+    text:
+      default: "&7"
+
+  near-color:
+    text:
+      default: "&f"
+
+  world:
+    text:
+      default: "%player_world%"
+    options:
+      capitalise: true
+      replace_underscore: true
+
+  group:
+    text:
+      default: "%group_name%"

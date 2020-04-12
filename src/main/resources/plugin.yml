@@ -1,78 +1,203 @@
 name: Rosechat
-author: Lilac <3
+main: dev.rosewood.rosechat.RoseChat
 version: 1.0.0
-api-version: 1.14
-description: Customized chat plugin for Rosewood.
-main: me.lilac.rosechat.Rosechat
-softdepend: [PlaceholderAPI, Vault, Essentials]
+api-version: 1.15
+description: A customisable chat plugin.
+author: Lilac
+softdepend: [PlaceholderAPI]
 commands:
   rosechat:
     aliases: [rc]
     description: Main command for Rosechat.
   message:
-    aliases: [msg, whisper, tell, m]
-    description: Message another player.
+    aliases: [msg, whisper, tell, m, pm, dm]
+    description: Send a message to another player.
   reply:
     aliases: [r]
-    description: Reply to a player.
+    description: Reply to a message from another player.
   staffchat:
     aliases: [sc, ac]
-    description: Talk privately to other staff.
+    description: Talk pivately to other staff members.
   broadcast:
     aliases: [bc]
-    description: Broadcasts a message to the entire server.
+    description: Broadcast a message to the entire server, or world.
   togglesound:
-    aliases: [togglesounds]
-    description: Toggles sounds from playing when receiving a message or broadcast.
-  socialspy:
-    aliases: [ss]
-    description: Toggles social spy.
-  messagetoggle:
-    aliases: [msgtoggle, togglemsg, togglemessage]
-    description: Toggles messages.
+    aliases: [togglesounds, soundtoggle, soundstoggle]
+    description: Toggles sounds from playing when receiving a message, tag, or broadcast.
+  spy:
+    aliases: [socialspy, ss]
+    description: Toggles spying in different channels.
+  togglemessage:
+    aliases: [togglemessages, togglemsg, msgtoggle, messagetoggle]
+    description: Toggles messages being able to be received.
+  channel:
+    aliases: [channels, chat]
+    description: Switches between different chat channels.
+  group:
+    aliases: [g, groups, groupdm]
+    description: Allows a player to create, edit and join groups.
+  toggletag:
+    aliases: [tagtoggle]
+    description: Toggles the player from receiving tags.
 permissions:
   rosechat.*:
-    description: All permissions for Rosechat.
+    description: Gives access to all Rosechat permissions.
     children:
-      - rosechat.admin
-      - rosechat.staffchat
-      - rosechat.color
-      - rosechat.format
-      - rosechat.broadcast
-      - rosechat.bypass.*
-      - rosechat.togglesound
       - rosechat.message
-      - rosechat.messagetoggle
-      - rosechat.socialspy
-  rosechat.admin:
-    description: Admin permission for Rosechat.
-  rosechat.staffchat:
-    description: Gives access to staffchat read and send.
-  rosechat.color:
-    description: Allows players to use colour codes in chat.
-  rosechat.format:
-    description: Allows players to use formatting codes in chat.
-  rosechat.broadcast:
-    description: Allows players to broadcast a message.
-  rosechat.bypass.*:
-    description: Allows players to bypass filters.
-    children:
-      - rosechat.bypass.spam
-      - rosechat.bypass.caps
-      - rosechat.bypass.language
-  rosechat.bypass.spam:
-    description: Allows players to bypass the spam filter.
-  rosechat.bypass.caps:
-    description: Allows players to bypass the caps filter.
-  rosechat.bypass.language:
-    description: Allows players to bypass the language filter.
-  rosechat.togglesound:
-    description: Allows players to toggle notification sounds.
+      - rosechat.reply
+      - rosechat.staffchat
+      - rosechat.broadcast
+      - rosechat.togglesound
+      - rosechat.spy
+      - rosechat.togglemessage
+      - rosechat.channels
+      - rosechat.group
+      - rosechat.chat
+      - rosechat.bypass
+      - rosechat.toggletag
   rosechat.message:
-    description: Allows players to send a message.
+    description: Allows a player to use /message.
+    default: op
   rosechat.reply:
-    description: Allows players to reply to a message.
-  rosechat.messagetoggle:
-    description: Allows players to toggle messages.
-  rosechat.socialspy:
-    description: Allows players to see others messages.
+    description: Allows a player to use /reply.
+    default: op
+  rosechat.staffchat:
+    description: Allows a player to use /staffchat.
+    default: op
+  rosechat.broadcast:
+    description: Allows a player to use /broadcast.
+    default: op
+    children:
+      - rosechat.broadcast.world
+      - rosechat.broadcast.global
+  rosechat.broadcast.world:
+    description: Allows a player to use /broadcast world.
+    default: op
+  rosechat.broadcast.global:
+    description: Allows a player to use /broadcast.
+    default: op
+  rosechat.togglesound:
+    description: Allows a player to use /togglesound.
+    default: op
+  rosechat.spy:
+    description: Allows a player to use /spy.
+    default: op
+    children:
+      - rosechat.spy.message
+      - rosechat.spy.world
+      - rosechat.spy.group
+  rosechat.spy.message:
+    description: Allows a player to use /spy message.
+    default: op
+  rosechat.spy.world:
+    description: Allows a player to use /spy world.
+    default: op
+  rosechat.spy.group:
+    description: Allows a player to use /spy group.
+    default: op
+  rosechat.togglemessage:
+    description: Allows a player to use /togglemessage.
+    default: op
+  rosechat.channels:
+    description: Allows a player to use /channel.
+    default: op
+  rosechat.channels.radius:
+    description: Allows a player to use /channel radius.
+    default: op
+  rosechat.channels.world:
+    description: Allows a player to use /channel world.
+    default: op
+  rosechat.channels.global:
+    description: Allows a player to use /channel global.
+    default: not op
+  rosechat.group:
+    description: Allows a player to use /group
+    default: op
+    children:
+      - rosechat.group.create
+      - rosechat.group.disband
+      - rosechat.group.rename
+      - rosechat.group.invite
+      - rosechat.group.accept
+      - rosechat.group.deny
+      - rosechat.group.send
+      - rosechat.group.leave
+      - rosechat.group.list
+      - rosechat.group.members
+      - rosechat.group.promote
+      - rosechat.group.mute
+      - rosechat.group.mail
+      - rosechat.group.kick
+      - rosechat.group.admin
+  rosechat.group.create:
+    description: Allows a player to use /group create.
+    default: op
+  rosechat.group.disband:
+    description: Allows a player to use /group disband.
+    default: op
+  rosechat.group.rename:
+    description: Allows a player to use /group rename.
+    default: op
+  rosechat.group.invite:
+    description: Allows a player to use /group invite.
+    default: op
+  rosechat.group.accept:
+    description: Allows a player to use /group accept.
+    default: op
+  rosechat.group.deny:
+    description: Allows a player to use /group deny.
+    default: op
+  rosechat.group.send:
+    description: Allows a player to use /group <message>.
+    default: op
+  rosechat.group.leave:
+    description: Allows a player to use /group leave.
+    default: op
+  rosechat.group.list:
+    description: Allows a player to use /group list.
+    default: op
+  rosechat.group.members:
+    description: Allows a player to use /group members.
+    default: op
+  rosechat.group.promote:
+    description: Allows a player to use /group promote.
+    default: op
+  rosechat.group.mute:
+    description: Allows a player to use /group mute.
+    default: op
+  rosechat.group.mail:
+    description: Allows a player to use /group mail.
+    default: op
+  rosechat.group.kick:
+    description: Allows a player to use /group kick.
+    default: op
+  rosechat.group.admin:
+    description: Allows a player to see groups, and who's in them.
+    default: op
+  rosechat.chat.color:
+    description: Allows a player to use color in chat.
+    default: op
+  rosechat.chat.format:
+    description: Allows a player to use formatting in chat.
+    default: op
+  rosechat.chat.magic:
+    description: Allows a player to use the magic formatting in chat.
+    default: op
+  rosechat.chat.tag:
+    description: Allows a player to tag other players.
+    default: op
+  rosechat.bypass.spam:
+    description: Allows a player to bypass the spam filter.
+    default: op
+  rosechat.bypass.language:
+    description: Allows a player to bypass the language filter.
+    default: op
+  rosechat.bypass.caps:
+    description: Allows a player to bypass the caps filter.
+    default: op
+  rosechat.bypass.links:
+    description: Allows a player to bypass the URL filter.
+    default: op
+  rosechat.toggletag:
+    description: Allows a player to use /toggletag.
+    default: op
