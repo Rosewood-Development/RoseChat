@@ -101,6 +101,10 @@ permissions:
   rosechat.channels:
     description: Allows a player to use /channel.
     default: op
+    children:
+      - rosechat.channels.radius
+      - rosechat.channels.world
+      - rosechat.channels.global
   rosechat.channels.radius:
     description: Allows a player to use /channel radius.
     default: op
@@ -174,6 +178,14 @@ permissions:
   rosechat.group.admin:
     description: Allows a player to see groups, and who's in them.
     default: op
+  rosechat.chat:
+    description: Allows a player to chat.
+    default: not op
+    children:
+      - rosechat.chat.color
+      - rosechat.chat.format
+      - rosechat.chat.magic
+      - rosechat.chat.tag
   rosechat.chat.color:
     description: Allows a player to use color in chat.
     default: op
@@ -186,6 +198,14 @@ permissions:
   rosechat.chat.tag:
     description: Allows a player to tag other players.
     default: op
+  rosechat.bypass:
+    description: Allows a player to bypass filters.
+    default: op
+    children:
+      - rosechat.bypass.spam
+      - rosechat.bypass.language
+      - rosechat.bypass.caps
+      - rosechat.bypass.links
   rosechat.bypass.spam:
     description: Allows a player to bypass the spam filter.
     default: op

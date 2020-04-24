@@ -10,6 +10,6 @@ public interface PetalPlugin {
      * @return The version of the Petal API.
      */
     default String getPetalVersion() {
-        return "1.1.2";
+        return "1.1.3";
     }
 }

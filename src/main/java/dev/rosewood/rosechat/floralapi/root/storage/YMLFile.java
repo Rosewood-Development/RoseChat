@@ -157,6 +157,11 @@ public class YMLFile {
         return getConfig().getDouble(path);
     }
 
+    /**
+     * Gets a Long from the file.
+     * @param path The path to get the value from.
+     * @return A Long value from the path.
+     */
     public long getLong(String path) {
         return getConfig().getLong(path);
     }

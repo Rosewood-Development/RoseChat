@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +43,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * A list of subcommands used by this command.
      */
     private List<AbstractCommand> subcommands;
-
-    private String permission;
 
     /**
      * Creates a new instance of the CommandManager.
@@ -109,44 +108,51 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String cmd, String[] args) {
         List<String> tab = new ArrayList<>();
 
-        if (mainCommand != null) return mainCommand.onTab(sender, args);
-
-        if (args.length == 1) {
-            for (AbstractCommand subcommand : subcommands) {
-                if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-                if (!subcommand.isPlayerOnly() && !(sender instanceof Player)) continue;
-
-                for (String label : subcommand.getLabels()) {
-                    if (label.contains(args[0].toLowerCase())) {
-                        tab.add(subcommand.getLabels().get(0));
-                    }
-                }
-            }
+        if (mainCommand != null) {
+            StringUtil.copyPartialMatches(args[args.length - 1], mainCommand.onTab(sender, args), tab);
 
             return tab;
         }
 
+        if (args.length == 1) {
+            List<String> labels = new ArrayList<>();
+
+            for (AbstractCommand subcommand : subcommands) {
+                if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
+                if (!subcommand.isPlayerOnly() && !(sender instanceof Player)) continue;
+                labels.add(subcommand.getLabels().get(0));
+            }
+
+            StringUtil.copyPartialMatches(args[args.length - 1], labels, tab);
+
+            return tab;
+        }
+
+        List<String> temp;
+        List<String> players = new ArrayList<>();
         for (AbstractCommand subcommand : subcommands) {
             if (!subcommand.getLabels().contains(args[0].toLowerCase())) continue;
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;;
             if (!subcommand.isPlayerOnly() && !(sender instanceof Player)) continue;
-            tab = subcommand.onTab(sender, truncateArgs(args));
+            temp = subcommand.onTab(sender, truncateArgs(args));
 
-            if (tab == null) return new ArrayList<>();
+            if (temp == null) return new ArrayList<>();
 
-            if (tab.contains("players")) {
-                List<String> playerfulTab = new ArrayList<>();
-
-                for (String str : tab) {
-                    if (!str.equalsIgnoreCase("players")) playerfulTab.add(str);
+            if (temp.contains("players")) {
+                for (String str : temp) {
+                    if (!str.equalsIgnoreCase("players")) players.add(str);
                 }
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (player.getName().contains(args[0])) playerfulTab.add(player.getName());
+                    players.add(player.getName());
                 }
-                return playerfulTab;
+
+                StringUtil.copyPartialMatches(args[args.length - 2], players, tab);
+
+                return tab;
             }
 
+            StringUtil.copyPartialMatches(args[args.length - 2], temp, tab);
             return tab;
         }
 
@@ -214,8 +220,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @return The main command label.
      */
     public String getMainCommandLabel() {
-        if (mainCommand != null) return mainCommand.getLabels().get(0);
-        else return mainCommandLabel;
+        if (mainCommand == null) {
+            return mainCommandLabel;
+        } else {
+            return mainCommand.getLabels().get(0);
+        }
     }
 
     /**
@@ -224,14 +233,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      */
     public String getMainSyntax() {
         return mainSyntax;
-    }
-
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public String getPermission() {
-        return permission;
     }
 }
 

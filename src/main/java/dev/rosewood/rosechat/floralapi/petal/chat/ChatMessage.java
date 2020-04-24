@@ -81,4 +81,9 @@ public class ChatMessage {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                 TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
     }
+
+    @Override
+    public String toString() {
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 }

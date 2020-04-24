@@ -10,6 +10,6 @@ public interface RootPlugin {
      * @return The version of the Root API.
      */
     default String getRootVersion() {
-        return "1.1.2";
+        return "1.1.3";
     }
 }

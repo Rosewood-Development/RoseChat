@@ -17,7 +17,24 @@ public enum Language {
         this.node = node;
     }
 
-    public String get() {
+    /**
+     * @return The localized text, formatted.
+     */
+    public String getFormatted() {
         return new LocalizedText(node).withPrefixPlaceholder().format();
+    }
+
+    /**
+     * @return The language file node.
+     */
+    public String getNode() {
+        return node;
+    }
+
+    /**
+     * @return The text as a localized text object.
+     */
+    public LocalizedText getLocalizedText() {
+        return new LocalizedText(node);
     }
 }

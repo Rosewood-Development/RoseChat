@@ -1,39 +1,38 @@
 package dev.rosewood.rosechat;
 
-import dev.rosewood.rosechat.commands.*;
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
-import dev.rosewood.rosechat.floralapi.root.command.CommandManager;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
+import dev.rosewood.rosechat.groups.GroupManager;
+import dev.rosewood.rosechat.placeholders.PlaceholderManager;
 
 public class RoseChat extends FloralPlugin {
 
     private static RoseChat instance;
     private YMLFile dataFile;
+    private PlaceholderManager placeholderManager;
+    private GroupManager groupManager;
 
     @Override
     public void onStartUp() {
-        new RosechatCommandManager("rosechat", "rosechat help")
-                .addCommandManager(new CommandManager(new CommandMessage()))
-                .addCommandManager(new CommandManager(new CommandReply()))
-                .addCommandManager(new CommandManager(new CommandStaffChat()))
-                .addCommandManager(new CommandManager(new CommandBroadcast()))
-                .addCommandManager(new CommandManager(new CommandToggleSound()))
-                .addCommandManager(new CommandManager(new CommandSpy()))
-                .addCommandManager(new CommandManager(new CommandToggleMessage()))
-                .addCommandManager(new CommandManager(new CommandChannel()))
-                .addCommandManager(new CommandManager(new CommandGroup()));
+
 
         dataFile = new YMLFile("data");
+        groupManager = new GroupManager();
     }
 
     @Override
     public void onShutDown() {
-
+        groupManager.save();
     }
 
     @Override
     public void onReload() {
+        instance = this;
+        placeholderManager = new PlaceholderManager();
+    }
 
+    public YMLFile getDataFile() {
+        return dataFile;
     }
 
     @Override
@@ -43,5 +42,13 @@ public class RoseChat extends FloralPlugin {
 
     public static RoseChat getInstance() {
         return instance;
+    }
+
+    public PlaceholderManager getPlaceholderManager() {
+        return placeholderManager;
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
     }
 }

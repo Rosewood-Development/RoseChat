@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.floralapi.root.command;
 
+import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public abstract class AbstractCommand {
      */
     public AbstractCommand(String... labels) {
         this.labels = new ArrayList<>(Arrays.asList(labels));
+    }
+
+    public AbstractCommand(String label, boolean isSeniorCommand) {
+        this.labels = new ArrayList<>();
+        labels.add(label);
+        List<String> aliases = FloralPlugin.getInstance().getCommand(label).getAliases();
+        labels.addAll(aliases);
+    }
+
+    public AbstractCommand(String label, boolean playerOnly, boolean isSeniorCommand) {
+        this(label);
+        this.playerOnly = playerOnly;
     }
 
     /**
@@ -83,4 +96,13 @@ public abstract class AbstractCommand {
      * @return The syntax for this command.
      */
     public abstract String getSyntax();
+
+    public String getAllArgs(int startArg, String[] args) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = startArg; i < args.length; i++) {
+            builder.append(args[i]).append(" ");
+        }
+
+        return builder.toString().trim();
+    }
 }
