@@ -11,6 +11,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public abstract class FloralPlugin extends JavaPlugin implements RootPlugin {
 
+    /**
+     * When working on a commission, should the plugin display an (unpaid) message next to sent messages?
+     */
     public static boolean UNPAID_MODE = false;
 
     /**

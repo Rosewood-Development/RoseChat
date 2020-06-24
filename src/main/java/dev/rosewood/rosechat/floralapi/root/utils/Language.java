@@ -1,5 +1,8 @@
 package dev.rosewood.rosechat.floralapi.root.utils;
 
+/**
+ * The commonly used messages.
+ */
 public enum Language {
 
     PREFIX("prefix"),
@@ -8,6 +11,7 @@ public enum Language {
     PLAYER_ONLY("player-only"),
     RELOADED("reloaded"),
     INVALID_ARGUMENTS("invalid-arguments"),
+    NOT_A_NUMBER("not-a-number"),
     COLOR("command-color"),
     COMMAND_RELOAD_DESCRIPTION("command-reload-description");
 

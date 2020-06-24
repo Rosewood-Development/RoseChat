@@ -30,7 +30,7 @@ public class CommandReload extends AbstractCommand {
     }
 
     @Override
-    public List<String> onTab(CommandSender sender, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, String[] args) {
         return null;
     }
 

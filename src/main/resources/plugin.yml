@@ -1,10 +1,10 @@
-name: Rosechat
+name: RoseChat
 main: dev.rosewood.rosechat.RoseChat
 version: 1.0.0
 api-version: 1.15
 description: A customisable chat plugin.
 author: Lilac
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, Vault]
 commands:
   rosechat:
     aliases: [rc]
@@ -120,7 +120,11 @@ permissions:
     children:
       - rosechat.group.create
       - rosechat.group.disband
+      - rosechat.group.disband.others
       - rosechat.group.rename
+      - rosechat.group.rename.color
+      - rosechat.group.rename.format
+      - rosechat.group.rename.magic
       - rosechat.group.invite
       - rosechat.group.accept
       - rosechat.group.deny
@@ -186,6 +190,7 @@ permissions:
       - rosechat.chat.format
       - rosechat.chat.magic
       - rosechat.chat.tag
+      - rosechat.chat.placeholders
   rosechat.chat.color:
     description: Allows a player to use color in chat.
     default: op
@@ -197,6 +202,9 @@ permissions:
     default: op
   rosechat.chat.tag:
     description: Allows a player to tag other players.
+    default: op
+  rosechat.chat.placeholders:
+    description: Allows a player to use placeholders in chat.
     default: op
   rosechat.bypass:
     description: Allows a player to bypass filters.

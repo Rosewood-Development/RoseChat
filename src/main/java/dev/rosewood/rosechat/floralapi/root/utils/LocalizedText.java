@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.floralapi.root.utils;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import dev.rosewood.rosechat.floralapi.petal.chat.ChatMessage;
+import dev.rosewood.rosechat.floralapi.petal.chat.ChatComponent;
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
 import org.bukkit.Bukkit;
@@ -31,6 +31,7 @@ public class LocalizedText {
 
     /**
      * Creates a new LocalizedText object with the given parameter.
+     * If the language file contains the string, gets the string from the language file.
      * @param text The text to be localized and formatted.
      */
     public LocalizedText(String text) {
@@ -188,7 +189,6 @@ public class LocalizedText {
      * @return The text formatted with colour codes.
      */
     public String format() {
-        if (FloralPlugin.UNPAID_MODE) text = "(Unpaid) " + text;
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
@@ -251,13 +251,16 @@ public class LocalizedText {
     }
 
     /**
-     * Converts the text to a ChatMessage, ready for hover and click events.
-     * @return The converted text as a ChatMessage.
+     * Converts the text to a ChatComponent, ready for hover and click events.
+     * @return The converted text as a ChatComponent.
      */
-    public ChatMessage toChatMessage() {
-        return new ChatMessage(text);
+    public ChatComponent toChatComponent() {
+        return new ChatComponent(text);
     }
 
+    /**
+     * @return The unformatted text.
+     */
     @Override
     public String toString() {
         return text;

@@ -7,7 +7,7 @@ public class TextPlaceholder {
     private Map<String, String> groups;
 
     public String getTextFromGroup(String group) {
-        return groups.get(group);
+        return groups.containsKey(group) ? groups.get(group) : groups.get("default");
     }
 
     public Map<String, String> getGroups() {

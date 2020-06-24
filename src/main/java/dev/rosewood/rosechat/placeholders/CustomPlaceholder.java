@@ -8,7 +8,7 @@ public class CustomPlaceholder {
     private ClickPlaceholder click;
 
     public CustomPlaceholder(String id) {
-       this.id = id;
+        this.id = id;
     }
 
     public String getId() {

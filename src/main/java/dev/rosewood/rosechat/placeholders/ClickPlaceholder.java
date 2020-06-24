@@ -1,20 +1,30 @@
 package dev.rosewood.rosechat.placeholders;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+
 import java.util.Map;
 
 public class ClickPlaceholder {
 
-    private Map<String, RoseClickEvent> groups;
+    private Map<String, ClickEvent> groups;
 
-    private RoseClickEvent getClickFromGroup(String group) {
-        return groups.get(group);
+    public ClickEvent getClickFromGroup(String group) {
+        return groups.containsKey(group) ? groups.get(group) : groups.get("default");
     }
 
-    public Map<String, RoseClickEvent> getGroups() {
+    public ClickEvent.Action getActionFromGroup(String group) {
+        return groups.containsKey(group) ? groups.get(group).getAction() : groups.get("default").getAction();
+    }
+
+    public String getValueFromGroup(String group) {
+        return groups.containsKey(group) ? groups.get(group).getValue() : groups.get("default").getValue();
+    }
+
+    public Map<String, ClickEvent> getGroups() {
         return groups;
     }
 
-    public void setGroups(Map<String, RoseClickEvent> groups) {
+    public void setGroups(Map<String, ClickEvent> groups) {
         this.groups = groups;
     }
 }

@@ -8,64 +8,83 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A subcommand to be used within a main command.
+ * A command to be used within a main command.
  */
 public abstract class AbstractCommand {
 
     /**
-     * The label for the subcommand.
+     * The labels for the ommand.
      */
     private List<String> labels;
 
     /**
-     * Is the subcommand player only, or can the console use it?
+     * Is the command player only, or can the console use it?
      */
     private boolean playerOnly;
 
     /**
-     * Creates a new subcommand with the given label.
-     * @param labels The names of the subcommand. E.g. /command <label>. Multiple for aliases.
+     * Is this command attached to a senior command?
+     */
+    private boolean juniorCommand;
+
+    /**
+     * Creates a new command with the given labels.
+     * This command will be able to be used by the console.
+     * @param labels The names of the command, e.g /command <label>. Multiple for aliases.
      */
     public AbstractCommand(String... labels) {
         this.labels = new ArrayList<>(Arrays.asList(labels));
     }
 
-    public AbstractCommand(String label, boolean isSeniorCommand) {
-        this.labels = new ArrayList<>();
-        labels.add(label);
-        List<String> aliases = FloralPlugin.getInstance().getCommand(label).getAliases();
-        labels.addAll(aliases);
-    }
-
-    public AbstractCommand(String label, boolean playerOnly, boolean isSeniorCommand) {
-        this(label);
-        this.playerOnly = playerOnly;
-    }
-
     /**
-     * Creates a new subcommand.
-     * @param labels The names of the subcommand. E.g. /command <label>. Multiple for aliases.
-     * @param playerOnly Whether or not this command can be used by only players, and not the console.
+     * Creates a new command with the given labels.
+     * @param playerOnly Whether or not this command can only be used by a player.
+     * @param labels The names of the command, e.g /command <label>. Multiple for aliases.
      */
     public AbstractCommand(boolean playerOnly, String... labels) {
-        this.labels = new ArrayList<>(Arrays.asList(labels));
+        this(labels);
         this.playerOnly = playerOnly;
     }
 
     /**
-     * Gets the command label.
-     * @return The command label.
+     * Creates a new command with the given labels.
+     * @param juniorCommand Whether or not this command is running with a senior command manager.
+     * @param playerOnly Whether or not this command can only be used by a player.
+     * @param labels The names of the command, e.g. /command <label>. Multiple for aliases.
      */
-    public List<String> getLabels() {
-        return labels;
+    public AbstractCommand(boolean juniorCommand, boolean playerOnly, String... labels) {
+        this(labels);
+        this.juniorCommand = juniorCommand;
+        this.playerOnly = playerOnly;
     }
 
     /**
-     * Gets whether or not this command is player only.
-     * @return True if this command cannot be used by the console.
+     * Creates a new command with the given label.
+     * Other labels will be taken from the plugin.yml file aliases.
+     * @param label The label to use, and also the command in the plugin.yml file for aliases.
+     * @param juniorCommand Whether or not this command is running with a senior command manager.
      */
-    public boolean isPlayerOnly() {
-        return playerOnly;
+    public AbstractCommand(String label, boolean juniorCommand) {
+        this.labels = new ArrayList<>();
+        this.juniorCommand = juniorCommand;
+        labels.add(label);
+
+        if (juniorCommand) {
+            List<String> aliases = (List<String>) FloralPlugin.getInstance().getDescription() .getCommands().get(label).get("aliases");
+            labels.addAll(aliases);
+        }
+    }
+
+    /**
+     * Creates a new command, with the given label.
+     * Other labels will be taken from the plugin.yml file aliases.
+     * @param label The label to use, and also the command in the plugin.yml file for aliases.
+     * @param juniorCommand Whether or not this command is running with a senior command manager.
+     * @param playerOnly Whether or not this command can only be used by a player.
+     */
+    public AbstractCommand(String label, boolean juniorCommand, boolean playerOnly) {
+        this(label, juniorCommand);
+        this.playerOnly = playerOnly;
     }
 
     /**
@@ -78,10 +97,10 @@ public abstract class AbstractCommand {
     /**
      * Called when tab completion is executed.
      * @param sender The player or console who tab completed.
-     * @param args The arguments executed with this tab completion.
+     * @param args The arguments executed with this tab completion
      * @return The tab completion results.
      */
-    public abstract List<String> onTab(CommandSender sender, String[] args);
+    public abstract List<String> onTabComplete(CommandSender sender, String[] args);
 
     /**
      * Gets the permission needed to execute this command.
@@ -89,14 +108,18 @@ public abstract class AbstractCommand {
      */
     public abstract String getPermission();
 
-    // The syntax for this command. Example: give <player> <item> <amount>
-
     /**
-     * Gets the syntax for this command. E.g. 'give <player> <item> <amount>'.
+     * Gets the syntax for this command. E.g. '/command give <player> <item>'.
      * @return The syntax for this command.
      */
     public abstract String getSyntax();
 
+    /**
+     * Gets all the arguments within this command.
+     * @param startArg The argument to start on.
+     * @param args The arguments.
+     * @return The arguments as a string.
+     */
     public String getAllArgs(int startArg, String[] args) {
         StringBuilder builder = new StringBuilder();
         for (int i = startArg; i < args.length; i++) {
@@ -104,5 +127,17 @@ public abstract class AbstractCommand {
         }
 
         return builder.toString().trim();
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public boolean isPlayerOnly() {
+        return playerOnly;
+    }
+
+    public boolean isJuniorCommand() {
+        return juniorCommand;
     }
 }
