@@ -32,12 +32,9 @@ public class ChatListener implements Listener {
                 .checkColours()
                 .checkFormatting()
                 .checkMagic()
-                .applyTags()
                 .parsePlaceholders("chat-format");
 
         ChatMessage message = messageBuilder.build();
-        ChatMessage tag = messageBuilder.tagMessage;
-        tag.send(player);
 
         // Don't cancel the message if it is null? Would use default format?
         if (message == null) return;

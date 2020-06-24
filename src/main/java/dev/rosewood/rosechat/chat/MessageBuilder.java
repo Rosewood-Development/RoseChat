@@ -19,9 +19,6 @@ public class MessageBuilder {
     private String message;
     private ChatMessage outMessage;
 
-    // edsf
-    public ChatMessage tagMessage;
-
     private char[] colourCharacters = { '1', '2', '3', '4',
             '5', '6', '7', '8',
             '9', '0', 'a', 'b',
@@ -117,8 +114,6 @@ public class MessageBuilder {
             message = message.replace(word, "{tag}");
         }
 
-        tagMessage = parsePlaceholders("tagging-format").build();
-
         return this;
     }
 
@@ -129,14 +124,11 @@ public class MessageBuilder {
         List<String> unformattedChatFormat = plugin.getPlaceholderManager().getParsedFormats().get(format);
 
         for (String placeholderId : unformattedChatFormat) {
-            Bukkit.broadcastMessage("Format: " + format + " with placeholder: " + placeholderId);
             CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(placeholderId);
 
             // Text can't be empty.
             if (placeholder.getText() == null) return this;
             String text = new LocalizedText(placeholder.getText().getTextFromGroup(group))
-                    .withPlaceholder("message", this.message)
-                    .withPlaceholder("tag", "AAAAA")
                     .withPlaceholderAPI(player).format();
 
             ChatComponent component = new ChatComponent(text);
@@ -144,15 +136,27 @@ public class MessageBuilder {
             if (placeholder.getHover() != null) {
                 component.setHoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new LocalizedText(placeholder.getHover().getHoverStringFromGroup(group))
-                                .withPlaceholder("message", this.message)
                                 .withPlaceholderAPI(player).format());
             }
 
             if (placeholder.getClick() != null) {
                 component.setClickEvent(placeholder.getClick().getActionFromGroup(group),
                         new LocalizedText(placeholder.getClick().getValueFromGroup(group))
-                                .withPlaceholder("message", this.message)
                                 .withPlaceholderAPI(player).format());
+            }
+
+            message.addComponent(component);
+        }
+
+        // Parse the message after. To do: Some way to detect stuff after the message too.
+        for (String word : this.message.split(" ")) {
+            ChatComponent component;
+
+            if (word.startsWith("@")) {
+                component = new ChatComponent("&6@tag ")
+                        .setHoverEvent(HoverEvent.Action.SHOW_TEXT, "&cThis is a tag.");
+            } else {
+                component = new ChatComponent(word + " ");
             }
 
             message.addComponent(component);
