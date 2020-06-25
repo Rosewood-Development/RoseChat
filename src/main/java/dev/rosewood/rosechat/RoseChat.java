@@ -9,7 +9,6 @@ import dev.rosewood.rosechat.listeners.ChatListener;
 import dev.rosewood.rosechat.listeners.PlayerListener;
 import dev.rosewood.rosechat.placeholders.PlaceholderManager;
 import net.milkbowl.vault.permission.Permission;
-
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class RoseChat extends FloralPlugin {

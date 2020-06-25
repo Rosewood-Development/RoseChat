@@ -1,20 +1,19 @@
 package dev.rosewood.rosechat.floralapi.root.utils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatComponent;
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * A friendly way to get localized and formatted text.
@@ -202,7 +201,7 @@ public class LocalizedText {
                 net.md_5.bungee.api.ChatColor hexColour = net.md_5.bungee.api.ChatColor.of(matcher.group());
                 String before = formatted.substring(0, matcher.start());
                 String after = formatted.substring(matcher.end());
-                formatted = before + hexColour + after + hexColour;
+                formatted = before + hexColour + after;
                 matcher = HEX_PATTERN.matcher(formatted);
             }
         }

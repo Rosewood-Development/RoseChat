@@ -2,14 +2,13 @@ package dev.rosewood.rosechat.floralapi.root.storage;
 
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Friendly wrapper for FileConfiguration.

@@ -1,13 +1,15 @@
 package dev.rosewood.rosechat.floralapi.petal.chat;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 public class ChatMessage {
 
@@ -27,17 +29,21 @@ public class ChatMessage {
      * @param player The player to send the message to.
      */
     public void send(Player player) {
-        TextComponent message = new TextComponent();
+        ComponentBuilder builder = new ComponentBuilder();
 
         for (ChatComponent component : components) {
-            TextComponent text = new TextComponent(TextComponent.fromLegacyText(component.getMessage()));
-            text.setHoverEvent(component.getHoverEvent());
-            text.setClickEvent(component.getClickEvent());
-            text.setColor(net.md_5.bungee.api.ChatColor.of(component.getColor()));
-            message.addExtra(text);
+            BaseComponent[] textComponents = TextComponent.fromLegacyText(component.getMessage());
+            if (component.getHoverEvent() != null || component.getClickEvent() != null) {
+                TextComponent text = new TextComponent(textComponents);
+                text.setHoverEvent(component.getHoverEvent());
+                text.setClickEvent(component.getClickEvent());
+                builder.append(text, FormatRetention.FORMATTING);
+            } else {
+                builder.append(textComponents, FormatRetention.FORMATTING);
+            }
         }
 
-        player.spigot().sendMessage(message);
+        player.spigot().sendMessage(builder.create());
     }
 
     public void send(ConsoleCommandSender console) {

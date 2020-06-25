@@ -4,16 +4,12 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatComponent;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatMessage;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
-import dev.rosewood.rosechat.floralapi.root.utils.NMSUtil;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import jdk.vm.ci.meta.Local;
+import java.util.ArrayList;
+import java.util.List;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 
 public class MessageBuilder {
 
@@ -161,15 +157,15 @@ public class MessageBuilder {
     }
 
     public void parseMessage(ChatMessage message, String group) {
+        ChatComponent previous = null;
         for (String word : this.message.split(" ")) {
             String tagPrefix = plugin.getConfigFile().getString("tag-prefix");
-            ChatComponent component;
 
             if (word.startsWith(tagPrefix) && player.hasPermission("rosechat.chat.tag")) {
                 word = word.replace(tagPrefix, "");
                 CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder("tag");
 
-                component = new ChatComponent(new LocalizedText(placeholder.getText().getTextFromGroup(group))
+                ChatComponent component = new ChatComponent(new LocalizedText(placeholder.getText().getTextFromGroup(group))
                         .withPlaceholder("tag", word + " ").format());
 
                 if (placeholder.getHover() != null) {
@@ -184,13 +180,21 @@ public class MessageBuilder {
                 }
 
                 taggedPlayerNames.add(word);
+                message.addComponent(component);
+                if (previous != null) {
+                    // TODO: Add a component with only a color code here, it should be the same color as the previous ChatComponent
+                }
             }
             else {
-                if (player.hasPermission("rosechat.chat.color")) component = new ChatComponent(new LocalizedText(word + " ").format());
-                else component = new ChatComponent(word);
+                ChatComponent component;
+                if (player.hasPermission("rosechat.chat.color")) {
+                    component = new ChatComponent(new LocalizedText(word + " ").format());
+                } else {
+                    component = new ChatComponent(word);
+                }
+                message.addComponent(component);
+                previous = component;
             }
-
-            message.addComponent(component);
         }
     }
 

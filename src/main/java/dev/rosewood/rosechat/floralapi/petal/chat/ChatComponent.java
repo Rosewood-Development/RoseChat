@@ -1,17 +1,16 @@
 package dev.rosewood.rosechat.floralapi.petal.chat;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
 
 public class ChatComponent {
 
     private String message;
     private HoverEvent hoverEvent;
     private ClickEvent clickEvent;
-    private String color = "#FFFFFF";
 
     public ChatComponent() {
 
@@ -41,11 +40,6 @@ public class ChatComponent {
         return this;
     }
 
-    public ChatComponent setColor(String color) {
-        this.color = color;
-        return this;
-    }
-
     public ChatComponent setHoverEvent(HoverEvent.Action action, String value) {
         BaseComponent[] nValue = TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', value));
         this.hoverEvent = new HoverEvent(action, nValue);
@@ -67,9 +61,5 @@ public class ChatComponent {
 
     public ClickEvent getClickEvent() {
         return clickEvent;
-    }
-
-    public String getColor() {
-        return color;
     }
 }

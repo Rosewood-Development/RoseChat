@@ -1,8 +1,7 @@
 package dev.rosewood.rosechat.listeners;
 
-import dev.rosewood.rosechat.chat.MessageBuilder;
 import dev.rosewood.rosechat.RoseChat;
-
+import dev.rosewood.rosechat.chat.MessageBuilder;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

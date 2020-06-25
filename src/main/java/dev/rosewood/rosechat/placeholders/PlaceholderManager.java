@@ -2,15 +2,11 @@ package dev.rosewood.rosechat.placeholders;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
-
-import net.md_5.bungee.api.chat.ClickEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.md_5.bungee.api.chat.ClickEvent;
 
 public class PlaceholderManager {
 
