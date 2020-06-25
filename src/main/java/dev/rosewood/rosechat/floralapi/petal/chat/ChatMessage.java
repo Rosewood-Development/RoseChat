@@ -33,6 +33,7 @@ public class ChatMessage {
             TextComponent text = new TextComponent(TextComponent.fromLegacyText(component.getMessage()));
             text.setHoverEvent(component.getHoverEvent());
             text.setClickEvent(component.getClickEvent());
+            text.setColor(net.md_5.bungee.api.ChatColor.of(component.getColor()));
             message.addExtra(text);
         }
 

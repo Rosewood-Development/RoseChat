@@ -11,6 +11,7 @@ public class ChatComponent {
     private String message;
     private HoverEvent hoverEvent;
     private ClickEvent clickEvent;
+    private String color = "#FFFFFF";
 
     public ChatComponent() {
 
@@ -40,6 +41,11 @@ public class ChatComponent {
         return this;
     }
 
+    public ChatComponent setColor(String color) {
+        this.color = color;
+        return this;
+    }
+
     public ChatComponent setHoverEvent(HoverEvent.Action action, String value) {
         BaseComponent[] nValue = TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', value));
         this.hoverEvent = new HoverEvent(action, nValue);
@@ -61,5 +67,9 @@ public class ChatComponent {
 
     public ClickEvent getClickEvent() {
         return clickEvent;
+    }
+
+    public String getColor() {
+        return color;
     }
 }

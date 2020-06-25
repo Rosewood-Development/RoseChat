@@ -9,36 +9,6 @@ commands:
   rosechat:
     aliases: [rc]
     description: Main command for Rosechat.
-  message:
-    aliases: [msg, whisper, tell, m, pm, dm]
-    description: Send a message to another player.
-  reply:
-    aliases: [r]
-    description: Reply to a message from another player.
-  staffchat:
-    aliases: [sc, ac]
-    description: Talk pivately to other staff members.
-  broadcast:
-    aliases: [bc]
-    description: Broadcast a message to the entire server, or world.
-  togglesound:
-    aliases: [togglesounds, soundtoggle, soundstoggle]
-    description: Toggles sounds from playing when receiving a message, tag, or broadcast.
-  spy:
-    aliases: [socialspy, ss]
-    description: Toggles spying in different channels.
-  togglemessage:
-    aliases: [togglemessages, togglemsg, msgtoggle, messagetoggle]
-    description: Toggles messages being able to be received.
-  channel:
-    aliases: [channels, chat]
-    description: Switches between different chat channels.
-  group:
-    aliases: [g, groups, groupdm]
-    description: Allows a player to create, edit and join groups.
-  toggletag:
-    aliases: [tagtoggle]
-    description: Toggles the player from receiving tags.
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.

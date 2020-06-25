@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A friendly way to get localized and formatted text.
@@ -28,6 +30,8 @@ public class LocalizedText {
      * The text to be localized and formatted.
      */
     private String text;
+
+    public final static Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]){6}");
 
     /**
      * Creates a new LocalizedText object with the given parameter.
@@ -189,7 +193,21 @@ public class LocalizedText {
      * @return The text formatted with colour codes.
      */
     public String format() {
-        return ChatColor.translateAlternateColorCodes('&', text);
+        String formatted = text;
+
+        if (NMSUtil.getVersionNumber() >= 16) {
+            Matcher matcher = HEX_PATTERN.matcher(formatted);
+
+            while (matcher.find()) {
+                net.md_5.bungee.api.ChatColor hexColour = net.md_5.bungee.api.ChatColor.of(matcher.group());
+                String before = formatted.substring(0, matcher.start());
+                String after = formatted.substring(matcher.end());
+                formatted = before + hexColour + after + hexColour;
+                matcher = HEX_PATTERN.matcher(formatted);
+            }
+        }
+
+        return ChatColor.translateAlternateColorCodes('&', formatted);
     }
 
     /**

@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.floralapi.root.command.CommandReload;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
 import dev.rosewood.rosechat.listeners.ChatListener;
+import dev.rosewood.rosechat.listeners.PlayerListener;
 import dev.rosewood.rosechat.placeholders.PlaceholderManager;
 import net.milkbowl.vault.permission.Permission;
 
@@ -28,6 +29,7 @@ public class RoseChat extends FloralPlugin {
         dataFile = new YMLFile("data");
 
         new ChatListener();
+        new PlayerListener();
     }
 
     @Override

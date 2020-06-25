@@ -66,6 +66,7 @@ formats:
   # The format of the chat. #
   # Define placeholders under custom-placeholders. #
   # Only placeholders can be used, no other characters. #
+  # You can use {message} to define where the message displays. #
   chat-format: "{prefix}{player}{extra}{message}"
 
   # The format of a /message send to another player. #
@@ -106,7 +107,6 @@ formats:
 
 # Custom placeholders for the different formats. #
 # Allows text, hover events, click events, and placeholders from PlaceholderAPI. #
-# Use the placeholder %message% for the sent message. #
 custom-placeholders:
 
   # This defines the {prefix} placeholder. #
@@ -156,10 +156,6 @@ custom-placeholders:
     text:
       default: "&8: "
       admin: " &8>> "
-
-  message:
-    text:
-      default: "%message%"
 
   left-bracket:
     text:

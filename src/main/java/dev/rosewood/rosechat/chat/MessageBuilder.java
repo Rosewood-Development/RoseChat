@@ -4,13 +4,16 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatComponent;
 import dev.rosewood.rosechat.floralapi.petal.chat.ChatMessage;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import dev.rosewood.rosechat.floralapi.root.utils.NMSUtil;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import jdk.vm.ci.meta.Local;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class MessageBuilder {
 
@@ -126,6 +129,11 @@ public class MessageBuilder {
         for (String placeholderId : unformattedChatFormat) {
             CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(placeholderId);
 
+            if (placeholderId.equalsIgnoreCase("message")) {
+                parseMessage(message, group);
+                continue;
+            }
+
             // Text can't be empty.
             if (placeholder.getText() == null) return this;
             String text = new LocalizedText(placeholder.getText().getTextFromGroup(group))
@@ -148,22 +156,42 @@ public class MessageBuilder {
             message.addComponent(component);
         }
 
-        // Parse the message after. To do: Some way to detect stuff after the message too.
+        outMessage = message;
+        return this;
+    }
+
+    public void parseMessage(ChatMessage message, String group) {
         for (String word : this.message.split(" ")) {
+            String tagPrefix = plugin.getConfigFile().getString("tag-prefix");
             ChatComponent component;
 
-            if (word.startsWith("@")) {
-                component = new ChatComponent("&6@tag ")
-                        .setHoverEvent(HoverEvent.Action.SHOW_TEXT, "&cThis is a tag.");
-            } else {
-                component = new ChatComponent(word + " ");
+            if (word.startsWith(tagPrefix) && player.hasPermission("rosechat.chat.tag")) {
+                word = word.replace(tagPrefix, "");
+                CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder("tag");
+
+                component = new ChatComponent(new LocalizedText(placeholder.getText().getTextFromGroup(group))
+                        .withPlaceholder("tag", word + " ").format());
+
+                if (placeholder.getHover() != null) {
+                    component.setHoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(placeholder.getHover()
+                            .getHoverStringFromGroup(group)).withPlaceholderAPI(Bukkit.getOfflinePlayer(word)).format());
+                }
+
+                if (placeholder.getClick() != null) {
+                    component.setClickEvent(placeholder.getClick().getActionFromGroup(group),
+                            new LocalizedText(placeholder.getClick().getValueFromGroup(group))
+                                    .withPlaceholderAPI(Bukkit.getOfflinePlayer(word)).format());
+                }
+
+                taggedPlayerNames.add(word);
+            }
+            else {
+                if (player.hasPermission("rosechat.chat.color")) component = new ChatComponent(new LocalizedText(word + " ").format());
+                else component = new ChatComponent(word);
             }
 
             message.addComponent(component);
         }
-
-        outMessage = message;
-        return this;
     }
 
     public ChatMessage build() {

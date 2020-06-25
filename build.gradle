@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'dev.rosewood.rosechat'
-version '1.0.0'
+version '1.0.0-Preview'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -11,22 +11,15 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
 
-    maven { url = 'https://repo.codemc.org/repository/nms' }
+    maven { url = 'https://repo.rosewooddev.io/repository/public/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public' }
     maven { url = 'http://repo.extendedclip.com/content/repositories/placeholderapi/' }
-
-
-    // peepoo
-    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot:1.16.1'
     compileOnly 'me.clip:placeholderapi:2.10.4'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
-
-    //peepoo
-    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
 }
 
 jar {
