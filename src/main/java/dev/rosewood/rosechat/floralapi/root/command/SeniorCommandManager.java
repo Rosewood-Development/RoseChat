@@ -2,9 +2,10 @@ package dev.rosewood.rosechat.floralapi.root.command;
 
 import dev.rosewood.rosechat.floralapi.root.utils.Language;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import org.bukkit.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.command.CommandSender;
 
 /**
  * A command manager that manages other command managers.

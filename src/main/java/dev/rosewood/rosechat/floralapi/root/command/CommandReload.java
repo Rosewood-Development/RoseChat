@@ -2,8 +2,9 @@ package dev.rosewood.rosechat.floralapi.root.command;
 
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.utils.Language;
-import java.util.List;
 import org.bukkit.command.CommandSender;
+
+import java.util.List;
 
 /**
  * A command example, /command reload

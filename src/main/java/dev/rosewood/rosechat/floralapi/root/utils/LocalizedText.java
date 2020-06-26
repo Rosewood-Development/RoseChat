@@ -1,19 +1,21 @@
 package dev.rosewood.rosechat.floralapi.root.utils;
 
-import dev.rosewood.rosechat.floralapi.petal.chat.ChatComponent;
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 /**
  * A friendly way to get localized and formatted text.
@@ -73,17 +75,7 @@ public class LocalizedText {
      * @return An instance of this class.
      */
     public LocalizedText fromArray() {
-        List<String> array = plugin.getLanguageFile().getStringList(text);
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < array.size(); i++) {
-            if (i != 0) builder.append("\n").append(array.get(i));
-            else builder.append(array.get(i));
-        }
-
-        this.text = builder.toString();
-
-        return this;
+        return fromArray(plugin.getLanguageFile());
     }
 
     /**
@@ -198,7 +190,7 @@ public class LocalizedText {
             Matcher matcher = HEX_PATTERN.matcher(formatted);
 
             while (matcher.find()) {
-                net.md_5.bungee.api.ChatColor hexColour = net.md_5.bungee.api.ChatColor.of(matcher.group());
+                ChatColor hexColour = ChatColor.of(matcher.group());
                 String before = formatted.substring(0, matcher.start());
                 String after = formatted.substring(matcher.end());
                 formatted = before + hexColour + after;
@@ -245,6 +237,8 @@ public class LocalizedText {
      * @return The config ready string.
      */
     public static String serialize(String text) {
+        // TODO: Serialize hex codes properly, they use the following format:
+        // TODO: §x§#§f§f§f§f§f§f
         return text.replace(ChatColor.COLOR_CHAR, '&');
     }
 
@@ -268,11 +262,11 @@ public class LocalizedText {
     }
 
     /**
-     * Converts the text to a ChatComponent, ready for hover and click events.
-     * @return The converted text as a ChatComponent.
+     * Converts the text to BaseComponents
+     * @return The converted text as a BaseComponent array.
      */
-    public ChatComponent toChatComponent() {
-        return new ChatComponent(text);
+    public BaseComponent[] toComponents() {
+        return TextComponent.fromLegacyText(format());
     }
 
     /**

@@ -1,10 +1,11 @@
 package dev.rosewood.rosechat.floralapi.root.command;
 
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
+import org.bukkit.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.bukkit.command.CommandSender;
 
 /**
  * A command to be used within a main command.

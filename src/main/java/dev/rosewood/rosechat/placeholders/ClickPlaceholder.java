@@ -1,7 +1,8 @@
 package dev.rosewood.rosechat.placeholders;
 
-import java.util.Map;
 import net.md_5.bungee.api.chat.ClickEvent;
+
+import java.util.Map;
 
 public class ClickPlaceholder {
 
