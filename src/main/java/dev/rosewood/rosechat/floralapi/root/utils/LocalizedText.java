@@ -184,21 +184,7 @@ public class LocalizedText {
      * @return The text formatted with colour codes.
      */
     public String format() {
-        String formatted = text;
-
-        if (NMSUtil.getVersionNumber() >= 16) {
-            Matcher matcher = HEX_PATTERN.matcher(formatted);
-
-            while (matcher.find()) {
-                ChatColor hexColour = ChatColor.of(matcher.group());
-                String before = formatted.substring(0, matcher.start());
-                String after = formatted.substring(matcher.end());
-                formatted = before + hexColour + after;
-                matcher = HEX_PATTERN.matcher(formatted);
-            }
-        }
-
-        return ChatColor.translateAlternateColorCodes('&', formatted);
+        return HexUtils.colorify(text);
     }
 
     /**

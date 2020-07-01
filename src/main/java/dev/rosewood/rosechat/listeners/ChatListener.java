@@ -37,8 +37,6 @@ public class ChatListener implements Listener {
             return;
         }
 
-        Bukkit.broadcastMessage(ComponentSerializer.toString(messageWrapper.build()));
-
         // Sends to all players and logs it to console.
         for (Player receiver : event.getRecipients()) messageWrapper.send(receiver);
         messageWrapper.send(Bukkit.getConsoleSender());

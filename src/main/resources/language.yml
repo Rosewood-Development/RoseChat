@@ -24,11 +24,12 @@ command-toggletag-description: "Toggles receiving tags."
 group-command-create-description: "Creates a new group."
 group-command-disband-description: "Disbands an existing group."
 
-enter-message: "%prefix% &cPlease enter a message!"
 blocked-caps: "%prefix% &cYour message could not be sent as it contains too many capital letters!"
 blocked-spam: "%prefix% &cPlease do not spam!"
 blocked-language: "%prefix% &cYou used a bad word. :("
 blocked-url: "%prefix% &cPlease not send URLs!"
+
+enter-message: "%prefix% &cPlease enter a message!"
 toggle-sound-on: "%prefix% &7You have &cenabled &7sounds when receiving message, broadcasts and tags."
 toggle-sound-off: "%prefix% &7You have &cdisabled &7sounds when receiving messages, broadcasts and tags."
 toggle-channel-join: "%prefix% &7You have joined the &c%channel% &7channel."

@@ -24,11 +24,13 @@ url-check: LIGHT_CENSOR
 
 # If the message contains these words, the words will be replaced. #
 # Format: contains:replace with #
-# Message filtering will never be perfect, 'assassin' will not be censored, but neither will 'stupidass'.
+# Message filtering will never be perfect, 'assassin' will not be censored, but neither will 'stupidass'. #
 replaced-messages:
   - fuck:f***
   - bitch:dog
   - ass:butt
+  # Emotes!! #
+  - <3:❤
 
 # If the message contains these words, the message will not be sent. #
 blocked-messages:
