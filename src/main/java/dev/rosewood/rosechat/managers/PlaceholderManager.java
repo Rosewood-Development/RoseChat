@@ -1,7 +1,12 @@
-package dev.rosewood.rosechat.placeholders;
+package dev.rosewood.rosechat.managers;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
+import dev.rosewood.rosechat.placeholders.ClickPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholders.HoverPlaceholder;
+import dev.rosewood.rosechat.placeholders.TextPlaceholder;
+
 import net.md_5.bungee.api.chat.ClickEvent;
 
 import java.util.ArrayList;
@@ -16,8 +21,8 @@ public class PlaceholderManager {
     private Map<String, String> formats;
     private Map<String, List<String>> parsedFormats;
 
-    public PlaceholderManager() {
-        this.config = RoseChat.getInstance().getConfigFile();
+    public PlaceholderManager(RoseChat plugin) {
+        this.config = plugin.getConfigFile();
         this.placeholders = new HashMap<>();
         formats = new HashMap<>();
         this.parsedFormats = new HashMap<>();
@@ -70,27 +75,31 @@ public class PlaceholderManager {
             placeholders.put(id, placeholder);
         }
 
-        for (String format : config.getSection("formats").getKeys(false)) {
-            formats.put(format, config.getString("formats." + format));
+        for (String format : config.getSection("chat-formats").getKeys(false)) {
+            formats.put(format, config.getString("chat-formats." + format));
         }
 
         parseFormats();
     }
 
-    public void parseFormats() {
+    private void parseFormats() {
         for (String id : formats.keySet()) {
             String format = formats.get(id);
-            String[] sections = format.split("[{}]");
-
-            List<String> parsed = new ArrayList<>();
-
-            for (String s : sections) {
-                if (s.isEmpty()) continue;
-                parsed.add(s);
-            }
-
-            parsedFormats.put(id, parsed);
+            parseFormat(id, format);
         }
+    }
+
+    public void parseFormat(String id, String format) {
+        String[] sections = format.split("[{}]");
+
+        List<String> parsed = new ArrayList<>();
+
+        for (String s : sections) {
+            if (s.isEmpty()) continue;
+            parsed.add(s);
+        }
+
+        parsedFormats.put(id, parsed);
     }
 
     public CustomPlaceholder getPlaceholder(String id) {

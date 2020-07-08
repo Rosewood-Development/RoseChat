@@ -160,7 +160,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @param sender The player of console who sent the command.
      */
     public void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(new LocalizedText("prefix").format());
+        sender.sendMessage(new LocalizedText("prefix").format() + new LocalizedText(" &7Plugin created by <g:#C0FFEE:#F768F7>Lilac").format());
         for (AbstractCommand subcommand : subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
             String label = subcommand.getLabels().get(0);

@@ -1,219 +1,303 @@
-#######################################
-# Rosechat General Configuration File #
-#######################################
+#  _____                 _____ _           _
+# |  __ \               / ____| |         | |
+# | |__) |___  ___  ___| |    | |__   __ _| |_
+# |  _  // _ \/ __|/ _ \ |    | '_ \ / _` | __|
+# | | \ \ (_) \__ \  __/ |____| | | | (_| | |_
+# |_|  \_\___/|___/\___|\_____|_| |_|\__,_|\__|
+#
 
-# Should the plugin check for a message full of capital letters? #
-caps-check: true
+# Moderation Settings
+moderation-settings:
 
-# The maximum amount of capital letters that are allowed in a message. #
-# Allows players to use words like 'LOL'. #
-max-amount-of-caps: 5
+  # Should the plugin check for a message full of capital letters?
+  # Default: true
+  caps-checking-enabled: true
 
-# Should the plugin lowercase capital messages? #
-# If false, the message will not be sent. Disable caps-check to send messages full of capital letters. #
-lowercase-caps: true
+  # The maximum amount of capital letters that are allowed in one message.
+  # Using this allows players to use acronyms and words like 'LOL'.
+  # Default: 5
+  maximum-caps-allowed: 5
 
-# Should the plugin check for multiple of the same message? #
-spam-check: true
+  # Should the plugin lowercase messages found to be full of capital letters?
+  # If false, the message will not be sent. Set caps-checking-enabled to false to allow message of full capital letters.
+  # Default: true
+  lowercase-capitals-enabled: true
 
-# What should the plugin do when URLs are sent in chat? #
-# Options: LIGHT_CENSOR - Removes the periods in the message, #
-# BLOCK - Stops the message from being sent, #
-# NOTHING - Players are allowed to send URLs in chat. #
-url-check: LIGHT_CENSOR
+  # Should the plugin send a warning message (defined in language.yml) when a player sends a message full of capital letters?
+  # Default: true
+  warn-on-caps-sent: true
 
-# If the message contains these words, the words will be replaced. #
-# Format: contains:replace with #
-# Message filtering will never be perfect, 'assassin' will not be censored, but neither will 'stupidass'. #
-replaced-messages:
-  - fuck:f***
-  - bitch:dog
-  - ass:butt
-  # Emotes!! #
-  - <3:❤
+  # Should the plugin check for multiple of the same message?
+  # Default: true
+  spam-checking-enabled: true
 
-# If the message contains these words, the message will not be sent. #
-blocked-messages:
-  - faggot
+  # How many similar messages count as spam?
+  # Default: 5
+  spam-message-count: 5
 
-# The sound sent when a player receives a message. #
-# Use https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html for sounds. #
-# Can be 'none'. #
-message-sound: BLOCK_NOTE_BLOCK_PLING
+  # Should the plugin send a warning message (defined in language.yml) when a player sends a spam message?
+  # Default: true
+  warn-on-spam-sent: true
 
-# The sound sent when a player receives a a tag. #
-# Can be 'none'. #
-tag-sound: BLOCK_NOTE_BLOCK_PLING
+  # Should the plugin check for URLs and IP addresses sent in chat? #
+  # Default: true
+  url-checking-enabled: true
 
-# How a tag is defined. #
-tag-prefix: "@"
+  # What should the plugin do when URLs and IP addresses are sent in chat?
+  # If true, messages will be censored - removing periods.
+  # If false, the message will not be sent at all.
+  # Default: true
+  url-censoring-enabled: true
 
-# Allows tagging an offline player, only the chat message will change. #
-allow-offline-tags: true
+  # Should the plugin send a warning message (defined in language.yml) when a player sends a message with a URL or IP address in it?
+  # Default: true
+  warn-on-url-sent: true
 
-# Allows players to use PlaceholderAPI placeholders in the chat. #
-allow-placeholders-in-chat: true
+  # Should the plugin check for swear words?
+  # Default: true
+  swear-checking-enabled: true
 
-# All the placeholders that players are not allowed to use in chat. #
-blacklisted-chat-placeholders:
-  - "Server"
-  - "%player_ip%"
+  # If a player sends a message that contains one of these words, then the message will not be sent.
+  blocked-swears:
+    - faggot
 
-# The radius of the radius chat channel. #
-# Can be set to 0 for a one-person channel. #
-chat-radius: 200
+  # Should the plugin send a warning message (defined in language.yml) when a player sends a message with a blocked swear in it?
+  # Default: true
+  warn-on-blocked-swear-sent: true
 
-formats:
+  # If a player sends a message that contains one of these words, the word will be replaced.
+  # Format: 'contains:replaced'.
+  swear-replacements:
+    - fuck:f***
+    - bitch:dog
+    - ass:butt
 
-  # The format of the chat. #
-  # Define placeholders under custom-placeholders. #
-  # Only placeholders can be used, no other characters. #
-  # You can use {message} to define where the message displays. #
-  chat-format: "{prefix}{player}{extra}{message}"
+  # Should the plugin send a warning message (defined in language.yml) when a player sends a message with a replaced swear in it?
+  # Default: true
+  warn-on-replaced-swear-sent: true
 
+# Emote Settings
+# Emotes replace words that are sent in chat, e.g. a player types "i <3 u", it becomes "i ❤ u"
+emotes:
+  # The ID of the emote.
+  heart:
+    # The text that gets replaced.
+    text: "<3"
+    # The replacement.
+    replacement: "❤"
+  kawaii:
+    text: ":kawaii:"
+    replacement: "(づ｡◕‿‿◕｡)づ"
+
+  show-emote-name-on-hover: true
+
+# Tags
+# Tags can be used to tag specific players, or add extra detail to a message in chat.
+# Tags use custom placeholders (see the custom-placeholders section) to allow hoverable and clickable tags.
+tags:
+
+  # The ID of the tag. #
+  # This tag allows players to use @<player>, e.g. "Hey @Lilac!".
+  player:
+    # This is what the player will use to start a tag.
+    prefix: "@"
+    # Should this tag allow tagging players? This allows tags to target players.
+    tag-online-players: true
+    # The sound that will be sent to the player who receives the tag.
+    # Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+    # Can also be 'none' for no sound.
+    sound: BLOCK_NOTE_BLOCK_PLING
+    # The format for this tag (see the formats section for more info).
+    format: "{player-tag}"
+
+  # This tag allows players to use hashtags in-game.
+  # E.g. "#rosewood".
+  hashtag:
+    prefix: "#"
+    tag-online-players: false
+    format: "{hashtag}"
+
+  # This tag allows players to type money in-game, and make it formatted and hoverable.
+  # E.g. "$500".
+  money:
+    prefix: "$"
+    tag-online-players: false
+    format: "{money-tag}"
+
+# General miscelllaneous settings.
+chat-settings:
+
+  # The sound that will be sent to a player when they receive a message.
+  # Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+  # Can also be 'none' for no sound.
+  # Default: BLOCK_NOTE_BLOCK_PLING
+  message-sound: BLOCK_NOTE_BLOCK_PLING
+
+  # Should players be able to use PlaceholderAPI placeholders in chat?
+  # Default: true
+  chat-placeholders-enabled: true
+
+  # These are PlaceholderAPI placeholders that are not allowed to be used in chat.
+  # Placeholders that do not use % symbols will blacklist all placeholders from that expansion.
+  # E.g. "Server" will block all Server placeholders, such as %server_name% and %server_version%.
+  blacklisted-chat-placeholders:
+    - "Server"
+    - "%player_ip%"
+
+  # These are replacements, similar to swears or emotes that can be used in chat.
+  # These replacements can be used with custom placeholders (see below).
+  # These can also support regular expressions.
+  # The %message% placeholder allows you to replace the message with its self, this can allow changing colour for specific words.
+  chat-replacements:
+    - "rosechat:<g:#8A2387:#E94057:#F27121>RoseChat"
+    - "&g:#C0FFEE"
+    - "&h:#C8A2C8"
+    - "replace me:{replacement}"
+    - "[regex]:&9%message%"
+
+# Chat Channels
+chat-channels:
+
+  # The ID of the channel, the player will use this to join the channel, e.g. /c global
+  global:
+    # This sets this channel as the default channel that players will be placed into once they first join the server.
+    default: true
+    # This is the format of this channel.
+    format: "{prefix}{player}{extra}{message}"
+    # Overriden Values
+    # These settings can be used to override the default values in specific chat channels.
+    #chat-placeholders-enabled: false
+    #disabled-tags:
+    #  - money
+    #disabled-emotes:
+    #  - kawaii
+    #caps-checking-enabled: false
+    #url-checking-enabled: false
+    #spam-checking-enabled: false
+    #swear-checking-enabled: false
+
+  # /c staff
+  staff:
+    format: "{staff-prefix}{player}{extra}{message}"
+    caps-checking-enabled: false
+    url-checking-enabled: false
+    spam-checking-enabled: false
+    swear-checking-enabled: false
+
+  # /c local
+  local:
+    # If no format is given, it will use the same format as the default channel.
+    # The radius for players for messages in this channel to be sent to.
+    radius: 200
+
+  skyblock:
+    # World channels allow messages to be sent in this channel only if they in the world. this makes no sense im crying
+    world: skyblock
+    # When auto-join true is combined with a world channel, as soon as the player joins this world they will be added to the channel.
+    auto-join: true
+
+    # Bungee Stuff for cross-server channels?
+
+# Formats
+chat-formats:
   # The format of a /message send to another player. #
-  message-sent-format: "{left-bracket}{player}{arrow}{receiver}{right-bracket}{message}"
+  message-sent: "{left-bracket}{you}{arrow}{receiver}{right-bracket}{message}"
 
   # The format of a /message sent from another player. #
-  message-received-format: "{left-bracket}{player}{arrow}{receiver}{right-bracket}{message}"
-
-  # The format of the staff chat. #
-  staff-chat-format: "{staff-prefix}{player}{extra}{message}"
-
-  # The format of a tag. #
-  tagging-format: "{tag}"
+  message-received: "{left-bracket}{player}{arrow}{you}{right-bracket}{message}"
 
   # The format of a spied message. #
-  social-spy-format: "{spy-prefix}{spy-players}{message}"
-
-  # The format of the radius chat, when a player is far away from the sender. #
-  radius-format-far: "{player}{extra}{far-color}{message}"
-
-  # The format of the radius chat, when a player is a medium distance away from the sender. #
-  radius-format-medium: "{player}{extra}{medium-color}{message}"
-
-  # The format of the radius chat, when a player is near the sender. #
-  radius-format-near: "{player}{extra}{near-color}{message}"
-
-  # The format of a per-world message. #
-  per-world-format: "{world}{player}{extra}{message}"
+  social-spy: "{spy-prefix}{spy-players}{message}"
 
   # The format of a group message. #
-  group-format: "{group}{player}{extra}{message}"
+  group: "{group}{player}{extra}{message}"
 
   # The format of a spied group message. #
-  group-spy-format: "{spy-prefix}{group}{player}{extra}{message}"
+  group-spy: "{spy-prefix}{group}{player}{extra}{message}"
 
   # The format of a spied world message. #
-  world-spy-format: "{spy-prefix}{world}{player}{extra}{message}"
+  world-spy: "{spy-prefix}{world}{player}{extra}{message}"
 
-# Custom placeholders for the different formats. #
-# Allows text, hover events, click events, and placeholders from PlaceholderAPI. #
+# Placeholders
+# These allow text, hover events, click events and placeholders from PlaceholderAPI.
+# The {message} placeholder is reserved for sent messages. You can set the colour of a message using the placeholder before {message},
+# e.g. the {extra} placeholder ends with &7, this changes the message colour to grey.
 custom-placeholders:
 
-  # This defines the {prefix} placeholder. #
+  # The ID of the placeholder. This defines the {prefix} placeholder.
   prefix:
-    # Text is mandatory. A placeholder will not work without it. #
+    # This is the text that will be shown.
     text:
-      # If the player is not in any groups specified, it will use the default. #
-      # If no groups are specified, it will use the default. #
-      default: "%luckperms_prefix%"
-      admin: "&8[&4&lAdmin&8] "
-    # This tells the plugin that the placeholder is using a hover event. #
-    # Hover events show text and can have multiple lines. #
+      # These are a list of groups and the prefixes that will be used for them.
+      # If the player is not in any of the groups, it will use the default.
+      # If Vault is not installed, it will use the default.
+      # If the player is in more than one group it will use the primary group.
+      default: "&7"
+      admin: "&8[&cAdmin&8] "
+    # This tells the plugin that this placeholder is using a hover event.
+    # Hover events show text and can have multiple lines.
     hover:
       default:
-        - "&7Username: &f%player_name%"
-        - "&7Balance: &a$%vault_eco_balance_formatted%"
-      admin:
-        - "&7Username: &f%player_name%"
-        - "&7Balance: &a$%vault_eco_balance_formatted%"
-        - "&cClick to Message"
-    # This tells the plugin that the placeholder is using a click event. #
-    # An 'action' is what to do when the message is clicked. #
-    # The 'extra' is what will be executed. #
-    # Possible Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL #
-    click:
-      default:
-        action: RUN_COMMAND
-        value: "/msg %player_name% <3"
-      admin:
-        action: SUGGEST_COMMAND
-        value: "/msg %player_name% Help, "
+        - "&cThis player administrates the server!"
 
   player:
     text:
-      default: "%essentials_nickname%"
+      default: "%player_displayname%"
     hover:
+      # The %player_name% placeholder is included in RoseChat, but most placeholders will need PlaceholderAPI.
+      # For example, the %vault_eco_balance_formatted% placeholder requires the Vault expansion for PlaceholderAPI.
       default:
-      - "&eClick to Message"
+        - "&7Username: &f%player_name%"
+        - "&7Click to Message"
+        - "&7Balance: &a$%vault_eco_balance_formatted%"
+    # This tells the plugin that the placeholder is using a click event.
+    # An 'action' is what to do when the message is clicked.
+    # The 'extra' is what will be executed.
+    # Valid Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL
     click:
       default:
         action: SUGGEST_COMMAND
         value: "/msg %player_name% "
 
-  # It is recommended that message colors are specified in the extra placeholder. #
-  # This is so things like radius chat colors are included before the message. #
   extra:
     text:
-      default: "&8: "
-      admin: " &8>> "
-
-  left-bracket:
-    text:
-      default: "&c["
-
-  right-bracket:
-    text:
-      default: "&c]"
-
-  # The %other_player% placeholder must be used to specify that it is not the sender. #
-  receiver:
-    text:
-      default: "%other_player_essentials_nickname%"
-    hover:
-      default:
-        - "&eClick to Message"
-    click:
-      default:
-        action: SUGGEST_COMMAND
-        value: "/msg %other_player_player_name% "
-
-  arrow:
-    text:
-      default: " &c-> "
+      default: "&7: &7"
+      admin: " &e» &f"
 
   staff-prefix:
     text:
-      default: "&8[&cStaffChat&8] "
+      default: "&8[&cStaffChat&8]"
     hover:
       default:
-        - "A chat channel for only staff members."
+        - "&7A chat channel that only staff members can see."
 
-  tag:
+  left-bracket:
     text:
-      default: "&e@%tag%"
+      default: "&8["
 
-  spy-prefix:
+  right-bracket:
     text:
-      default: "&e[SocialSpy&e]"
+      default: "&8] "
 
-  spy-players:
+  arrow:
     text:
-      default: "&e[%player_name% &e-> %other_player_player_name%&e]"
+      default: " &6->&r "
+    # RoseChat allows "other_" to be placed in front of PlaceholderAPI player placeholders to target the second player.
+    # This can be used in a /message, or a tag.
+    hover:
+      default:
+        - "&6From: &f%player_name%"
+        - "&eTo: &f%other_player_name%"
 
-  far-color:
+  receiver:
     text:
-      default: "&8"
+      default: "%other_player_displayname%"
+    hover:
+      default:
+        - "&7Balance: &a$%vault_eco_balance_formatted%"
 
-  medium-color:
+  you:
     text:
-      default: "&7"
-
-  near-color:
-    text:
-      default: "&f"
-
-  group:
-    text:
-      default: "%group_name%"
+      default: "&eYou"
+# The End
+# Enjoy <3

@@ -1,6 +1,6 @@
 # Rosechat Language File #
 
-prefix: "&8[&cRoseChat&8]"
+prefix: "&7[<g:#8A2387:#E94057:#F27121>RoseChat&7]"
 no-permission: "%prefix% &cYou do not have permission to do this!"
 player-not-found: "%prefix% &cThis player is not online!"
 player-only: "%prefix% &cThe console cannot use this command!"
@@ -30,6 +30,7 @@ blocked-language: "%prefix% &cYou used a bad word. :("
 blocked-url: "%prefix% &cPlease not send URLs!"
 
 enter-message: "%prefix% &cPlease enter a message!"
+
 toggle-sound-on: "%prefix% &7You have &cenabled &7sounds when receiving message, broadcasts and tags."
 toggle-sound-off: "%prefix% &7You have &cdisabled &7sounds when receiving messages, broadcasts and tags."
 toggle-channel-join: "%prefix% &7You have joined the &c%channel% &7channel."

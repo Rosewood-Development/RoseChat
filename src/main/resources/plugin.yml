@@ -1,14 +1,17 @@
 name: RoseChat
 main: dev.rosewood.rosechat.RoseChat
 version: 1.0.0
-api-version: 1.15
+api-version: "1.16"
 description: A customisable chat plugin.
 author: Lilac
-softdepend: [PlaceholderAPI, Vault]
+softdepend: [PlaceholderAPI, Vault, Essentials, LuckPerms]
 commands:
   rosechat:
     aliases: [rc]
-    description: Main command for Rosechat.
+    description: Main command for RoseChat.
+  message:
+    aliases: [msg, whisper, tell, m, w, t, pm]
+    description: Send a message to another player.
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.
@@ -28,23 +31,40 @@ permissions:
   rosechat.message:
     description: Allows a player to use /message.
     default: op
+    children:
+      - rosechat.message.color
+      - rosechat.message.format
+      - rosechat.message.magic
+      - rosechat.message.caps
+      - rosechat.message.language
+      - rosechat.message.links
+      - rosechat.message.spam
+  rosechat.message.color:
+    description: Allows a player to use color in /message.
+    default: op
+  rosechat.message.format:
+    description: Allows a player to use formatting in /message.
+    default: op
+  rosechat.message.magic:
+    description: Allows a player to use magic in /message.
+    default: op
+  rosechat.message.caps:
+    description: Allows a player to use caps in /message.
+    default: op
+  rosechat.message.language:
+    description: Allows a player to use bad language in /message.
+    default: op
+  rosechat.message.links:
+    description: Allows a player to use links in /message.
+    default: op
+  rosechat.message.spam:
+    description: Allows a player to spam in /message.
+    default: op
   rosechat.reply:
     description: Allows a player to use /reply.
     default: op
   rosechat.staffchat:
     description: Allows a player to use /staffchat.
-    default: op
-  rosechat.broadcast:
-    description: Allows a player to use /broadcast.
-    default: op
-    children:
-      - rosechat.broadcast.world
-      - rosechat.broadcast.global
-  rosechat.broadcast.world:
-    description: Allows a player to use /broadcast world.
-    default: op
-  rosechat.broadcast.global:
-    description: Allows a player to use /broadcast.
     default: op
   rosechat.togglesound:
     description: Allows a player to use /togglesound.

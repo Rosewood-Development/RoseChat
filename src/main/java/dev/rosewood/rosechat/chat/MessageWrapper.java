@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MessageWrapper {
 
@@ -32,6 +34,8 @@ public class MessageWrapper {
     private List<String> taggedPlayerNames;
     private boolean isBlocked;
     private FilterType filterType;
+
+    private static final Pattern URL_PATTERN = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+.~#?&=]*)");
 
     public MessageWrapper(Player sender, String message) {
         this.plugin = RoseChat.getInstance();
@@ -72,22 +76,32 @@ public class MessageWrapper {
     }
 
     private boolean isCaps() {
-        String alpha = message.replaceAll("[^A-Za-z0-9*À-ÖØ-öø-ÿ/]*", "X");
-        //String alpha = message;//.replaceAll("[A-Za-z0-9]*]", "");
+        if (player.hasPermission("rosechat.bypass.caps")) return false;
+        if (!plugin.getConfigFile().getBoolean("moderation-settings.caps-checking-enabled")) return false;
+
+        String alpha = message;//.replaceAll("[A-Za-z0-9]*]", "");
         int caps = 0;
 
         // Checks if the letter is the same as the letter capitalised.
         for (int i = 0; i < alpha.length(); i++)
             if (alpha.charAt(i) == Character.toUpperCase(alpha.charAt(i))) caps++;
 
-        return caps > plugin.getConfigFile().getInt("max-amount-of-caps")
-                && !player.hasPermission("rosechat.bypass.caps");
+        return caps > plugin.getConfigFile().getInt("moderation-settings.maximum-caps-allowed");
     }
 
     public MessageWrapper filterCaps() {
-        if (!isCaps() || plugin.getConfigFile().getBoolean("caps-check")) return this;
+        if (player.hasPermission("rosechat.bypass.caps")) return this;
+        if (!plugin.getConfigFile().getBoolean("moderation-settings.caps-checking-enabled")) return this;
+        if (!isCaps()) return this;
+
+        if (plugin.getConfigFile().getBoolean("moderation-settings.lowercase-capitals-enabled")) {
+            message = message.toLowerCase();
+            return this;
+        }
+
+        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-caps-sent")) filterType = FilterType.CAPS;
         isBlocked = true;
-        filterType = FilterType.CAPS;
+
         return this;
     }
 
@@ -96,6 +110,23 @@ public class MessageWrapper {
     }
 
     public MessageWrapper filterURLs() {
+        if (player.hasPermission("rosechat.bypass.links")) return this;
+        if (!plugin.getConfigFile().getBoolean("moderation-settings.url-checking-enabled")) return this;
+
+        if (!message.matches(URL_PATTERN.pattern()))
+            return this;
+
+        if (plugin.getConfigFile().getBoolean("moderation-settings.url-censoring-enabled")) {
+            Matcher matcher = URL_PATTERN.matcher(message);
+            while (matcher.find()) {
+                // bruh idk
+            }
+            return this;
+        }
+
+        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-url-sent")) filterType = FilterType.URL;
+        isBlocked = true;
+
         return this;
     }
 
@@ -111,22 +142,25 @@ public class MessageWrapper {
         return this;
     }
 
-    public MessageWrapper parsePlaceholders(String format) {
+    public MessageWrapper parsePlaceholders(String format, Player other, Player viewer) {
         String group = plugin.getVault() == null ? "default" : plugin.getVault().getPrimaryGroup(player);
 
         List<String> unformattedChatFormat = plugin.getPlaceholderManager().getParsedFormats().get(format);
 
         for (String placeholderId : unformattedChatFormat) {
             CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(placeholderId);
-            Bukkit.broadcastMessage(placeholder.getText().getTextFromGroup(group));
             if (placeholderId.equalsIgnoreCase("message")) {
-                parseMessage(group);
+                parseMessage(group, other, viewer);
                 continue;
             }
 
             // Text can't be empty.
             if (placeholder.getText() == null) return this;
             String text = new LocalizedText(placeholder.getText().getTextFromGroup(group))
+                    .withPlaceholder("player_name", player.getName())
+                    .withPlaceholder("player_displayname", player.getDisplayName())
+                    .withPlaceholder("other_player_name", other == null ? "null" : other.getName())
+                    .withPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
                     .withPlaceholderAPI(player).format();
 
             TextComponent component = new TextComponent(text);
@@ -134,13 +168,21 @@ public class MessageWrapper {
             if (placeholder.getHover() != null) {
                 HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new LocalizedText(placeholder.getHover().getHoverStringFromGroup(group))
-                        .withPlaceholderAPI(player).toComponents());
+                                .withPlaceholder("player_name", player.getName())
+                                .withPlaceholder("player_displayname", player.getDisplayName())
+                                .withPlaceholder("other_player_name", other == null ? "null" : other.getName())
+                                .withPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
+                                .withPlaceholderAPI(player).toComponents());
                 component.setHoverEvent(hoverEvent);
             }
 
             if (placeholder.getClick() != null) {
                 ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group),
                         new LocalizedText(placeholder.getClick().getValueFromGroup(group))
+                                .withPlaceholder("player_name", player.getName())
+                                .withPlaceholder("player_displayname", player.getDisplayName())
+                                .withPlaceholder("other_player_name", other == null ? "null" : other.getName())
+                                .withPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
                                 .withPlaceholderAPI(player).format());
                 component.setClickEvent(clickEvent);
             }
@@ -151,9 +193,9 @@ public class MessageWrapper {
         return this;
     }
 
-    public void parseMessage(String group) {
+    public void parseMessage(String group, Player other, Player viewer) {
         for (String word : this.message.split(" ")) {
-            String tagPrefix = plugin.getConfigFile().getString("tag-prefix");
+            String tagPrefix = plugin.getConfigFile().getString("tags.player.prefix");
 
             if (word.startsWith(tagPrefix) && player.hasPermission("rosechat.chat.tag") && word.length() > 1) {
                 word = word.replace(tagPrefix, "");
