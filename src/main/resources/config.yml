@@ -35,6 +35,10 @@ moderation-settings:
   # Default: 5
   spam-message-count: 5
 
+  # How similar are the message that count as spam?
+  # Default: 0.75
+  spam-filter-sensitivity: 0.75
+
   # Should the plugin send a warning message (defined in language.yml) when a player sends a spam message?
   # Default: true
   warn-on-spam-sent: true
@@ -56,6 +60,12 @@ moderation-settings:
   # Should the plugin check for swear words?
   # Default: true
   swear-checking-enabled: true
+
+  # How sensitive is the swear filter?
+  # Sensitivity is inverted rn smfh
+  # For example, a high sensitivity will block "bitch" and "bítch"
+  # Default: 0.75
+  swear-filter-sensitivity: 0.75
 
   # If a player sends a message that contains one of these words, then the message will not be sent.
   blocked-swears:

@@ -32,6 +32,9 @@ public class ChatListener implements Listener {
         MessageWrapper messageWrapper = new MessageWrapper(player, oldMessage)
                 .checkAll()
                 .filterCaps()
+                .filterSpam()
+                .filterSwears()
+                // get player channel
                 .parsePlaceholders("channel-global", null, null);
 
         // Don't cancel the message if it is null? Would use default format?

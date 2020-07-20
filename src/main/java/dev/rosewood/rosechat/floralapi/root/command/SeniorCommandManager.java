@@ -33,7 +33,7 @@ public class SeniorCommandManager extends CommandManager {
 
     @Override
     public void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(new LocalizedText("prefix").format());
+        sender.sendMessage(new LocalizedText("prefix").format() + new LocalizedText(" &7Plugin created by <g:#C0FFEE:#F768F7>Lilac").format());
         for (CommandManager manager : commandManagers) {
             if (manager.getMainCommand() == null) {
                 String label = manager.getMainCommandLabel();
@@ -52,6 +52,16 @@ public class SeniorCommandManager extends CommandManager {
                             command.getSyntax() + " &7- ").format() +
                     new LocalizedText((command.isJuniorCommand() ? label + "-command-" : "command-") + "" +
                             command.getLabels().get(0) + "-description"
+                    ).format());
+        }
+
+        for (AbstractCommand subcommand : getSubcommands()) {
+            if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
+            sender.sendMessage(new LocalizedText(
+                    new LocalizedText(subcommand.isJuniorCommand() ? "command-color" : "command-color").format() +
+                            subcommand.getSyntax() + " &7- ").format() +
+                    new LocalizedText((subcommand.isJuniorCommand() ? "command-" : "command-") + "" +
+                            subcommand.getLabels().get(0) + "-description"
                     ).format());
         }
     }

@@ -12,6 +12,9 @@ commands:
   message:
     aliases: [msg, whisper, tell, m, w, t, pm]
     description: Send a message to another player.
+  reply:
+    aliases: [reply, r]
+    description: Replies to a message from another player.
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.

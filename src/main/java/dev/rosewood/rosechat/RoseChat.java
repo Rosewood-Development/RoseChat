@@ -1,14 +1,17 @@
 package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.commands.CommandMessage;
+import dev.rosewood.rosechat.commands.CommandReply;
 import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
 import dev.rosewood.rosechat.floralapi.root.command.CommandManager;
 import dev.rosewood.rosechat.floralapi.root.command.CommandReload;
+import dev.rosewood.rosechat.floralapi.root.command.SeniorCommandManager;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
 import dev.rosewood.rosechat.listeners.ChatListener;
 import dev.rosewood.rosechat.listeners.PlayerListener;
 import dev.rosewood.rosechat.managers.ChannelManager;
+import dev.rosewood.rosechat.managers.DataManager;
 import dev.rosewood.rosechat.managers.PlaceholderManager;
 
 import net.milkbowl.vault.permission.Permission;
@@ -22,20 +25,25 @@ public class RoseChat extends FloralPlugin {
     private YMLFile dataFile;
     private PlaceholderManager placeholderManager;
     private ChannelManager channelManager;
+    private DataManager dataManager;
 
     @Override
     public void onStartUp() {
         initHooks();
 
-        new CommandManager("rosechat", "rosechat help")
-                .addSubcommand(new CommandReload());
+        CommandManager messageCommand = new CommandManager(new CommandMessage(this));
+        CommandManager replyCommand = new CommandManager(new CommandReply(this));
 
-        new CommandManager(new CommandMessage());
+        new SeniorCommandManager("rosechat", "/rosechat help")
+                .addCommandManager(messageCommand)
+                .addCommandManager(replyCommand)
+                .addSubcommand(new CommandReload());
 
         this.dataFile = new YMLFile("data");
 
         new ChatListener(this);
         new PlayerListener(this);
+        this.dataManager = new DataManager();
     }
 
     @Override
@@ -73,6 +81,10 @@ public class RoseChat extends FloralPlugin {
 
     public PlaceholderManager getPlaceholderManager() {
         return placeholderManager;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 
     public YMLFile getDataFile() {

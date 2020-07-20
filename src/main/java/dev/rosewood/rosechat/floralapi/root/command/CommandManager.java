@@ -111,7 +111,9 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         List<String> tab = new ArrayList<>();
 
         if (mainCommand != null) {
-            StringUtil.copyPartialMatches(args[args.length - 1], mainCommand.onTabComplete(sender, args), tab);
+            List<String> original = mainCommand.onTabComplete(sender, args);
+            if (original == null) return tab;
+            StringUtil.copyPartialMatches(args[args.length - 1], original, tab);
             return tab;
         }
 
@@ -163,7 +165,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         sender.sendMessage(new LocalizedText("prefix").format() + new LocalizedText(" &7Plugin created by <g:#C0FFEE:#F768F7>Lilac").format());
         for (AbstractCommand subcommand : subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            String label = subcommand.getLabels().get(0);
             sender.sendMessage(new LocalizedText(
                     new LocalizedText(subcommand.isJuniorCommand() ? mainCommandLabel + "-command-color" : "command-color").format() +
                             subcommand.getSyntax() + " &7- ").format() +

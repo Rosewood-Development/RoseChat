@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MessageWrapper {
 
@@ -34,8 +33,6 @@ public class MessageWrapper {
     private List<String> taggedPlayerNames;
     private boolean isBlocked;
     private FilterType filterType;
-
-    private static final Pattern URL_PATTERN = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+.~#?&=]*)");
 
     public MessageWrapper(Player sender, String message) {
         this.plugin = RoseChat.getInstance();
@@ -94,18 +91,25 @@ public class MessageWrapper {
         if (!plugin.getConfigFile().getBoolean("moderation-settings.caps-checking-enabled")) return this;
         if (!isCaps()) return this;
 
+        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-caps-sent")) filterType = FilterType.CAPS;
+
         if (plugin.getConfigFile().getBoolean("moderation-settings.lowercase-capitals-enabled")) {
             message = message.toLowerCase();
             return this;
         }
-
-        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-caps-sent")) filterType = FilterType.CAPS;
         isBlocked = true;
 
         return this;
     }
 
     public MessageWrapper filterSpam() {
+        if (player.hasPermission("rosechat.bypass.spam")) return this;
+        if (!plugin.getConfigFile().getBoolean("moderation-settings.spam-checking-enabled")) return this;
+        if (!plugin.getDataManager().getPlayerChatMessages(player).addMessageWithSpamCheck(message)) return this;
+        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-spam-sent")) filterType = FilterType.SPAM;
+
+        isBlocked = true;
+
         return this;
     }
 
@@ -113,24 +117,57 @@ public class MessageWrapper {
         if (player.hasPermission("rosechat.bypass.links")) return this;
         if (!plugin.getConfigFile().getBoolean("moderation-settings.url-checking-enabled")) return this;
 
-        if (!message.matches(URL_PATTERN.pattern()))
+        if (!message.matches(MessageUtils.URL_PATTERN.pattern()))
             return this;
 
+        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-url-sent")) filterType = FilterType.URL;
+
         if (plugin.getConfigFile().getBoolean("moderation-settings.url-censoring-enabled")) {
-            Matcher matcher = URL_PATTERN.matcher(message);
+            Matcher matcher = MessageUtils.URL_PATTERN.matcher(message);
             while (matcher.find()) {
                 // bruh idk
             }
             return this;
         }
 
-        if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-url-sent")) filterType = FilterType.URL;
         isBlocked = true;
 
         return this;
     }
 
     public MessageWrapper filterSwears() {
+        if (player.hasPermission("rosechat.bypass.language")) return this;
+        if (!plugin.getConfigFile().getBoolean("moderation-settings.swear-checking-enabled")) return this;
+        String rawMessage = MessageUtils.stripAccents(message.toLowerCase());
+
+        // how to solve the scunthorpe problem :sob:
+        // Sorry server admins, your players can either say "aaaaassssssss" or not "grass", or "assassin"... :(
+        for (String swear : plugin.getConfigFile().getStringList("moderation-settings.blocked-swears")) {
+            for (String word : message.split(" ")) {
+                double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
+                if (similarity >= plugin.getConfigFile().getDouble("moderation-settings.swear-filter-sensitivity")) {
+                    if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-blocked-swear-sent")) filterType = FilterType.SWEAR;
+                    isBlocked = true;
+                    return this;
+                }
+            }
+        }
+
+        // TODO: Merge, or make function for this duplicate code!!!
+        for (String replacements : plugin.getConfigFile().getStringList("moderation-settings.swear-replacements")) {
+            String[] swearReplacement = replacements.split(":");
+            String swear = swearReplacement[0];
+            String replacement = swearReplacement[1];
+            for (String word : message.split(" ")) {
+                double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
+                if (similarity >= plugin.getConfigFile().getDouble("moderation-settings.swear-filter-sensitivity")) {
+                    message = message.replace(word, replacement);
+
+                    if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-replaced-swear-sent")) filterType = FilterType.SWEAR;
+                }
+            }
+        }
+
         return this;
     }
 

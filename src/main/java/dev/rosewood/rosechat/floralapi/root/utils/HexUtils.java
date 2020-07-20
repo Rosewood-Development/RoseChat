@@ -328,6 +328,8 @@ public final class HexUtils {
         private float hue;
 
         public Rainbow(int totalColors, float saturation, float brightness) {
+            // Thanks nicole but for a chat plugin i dont wann throw :angry:
+            // TODO: Ignore errors (probably includes clamping the value between 0 and 1, and ignoring if 0 colours.
             if (totalColors < 1)
                 throw new IllegalArgumentException("Must have at least 1 total color");
 
