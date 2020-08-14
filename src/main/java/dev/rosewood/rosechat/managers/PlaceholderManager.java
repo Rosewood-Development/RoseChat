@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.managers;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.chat.Emote;
+import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
 import dev.rosewood.rosechat.placeholders.ClickPlaceholder;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
@@ -8,6 +10,10 @@ import dev.rosewood.rosechat.placeholders.HoverPlaceholder;
 import dev.rosewood.rosechat.placeholders.TextPlaceholder;
 
 import net.md_5.bungee.api.chat.ClickEvent;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,16 +26,43 @@ public class PlaceholderManager {
     private Map<String, CustomPlaceholder> placeholders;
     private Map<String, String> formats;
     private Map<String, List<String>> parsedFormats;
+    private Map<String, Tag> tags;
+    private Map<String, Emote> emotes;
 
     public PlaceholderManager(RoseChat plugin) {
         this.config = plugin.getConfigFile();
         this.placeholders = new HashMap<>();
         formats = new HashMap<>();
         this.parsedFormats = new HashMap<>();
+        this.tags = new HashMap<>();
+        this.emotes = new HashMap<>();
         load();
     }
 
     public void load() {
+        for (String id : config.getSection("emotes").getKeys(false)) {
+            String text = config.getString("emotes." + id + ".text");
+            String replacement = config.getString("emotes." + id + ".replacement");
+            emotes.put(id, new Emote(id, text, replacement));
+        }
+
+        for (String id : config.getSection("tags").getKeys(false)) {
+            String prefix = config.getString("tags." + id + ".prefix");
+            boolean tagOnlinePlayers = config.getBoolean("tags." + id + ".tag-online-players");
+            String format = config.getString("tags." + id + ".format");
+            Sound sound;
+
+            try {
+                sound = Sound.valueOf(config.getString("tags." + id + ".sound"));
+            } catch (Exception e) {
+                sound = null;
+            }
+
+            Tag tag = new Tag(id).setPrefix(prefix).setTagOnlinePlayers(tagOnlinePlayers).setFormat(format).setSound(sound);
+            tags.put(id, tag);
+            parseFormat(id, format);
+        }
+
         for (String id : config.getSection("custom-placeholders").getKeys(false)) {
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
             TextPlaceholder textPlaceholder = new TextPlaceholder();
@@ -116,5 +149,21 @@ public class PlaceholderManager {
 
     public Map<String, List<String>> getParsedFormats() {
         return parsedFormats;
+    }
+
+    public Emote getEmote(String id) {
+        return emotes.get(id);
+    }
+
+    public Map<String, Emote> getEmotes() {
+        return emotes;
+    }
+
+    public Tag getTag(String id) {
+        return tags.get(id);
+    }
+
+    public Map<String, Tag> getTags() {
+        return tags;
     }
 }

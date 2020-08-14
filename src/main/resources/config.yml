@@ -65,7 +65,7 @@ moderation-settings:
   # Sensitivity is inverted rn smfh
   # For example, a high sensitivity will block "bitch" and "bítch"
   # Default: 0.75
-  swear-filter-sensitivity: 0.75
+  swear-filter-sensitivity: 0.8
 
   # If a player sends a message that contains one of these words, then the message will not be sent.
   blocked-swears:
@@ -99,7 +99,8 @@ emotes:
     text: ":kawaii:"
     replacement: "(づ｡◕‿‿◕｡)づ"
 
-  show-emote-name-on-hover: true
+show-emote-name-on-hover: true
+show-emote-format: "&b&o%text%"
 
 # Tags
 # Tags can be used to tag specific players, or add extra detail to a message in chat.
@@ -111,7 +112,7 @@ tags:
   player:
     # This is what the player will use to start a tag.
     prefix: "@"
-    # Should this tag allow tagging players? This allows tags to target players.
+    # This allows the tag to target online players.
     tag-online-players: true
     # The sound that will be sent to the player who receives the tag.
     # Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
@@ -124,17 +125,27 @@ tags:
   # E.g. "#rosewood".
   hashtag:
     prefix: "#"
-    tag-online-players: false
     format: "{hashtag}"
 
   # This tag allows players to type money in-game, and make it formatted and hoverable.
   # E.g. "$500".
   money:
     prefix: "$"
-    tag-online-players: false
     format: "{money-tag}"
 
-# General miscelllaneous settings.
+  spoiler:
+    prefix: "[["
+    suffix: "]]"
+    format: "{spoiler-tag}"
+
+  # This tag is used as a way to show conditional placeholders.
+  condition:
+    prefix: "?["
+    suffix: "]"
+    tag-online-players: false
+    format: "{conditional-example}"
+
+# General miscellaneous settings.
 chat-settings:
 
   # The sound that will be sent to a player when they receive a message.
@@ -309,5 +320,52 @@ custom-placeholders:
   you:
     text:
       default: "&eYou"
+
+  # The "%tag%" placeholder represents the message the player types, e.g.
+  # If a player typed "@Lilac", '%tag%' would be replaced with 'Lilac'.
+  player-tag:
+    text:
+      default: "&e@%tag%"
+    hover:
+      default:
+        condition-type: PLACEHOLDER
+        condition: "%player_online%"
+        true:
+          - "&aOnline"
+        false:
+          - "&cOffline"
+
+  hashtag:
+    text:
+      default: "&9#%tag%"
+
+  money-tag:
+    text:
+      default: "&a$%tag%"
+    hover:
+      default:
+        - "&7Click to pay &c%player% &a$%tag%"
+    click:
+      default:
+        action: SUGGEST_COMMAND
+        value: "/pay %player% %tag%"
+
+  spoiler-tag:
+    text:
+      default: "&0⬛⬛⬛⬛⬛"
+    hover:
+      default: "%tag%"
+
+  conditional-example:
+    text:
+      default: "&c⬛⬛⬛⬛⬛"
+    hover:
+      condition-type: PERMISSION
+      condition: "rosechat.staffhover"
+      true:
+        - "%tag%"
+      false:
+        - "&cYou do not have permission to view this!"
+
 # The End
 # Enjoy <3

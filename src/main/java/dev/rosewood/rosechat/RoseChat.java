@@ -72,7 +72,7 @@ public class RoseChat extends FloralPlugin {
         }
 
         if (!hasPlaceholderAPI())
-            new LocalizedText(getPluginName() + " &ePlaceholderAPI was not found! Only RoseChat placeholders will work.").sendConsoleMessage();
+            new LocalizedText(getPluginName() + " &ePlaceholderAPI was not found! Only Rosechat placeholders will work.").sendConsoleMessage();
     }
 
     public ChannelManager getChannelManager() {

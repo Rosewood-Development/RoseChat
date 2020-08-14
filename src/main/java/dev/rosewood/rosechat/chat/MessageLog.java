@@ -1,10 +1,6 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

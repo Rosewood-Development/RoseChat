@@ -3,18 +3,22 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 public class MessageWrapper {
 
@@ -22,6 +26,9 @@ public class MessageWrapper {
     private Player player;
     private String message;
     private ComponentBuilder builder;
+
+    private boolean emotes;
+    private boolean tags;
 
     private char[] colourCharacters = { '1', '2', '3', '4',
             '5', '6', '7', '8',
@@ -33,6 +40,7 @@ public class MessageWrapper {
     private List<String> taggedPlayerNames;
     private boolean isBlocked;
     private FilterType filterType;
+    private Sound tagSound;
 
     public MessageWrapper(Player sender, String message) {
         this.plugin = RoseChat.getInstance();
@@ -122,15 +130,15 @@ public class MessageWrapper {
 
         if (plugin.getConfigFile().getBoolean("moderation-settings.warn-on-url-sent")) filterType = FilterType.URL;
 
-        if (plugin.getConfigFile().getBoolean("moderation-settings.url-censoring-enabled")) {
-            Matcher matcher = MessageUtils.URL_PATTERN.matcher(message);
-            while (matcher.find()) {
-                // bruh idk
+        if (message.matches(MessageUtils.URL_PATTERN.pattern())) {
+            if (plugin.getConfigFile().getBoolean("moderation-settings.url-censoring-enabled")) {
+                // Maybe just replace within the URL/IP?
+                message = message.replace(".", " ");
+                // what else should go here idk
+            } else {
+                isBlocked = true;
             }
-            return this;
         }
-
-        isBlocked = true;
 
         return this;
     }
@@ -179,6 +187,16 @@ public class MessageWrapper {
         return this;
     }
 
+    public MessageWrapper withEmotes() {
+        this.emotes = true;
+        return this;
+    }
+
+    public MessageWrapper withTags() {
+        this.tags = true;
+        return this;
+    }
+
     public MessageWrapper parsePlaceholders(String format, Player other, Player viewer) {
         String group = plugin.getVault() == null ? "default" : plugin.getVault().getPrimaryGroup(player);
 
@@ -201,6 +219,7 @@ public class MessageWrapper {
                     .withPlaceholderAPI(player).format();
 
             TextComponent component = new TextComponent(text);
+            BaseComponent[] testComponents = TextComponent.fromLegacyText(text);
 
             if (placeholder.getHover() != null) {
                 HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -211,6 +230,8 @@ public class MessageWrapper {
                                 .withPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
                                 .withPlaceholderAPI(player).toComponents());
                 component.setHoverEvent(hoverEvent);
+
+                for (BaseComponent lilTestComponent : testComponents) lilTestComponent.setHoverEvent(hoverEvent);
             }
 
             if (placeholder.getClick() != null) {
@@ -221,10 +242,12 @@ public class MessageWrapper {
                                 .withPlaceholder("other_player_name", other == null ? "null" : other.getName())
                                 .withPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
                                 .withPlaceholderAPI(player).format());
+
                 component.setClickEvent(clickEvent);
+                for (BaseComponent lilTestComponent : testComponents) lilTestComponent.setClickEvent(clickEvent);
             }
 
-            builder.append(component, ComponentBuilder.FormatRetention.FORMATTING);
+            builder.append(testComponents, ComponentBuilder.FormatRetention.FORMATTING);
         }
 
         return this;
@@ -232,37 +255,107 @@ public class MessageWrapper {
 
     public void parseMessage(String group, Player other, Player viewer) {
         for (String word : this.message.split(" ")) {
-            String tagPrefix = plugin.getConfigFile().getString("tags.player.prefix");
+            boolean hasTag;
 
-            if (word.startsWith(tagPrefix) && player.hasPermission("rosechat.chat.tag") && word.length() > 1) {
-                word = word.replace(tagPrefix, "");
-                CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder("tag");
+            boolean hasEmote = false;
 
-                TextComponent component = new TextComponent(new LocalizedText(placeholder.getText().getTextFromGroup(group))
-                        .withPlaceholder("tag", word + " ").format());
+            for (String emoteId : plugin.getPlaceholderManager().getEmotes().keySet()) {
+                Emote emote = plugin.getPlaceholderManager().getEmote(emoteId);
+                String text = emote.getText();
+                String replacement = emote.getReplacement();
 
-                if (placeholder.getHover() != null) {
-                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(placeholder.getHover()
-                            .getHoverStringFromGroup(group)).withPlaceholderAPI(Bukkit.getOfflinePlayer(word)).toComponents());
-                    component.setHoverEvent(hoverEvent);
+                String message = word;
+                String emote1 = text;
+                String emoteReplacement = replacement;
+                int index;
+                while ((index = message.toLowerCase().indexOf(emote1.toLowerCase())) != -1) {
+                    String beginning = message.substring(0, index);
+                    String end = message.substring(index + emote1.length());
+                    String color = ChatColor.getLastColors(beginning);
+                    message = beginning + emoteReplacement + color + end;
+                    builder.append(new LocalizedText(beginning).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+                    if (plugin.getConfigFile().getBoolean("show-emote-name-on-hover")) {
+                        String hover = new LocalizedText(plugin.getConfigFile().getString("show-emote-format"))
+                                .withPlaceholder("text", text).format();
+                        TextComponent component = new TextComponent(new LocalizedText(emoteReplacement).format() + " ");
+                        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(hover).toComponents()));
+                        builder.append(component, ComponentBuilder.FormatRetention.FORMATTING);
+                    }
+
+                    builder.append(new LocalizedText(color + end).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+                    hasEmote = true;
                 }
 
-                if (placeholder.getClick() != null) {
-                    ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group),
-                            new LocalizedText(placeholder.getClick().getValueFromGroup(group))
-                                    .withPlaceholderAPI(Bukkit.getOfflinePlayer(word)).format());
-                    component.setClickEvent(clickEvent);
-                }
+                /*
+                if (word.toLowerCase().contains(text.toLowerCase())) {
+                    word = word.replace(word, replacement);
 
-                builder.append(component, ComponentBuilder.FormatRetention.FORMATTING);
+                    if (plugin.getConfigFile().getBoolean("show-emote-name-on-hover")) {
+                        String hover = new LocalizedText(plugin.getConfigFile().getString("show-emote-format"))
+                                .withPlaceholder("text", text).format();
+                        TextComponent component = new TextComponent(new LocalizedText(word).format() + " ");
+                        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(hover).toComponents()));
+                        builder.append(component, ComponentBuilder.FormatRetention.FORMATTING);
+                        hasEmote = true;
+                        break;
+                    }
 
-                taggedPlayerNames.add(word);
+                    builder.append(new LocalizedText(word + " ").toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+                    hasEmote = true;
+                    break;
+                }*/
             }
-            else {
+
+            if (!hasEmote) {
                 if (player.hasPermission("rosechat.chat.color")) {
                     builder.append(new LocalizedText(word + " ").toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
                     builder.append(word, ComponentBuilder.FormatRetention.FORMATTING);
+                }
+            }
+
+            for (String tagId : plugin.getPlaceholderManager().getTags().keySet()) {
+                Tag tag = plugin.getPlaceholderManager().getTag(tagId);
+
+                if (word.startsWith(tag.getPrefix()) && player.hasPermission("rosechat.chat.tag." + tagId) && word.length() > 1) {
+                    word = word.replace(tag.getPrefix(), "");
+                    CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(tagId);
+
+                    TextComponent component = new TextComponent(new LocalizedText(placeholder.getText().getTextFromGroup(group))
+                            .withPlaceholder("tag", word + " ")
+                            .withPlaceholder("player_name", player.getName())
+                            .withPlaceholder("player_displayname", player.getDisplayName())
+                            .withPlaceholderAPI(player)
+                            .format());
+
+                    if (placeholder.getHover() != null) {
+                        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(placeholder.getHover()
+                                .getHoverStringFromGroup(group))
+                                .withPlaceholder("tag", word + " ")
+                                .withPlaceholder("player_name", player.getName())
+                                .withPlaceholder("player_displayname", player.getDisplayName())
+                                .withPlaceholderAPI(player)
+                                .toComponents());
+                        component.setHoverEvent(hoverEvent);
+                    }
+
+                    if (placeholder.getHover() != null) {
+                        ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), new LocalizedText(placeholder.getHover()
+                                .getHoverStringFromGroup(group))
+                                .withPlaceholder("tag", word + " ")
+                                .withPlaceholder("player_name", player.getName())
+                                .withPlaceholder("player_displayname", player.getDisplayName())
+                                .withPlaceholderAPI(player)
+                                .format());
+                        component.setClickEvent(clickEvent);
+                    }
+
+                    builder.append(component, ComponentBuilder.FormatRetention.FORMATTING);
+                    if (tag.shouldTagOnlinePlayers()) taggedPlayerNames.add(word);
+                    tagSound = tag.getSound();
                 }
             }
         }
@@ -287,6 +380,10 @@ public class MessageWrapper {
 
     public FilterType getFilterType() {
         return filterType;
+    }
+
+    public Sound getTagSound() {
+        return tagSound;
     }
 
     public void send(CommandSender sender) {

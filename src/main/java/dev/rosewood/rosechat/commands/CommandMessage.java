@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.floralapi.root.utils.Language;
 import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -56,6 +57,14 @@ public class CommandMessage extends AbstractCommand {
         MessageWrapper messageReceivedWrapper = new MessageWrapper(player, message).parsePlaceholders("message-received", target, player);
         sender.spigot().sendMessage(messageSentWrapper.build());
         target.spigot().sendMessage(messageReceivedWrapper.build());
+
+        try {
+            Sound sound = Sound.valueOf(plugin.getConfigFile().getString("chat-settings.message-sound"));
+            target.playSound(target.getLocation(), sound, 1, 1);
+        } catch (Exception e) {
+
+        }
+
         plugin.getDataManager().setLastMessagedBy(target, player);
     }
 

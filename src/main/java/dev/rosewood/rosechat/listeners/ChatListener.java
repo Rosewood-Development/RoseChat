@@ -31,9 +31,7 @@ public class ChatListener implements Listener {
         // player data, get channel, get format
         MessageWrapper messageWrapper = new MessageWrapper(player, oldMessage)
                 .checkAll()
-                .filterCaps()
-                .filterSpam()
-                .filterSwears()
+                .filterAll()
                 // get player channel
                 .parsePlaceholders("channel-global", null, null);
 
@@ -49,20 +47,11 @@ public class ChatListener implements Listener {
         for (Player receiver : event.getRecipients()) messageWrapper.send(receiver);
         messageWrapper.send(Bukkit.getConsoleSender());
 
-        if (plugin.getConfigFile().getString("tag-sound") == null) return;
-
-        String soundStr = plugin.getConfigFile().getString("tag-sound");
-
-        Sound sound;
-        try {
-            sound = Sound.valueOf(soundStr);
-        } catch (Exception e) {
-            return;
-        }
+        if (messageWrapper.getTagSound() == null) return;
 
         for (String playerStr : messageWrapper.getTaggedPlayerNames()) {
             Player tagged = Bukkit.getPlayer(playerStr);
-            if (tagged != null) tagged.playSound(tagged.getLocation(), sound, 1, 1);
+            if (tagged != null) tagged.playSound(tagged.getLocation(), messageWrapper.getTagSound(), 1, 1);
         }
     }
 }

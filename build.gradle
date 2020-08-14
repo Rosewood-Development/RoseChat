@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot:1.16.1'
-    compileOnly 'me.clip:placeholderapi:2.10.4'
+    compileOnly 'org.spigotmc:spigot:1.16.2'
+    compileOnly 'me.clip:placeholderapi:2.10.9'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
 }
 
