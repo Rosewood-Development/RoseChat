@@ -14,6 +14,7 @@ public class ChannelManager {
     private RoseChat plugin;
     private YMLFile config;
     private Map<String, ChatChannel> channels;
+    private ChatChannel defaultChannel;
 
     public ChannelManager(RoseChat plugin) {
         this.plugin = plugin;
@@ -64,6 +65,8 @@ public class ChannelManager {
 
             channels.put(id, channel);
 
+
+            if (isDefault) defaultChannel = channel;
             plugin.getPlaceholderManager().parseFormat("channel-" + id, format);
         }
     }
@@ -74,5 +77,9 @@ public class ChannelManager {
 
     public Map<String, ChatChannel> getChannels() {
         return channels;
+    }
+
+    public ChatChannel getDefaultChannel() {
+        return defaultChannel;
     }
 }

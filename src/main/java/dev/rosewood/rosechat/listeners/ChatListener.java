@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.MessageWrapper;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

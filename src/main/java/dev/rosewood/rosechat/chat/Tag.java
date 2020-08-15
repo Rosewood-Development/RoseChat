@@ -6,6 +6,7 @@ public class Tag {
 
     private String id;
     private String prefix;
+    private String suffix;
     private boolean tagOnlinePlayers;
     private Sound sound;
     private String format;
@@ -29,6 +30,15 @@ public class Tag {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public Tag setSuffix(String suffix) {
+        this.suffix = suffix;
+        return this;
+    }
+
+    public String getSuffix() {
+        return suffix;
     }
 
     public Tag setTagOnlinePlayers(boolean tagOnlinePlayers) {

@@ -142,7 +142,6 @@ tags:
   condition:
     prefix: "?["
     suffix: "]"
-    tag-online-players: false
     format: "{conditional-example}"
 
 # General miscellaneous settings.
@@ -254,7 +253,7 @@ custom-placeholders:
       # If Vault is not installed, it will use the default.
       # If the player is in more than one group it will use the primary group.
       default: "&7"
-      admin: "&8[&cAdmin&8] "
+      admin: "&8[#C0FFEEAdmin&8] "
     # This tells the plugin that this placeholder is using a hover event.
     # Hover events show text and can have multiple lines.
     hover:
@@ -282,7 +281,7 @@ custom-placeholders:
 
   extra:
     text:
-      default: "&7: &7"
+      default: "&7: &f"
       admin: " &e» &f"
 
   staff-prefix:
@@ -298,7 +297,7 @@ custom-placeholders:
 
   right-bracket:
     text:
-      default: "&8] "
+      default: "&8] &f"
 
   arrow:
     text:
@@ -325,9 +324,9 @@ custom-placeholders:
   # If a player typed "@Lilac", '%tag%' would be replaced with 'Lilac'.
   player-tag:
     text:
-      default: "&e@%tag%"
+      default: "&e@%player_displayname%"
     hover:
-      default:
+      default: # NYI
         condition-type: PLACEHOLDER
         condition: "%player_online%"
         true:

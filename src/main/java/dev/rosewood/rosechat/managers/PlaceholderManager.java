@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.managers;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.Emote;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
@@ -11,8 +12,6 @@ import dev.rosewood.rosechat.placeholders.TextPlaceholder;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ public class PlaceholderManager {
 
         for (String id : config.getSection("tags").getKeys(false)) {
             String prefix = config.getString("tags." + id + ".prefix");
+            String suffix = config.getString("tags." + id + ".suffix");
             boolean tagOnlinePlayers = config.getBoolean("tags." + id + ".tag-online-players");
             String format = config.getString("tags." + id + ".format");
             Sound sound;
@@ -58,7 +58,9 @@ public class PlaceholderManager {
                 sound = null;
             }
 
-            Tag tag = new Tag(id).setPrefix(prefix).setTagOnlinePlayers(tagOnlinePlayers).setFormat(format).setSound(sound);
+            Tag tag = new Tag(id).setPrefix(prefix).setSuffix(suffix)
+                    .setTagOnlinePlayers(tagOnlinePlayers).setFormat(format.replace("{", "").replace("}", ""))
+                    .setSound(sound);
             tags.put(id, tag);
             parseFormat(id, format);
         }

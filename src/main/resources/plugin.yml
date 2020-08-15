@@ -34,14 +34,6 @@ permissions:
   rosechat.message:
     description: Allows a player to use /message.
     default: op
-    children:
-      - rosechat.message.color
-      - rosechat.message.format
-      - rosechat.message.magic
-      - rosechat.message.caps
-      - rosechat.message.language
-      - rosechat.message.links
-      - rosechat.message.spam
   rosechat.message.color:
     description: Allows a player to use color in /message.
     default: op
@@ -75,10 +67,6 @@ permissions:
   rosechat.spy:
     description: Allows a player to use /spy.
     default: op
-    children:
-      - rosechat.spy.message
-      - rosechat.spy.world
-      - rosechat.spy.group
   rosechat.spy.message:
     description: Allows a player to use /spy message.
     default: op
@@ -94,10 +82,6 @@ permissions:
   rosechat.channels:
     description: Allows a player to use /channel.
     default: op
-    children:
-      - rosechat.channels.radius
-      - rosechat.channels.world
-      - rosechat.channels.global
   rosechat.channels.radius:
     description: Allows a player to use /channel radius.
     default: op
@@ -110,26 +94,6 @@ permissions:
   rosechat.group:
     description: Allows a player to use /group
     default: op
-    children:
-      - rosechat.group.create
-      - rosechat.group.disband
-      - rosechat.group.disband.others
-      - rosechat.group.rename
-      - rosechat.group.rename.color
-      - rosechat.group.rename.format
-      - rosechat.group.rename.magic
-      - rosechat.group.invite
-      - rosechat.group.accept
-      - rosechat.group.deny
-      - rosechat.group.send
-      - rosechat.group.leave
-      - rosechat.group.list
-      - rosechat.group.members
-      - rosechat.group.promote
-      - rosechat.group.mute
-      - rosechat.group.mail
-      - rosechat.group.kick
-      - rosechat.group.admin
   rosechat.group.create:
     description: Allows a player to use /group create.
     default: op
@@ -178,12 +142,6 @@ permissions:
   rosechat.chat:
     description: Allows a player to chat.
     default: not op
-    children:
-      - rosechat.chat.color
-      - rosechat.chat.format
-      - rosechat.chat.magic
-      - rosechat.chat.tag
-      - rosechat.chat.placeholders
   rosechat.chat.color:
     description: Allows a player to use color in chat.
     default: op
@@ -202,11 +160,6 @@ permissions:
   rosechat.bypass:
     description: Allows a player to bypass filters.
     default: op
-    children:
-      - rosechat.bypass.spam
-      - rosechat.bypass.language
-      - rosechat.bypass.caps
-      - rosechat.bypass.links
   rosechat.bypass.spam:
     description: Allows a player to bypass the spam filter.
     default: op
