@@ -86,22 +86,6 @@ moderation-settings:
   # Default: true
   warn-on-replaced-swear-sent: true
 
-# Emote Settings
-# Emotes replace words that are sent in chat, e.g. a player types "i <3 u", it becomes "i ❤ u"
-emotes:
-  # The ID of the emote.
-  heart:
-    # The text that gets replaced.
-    text: "<3"
-    # The replacement.
-    replacement: "❤"
-  kawaii:
-    text: ":kawaii:"
-    replacement: "(づ｡◕‿‿◕｡)づ"
-
-show-emote-name-on-hover: true
-show-emote-format: "&b&o%text%"
-
 # Tags
 # Tags can be used to tag specific players, or add extra detail to a message in chat.
 # Tags use custom placeholders (see the custom-placeholders section) to allow hoverable and clickable tags.
@@ -134,9 +118,13 @@ tags:
     format: "{money-tag}"
 
   spoiler:
-    prefix: "[["
-    suffix: "]]"
+    prefix: "<spoiler>"
+    suffix: "</spoiler>"
     format: "{spoiler-tag}"
+    # Match length allows the tag replacement to be the same length as the message sent.
+    # This is useful in tags with suffixes as it can replace a 3 letter long word with ⬛⬛⬛,
+    # and a 10 letter long word with ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛.
+    match-length: true
 
   # This tag is used as a way to show conditional placeholders.
   condition:
@@ -154,6 +142,8 @@ chat-settings:
   message-sound: BLOCK_NOTE_BLOCK_PLING
 
   # Should players be able to use PlaceholderAPI placeholders in chat?
+  # Players will need the permission, rosechat.placeholder.placeholder_name,
+  # For example: rosechat.placeholder.player_name
   # Default: true
   chat-placeholders-enabled: true
 
@@ -164,16 +154,32 @@ chat-settings:
     - "Server"
     - "%player_ip%"
 
-  # These are replacements, similar to swears or emotes that can be used in chat.
+  # These are replacements, similar to swears that can be used in chat.
   # These replacements can be used with custom placeholders (see below).
   # These can also support regular expressions.
-  # The %message% placeholder allows you to replace the message with its self, this can allow changing colour for specific words.
   chat-replacements:
-    - "rosechat:<g:#8A2387:#E94057:#F27121>RoseChat"
-    - "&g:#C0FFEE"
-    - "&h:#C8A2C8"
-    - "replace me:{replacement}"
-    - "[regex]:&9%message%"
+    heart:
+      text: "<3"
+      replacement: "❤"
+      hover: "&b&o:<3:"
+    kawaii:
+      text: ":kawaii:"
+      replacement: "(づ｡◕‿‿◕｡)づ"
+      hover: "&b&o:<3:"
+    rosechat:
+      text: "rosechat"
+      replacement: "<g:#8A2387:#E94057:#F27121>RoseChat"
+    coffee-color:
+      text: "&g"
+      replacement: "#C0FFEE"
+    pink-color:
+      text: "&h"
+      replacement: "#C8A2C8"
+    regex-example:
+      text: "[some regex]"
+      replacement: "someth"
+
+
 
 # Chat Channels
 chat-channels:
@@ -220,22 +226,22 @@ chat-channels:
 
 # Formats
 chat-formats:
-  # The format of a /message send to another player. #
+  # The format of a /message send to another player.
   message-sent: "{left-bracket}{you}{arrow}{receiver}{right-bracket}{message}"
 
-  # The format of a /message sent from another player. #
+  # The format of a /message sent from another player.
   message-received: "{left-bracket}{player}{arrow}{you}{right-bracket}{message}"
 
-  # The format of a spied message. #
+  # The format of a spied message.
   social-spy: "{spy-prefix}{spy-players}{message}"
 
-  # The format of a group message. #
+  # The format of a group message.
   group: "{group}{player}{extra}{message}"
 
-  # The format of a spied group message. #
+  # The format of a spied group message.
   group-spy: "{spy-prefix}{group}{player}{extra}{message}"
 
-  # The format of a spied world message. #
+  # The format of a spied world message.
   world-spy: "{spy-prefix}{world}{player}{extra}{message}"
 
 # Placeholders
@@ -324,11 +330,11 @@ custom-placeholders:
   # If a player typed "@Lilac", '%tag%' would be replaced with 'Lilac'.
   player-tag:
     text:
-      default: "&e@%player_displayname%"
+      default: "&e@%other_player_displayname%"
     hover:
       default: # NYI
         condition-type: PLACEHOLDER
-        condition: "%player_online%"
+        condition: "%other_player_online%"
         true:
           - "&aOnline"
         false:
@@ -351,9 +357,10 @@ custom-placeholders:
 
   spoiler-tag:
     text:
-      default: "&0⬛⬛⬛⬛⬛"
+      default: "&0⬛"
     hover:
-      default: "%tag%"
+      default:
+        - "%tag%"
 
   conditional-example:
     text:

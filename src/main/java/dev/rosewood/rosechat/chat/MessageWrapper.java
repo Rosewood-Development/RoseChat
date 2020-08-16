@@ -18,8 +18,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MessageWrapper {
 
@@ -150,7 +148,7 @@ public class MessageWrapper {
         String rawMessage = MessageUtils.stripAccents(message.toLowerCase());
 
         // how to solve the scunthorpe problem :sob:
-        // Sorry server admins, your players can either say "aaaaassssssss" or not "grass", or "assassin"... :(
+        // Sorry server admins, your players can either say "aaaaassssssss" or not "grass"/"assassin"... :(
         for (String swear : plugin.getConfigFile().getStringList("moderation-settings.blocked-swears")) {
             for (String word : message.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
@@ -255,6 +253,9 @@ public class MessageWrapper {
     public void parseMessage(String group, Player other, Player viewer) {
         boolean hasTagOrEmote;
 
+        // Parse colours before.
+        message = new LocalizedText(message).format();
+
         if (parseMessageTags(group, other, viewer)) return;
 
         int index = 0;
@@ -262,7 +263,7 @@ public class MessageWrapper {
         for (String word : words) {
             // Ensures the final word does not have a space at the end.
             if (index != words.length - 1) word += " ";
-            hasTagOrEmote = parseEmotes(word) || parseTags((index == 0 ? null : words[index-1]), word, group);
+            hasTagOrEmote = parseEmotes(word) || parseTags((index == 0 ? null : words[index - 1]), word, group);
 
             if (!hasTagOrEmote) {
                 builder.append(new LocalizedText(word).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
@@ -278,22 +279,71 @@ public class MessageWrapper {
         // It's nicer to parse the message tags, and then parse the word tags after.
         // But it's probably more efficient to parse both at once? :thinking:
         for (Tag tag : plugin.getPlaceholderManager().getTags().values()) {
-            if (!message.contains(tag.getPrefix()) && (tag.getSuffix() != null && !message.contains(tag.getSuffix()))) continue;
-            String suffix = tag.getSuffix() == null ? "" : tag.getSuffix();
-            Pattern pattern = Pattern.compile(Pattern.quote(tag.getPrefix()) + "(.+?)" + Pattern.quote(suffix), Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(message);
-            while (matcher.find()) {
-                String message = matcher.group(1);
-                /*
-                uhhuh ok
-                so we gotta
-                get the message between the tags,
-                then parse *that*,
-                THEN convert the original message to be the tag format (PLUS the rest of the message)
-                THEN add hover and click events to the tag format
-                :sob:
-                 */
+            if (!player.hasPermission("rosechat.chat.tag." + tag.getId())) return false;
+            if (tag.getSuffix() == null) continue; // Ensures word tags don't get parsed here.
+            if (!message.contains(tag.getPrefix()) && !message.contains(tag.getSuffix())) continue;
+            String tempMessage = message;
+
+            while (tempMessage.contains(tag.getPrefix()) && tempMessage.contains(tag.getSuffix())) {
+                int firstPrefix = tempMessage.indexOf(tag.getPrefix()) + tag.getPrefix().length();
+                int firstSuffix = tempMessage.indexOf(tag.getSuffix());
+                String before = tempMessage.substring(0, firstPrefix - tag.getPrefix().length());
+                String tagMessage = tempMessage.substring(firstPrefix, firstSuffix);
+                String after = null;
+                tempMessage = tempMessage.substring(firstSuffix + tag.getSuffix().length());
+
+
+                if (!tempMessage.contains(tag.getSuffix())) {
+                    after = tempMessage;
+                }
+
+                builder.append(new LocalizedText(before).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+                CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(tag.getFormat());
+
+                StringBuilder text = new StringBuilder(new LocalizedText(placeholder.getText().getTextFromGroup(group)).format());
+
+                if (tag.shouldMatchLength()) {
+                    String originalText = text.toString();
+                    for (int i = 0; i < tagMessage.length() - 1; i++) text.append(originalText);
+                }
+
+                BaseComponent[] components = TextComponent.fromLegacyText(new LocalizedText(text.toString())
+                        .withPlaceholder("tag", tagMessage)
+                        .withPlaceholder("player_name", this.player.getName())
+                        .withPlaceholder("player_displayname", this.player.getDisplayName())
+                        .withPlaceholderAPI(player)
+                        .format());
+
+                if (placeholder.getHover() != null) {
+                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(placeholder.getHover()
+                            .getHoverStringFromGroup(group))
+                            .withPlaceholder("tag", tagMessage)
+                            .withPlaceholder("player_name", this.player.getName())
+                            .withPlaceholder("player_displayname", this.player.getDisplayName())
+                            .withPlaceholderAPI(player)
+                            .toComponents());
+                    for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
+                }
+
+                if (placeholder.getClick() != null) {
+                    ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), new LocalizedText(placeholder.getClick()
+                            .getValueFromGroup(group))
+                            .withPlaceholder("tag", tagMessage)
+                            .withPlaceholder("player_name", this.player.getName())
+                            .withPlaceholder("player_displayname", this.player.getDisplayName())
+                            .withPlaceholderAPI(player)
+                            .format());
+                    for (BaseComponent component : components) component.setClickEvent(clickEvent);
+                }
+
+                builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
+
+                if (after != null)
+                    builder.append(new LocalizedText(after).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
+
+            hasTag = true;
         }
 
         return hasTag;
@@ -303,23 +353,26 @@ public class MessageWrapper {
         return false;
     }
 
+    // TODO: Fix multiple emotes touching.
+    // TODO: Merge all replacements here, allow placeholders in the emote replacement.
     private boolean parseEmotes(String word) {
         boolean hasEmote = false;
         
-        for (Emote emote : plugin.getPlaceholderManager().getEmotes().values()) {
+        for (ChatReplacement chatReplacement : plugin.getPlaceholderManager().getEmotes().values()) {
+            if (!player.hasPermission("rosechat.chat.emote." + chatReplacement.getId())) return false;
             String wordLower = word.toLowerCase();
-            if (wordLower.contains(emote.getText().toLowerCase()) && player.hasPermission("rosechat.chat.emote." + emote.getId())) {
+            if (wordLower.contains(chatReplacement.getText().toLowerCase()) && player.hasPermission("rosechat.chat.emote." + chatReplacement.getId())) {
                 int i = 0;
-                String[] parts = wordLower.split(emote.getText());
+                String[] parts = wordLower.split(chatReplacement.getText());
                 for (String s : parts) {
                     builder.append(new LocalizedText(s).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
 
-                    if (i != parts.length - 1) applyEmote(emote);
+                    if (i != parts.length - 1) applyEmote(chatReplacement);
                     i++;
                 }
 
                 // Only the emote is sent.
-                if (wordLower.endsWith(emote.getText().toLowerCase())) applyEmote(emote);
+                if (wordLower.endsWith(chatReplacement.getText().toLowerCase())) applyEmote(chatReplacement);
                 hasEmote = true;
             }
         }
@@ -327,24 +380,30 @@ public class MessageWrapper {
         return hasEmote;
     }
 
+    // TODO: Fix colour parsing around the tag.
     private boolean parseTags(String prevWord, String word, String group) {
         boolean hasTag = false;
 
         for (Tag tag : plugin.getPlaceholderManager().getTags().values()) {
+            if (!player.hasPermission("rosechat.chat.tag." + tag.getId())) return false;
+            if (tag.getSuffix() != null) continue; // Ensures full message tags don't get parsed here.
             if (word.startsWith(tag.getPrefix()) && player.hasPermission("rosechat.chat.tag." + tag.getId())) {
-                String color = prevWord == null ? ChatColor.RESET + "" : ChatColor.RED + "";
+                String lastColors = prevWord == null ? ChatColor.RESET + "": ChatColor.getLastColors(prevWord);
+                String color = lastColors.isEmpty() ? ChatColor.RESET + "" : lastColors;
                 word = word.replace(tag.getPrefix(), ""); // Removes the prefix from the message
                 CustomPlaceholder placeholder = plugin.getPlaceholderManager().getPlaceholder(tag.getFormat());
 
                 // Okay, gotta trim here and later to get the player name.
                 // But then gotta add the spaces back in the placeholder (wait how does this work with PlaceholderAPI??)
-                Player player = Bukkit.getPlayer(word.trim());
+                word = word.trim();
+                Player other = Bukkit.getPlayer(word);
 
                 BaseComponent[] components = TextComponent.fromLegacyText(new LocalizedText(placeholder.getText().getTextFromGroup(group))
-                        .withPlaceholder("tag", word + color)
-                        .withPlaceholder("player_name", player == null ? word : player.getName() + " " + color)
-                        // why the F F F f RI CK wont this colour work idk im sleepy gn
-                        .withPlaceholder("player_displayname", player == null ? word : player.getDisplayName() + " " + ChatColor.RED)
+                        .withPlaceholder("tag", word + " " + color)
+                        .withPlaceholder("player_name", this.player.getName() + " " + color)
+                        .withPlaceholder("player_displayname", this.player.getDisplayName() + " " + color)
+                        .withPlaceholder("other_player_name", (other == null ? word : other.getName()) + " " + color)
+                        .withPlaceholder("other_player_displayname", (other == null ? word : other.getDisplayName()) + " " + color)
                         .withPlaceholderAPI(player)
                         .format());
 
@@ -352,8 +411,10 @@ public class MessageWrapper {
                     HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LocalizedText(placeholder.getHover()
                             .getHoverStringFromGroup(group))
                             .withPlaceholder("tag", word + color)
-                            .withPlaceholder("player_name", player == null ? word : player.getName() + " " + color)
-                            .withPlaceholder("player_displayname", player == null ? word : player.getDisplayName() + " " + color)
+                            .withPlaceholder("player_name", this.player.getName() + " " + color)
+                            .withPlaceholder("player_displayname", this.player.getDisplayName() + " " + color)
+                            .withPlaceholder("other_player_name", (other == null ? word : other.getName()) + color)
+                            .withPlaceholder("other_player_displayname", (other == null ? word : other.getDisplayName()) + color)
                             .withPlaceholderAPI(player)
                             .toComponents());
                     for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
@@ -362,16 +423,18 @@ public class MessageWrapper {
                 if (placeholder.getClick() != null) {
                     ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), new LocalizedText(placeholder.getClick()
                             .getValueFromGroup(group))
-                            .withPlaceholder("tag", word + color)
-                            .withPlaceholder("player_name", player == null ? word : player.getName() + " " + color)
-                            .withPlaceholder("player_displayname", player == null ? word : player.getDisplayName() + " " + color)
+                            .withPlaceholder("tag", word)
+                            .withPlaceholder("player_name", this.player.getName() + " " + color)
+                            .withPlaceholder("player_displayname", this.player.getDisplayName() + " " + color)
+                            .withPlaceholder("other_player_name", (other == null ? word : other.getName()))
+                            .withPlaceholder("other_player_displayname", (other == null ? word : other.getDisplayName()))
                             .withPlaceholderAPI(player)
                             .format());
                     for (BaseComponent component : components) component.setClickEvent(clickEvent);
                 }
 
                 builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
-                if (tag.shouldTagOnlinePlayers()) taggedPlayerNames.add(word.trim());
+                if (tag.shouldTagOnlinePlayers()) taggedPlayerNames.add(word);
                 tagSound = tag.getSound();
 
                 hasTag = true;
@@ -381,15 +444,15 @@ public class MessageWrapper {
         return hasTag;
     }
 
-    private void applyEmote(Emote emote) {
+    private void applyEmote(ChatReplacement chatReplacement) {
         if (plugin.getConfigFile().getBoolean("show-emote-name-on-hover")) {
-            BaseComponent[] components = TextComponent.fromLegacyText(emote.getReplacement());
+            BaseComponent[] components = TextComponent.fromLegacyText(chatReplacement.getReplacement());
             BaseComponent[] hover = new LocalizedText(plugin.getConfigFile().getString("show-emote-format"))
-                    .withPlaceholder("text", emote.getText()).toComponents();
+                    .withPlaceholder("text", chatReplacement.getText()).toComponents();
             for (BaseComponent component : components) component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
             builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
         } else {
-            builder.append(new LocalizedText(emote.getReplacement()).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            builder.append(new LocalizedText(chatReplacement.getReplacement()).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
         }
     }
 

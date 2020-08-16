@@ -1,0 +1,131 @@
+# Placeholders
+# These allow text, hover events, click events and placeholders from PlaceholderAPI.
+# The {message} placeholder is reserved for sent messages. You can set the colour of a message using the placeholder before {message},
+# e.g. the {extra} placeholder ends with &7, this changes the message colour to grey.
+placeholders:
+
+  # The ID of the placeholder. This defines the {prefix} placeholder.
+  prefix:
+    # This is the text that will be shown.
+    text:
+      # These are a list of groups and the prefixes that will be used for them.
+      # If the player is not in any of the groups, it will use the default.
+      # If Vault is not installed, it will use the default.
+      # If the player is in more than one group it will use the primary group.
+      default: "&7"
+      admin: "&8[#C0FFEEAdmin&8] "
+    # This tells the plugin that this placeholder is using a hover event.
+    # Hover events show text and can have multiple lines.
+    hover:
+      default:
+        - "&cThis player administrates the server!"
+
+  player:
+    text:
+      default: "%player_displayname%"
+    hover:
+      # The %player_name% placeholder is included in RoseChat, but most placeholders will need PlaceholderAPI.
+      # For example, the %vault_eco_balance_formatted% placeholder requires the Vault expansion for PlaceholderAPI.
+      default:
+        - "&7Username: &f%player_name%"
+        - "&7Click to Message"
+        - "&7Balance: &a$%vault_eco_balance_formatted%"
+    # This tells the plugin that the placeholder is using a click event.
+    # An 'action' is what to do when the message is clicked.
+    # The 'extra' is what will be executed.
+    # Valid Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL
+    click:
+      default:
+        action: SUGGEST_COMMAND
+        value: "/msg %player_name% "
+
+  extra:
+    text:
+      default: "&7: &f"
+      admin: " &e» &f"
+
+  staff-prefix:
+    text:
+      default: "&8[&cStaffChat&8]"
+    hover:
+      default:
+        - "&7A chat channel that only staff members can see."
+
+  left-bracket:
+    text:
+      default: "&8["
+
+  right-bracket:
+    text:
+      default: "&8] &f"
+
+  arrow:
+    text:
+      default: " &6->&r "
+    # RoseChat allows "other_" to be placed in front of PlaceholderAPI player placeholders to target the second player.
+    # This can be used in a /message, or a tag.
+    hover:
+      default:
+        - "&6From: &f%player_name%"
+        - "&eTo: &f%other_player_name%"
+
+  receiver:
+    text:
+      default: "%other_player_displayname%"
+    hover:
+      default:
+        - "&7Balance: &a$%vault_eco_balance_formatted%"
+
+  you:
+    text:
+      default: "&eYou"
+
+  # The "%tag%" placeholder represents the message the player types, e.g.
+  # If a player typed "@Lilac", '%tag%' would be replaced with 'Lilac'.
+  player-tag:
+    text:
+      default: "&e@%other_player_displayname%"
+    hover:
+      default: # NYI
+        condition-type: PLACEHOLDER
+        condition: "%other_player_online%"
+        true:
+          - "&aOnline"
+        false:
+          - "&cOffline"
+
+  hashtag:
+    text:
+      default: "&9#%tag%"
+
+  money-tag:
+    text:
+      default: "&a$%tag%"
+    hover:
+      default:
+        - "&7Click to pay &c%player% &a$%tag%"
+    click:
+      default:
+        action: SUGGEST_COMMAND
+        value: "/pay %player% %tag%"
+
+  spoiler-tag:
+    text:
+      default: "&0⬛"
+    hover:
+      default:
+        - "%tag%"
+
+  conditional-example:
+    text:
+      default: "&c⬛⬛⬛⬛⬛"
+    hover:
+      condition-type: PERMISSION
+      condition: "rosechat.staffhover"
+      true:
+        - "%tag%"
+      false:
+        - "&cYou do not have permission to view this!"
+
+# The End
+# Enjoy <3

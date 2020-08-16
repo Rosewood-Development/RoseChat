@@ -8,6 +8,7 @@ public class Tag {
     private String prefix;
     private String suffix;
     private boolean tagOnlinePlayers;
+    private boolean matchLength;
     private Sound sound;
     private String format;
 
@@ -48,6 +49,15 @@ public class Tag {
 
     public boolean shouldTagOnlinePlayers() {
         return tagOnlinePlayers;
+    }
+
+    public Tag setMatchLength(boolean matchLength) {
+        this.matchLength = matchLength;
+        return this;
+    }
+
+    public boolean shouldMatchLength() {
+        return matchLength;
     }
 
     public Tag setSound(Sound sound) {

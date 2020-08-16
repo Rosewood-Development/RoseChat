@@ -1,12 +1,12 @@
 package dev.rosewood.rosechat.chat;
 
-public class Emote {
+public class ChatReplacement {
 
     private String id;
     private String text;
     private String replacement;
 
-    public Emote(String id, String text, String replacement) {
+    public ChatReplacement(String id, String text, String replacement) {
         this.id = id;
         this.text = text;
         this.replacement = replacement;

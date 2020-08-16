@@ -1,8 +1,7 @@
 package dev.rosewood.rosechat.managers;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.Emote;
+import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
 import dev.rosewood.rosechat.placeholders.ClickPlaceholder;
@@ -26,7 +25,7 @@ public class PlaceholderManager {
     private Map<String, String> formats;
     private Map<String, List<String>> parsedFormats;
     private Map<String, Tag> tags;
-    private Map<String, Emote> emotes;
+    private Map<String, ChatReplacement> emotes;
 
     public PlaceholderManager(RoseChat plugin) {
         this.config = plugin.getConfigFile();
@@ -39,16 +38,17 @@ public class PlaceholderManager {
     }
 
     public void load() {
-        for (String id : config.getSection("emotes").getKeys(false)) {
-            String text = config.getString("emotes." + id + ".text");
-            String replacement = config.getString("emotes." + id + ".replacement");
-            emotes.put(id, new Emote(id, text, replacement));
+        for (String id : config.getSection("chat-replacements").getKeys(false)) {
+            String text = config.getString("chat-replacements." + id + ".text");
+            String replacement = config.getString("chat-replacements." + id + ".replacement");
+            emotes.put(id, new ChatReplacement(id, text, replacement));
         }
 
         for (String id : config.getSection("tags").getKeys(false)) {
             String prefix = config.getString("tags." + id + ".prefix");
             String suffix = config.getString("tags." + id + ".suffix");
             boolean tagOnlinePlayers = config.getBoolean("tags." + id + ".tag-online-players");
+            boolean matchLength = config.getBoolean("tags." + id + ".match-length");
             String format = config.getString("tags." + id + ".format");
             Sound sound;
 
@@ -60,6 +60,7 @@ public class PlaceholderManager {
 
             Tag tag = new Tag(id).setPrefix(prefix).setSuffix(suffix)
                     .setTagOnlinePlayers(tagOnlinePlayers).setFormat(format.replace("{", "").replace("}", ""))
+                    .setMatchLength(matchLength)
                     .setSound(sound);
             tags.put(id, tag);
             parseFormat(id, format);
@@ -153,11 +154,11 @@ public class PlaceholderManager {
         return parsedFormats;
     }
 
-    public Emote getEmote(String id) {
+    public ChatReplacement getEmote(String id) {
         return emotes.get(id);
     }
 
-    public Map<String, Emote> getEmotes() {
+    public Map<String, ChatReplacement> getEmotes() {
         return emotes;
     }
 
