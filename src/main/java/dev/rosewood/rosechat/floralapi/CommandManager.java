@@ -1,16 +1,18 @@
-package dev.rosewood.rosechat.floralapi.root.command;
+package dev.rosewood.rosechat.floralapi;
 
-import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
-import dev.rosewood.rosechat.floralapi.root.utils.Language;
-import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
-import java.util.ArrayList;
-import java.util.List;
+import dev.rosewood.rosechat.RoseChat;
+
+import dev.rosewood.rosechat.managers.LocaleManager;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for managing commands and subcommands.
@@ -20,7 +22,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     /**
      * An instance of the main class.
      */
-    private FloralPlugin plugin;
+    private RoseChat plugin;
 
     /**
      * The main command label.
@@ -42,16 +44,19 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      */
     private List<AbstractCommand> subcommands;
 
+    private LocaleManager localeManager;
+
     /**
      * Creates a new instance of the CommandManager. This also creates a new command.
      * @param mainCommandLabel The main command that the player will use. E.g., '/command'
      * @param mainSyntax The main syntax that the player will see. E.g. '/command <reload|help>'
      */
     public CommandManager(String mainCommandLabel, String mainSyntax) {
-        this.plugin = FloralPlugin.getInstance();
+        this.plugin = RoseChat.getInstance();
         this.mainCommandLabel = mainCommandLabel;
         this.mainSyntax = mainSyntax;
         this.subcommands = new ArrayList<>();
+        this.localeManager = plugin.getManager(LocaleManager.class);
         plugin.getCommand(mainCommandLabel).setExecutor(this);
         plugin.getCommand(mainCommandLabel).setTabCompleter(this);
     }
@@ -87,19 +92,18 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
         }
 
-        Language.INVALID_ARGUMENTS.getLocalizedText().withPrefixPlaceholder()
-                .withPlaceholder("syntax", mainSyntax).sendMessage(sender);
+        localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", mainSyntax));
         return true;
     }
 
     private boolean canSend(CommandSender sender, AbstractCommand command) {
         if (command.getPermission() != null && !sender.hasPermission(command.getPermission())) {
-            sender.sendMessage(Language.NO_PERMISSION.getFormatted());
+            localeManager.sendMessage(sender, "no-permission");
             return false;
         }
 
         if (command.isPlayerOnly() && !(sender instanceof Player)) {
-            sender.sendMessage(Language.PLAYER_ONLY.getFormatted());
+            localeManager.sendMessage(sender, "player-only");
             return false;
         }
 
@@ -162,15 +166,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @param sender The player of console who sent the command.
      */
     public void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(new LocalizedText("prefix").format() + new LocalizedText(" &7Plugin created by <g:#C0FFEE:#F768F7>Lilac").format());
+        localeManager.sendMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            sender.sendMessage(new LocalizedText(
-                    new LocalizedText(subcommand.isJuniorCommand() ? mainCommandLabel + "-command-color" : "command-color").format() +
-                            subcommand.getSyntax() + " &7- ").format() +
-                    new LocalizedText((subcommand.isJuniorCommand() ? mainCommandLabel + "-command-" : "command-") + "" +
-                            subcommand.getLabels().get(0) + "-description"
-            ).format());
+            String colour = localeManager.getLocaleMessage(subcommand.isJuniorCommand() ? mainCommandLabel + "-command-color" : "base-command-color");
+            localeManager.sendCustomMessage(sender, colour + localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
         }
     }
 

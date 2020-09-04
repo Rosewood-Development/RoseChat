@@ -21,13 +21,18 @@ public class ChatChannel {
     private boolean checkLanguage;
     private boolean chatPlaceholders;
     private List<String> disabledTags;
-    private List<String> disabledEmotes;
+    private List<String> disabledReplacements;
+    private List<String> servers;
 
     private List<UUID> players;
 
     public ChatChannel(String id, String format, boolean defaultChannel) {
         this(id, format);
         this.defaultChannel = defaultChannel;
+        this.players = new ArrayList<>();
+        this.disabledTags = new ArrayList<>();
+        this.disabledReplacements = new ArrayList<>();
+        this.servers = new ArrayList<>();
     }
 
     public ChatChannel(String id, String format) {
@@ -69,119 +74,143 @@ public class ChatChannel {
         return id;
     }
 
-    public void setId(String id) {
+    public ChatChannel setId(String id) {
         this.id = id;
+        return this;
     }
 
     public boolean isDefaultChannel() {
         return defaultChannel;
     }
 
-    public void setDefaultChannel(boolean defaultChannel) {
+    public ChatChannel setDefaultChannel(boolean defaultChannel) {
         this.defaultChannel = defaultChannel;
+        return this;
     }
 
     public String getFormat() {
         return format;
     }
 
-    public void setFormat(String format) {
+    public ChatChannel setFormat(String format) {
         this.format = format;
+        return this;
     }
 
     public String getFormatId() {
         return formatId;
     }
 
-    public void setFormatId(String formatId) {
+    public ChatChannel setFormatId(String formatId) {
         this.formatId = formatId;
+        return this;
     }
 
     public int getRadius() {
         return radius;
     }
 
-    public void setRadius(int radius) {
+    public ChatChannel setRadius(int radius) {
         this.radius = radius;
+        return this;
     }
 
     public String getWorld() {
         return world;
     }
 
-    public void setWorld(String world) {
+    public ChatChannel setWorld(String world) {
         this.world = world;
+        return this;
     }
 
     public boolean isAutoJoin() {
         return autoJoin;
     }
 
-    public void setAutoJoin(boolean autoJoin) {
+    public ChatChannel setAutoJoin(boolean autoJoin) {
         this.autoJoin = autoJoin;
+        return this;
     }
 
     public boolean isCheckCaps() {
         return checkCaps;
     }
 
-    public void setCheckCaps(boolean checkCaps) {
+    public ChatChannel setCheckCaps(boolean checkCaps) {
         this.checkCaps = checkCaps;
+        return this;
     }
 
     public boolean isCheckLanguage() {
         return checkLanguage;
     }
 
-    public void setCheckLanguage(boolean checkLanguage) {
+    public ChatChannel setCheckLanguage(boolean checkLanguage) {
         this.checkLanguage = checkLanguage;
+        return this;
     }
 
     public boolean isCheckSpam() {
         return checkSpam;
     }
 
-    public void setCheckSpam(boolean checkSpam) {
+    public ChatChannel setCheckSpam(boolean checkSpam) {
         this.checkSpam = checkSpam;
+        return this;
     }
 
     public boolean isCheckUrl() {
         return checkUrl;
     }
 
-    public void setCheckUrl(boolean checkUrl) {
+    public ChatChannel setCheckUrl(boolean checkUrl) {
         this.checkUrl = checkUrl;
+        return this;
     }
 
     public List<UUID> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<UUID> players) {
+    public ChatChannel setPlayers(List<UUID> players) {
         this.players = players;
+        return this;
     }
 
     public boolean hasChatPlaceholders() {
         return chatPlaceholders;
     }
 
-    public void setChatPlaceholders(boolean chatPlaceholders) {
+    public ChatChannel setChatPlaceholders(boolean chatPlaceholders) {
         this.chatPlaceholders = chatPlaceholders;
+        return this;
     }
 
     public List<String> getDisabledEmotes() {
-        return disabledEmotes;
+        return disabledReplacements;
     }
 
-    public void setDisabledEmotes(List<String> disabledEmotes) {
-        this.disabledEmotes = disabledEmotes;
+    public ChatChannel setDisabledReplacements(List<String> disabledReplacements) {
+        this.disabledReplacements = disabledReplacements;
+        return this;
     }
 
     public List<String> getDisabledTags() {
         return disabledTags;
     }
 
-    public void setDisabledTags(List<String> disabledTags) {
+    public ChatChannel setDisabledTags(List<String> disabledTags) {
         this.disabledTags = disabledTags;
+        return this;
+    }
+
+    public List<String> getServers() {
+        return servers;
+    }
+
+    public ChatChannel setServers(List<String> servers) {
+        this.servers = servers;
+        return this;
     }
 }

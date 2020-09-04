@@ -22,23 +22,26 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
-        if (!event.getPlayer().hasPermission("rosechat.chat")) return;
 
         Player player = event.getPlayer();
+        if (!player.hasPermission("rosechat.chat")) return;
+
         String oldMessage = event.getMessage();
 
         // player data, get channel, get format
         MessageWrapper messageWrapper = new MessageWrapper(player, oldMessage)
                 .checkAll()
                 .filterAll()
+                .withReplacements()
+                .withTags()
                 // get player channel
-                .parsePlaceholders("channel-global", null, null);
+                .parsePlaceholders("channel-global", null);
 
         // Don't cancel the message if it is null? Would use default format?
         if (messageWrapper.isEmpty()) return;
 
         if (messageWrapper.isBlocked()) {
-            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().getWarning().sendMessage(player);
+            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(player);
             return;
         }
 

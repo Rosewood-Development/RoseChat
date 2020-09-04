@@ -1,7 +1,7 @@
-package dev.rosewood.rosechat.floralapi.root.command;
+package dev.rosewood.rosechat.floralapi;
 
-import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
-import dev.rosewood.rosechat.floralapi.root.utils.Language;
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.managers.LocaleManager;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -11,11 +11,14 @@ import java.util.List;
  */
 public class CommandReload extends AbstractCommand {
 
+    private LocaleManager localeManager;
+
     /**
      * Creates a new subcommand with the argument 'reload',
      */
     public CommandReload() {
         super("reload", "rl");
+        localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
     }
 
     /**
@@ -25,8 +28,8 @@ public class CommandReload extends AbstractCommand {
      */
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        FloralPlugin.getInstance().reload();
-        sender.sendMessage(Language.RELOADED.getFormatted());
+        RoseChat.getInstance().reload();
+        localeManager.sendMessage(sender, "command-reload-reloaded");
     }
 
     @Override
@@ -36,7 +39,7 @@ public class CommandReload extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return FloralPlugin.getInstance().getPluginTitle() + ".reload";
+        return "rosechat.reload";
     }
 
     @Override

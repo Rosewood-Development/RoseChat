@@ -1,7 +1,7 @@
-package dev.rosewood.rosechat.floralapi.root.command;
+package dev.rosewood.rosechat.floralapi;
 
-import dev.rosewood.rosechat.floralapi.root.utils.Language;
-import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.managers.LocaleManager;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ public class SeniorCommandManager extends CommandManager {
      */
     private List<CommandManager> commandManagers;
 
+    private LocaleManager localeManager;
+
     /**
      * Creates a new instance of the senior command manager.
      * @param mainCommandLabel The main command label.
@@ -28,41 +30,32 @@ public class SeniorCommandManager extends CommandManager {
      */
     public SeniorCommandManager(String mainCommandLabel, String mainSyntax) {
         super(mainCommandLabel, mainSyntax);
-        commandManagers = new ArrayList<>();
+        this.commandManagers = new ArrayList<>();
+        this.localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
     }
 
     @Override
     public void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage(new LocalizedText("prefix").format() + new LocalizedText(" &7Plugin created by <g:#C0FFEE:#F768F7>Lilac").format());
+        localeManager.sendMessage(sender, "command-help-title");
         for (CommandManager manager : commandManagers) {
             if (manager.getMainCommand() == null) {
                 String label = manager.getMainCommandLabel();
-                sender.sendMessage(new LocalizedText(
-                        Language.COLOR.getFormatted() + manager.getMainSyntax() + " &7- " +
-                                new LocalizedText("command-" + label + "-description").format()
-                ).format());
+                localeManager.sendCustomMessage(sender, localeManager.getLocaleMessage("base-command-color") +
+                        localeManager.getLocaleMessage("command-" + label + "-description"));
 
                 return;
             }
 
             AbstractCommand command = manager.getMainCommand();
             String label = command.getLabels().get(0);
-            sender.sendMessage(new LocalizedText(
-                    new LocalizedText(command.isJuniorCommand() ? label + "-command-color" : "command-color").format() +
-                            command.getSyntax() + " &7- ").format() +
-                    new LocalizedText((command.isJuniorCommand() ? label + "-command-" : "command-") + "" +
-                            command.getLabels().get(0) + "-description"
-                    ).format());
+            String colour = localeManager.getLocaleMessage(command.isJuniorCommand() ? label + "-command-color" : "base-command-color");
+            localeManager.sendMessage(sender, colour + localeManager.getLocaleMessage("command-" + label + "-description"));
         }
 
         for (AbstractCommand subcommand : getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            sender.sendMessage(new LocalizedText(
-                    new LocalizedText(subcommand.isJuniorCommand() ? "command-color" : "command-color").format() +
-                            subcommand.getSyntax() + " &7- ").format() +
-                    new LocalizedText((subcommand.isJuniorCommand() ? "command-" : "command-") + "" +
-                            subcommand.getLabels().get(0) + "-description"
-                    ).format());
+            String colour = localeManager.getLocaleMessage("base-command-color");
+            localeManager.sendMessage(sender, colour + localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
         }
     }
 

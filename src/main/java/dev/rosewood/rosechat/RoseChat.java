@@ -2,33 +2,43 @@ package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.commands.CommandMessage;
 import dev.rosewood.rosechat.commands.CommandReply;
-import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
-import dev.rosewood.rosechat.floralapi.root.command.CommandManager;
-import dev.rosewood.rosechat.floralapi.root.command.CommandReload;
-import dev.rosewood.rosechat.floralapi.root.command.SeniorCommandManager;
-import dev.rosewood.rosechat.floralapi.root.storage.YMLFile;
-import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import dev.rosewood.rosechat.floralapi.CommandManager;
+import dev.rosewood.rosechat.floralapi.CommandReload;
+import dev.rosewood.rosechat.floralapi.SeniorCommandManager;
 import dev.rosewood.rosechat.listeners.ChatListener;
 import dev.rosewood.rosechat.listeners.PlayerListener;
 import dev.rosewood.rosechat.managers.ChannelManager;
+import dev.rosewood.rosechat.managers.ConfigurationManager;
 import dev.rosewood.rosechat.managers.DataManager;
-import dev.rosewood.rosechat.managers.PlaceholderManager;
+import dev.rosewood.rosechat.managers.LocaleManager;
+import dev.rosewood.rosechat.managers.PlaceholderSettingManager;
+import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.database.DataMigration;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import dev.rosewood.rosegarden.manager.Manager;
 
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public class RoseChat extends FloralPlugin {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class RoseChat extends RosePlugin {
 
     private static RoseChat instance;
     private Permission vault;
-    private YMLFile dataFile;
-    private PlaceholderManager placeholderManager;
-    private ChannelManager channelManager;
-    private DataManager dataManager;
+
+    public RoseChat() {
+        super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class);
+
+        instance = this;
+    }
 
     @Override
-    public void onStartUp() {
+    public void enable() {
         initHooks();
 
         CommandManager messageCommand = new CommandManager(new CommandMessage(this));
@@ -39,56 +49,43 @@ public class RoseChat extends FloralPlugin {
                 .addCommandManager(replyCommand)
                 .addSubcommand(new CommandReload());
 
-        this.dataFile = new YMLFile("data");
-
         new ChatListener(this);
         new PlayerListener(this);
-        this.dataManager = new DataManager();
     }
 
     @Override
-    public void onShutDown() {
+    public void disable() {
 
     }
 
     @Override
-    public void onReload() {
-        instance = this;
-        this.placeholderManager = new PlaceholderManager(this);
-        this.channelManager = new ChannelManager(this);
+    protected List<Class<? extends Manager>> getManagerLoadPriority() {
+        return Arrays.asList(
+                DataManager.class,
+                PlaceholderSettingManager.class,
+                ChannelManager.class
+        );
     }
 
     @Override
-    public String getPluginName() {
-        return "&8[&cRosechat&8]";
+    public List<DataMigration> getDataMigrations() {
+        return Collections.emptyList();
     }
 
     private void initHooks() {
+        LocaleManager localeManager = this.getManager(LocaleManager.class);
+
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> provider = getServer().getServicesManager().getRegistration(Permission.class);
             this.vault = provider.getProvider();
         } else {
-            new LocalizedText(getPluginName() + " &cVault was not found! Group placeholders will be disabled.").sendConsoleMessage();
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                    "&eVault was not found! Group placeholders will be disabled.");
         }
 
-        if (!hasPlaceholderAPI())
-            new LocalizedText(getPluginName() + " &ePlaceholderAPI was not found! Only Rosechat placeholders will work.").sendConsoleMessage();
-    }
-
-    public ChannelManager getChannelManager() {
-        return channelManager;
-    }
-
-    public PlaceholderManager getPlaceholderManager() {
-        return placeholderManager;
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
-    public YMLFile getDataFile() {
-        return dataFile;
+        if (!PlaceholderAPIHook.enabled())
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                    "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
     }
 
     public Permission getVault() {

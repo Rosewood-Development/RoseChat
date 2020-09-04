@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HoverPlaceholder {
+public class HoverPlaceholder extends Placeholder {
 
     private Map<String, List<String>> groups;
     private Map<String, String> groupsAsStrings;

@@ -4,7 +4,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 
 import java.util.Map;
 
-public class ClickPlaceholder {
+public class ClickPlaceholder extends Placeholder {
 
     private Map<String, ClickEvent> groups;
 

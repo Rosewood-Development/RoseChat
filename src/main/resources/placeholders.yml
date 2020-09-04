@@ -1,125 +1,149 @@
-# Placeholders
-# These allow text, hover events, click events and placeholders from PlaceholderAPI.
-# The {message} placeholder is reserved for sent messages. You can set the colour of a message using the placeholder before {message},
-# e.g. the {extra} placeholder ends with &7, this changes the message colour to grey.
-placeholders:
+# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI.
+# These can be used in several sections within the config.yml to add more information to chat.
+# The {message} placeholder is reserved for sent messages.
+# You can set the colour of a message by using the placeholder before {message}.
+# For example, the {extra} placeholder ends with '&f', this will set the message colour to white.
 
-  # The ID of the placeholder. This defines the {prefix} placeholder.
-  prefix:
-    # This is the text that will be shown.
-    text:
-      # These are a list of groups and the prefixes that will be used for them.
-      # If the player is not in any of the groups, it will use the default.
-      # If Vault is not installed, it will use the default.
-      # If the player is in more than one group it will use the primary group.
-      default: "&7"
-      admin: "&8[#C0FFEEAdmin&8] "
-    # This tells the plugin that this placeholder is using a hover event.
-    # Hover events show text and can have multiple lines.
-    hover:
-      default:
-        - "&cThis player administrates the server!"
+# The ID of the placeholder. This defines the {prefix} placeholder.
+prefix:
+  # This is the text that will be shown.
+  text:
+    # These are groups and the prefixes that will be used for them.
+    # If the player is not in any of the groups, it will use the default group.
+    # If Vault is not installed, it will use the default group.
+    # If the player is in more than one group, the primary group will be used.
+    default: "&7"
+    admin: "&8[#C0FFEEAdmin&8] "
 
-  player:
-    text:
-      default: "%player_displayname%"
-    hover:
-      # The %player_name% placeholder is included in RoseChat, but most placeholders will need PlaceholderAPI.
-      # For example, the %vault_eco_balance_formatted% placeholder requires the Vault expansion for PlaceholderAPI.
-      default:
-        - "&7Username: &f%player_name%"
-        - "&7Click to Message"
-        - "&7Balance: &a$%vault_eco_balance_formatted%"
-    # This tells the plugin that the placeholder is using a click event.
-    # An 'action' is what to do when the message is clicked.
-    # The 'extra' is what will be executed.
-    # Valid Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL
-    click:
-      default:
-        action: SUGGEST_COMMAND
-        value: "/msg %player_name% "
+  # This tells the plugin that this placeholder is using a hover event.
+  # Hover events show text and can have multiple lines.
+  hover:
+    admin:
+      - "&cThis player administrates the server!"
 
-  extra:
-    text:
-      default: "&7: &f"
-      admin: " &e» &f"
+player:
+  text:
+    # RoseChat has a few placeholders that do not require PlaceholderAPI.
+    # These include:
+    # %player_name% - The player's name.
+    # %player_displayname% - The player's displayname.
+    # Other placeholders require PlaceholderAPI to be installed.
+    # For example, the %vault_eco_balance_formatted% placeholder requires the Vault expansion for PlaceholderAPI.
+    default: "%player_displayname%"
+  hover:
+    default:
+      - "&7Username: &f%player_name%"
+      - "&7Click to Message"
+      - "&7Balance: &a$vault_eco_balance_formatted%"
 
-  staff-prefix:
-    text:
-      default: "&8[&cStaffChat&8]"
-    hover:
-      default:
-        - "&7A chat channel that only staff members can see."
+  # The tells the plugin that this placeholder is using a click event.
+  # An 'action' is what to do when the message is clicked.
+  # The 'extra' is what will be executed.
+  # Valid Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value: "/msg %player_name% "
 
-  left-bracket:
-    text:
-      default: "&8["
+extra:
+  text:
+    default: "&7: &f"
+    admin: " &e» &f"
 
-  right-bracket:
-    text:
-      default: "&8] &f"
+staff-prefix:
+  text:
+    default: "&8[&cStaffChat&8]"
+  hover:
+    default:
+      - "&7A chat channel that only staff members can see."
 
-  arrow:
-    text:
-      default: " &6->&r "
-    # RoseChat allows "other_" to be placed in front of PlaceholderAPI player placeholders to target the second player.
-    # This can be used in a /message, or a tag.
-    hover:
-      default:
-        - "&6From: &f%player_name%"
-        - "&eTo: &f%other_player_name%"
+left-bracket:
+  text:
+    default: "&8["
 
-  receiver:
-    text:
-      default: "%other_player_displayname%"
-    hover:
-      default:
-        - "&7Balance: &a$%vault_eco_balance_formatted%"
+right-bracket:
+  text:
+    default: "&8] &f"
 
-  you:
-    text:
-      default: "&eYou"
+arrow:
+  text:
+    default: " &6->&r "
 
-  # The "%tag%" placeholder represents the message the player types, e.g.
-  # If a player typed "@Lilac", '%tag%' would be replaced with 'Lilac'.
-  player-tag:
-    text:
-      default: "&e@%other_player_displayname%"
-    hover:
-      default: # NYI
-        condition-type: PLACEHOLDER
-        condition: "%other_player_online%"
-        true:
-          - "&aOnline"
-        false:
-          - "&cOffline"
+  # RoseChat allows "other_" to be placed in front of placeholders to target the second player.
+  # This can be used in a /message, or a tag. If used anywhere else, the second player will be the person reading.
+  hover:
+    default:
+      - "&6From: &f%player_name%"
+      - "&eTo: &f%other_player_name%"
 
-  hashtag:
-    text:
-      default: "&9#%tag%"
+receiver:
+  text:
+    default: "%other_player_displayname%"
+  hover:
+    default: "&7Balance: &a$%vault_eco_balance_formatted%"
 
-  money-tag:
-    text:
-      default: "&a$%tag%"
-    hover:
-      default:
-        - "&7Click to pay &c%player% &a$%tag%"
-    click:
-      default:
-        action: SUGGEST_COMMAND
-        value: "/pay %player% %tag%"
+you:
+  text:
+    default: "&eYou"
 
-  spoiler-tag:
-    text:
-      default: "&0⬛"
-    hover:
-      default:
-        - "%tag%"
+# Tags
 
-  conditional-example:
-    text:
-      default: "&c⬛⬛⬛⬛⬛"
-    hover:
+# The "%tag%" placeholder represents the message that the player types.
+# For example, if a player typed "@Lilac", "%tag% will be replaced with "Lilac".
+# For this reason, if neccessary, you must add the prefix (@), before the placeholder.
+player-tag:
+  text:
+    default: "&e@%other_player_displayname%"
+  hover:
+    default:
+      # NOT YET IMPLEMENTED
+      # A conditional placeholder allows messages based on a true or false value.
+      # The condition-type allows the plugin to see which condition is used for this placeholder.
+      # Valid Conditions:
+      # PLACEHOLDER - Based on a true/false value from PlaceholderAPI.
+      # OTHER_PLACEHOLDER - Based on a true/false value from PlaceholderAPI, using the viewer (or second player).
+      # PLAYER_PERMISSION - Based on whether the player has a permission.
+      # OTHER_PERMISSION - Based on whether the viewer (or second player) has a permission.
+      condition-type: PLACEHOLDER
+      # The condition to use.
+      # This can either be a placeholder or permission.
+      condition: "%other_player_online%"
+      # What to display if the condition is true.
+      true:
+        - "&aOnline"
+      # What to display if the condition is false.
+      false:
+        - "&cOffline"
+
+hashtag:
+  text:
+    default: "&9#%tag%"
+
+money-tag:
+  text:
+    default: "&a$%tag%"
+  hover:
+    default:
+      - "&7Click to pay &c%player% &a$%text%"
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value: "/play %player% %tag%"
+
+spoiler-tag:
+  text:
+    # This uses 1 ⬛, as the tag (defined in config.yml) uses match-length.
+    # This message will be repeated as many times as the amount of letters in the tag.
+    default: "&0⬛"
+  hover:
+    default:
+      - "%tag%"
+
+conditional-example:
+  text:
+    default: "&c⬛"
+  hover:
+    default:
       condition-type: PERMISSION
       condition: "rosechat.staffhover"
       true:
@@ -127,5 +151,13 @@ placeholders:
       false:
         - "&cYou do not have permission to view this!"
 
-# The End
-# Enjoy <3
+copy-paste:
+  text:
+    default: "%tag%"
+  hover:
+    default:
+      - "Click to Copy"
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value : "%tag%"

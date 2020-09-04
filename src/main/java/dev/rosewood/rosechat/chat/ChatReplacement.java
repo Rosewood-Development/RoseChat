@@ -5,11 +5,13 @@ public class ChatReplacement {
     private String id;
     private String text;
     private String replacement;
+    private String hoverText;
 
-    public ChatReplacement(String id, String text, String replacement) {
+    public ChatReplacement(String id, String text, String replacement, String hoverText) {
         this.id = id;
         this.text = text;
         this.replacement = replacement;
+        this.hoverText = hoverText;
     }
 
     public String getId() {
@@ -34,5 +36,13 @@ public class ChatReplacement {
 
     public void setReplacement(String replacement) {
         this.replacement = replacement;
+    }
+
+    public String getHoverText() {
+        return hoverText;
+    }
+
+    public void setHoverText(String hoverText) {
+        this.hoverText = hoverText;
     }
 }

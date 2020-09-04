@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.managers.ConfigurationManager.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,9 @@ public class MessageLog {
 
     public MessageLog(UUID sender, boolean doCleanup) {
         this(sender);
-        if (doCleanup)
-            this.cleanupAmount = plugin.getConfigFile().getInt("moderation-settings.spam-message-count");
+        if (doCleanup) {
+            this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
+        }
     }
 
     /**
@@ -38,7 +40,7 @@ public class MessageLog {
                 String message = messages.get((messages.size() - 1) - i);
                 double similarity = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if (similarity >= plugin.getConfigFile().getDouble("moderation-settings.spam-filter-sensitivity")) {
+                if (similarity >= Setting.SPAM_FILTER_SENSITIVITY.getDouble()) {
                     similarMessages++;
                 }
             }

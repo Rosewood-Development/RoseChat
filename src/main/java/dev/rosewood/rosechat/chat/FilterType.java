@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.chat;
 
-import dev.rosewood.rosechat.floralapi.root.utils.LocalizedText;
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.managers.LocaleManager;
+import org.bukkit.command.CommandSender;
 
 public enum FilterType {
     CAPS("blocked-caps"),
@@ -14,7 +16,8 @@ public enum FilterType {
         this.warning = warning;
     }
 
-    public LocalizedText getWarning() {
-        return new LocalizedText(warning).withPrefixPlaceholder();
+    public void sendWarning(CommandSender sender) {
+        LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
+        localeManager.sendMessage(sender, this.warning);
     }
 }

@@ -1,20 +1,24 @@
 package dev.rosewood.rosechat.managers;
 
 import dev.rosewood.rosechat.chat.MessageLog;
+import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.manager.AbstractDataManager;
+
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DataManager {
+public class DataManager extends AbstractDataManager {
 
-    private Map<UUID, UUID> lastMessagedBy;
     private Map<UUID, MessageLog> playerChatMessages;
+    private Map<UUID, UUID> lastMessagedBy;
 
-    public DataManager() {
-        this.lastMessagedBy = new HashMap<>();
+    public DataManager(RosePlugin rosePlugin) {
+        super(rosePlugin);
         this.playerChatMessages = new HashMap<>();
+        this.lastMessagedBy = new HashMap<>();
     }
 
     public void createPlayerMessageLog(Player player) {

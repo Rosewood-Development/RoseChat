@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.placeholders;
 
 import java.util.Map;
 
-public class TextPlaceholder {
+public class TextPlaceholder extends Placeholder {
 
     private Map<String, String> groups;
 

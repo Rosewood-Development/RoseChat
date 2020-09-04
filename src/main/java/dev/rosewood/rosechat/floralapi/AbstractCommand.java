@@ -1,6 +1,7 @@
-package dev.rosewood.rosechat.floralapi.root.command;
+package dev.rosewood.rosechat.floralapi;
 
-import dev.rosewood.rosechat.floralapi.root.FloralPlugin;
+import dev.rosewood.rosechat.RoseChat;
+
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public abstract class AbstractCommand {
         labels.add(label);
 
         if (juniorCommand) {
-            List<String> aliases = (List<String>) FloralPlugin.getInstance().getDescription() .getCommands().get(label).get("aliases");
+            List<String> aliases = (List<String>) RoseChat.getInstance().getDescription() .getCommands().get(label).get("aliases");
             labels.addAll(aliases);
         }
     }

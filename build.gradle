@@ -1,12 +1,17 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
-group 'dev.rosewood.rosechat'
+group 'dev.rosewood'
 version '1.0.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
 
 repositories {
     mavenCentral()
@@ -20,8 +25,14 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.16.2'
     compileOnly 'me.clip:placeholderapi:2.10.9'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
+
+    implementation 'dev.rosewood:rosegarden:1.0.3-SNAPSHOT'
 }
 
-jar {
-    baseName 'RoseChat'
+shadowJar {
+    archiveClassifier.set(null);
+    relocate('dev.rosewood.rosegarden', 'dev.rosewood.rosechat.lib.rosegarden')
+    minimize()
 }
+
+build.dependsOn shadowJar
