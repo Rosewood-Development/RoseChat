@@ -1,13 +1,12 @@
 package dev.rosewood.rosechat.chat;
 
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
-
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
 public class MessageUtils {
 
-    public static final Pattern URL_PATTERN = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+.~#?&=]*)");
+    public static final Pattern URL_PATTERN = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&=]*)");
 
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());

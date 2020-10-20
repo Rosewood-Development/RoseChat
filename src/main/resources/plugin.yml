@@ -15,6 +15,14 @@ commands:
   reply:
     aliases: [reply, r]
     description: Replies to a message from another player.
+  socialspy:
+    aliases: [ss]
+    description: See private messages.
+  togglemessage:
+    aliases: [togglemessages, togglepm, togglemsg, togglemsgs]
+    description: Toggles receiving messages.
+  togglesound:
+    aliases: [togglesounds, toggleping, toggletag]
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.
@@ -64,20 +72,20 @@ permissions:
   rosechat.togglesound:
     description: Allows a player to use /togglesound.
     default: op
-  rosechat.spy:
-    description: Allows a player to use /spy.
-    default: op
-  rosechat.spy.message:
-    description: Allows a player to use /spy message.
-    default: op
-  rosechat.spy.world:
-    description: Allows a player to use /spy world.
-    default: op
-  rosechat.spy.group:
-    description: Allows a player to use /spy group.
-    default: op
   rosechat.togglemessage:
     description: Allows a player to use /togglemessage.
+    default: op
+  rosechat.spy:
+    description: Allows a player to use /socialspy.
+    default: op
+  rosechat.spy.message:
+    description: Allows a player to use /socialspy.
+    default: op
+  rosechat.spy.channel:
+    description: Allows a player to use /channelspy.
+    default: op
+  rosechat.spy.group:
+    description: Allows a player to use /groupspy.
     default: op
   rosechat.channels:
     description: Allows a player to use /channel.

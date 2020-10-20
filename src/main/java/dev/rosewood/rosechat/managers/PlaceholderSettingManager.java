@@ -12,13 +12,8 @@ import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-
 import net.md_5.bungee.api.chat.ClickEvent;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,43 +44,6 @@ public class PlaceholderSettingManager extends Manager {
 
         CommentedFileConfiguration placeholderConfiguration = CommentedFileConfiguration.loadConfiguration(placeholderFile);
 
-        // Replacements
-        for (String id : Setting.CHAT_REPLACEMENTS.getSection().getKeys(false)) {
-            CommentedConfigurationSection section = Setting.CHAT_REPLACEMENTS.getSection();
-            String text = section.getString(id + ".text");
-            String replacement = section.getString(id + ".replacement");
-            String hover = section.contains(id + ".hover") ? section.getString(id + ".hover") : null;
-
-            // TODO: If the format has a hover, remove the hover param.
-            if (replacement.startsWith("{") && replacement.endsWith("}"))
-                parseFormat("replacement-" + id, replacement);
-
-            replacements.put(id, new ChatReplacement(id, text, replacement, hover));
-        }
-
-        // Tags
-        for (String id : Setting.TAGS.getSection().getKeys(false)) {
-            CommentedConfigurationSection section = Setting.TAGS.getSection();
-            String prefix = section.getString(id + ".prefix");
-            String suffix = section.getString(id + ".suffix");
-            boolean tagOnlinePlayers = section.getBoolean(id + ".tag-online-players");
-            boolean matchLength = section.getBoolean(id + ".match-length");
-            String format = section.getString(id + ".format").replace("{", "").replace("}", "");
-            Sound sound;
-
-            try {
-                sound = Sound.valueOf(section.getString(id + ".sound"));
-            } catch (Exception e) {
-                sound = null;
-            }
-
-            Tag tag = new Tag(id).setPrefix(prefix).setSuffix(suffix)
-                    .setTagOnlinePlayers(tagOnlinePlayers).setMatchLength(matchLength)
-                    .setFormat(format).setSound(sound);
-            tags.put(id, tag);
-            parseFormat("tag-" + id, format);
-        }
-
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
@@ -93,7 +51,10 @@ public class PlaceholderSettingManager extends Manager {
             HoverPlaceholder hoverPlaceholder = new HoverPlaceholder();
             ClickPlaceholder clickPlaceholder = new ClickPlaceholder();
 
-            // TODO: Conditional Placeholder Loading
+            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), textPlaceholder);
+            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), hoverPlaceholder);
+            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), clickPlaceholder);
+
 
             Map<String, String> textPlaceholders = new HashMap<>();
             for (String textGroup : placeholderConfiguration.getConfigurationSection(id + ".text").getKeys(false)) {
@@ -126,6 +87,42 @@ public class PlaceholderSettingManager extends Manager {
             placeholders.put(id, placeholder);
         }
 
+        // Replacements
+        for (String id : Setting.CHAT_REPLACEMENTS.getSection().getKeys(false)) {
+            CommentedConfigurationSection section = Setting.CHAT_REPLACEMENTS.getSection();
+            String text = section.getString(id + ".text");
+            String replacement = section.getString(id + ".replacement");
+            String hover = section.contains(id + ".hover") ? section.getString(id + ".hover") : null;
+
+            if (replacement.startsWith("{") && replacement.endsWith("}"))
+                parseFormat("replacement-" + id, replacement);
+
+            replacements.put(id, new ChatReplacement(id, text, replacement, hover));
+        }
+
+        // Tags
+        for (String id : Setting.TAGS.getSection().getKeys(false)) {
+            CommentedConfigurationSection section = Setting.TAGS.getSection();
+            String prefix = section.getString(id + ".prefix");
+            String suffix = section.getString(id + ".suffix");
+            boolean tagOnlinePlayers = section.getBoolean(id + ".tag-online-players");
+            boolean matchLength = section.getBoolean(id + ".match-length");
+            String format = section.getString(id + ".format").replace("{", "").replace("}", "");
+            Sound sound;
+
+            try {
+                sound = Sound.valueOf(section.getString(id + ".sound"));
+            } catch (Exception e) {
+                sound = null;
+            }
+
+            Tag tag = new Tag(id).setPrefix(prefix).setSuffix(suffix)
+                    .setTagOnlinePlayers(tagOnlinePlayers).setMatchLength(matchLength)
+                    .setFormat(format).setSound(sound);
+            tags.put(id, tag);
+            parseFormat("tag-" + id, format);
+        }
+
         // Formats
         for (String format : Setting.CHAT_FORMATS.getSection().getKeys(false)) {
             chatFormats.put(format, Setting.CHAT_FORMATS.getSection().getString(format));
@@ -139,8 +136,9 @@ public class PlaceholderSettingManager extends Manager {
 
     }
 
-    private void loadConditionalPlaceholders(CommentedFileConfiguration config, Placeholder placeholder) {
-
+    // TODO: Conditional Placeholders
+    private boolean loadConditionalPlaceholders(CommentedConfigurationSection config, Placeholder placeholder) {
+        return false;
     }
 
     private void parseFormats() {

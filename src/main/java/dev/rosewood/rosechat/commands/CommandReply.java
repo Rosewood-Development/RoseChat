@@ -2,15 +2,19 @@ package dev.rosewood.rosechat.commands;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.MessageWrapper;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.floralapi.AbstractCommand;
 
+import dev.rosewood.rosechat.managers.ConfigurationManager;
 import dev.rosewood.rosechat.managers.DataManager;
 import dev.rosewood.rosechat.managers.LocaleManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CommandReply extends AbstractCommand {
 
@@ -39,17 +43,20 @@ public class CommandReply extends AbstractCommand {
 
         Player player = (Player) sender;
         DataManager dataManager = plugin.getManager(DataManager.class);
+        PlayerData playerData = dataManager.getPlayerData(player.getUniqueId());
 
-        if (dataManager.getLastMessagedBy(player) == null) {
+        if (playerData.getReplyTo() == null) {
             localeManager.sendMessage(sender, "command-reply-no-one");
             return;
         }
 
-        Player target = Bukkit.getPlayer(dataManager.getLastMessagedBy(player));
+        Player target = Bukkit.getPlayer(playerData.getReplyTo());
         if (target == null) {
             localeManager.sendMessage(sender, "command-reply-no-one");
             return;
         }
+
+        PlayerData targetData = dataManager.getPlayerData(target.getUniqueId());
 
         String message = getAllArgs(0, args);
 
@@ -58,11 +65,42 @@ public class CommandReply extends AbstractCommand {
             return;
         }
 
-        MessageWrapper messageSentWrapper = new MessageWrapper(player, message).parsePlaceholders("message-sent", player);
-        MessageWrapper messageReceivedWrapper = new MessageWrapper(player, message).parsePlaceholders("message-received", player);
+        if (playerData.canBeMessaged()) {
+            localeManager.sendMessage(sender, "command-togglemessage-cannot-message");
+            return;
+        }
+
+        MessageWrapper messageSentWrapper = new MessageWrapper(player, message)
+                .checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("message-sent", target);
+        MessageWrapper messageReceivedWrapper = new MessageWrapper(target, message)
+                .checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("message-received", player);
         sender.spigot().sendMessage(messageSentWrapper.build());
         target.spigot().sendMessage(messageReceivedWrapper.build());
-        dataManager.setLastMessagedBy(target, player);
+        targetData.setReplyTo(player.getUniqueId());
+
+        MessageWrapper spyMessageWrapper = new MessageWrapper(player, message).checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("social-spy", target);
+
+        for (UUID uuid : dataManager.getSocialSpies()) {
+            if (uuid.equals(((Player) sender).getUniqueId()) || uuid.equals(target.getUniqueId())) continue;
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null) spy.spigot().sendMessage(spyMessageWrapper.build());
+        }
+
+        try {
+            Sound sound = Sound.valueOf(ConfigurationManager.Setting.MESSAGE_SOUND.getString());
+            target.playSound(target.getLocation(), sound, 1, 1);
+        } catch (Exception e) {
+
+        }
     }
 
     @Override

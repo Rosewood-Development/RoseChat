@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.locale.EnglishLocale;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.locale.Locale;
 import dev.rosewood.rosegarden.manager.AbstractLocaleManager;
-
 import java.util.Collections;
 import java.util.List;
 

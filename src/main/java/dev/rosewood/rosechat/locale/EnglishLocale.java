@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.locale;
 
 import dev.rosewood.rosegarden.locale.Locale;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class EnglishLocale implements Locale {
             this.put("no-permission", "&cYou do not have permission to do this!");
             this.put("player-not-found", "&cThis player is not online!");
             this.put("player-only", "&cThe console cannot use this command!");
-            this.put("invalid-arguments", "&cPlease use &b%syntax%&c.");
+            this.put("invalid-arguments", "&cUsage: &b%syntax%&c.");
 
             this.put("#2", "Base Command Message");
             this.put("base-command-color", "&e");
@@ -38,11 +37,11 @@ public class EnglishLocale implements Locale {
             this.put("command-help-title", "&eAvailable Commands:");
 
             this.put("#4", "Reload Command");
-            this.put("command-reload-description", "&8- &d/rc reload &7- Reloads the plugin.");
+            this.put("command-reload-description", "&8 - &d/rc reload &7- Reloads the plugin");
             this.put("command-reload-reloaded", "&ePlugin data, configuration, and locale files were reloaded.");
 
             this.put("#5", "Message Command");
-            this.put("command-message-description", "&8- &d/msg &7- Message a player.");
+            this.put("command-message-description", "&8 - &d/msg &7- Message a player");
             this.put("command-message-usage", "&e/msg <player> <message>");
             this.put("command-message-enter-message", "&cPlease enter a message!");
 
@@ -61,13 +60,19 @@ public class EnglishLocale implements Locale {
             this.put("command-togglesound-tags", "tags");
 
             this.put("#8", "ToggleMessage Command");
-            this.put("command-togglemessage-description", "&8- &d/togglemessages &7- Toggles the ability to receive messages");
-            this.put("command-togglemessage-usage", "&e/togglemessages");
+            this.put("command-togglemessage-description", "&8 - &d/togglemessage &7- Toggles the ability to receive messages");
+            this.put("command-togglemessage-usage", "&e/togglemessage");
             this.put("command-togglemessage-on", "&eYou have &aenabled &ereceiving messages.");
             this.put("command-togglemessage-off", "&eYou have &cdisabled &ereceiving messages.");
             this.put("command-togglemessage-cannot-message", "&cYou cannot message this player!");
 
-            this.put("#9", "Moderation Messages");
+            this.put("#9", "SocialSpy Command");
+            this.put("command-socialspy-description", "&8 - &d/socialspy &7- Toggles the ability to see private messages");
+            this.put("command-socialspy-usage", "&e/socialspy");
+            this.put("command-socialspy-enabled", "&eYou have &aenabled &esocial spy.");
+            this.put("command-socialspy-disabled", "&eYou have &cdisabled &esocial spy.");
+
+            this.put("#10", "Moderation Messages");
             this.put("blocked-caps", "&cYour message could not be sent as it contains too much capital letters!");
             this.put("blocked-spam", "&cPlease do not spam!");
             this.put("blocked-language", "&cYou used a bad word. :(");

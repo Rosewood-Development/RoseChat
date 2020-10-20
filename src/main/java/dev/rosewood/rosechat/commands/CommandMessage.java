@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.commands;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.MessageWrapper;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.floralapi.AbstractCommand;
 import dev.rosewood.rosechat.managers.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.managers.DataManager;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CommandMessage extends AbstractCommand {
 
@@ -29,6 +31,8 @@ public class CommandMessage extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
+        DataManager dataManager = plugin.getManager(DataManager.class);
+
         if (args.length == 0) {
             localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
@@ -46,6 +50,8 @@ public class CommandMessage extends AbstractCommand {
             return;
         }
 
+        PlayerData targetData = dataManager.getPlayerData(target.getUniqueId());
+
         String message = getAllArgs(1, args);
 
         if (message.isEmpty()) {
@@ -53,13 +59,38 @@ public class CommandMessage extends AbstractCommand {
             return;
         }
 
+        if (targetData.canBeMessaged()) {
+            localeManager.sendMessage(sender, "command-togglemessage-cannot-message");
+            return;
+        }
+
         // TODO: Allow console sending & receiving messages.
         Player player = (Player) sender;
 
-        MessageWrapper messageSentWrapper = new MessageWrapper(player, message).parsePlaceholders("message-sent", target);
-        MessageWrapper messageReceivedWrapper = new MessageWrapper(player, message).parsePlaceholders("message-received", target);
+        // TODO: Someway to check message permissions
+        MessageWrapper messageSentWrapper = new MessageWrapper(player, message)
+                .checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("message-sent", target);
+        MessageWrapper messageReceivedWrapper = new MessageWrapper(target, message)
+                .checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("message-received", player);
         sender.spigot().sendMessage(messageSentWrapper.build());
         target.spigot().sendMessage(messageReceivedWrapper.build());
+
+        MessageWrapper spyMessageWrapper = new MessageWrapper(player, message)
+                .checkAll()
+                .filterAll()
+                .withReplacements()
+                .withTags().parsePlaceholders("social-spy", target);
+        for (UUID uuid : dataManager.getSocialSpies()) {
+            if (uuid.equals(((Player) sender).getUniqueId()) || uuid.equals(target.getUniqueId())) continue;
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null) spy.spigot().sendMessage(spyMessageWrapper.build());
+        }
 
         try {
             Sound sound = Sound.valueOf(Setting.MESSAGE_SOUND.getString());
@@ -68,8 +99,7 @@ public class CommandMessage extends AbstractCommand {
 
         }
 
-        DataManager dataManager = plugin.getManager(DataManager.class);
-        dataManager.setLastMessagedBy(target, player);
+        targetData.setReplyTo(player.getUniqueId());
     }
 
     @Override

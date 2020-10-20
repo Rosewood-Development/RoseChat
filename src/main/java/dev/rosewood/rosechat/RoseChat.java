@@ -1,7 +1,11 @@
 package dev.rosewood.rosechat;
 
+import dev.rosewood.rosechat.commands.CommandHelp;
 import dev.rosewood.rosechat.commands.CommandMessage;
 import dev.rosewood.rosechat.commands.CommandReply;
+import dev.rosewood.rosechat.commands.CommandSocialSpy;
+import dev.rosewood.rosechat.commands.CommandToggleMessages;
+import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.floralapi.CommandManager;
 import dev.rosewood.rosechat.floralapi.CommandReload;
 import dev.rosewood.rosechat.floralapi.SeniorCommandManager;
@@ -16,12 +20,9 @@ import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
-
 import net.milkbowl.vault.permission.Permission;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,11 +30,11 @@ import java.util.List;
 public class RoseChat extends RosePlugin {
 
     private static RoseChat instance;
+    private SeniorCommandManager commandManager;
     private Permission vault;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class);
-
         instance = this;
     }
 
@@ -43,10 +44,15 @@ public class RoseChat extends RosePlugin {
 
         CommandManager messageCommand = new CommandManager(new CommandMessage(this));
         CommandManager replyCommand = new CommandManager(new CommandReply(this));
+        CommandManager socialSpyCommand = new CommandManager(new CommandSocialSpy(this));
+        CommandManager toggleMessageCommand = new CommandManager(new CommandToggleMessages(this));
 
-        new SeniorCommandManager("rosechat", "/rosechat help")
+        this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)
                 .addCommandManager(replyCommand)
+                .addCommandManager(socialSpyCommand)
+                .addCommandManager(toggleMessageCommand)
+                .addSubcommand(new CommandHelp(this))
                 .addSubcommand(new CommandReload());
 
         new ChatListener(this);
@@ -61,15 +67,17 @@ public class RoseChat extends RosePlugin {
     @Override
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
-                DataManager.class,
                 PlaceholderSettingManager.class,
+                DataManager.class,
                 ChannelManager.class
         );
     }
 
     @Override
-    public List<DataMigration> getDataMigrations() {
-        return Collections.emptyList();
+    public List<Class<? extends DataMigration>> getDataMigrations() {
+        return Arrays.asList(
+                _1_Create_Tables_Data.class
+        );
     }
 
     private void initHooks() {
@@ -90,6 +98,10 @@ public class RoseChat extends RosePlugin {
 
     public Permission getVault() {
         return vault;
+    }
+
+    public SeniorCommandManager getCommandManager() {
+        return commandManager;
     }
 
     public static RoseChat getInstance() {

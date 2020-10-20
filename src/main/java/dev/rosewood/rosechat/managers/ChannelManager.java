@@ -6,7 +6,6 @@ import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

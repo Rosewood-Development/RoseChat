@@ -7,9 +7,7 @@ import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.config.RoseSettingSection;
 import dev.rosewood.rosegarden.config.RoseSettingValue;
 import dev.rosewood.rosegarden.manager.AbstractConfigurationManager;
-
 import org.bukkit.Sound;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -23,17 +21,16 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         WARN_ON_CAPS_SENT("moderation-settings.warn-on-caps-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player sends a message that contains too many capital letters?"),
         SPAM_CHECKING_ENABLED("moderation-settings.spam-checking-enabled", true, "Should the plugin check for players sending multiple of the same message?"),
         SPAM_MESSAGE_COUNT("moderation-settings.spam-message-count", 5, "How many similar messages are allowed to be sent before it can be seen as spam?"),
-        SPAM_FILTER_SENSITIVITY("moderation-settings.spam-filter-sensitivity", 0.75, "How similar are the messages that count as spam?"),
+        SPAM_FILTER_SENSITIVITY("moderation-settings.spam-filter-sensitivity", 0.3, "How similar are the messages that count as spam?"),
         WARN_ON_SPAM_SENT("moderation-settings.warn-on-spam-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player spams?"),
         URL_CHECKING_ENABLED("moderation-settings.url-checking-enabled", true, "Should the plugin check for messages that contain URLs and IP addresses?"),
         URL_CENSORING_ENABLED("moderation-settings.url-censoring-enabled", true, "Should the plugin censor URLs and IP addresses?", "If true, messages will be censored - removing periods and click functionality.", "If false, the message will not be sent."),
         WARN_ON_URL_SENT("moderation-settings.warn-on-url-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player sends a message containing a URL or IP address?"),
         SWEAR_CHECKING_ENABLED("moderation-settings.swear-checking-enabled", true, "Should the plugin check for swear words?"),
-        SWEAR_FILTER_SENSITIVITY("moderation-settings.swear-filter-sensitivity", 0.8, "How similar are the messages that count as swears?", "THIS SETTING IS BROKEN"),
+        SWEAR_FILTER_SENSITIVITY("moderation-settings.swear-filter-sensitivity", 0.2, "How similar are the messages that count as swears?"),
         BLOCKED_SWEARS("moderation-settings.blocked-swears", Collections.singletonList("faggot"), "If a player sends a message that contains one of these words, then the message will not be sent."),
         WARN_ON_BLOCKED_SWEAR_SENT("moderation-settings.warn-on-blocked-swear-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player sends a message with a blocked swear in it?"),
         SWEAR_REPLACEMENTS("moderation-settings.swear-replacements", Arrays.asList("fuck:f***", "bitch:dog", "ass:butt"), "If a player sends a message that contains one of these words, then the word will be replaced.", "Format: 'contains:replaced'."),
-        WARN_ON_REPLACED_SWEAR_SENT("moderation-settings.warn-on-replaced-swear-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player sends a message with a replaced swear in it?"),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         MESSAGE_SOUND("chat-settings.message-sound", Sound.BLOCK_NOTE_BLOCK_PLING.name(), "The sound that will be sent to a player when they receive a message.", "Players can individually disable this in-game with /togglesound.", "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
@@ -128,13 +125,12 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         ), "Chat Channels are different chats that players can use.", "These can be accessed with /channel or /c in-game"),
 
         CHAT_FORMATS("chat-formats", null,"These are all of the miscellanous chat formats in the plugin."),
-        MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{left-bracket}{you}{arrow}{receiver}{right-bracket}{message}", "The format of a /msg sent to another player."),
-        MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{left-bracket}{player}{arrow}{you}{right-bracket}{message}", "The format of a /msg received from another player."),
-        SOCIAL_SPY_FORMAT("chat-formats.social-spy", "{spy-prefix}{spy-player}{message}", "The format of a spied /msg."),
+        MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{left-bracket}{you}{arrow-sender}{msg-player}{right-bracket}{message}", "The format of a /msg sent to another player."),
+        MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{left-bracket}{msg-player}{arrow-receiver}{you}{right-bracket}{message}", "The format of a /msg received from another player."),
+        SOCIAL_SPY_FORMAT("chat-formats.social-spy", "{spy-prefix}{spy-player}{spy-other}{message}", "The format of a spied /msg."),
         GROUP_FORMAT("chat-formats.group", "{group}{player}{extra}{message}", "The format of a group message."),
         GROUP_SPY_FORMAT("chat-formats.group-spy", "{spy-prefix}{group}{player}{extra}{message}", "The format of a spied group message."),
-        WORLD_SPY_FORMAT("chat-formats.world-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message.")
-        ;
+        WORLD_SPY_FORMAT("chat-formats.world-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message.");
 
         private final String key;
         private final Object defaultValue;

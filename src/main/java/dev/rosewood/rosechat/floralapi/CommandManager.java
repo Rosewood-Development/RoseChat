@@ -96,7 +96,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean canSend(CommandSender sender, AbstractCommand command) {
+    public boolean canSend(CommandSender sender, AbstractCommand command) {
         if (command.getPermission() != null && !sender.hasPermission(command.getPermission())) {
             localeManager.sendMessage(sender, "no-permission");
             return false;
@@ -155,7 +155,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @param args The arguments sent with the cards.
      * @return The arguments sent with the command, except the first one.
      */
-    private String[] truncateArgs(String[] args) {
+    public String[] truncateArgs(String[] args) {
         String[] trueArgs = new String[args.length - 1];
         System.arraycopy(args, 1, trueArgs, 0, args.length - 1);
         return trueArgs;

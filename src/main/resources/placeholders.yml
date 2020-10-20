@@ -59,13 +59,13 @@ staff-prefix:
 
 left-bracket:
   text:
-    default: "&8["
+    default: "&8[&f"
 
 right-bracket:
   text:
     default: "&8] &f"
 
-arrow:
+arrow-sender:
   text:
     default: " &6->&r "
 
@@ -76,15 +76,33 @@ arrow:
       - "&6From: &f%player_name%"
       - "&eTo: &f%other_player_name%"
 
-receiver:
+arrow-receiver:
+  text:
+    default: " &6->&r "
+  hover:
+    default:
+      - "&6From: &f%other_player_name%"
+      - "&eTo: &f%player_name%"
+
+msg-player:
   text:
     default: "%other_player_displayname%"
-  hover:
-    default: "&7Balance: &a$%vault_eco_balance_formatted%"
 
 you:
   text:
     default: "&eYou"
+
+spy-prefix:
+  text:
+    default: "&6[&eSocialSpy&6] "
+
+spy-player:
+  text:
+    default: "&8[&e%player_name% &6-> "
+
+spy-other:
+  text:
+    default: "&e%other_player_name%&8] &f"
 
 # Tags
 
@@ -138,6 +156,13 @@ spoiler-tag:
   hover:
     default:
       - "%tag%"
+
+rosechat:
+  text:
+    default: "<g:#8A2387:#E94057:#F27121>RoseChat"
+  hover:
+    default:
+      - "&eYou're using <g:#8A2387:#E94057:#F27121>RoseChat&e"
 
 conditional-example:
   text:

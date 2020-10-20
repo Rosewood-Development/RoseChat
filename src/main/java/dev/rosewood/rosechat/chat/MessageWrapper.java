@@ -3,32 +3,34 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.managers.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.managers.DataManager;
+import dev.rosewood.rosechat.managers.LocaleManager;
 import dev.rosewood.rosechat.managers.PlaceholderSettingManager;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class MessageWrapper {
 
     private RoseChat plugin;
+    private DataManager dataManager;
+
     private PlaceholderSettingManager placeholderManager;
     private Player player;
+    private PlayerData playerData;
     private String message;
     private ComponentBuilder builder;
 
@@ -49,6 +51,8 @@ public class MessageWrapper {
 
     public MessageWrapper(Player sender, String message) {
         this.plugin = RoseChat.getInstance();
+        this.dataManager = plugin.getManager(DataManager.class);
+        this.playerData = dataManager.getPlayerData(sender.getUniqueId());
         this.placeholderManager = plugin.getManager(PlaceholderSettingManager.class);
         this.player = sender;
         this.message = message;
@@ -80,10 +84,7 @@ public class MessageWrapper {
     }
 
     public MessageWrapper checkAll() {
-        this.checkColours();
-        this.checkFormatting();
-        this.checkMagic();
-        return this;
+        return this.checkColours().checkFormatting().checkMagic();
     }
 
     private boolean isCaps() {
@@ -119,8 +120,7 @@ public class MessageWrapper {
     public MessageWrapper filterSpam() {
         if (player.hasPermission("rosechat.bypass.spam")) return this;
         if (!Setting.SPAM_CHECKING_ENABLED.getBoolean()) return this;
-        DataManager dataManager = plugin.getManager(DataManager.class);
-        if (!dataManager.getPlayerChatMessages(player).addMessageWithSpamCheck(message)) return this;
+        if (!playerData.getMessageLog().addMessageWithSpamCheck(message)) return this;
         if (Setting.WARN_ON_SPAM_SENT.getBoolean()) filterType = FilterType.SPAM;
 
         isBlocked = true;
@@ -132,20 +132,19 @@ public class MessageWrapper {
         if (player.hasPermission("rosechat.bypass.links")) return this;
         if (!Setting.URL_CHECKING_ENABLED.getBoolean()) return this;
 
-        if (!message.matches(MessageUtils.URL_PATTERN.pattern()))
-            return this;
+        boolean hasUrl = false;
+
+        Matcher matcher = MessageUtils.URL_PATTERN.matcher(message);
+        while (matcher.find()) {
+            String url = message.substring(matcher.start(0), matcher.end(0));
+            message = message.replace(url, "&m" + url.replace(".", " ") + "&r");
+            hasUrl = true;
+        }
+
+        if (!hasUrl) return this;
 
         if (Setting.WARN_ON_URL_SENT.getBoolean()) filterType = FilterType.URL;
-
-        if (message.matches(MessageUtils.URL_PATTERN.pattern())) {
-            if (Setting.URL_CENSORING_ENABLED.getBoolean()) {
-                // Maybe just replace within the URL/IP?
-                message = message.replace(".", " ");
-                // what else should go here idk
-            } else {
-                isBlocked = true;
-            }
-        }
+        isBlocked = !Setting.URL_CENSORING_ENABLED.getBoolean();
 
         return this;
     }
@@ -158,9 +157,9 @@ public class MessageWrapper {
         // how to solve the scunthorpe problem :sob:
         // Sorry server admins, your players can either say "aaaaassssssss" or not "grass"/"assassin"... :(
         for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
-            for (String word : message.split(" ")) {
+            for (String word : rawMessage.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similarity >= Setting.SWEAR_FILTER_SENSITIVITY.getDouble()) {
+                if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble() - 1)) {
                     if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) filterType = FilterType.SWEAR;
                     isBlocked = true;
                     return this;
@@ -175,10 +174,8 @@ public class MessageWrapper {
             String replacement = swearReplacement[1];
             for (String word : message.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similarity >= Setting.SWEAR_FILTER_SENSITIVITY.getDouble()) {
+                if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble() - 1)) {
                     message = message.replace(word, replacement);
-
-                    if (Setting.WARN_ON_REPLACED_SWEAR_SENT.getBoolean()) filterType = FilterType.SWEAR;
                 }
             }
         }
@@ -187,11 +184,7 @@ public class MessageWrapper {
     }
 
     public MessageWrapper filterAll() {
-        filterCaps();
-        filterSpam();
-        filterURLs();
-        filterSwears();
-        return this;
+        return this.filterCaps().filterSpam().filterURLs().filterSwears();
     }
 
     public MessageWrapper withReplacements() {
@@ -311,7 +304,7 @@ public class MessageWrapper {
 
                 if (tag.shouldMatchLength()) {
                     String originalText = textSb.toString();
-                    for (int i = 0; i < tagMessage.length() - 1; i++) textSb.append(originalText);
+                    for (int i = 0; i < ChatColor.stripColor(tagMessage).length() - 1; i++) textSb.append(originalText);
                 }
 
                 // TODO: 'other' placeholders.
@@ -323,6 +316,8 @@ public class MessageWrapper {
                     String hover = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getHover().getHoverStringFromGroup(group)));
                     HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(hover)));
                     for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
+                    // If log hover to console,
+                    Bukkit.getConsoleSender().sendMessage("[Hover] " + this.player.getDisplayName() + ": " + hover);
                 }
 
                 // TODO: Merge Duplicate
@@ -430,6 +425,11 @@ public class MessageWrapper {
 
     private void applyEmote(ChatReplacement chatReplacement) {
         if (chatReplacement.getHoverText() != null) {
+            if (chatReplacement.getReplacement().startsWith("{") && chatReplacement.getReplacement().endsWith("}")) {
+                CustomPlaceholder placeholder = placeholderManager.getPlaceholder(chatReplacement.getReplacement().replace("{", "").replace("}", ""));
+                return;
+            }
+
             BaseComponent[] components = TextComponent.fromLegacyText(chatReplacement.getReplacement());
             StringPlaceholders placeholders = StringPlaceholders.single("text", chatReplacement.getText());
             BaseComponent[] hover = TextComponent.fromLegacyText(HexUtils.colorify(placeholders.apply(chatReplacement.getHoverText())));

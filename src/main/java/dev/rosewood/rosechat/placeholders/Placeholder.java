@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.placeholders;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
-
 import java.util.List;
 
 public class Placeholder {

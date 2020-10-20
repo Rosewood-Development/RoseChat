@@ -1,11 +1,11 @@
 package dev.rosewood.rosechat.listeners;
 
 import dev.rosewood.rosechat.RoseChat;
-
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.managers.ChannelManager;
 import dev.rosewood.rosechat.managers.DataManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,14 +26,20 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
 
-        for (ChatChannel channel : plugin.getManager(ChannelManager.class).getChannels().values()) {
+        ChannelManager channelManager = plugin.getManager(ChannelManager.class);
+        DataManager dataManager = plugin.getManager(DataManager.class);
+
+        for (ChatChannel channel : channelManager.getChannels().values()) {
             if (channel.isAutoJoin() && channel.getWorld().equalsIgnoreCase(world.getName())) {
                 channel.add(player);
                 return;
             }
         }
 
-        plugin.getManager(ChannelManager.class).getDefaultChannel().add(player);
-        plugin.getManager(DataManager.class).createPlayerMessageLog(player);
+        channelManager.getDefaultChannel().add(player);
+        dataManager.getPlayerData(player.getUniqueId(), (playerData) -> {
+            Bukkit.broadcastMessage(ChatColor.RED + "Has Social Spy: " + playerData.hasSocialSpy());
+        });
+
     }
 }
