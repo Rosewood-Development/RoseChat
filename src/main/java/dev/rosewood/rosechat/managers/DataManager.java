@@ -23,7 +23,14 @@ public class DataManager extends AbstractDataManager {
     }
 
     public PlayerData getPlayerData(UUID uuid) {
-        return playerData.get(uuid);
+        PlayerData data = playerData.get(uuid);
+        if (data == null)
+            throw new IllegalStateException("PlayerData for [" + uuid + "] not yet loaded.");
+        return data;
+    }
+
+    public void unloadPlayerData(UUID uuid) {
+        playerData.remove(uuid);
     }
 
     public void getPlayerData(UUID uuid, Consumer<PlayerData> callback) {
@@ -66,17 +73,38 @@ public class DataManager extends AbstractDataManager {
     public void updatePlayerData(PlayerData playerData) {
         this.async(() -> {
             this.databaseConnector.connect(connection -> {
-                String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET " +
-                        "social_spy = ?, can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ? " +
-                        "WHERE uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                    statement.setBoolean(1, playerData.hasSocialSpy());
-                    statement.setBoolean(2, playerData.canBeMessaged());
-                    statement.setBoolean(3, playerData.hasTagSounds());
-                    statement.setBoolean(4, playerData.hasMessageSounds());
-                    statement.setString(5, playerData.getUuid().toString());
-                    statement.addBatch();
-                    statement.executeUpdate();
+                boolean create;
+
+                String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+                    statement.setString(1, playerData.getUuid().toString());
+                    ResultSet result = statement.executeQuery();
+                    create = !result.next();
+                }
+
+                if (create) {
+                    String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, social_spy, " +
+                            "can_be_messaged, has_tag_sounds, has_message_sounds) VALUES (?, ?, ?, ?, ?)";
+                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                        statement.setString(1, playerData.getUuid().toString());
+                        statement.setBoolean(2, playerData.hasSocialSpy());
+                        statement.setBoolean(3, playerData.canBeMessaged());
+                        statement.setBoolean(4, playerData.hasTagSounds());
+                        statement.setBoolean(5, playerData.hasMessageSounds());
+                        statement.executeUpdate();
+                    }
+                } else {
+                    String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET " +
+                            "social_spy = ?, can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ? " +
+                            "WHERE uuid = ?";
+                    try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+                        statement.setBoolean(1, playerData.hasSocialSpy());
+                        statement.setBoolean(2, playerData.canBeMessaged());
+                        statement.setBoolean(3, playerData.hasTagSounds());
+                        statement.setBoolean(4, playerData.hasMessageSounds());
+                        statement.setString(5, playerData.getUuid().toString());
+                        statement.executeUpdate();
+                    }
                 }
             });
         });

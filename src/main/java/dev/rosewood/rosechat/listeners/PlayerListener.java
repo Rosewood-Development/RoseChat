@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
 
@@ -41,5 +42,12 @@ public class PlayerListener implements Listener {
             Bukkit.broadcastMessage(ChatColor.RED + "Has Social Spy: " + playerData.hasSocialSpy());
         });
 
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        DataManager dataManager = plugin.getManager(DataManager.class);
+        dataManager.unloadPlayerData(player.getUniqueId());
     }
 }

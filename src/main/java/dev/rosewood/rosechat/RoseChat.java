@@ -57,6 +57,10 @@ public class RoseChat extends RosePlugin {
 
         new ChatListener(this);
         new PlayerListener(this);
+
+        // Load data for all players currently online
+        DataManager dataManager = this.getManager(DataManager.class);
+        Bukkit.getOnlinePlayers().forEach(x -> dataManager.getPlayerData(x.getUniqueId(), data -> {}));
     }
 
     @Override
