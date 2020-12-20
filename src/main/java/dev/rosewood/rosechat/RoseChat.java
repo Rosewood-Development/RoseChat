@@ -1,10 +1,13 @@
 package dev.rosewood.rosechat;
 
+import dev.rosewood.rosechat.commands.CommandChannel;
 import dev.rosewood.rosechat.commands.CommandHelp;
 import dev.rosewood.rosechat.commands.CommandMessage;
 import dev.rosewood.rosechat.commands.CommandReply;
 import dev.rosewood.rosechat.commands.CommandSocialSpy;
+import dev.rosewood.rosechat.commands.CommandToggleEmotes;
 import dev.rosewood.rosechat.commands.CommandToggleMessages;
+import dev.rosewood.rosechat.commands.CommandToggleSound;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.floralapi.CommandManager;
 import dev.rosewood.rosechat.floralapi.CommandReload;
@@ -24,7 +27,6 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class RoseChat extends RosePlugin {
@@ -46,12 +48,18 @@ public class RoseChat extends RosePlugin {
         CommandManager replyCommand = new CommandManager(new CommandReply(this));
         CommandManager socialSpyCommand = new CommandManager(new CommandSocialSpy(this));
         CommandManager toggleMessageCommand = new CommandManager(new CommandToggleMessages(this));
+        CommandManager toggleSoundCommand = new CommandManager(new CommandToggleSound(this));
+        CommandManager toggleEmotesCommand = new CommandManager(new CommandToggleEmotes(this));
+        CommandManager channelCommand = new CommandManager(new CommandChannel(this));
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)
                 .addCommandManager(replyCommand)
                 .addCommandManager(socialSpyCommand)
                 .addCommandManager(toggleMessageCommand)
+                .addCommandManager(toggleSoundCommand)
+                .addCommandManager(toggleEmotesCommand)
+                .addCommandManager(channelCommand)
                 .addSubcommand(new CommandHelp(this))
                 .addSubcommand(new CommandReload());
 
@@ -72,8 +80,8 @@ public class RoseChat extends RosePlugin {
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
                 PlaceholderSettingManager.class,
-                DataManager.class,
-                ChannelManager.class
+                ChannelManager.class,
+                DataManager.class
         );
     }
 

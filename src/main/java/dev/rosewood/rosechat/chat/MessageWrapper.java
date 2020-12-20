@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.managers.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.managers.DataManager;
-import dev.rosewood.rosechat.managers.LocaleManager;
 import dev.rosewood.rosechat.managers.PlaceholderSettingManager;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -21,6 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 
 public class MessageWrapper {
@@ -33,6 +33,7 @@ public class MessageWrapper {
     private PlayerData playerData;
     private String message;
     private ComponentBuilder builder;
+    private ChatChannel channel;
 
     private boolean replacements;
     private boolean tags;
@@ -58,6 +59,11 @@ public class MessageWrapper {
         this.message = message;
         this.builder = new ComponentBuilder();
         this.taggedPlayerNames = new ArrayList<>();
+    }
+
+    public MessageWrapper inChannel(ChatChannel channel) {
+        this.channel = channel;
+        return this;
     }
 
     public MessageWrapper checkColours() {
@@ -198,6 +204,8 @@ public class MessageWrapper {
     }
 
     public MessageWrapper parsePlaceholders(String format, Player other) {
+        this.builder = new ComponentBuilder();
+
         String group = plugin.getVault() == null ? "default" : plugin.getVault().getPrimaryGroup(player);
 
         List<String> unformattedChatFormat = placeholderManager.getParsedFormats().get(format);
@@ -345,6 +353,7 @@ public class MessageWrapper {
 
     // TODO: Fix multiple emotes touching.
     private boolean parseEmotes(String word) {
+        if (!playerData.hasEmotes()) return false;
         if (!replacements) return false;
         boolean hasEmote = false;
         
@@ -465,7 +474,59 @@ public class MessageWrapper {
         return tagSound;
     }
 
+    public ChatChannel getChannel() {
+        return channel;
+    }
+
+    public List<Player> getChannelMembers() {
+        List<Player> players = new ArrayList<>();
+
+        for (UUID uuid : this.channel.getPlayers()) {
+            if (uuid.equals(player.getUniqueId())) continue;
+            if (Bukkit.getPlayer(uuid) != null) players.add(Bukkit.getPlayer(uuid));
+        }
+
+        return players;
+    }
+
     public void send(CommandSender sender) {
         sender.spigot().sendMessage(build());
+    }
+
+    public void send(Player player) {
+        player.spigot().sendMessage(build());
+    }
+
+    public void send(ChatChannel channel) {
+        BaseComponent[] message = this.build();
+
+        for (UUID uuid : channel.getPlayers()) {
+            Player member = Bukkit.getPlayer(uuid);
+            member.spigot().sendMessage(message);
+        }
+    }
+
+    public void tagPlayers() {
+        if (this.tagSound == null) return;
+
+        if (this.channel != null) {
+            for (UUID taggedUuid : this.channel.getPlayers()) {
+                Player tagged = Bukkit.getPlayer(taggedUuid);
+                if (tagged == null || !this.getTaggedPlayerNames().contains(tagged.getName())) continue;
+
+                PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
+                if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), this.getTagSound(), 1, 1);
+            }
+
+            return;
+        }
+
+        for (String playerStr : getTaggedPlayerNames()) {
+            Player tagged = Bukkit.getPlayer(playerStr);
+            if (tagged == null) continue;
+
+            PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
+            if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), getTagSound(), 1, 1);
+        }
     }
 }

@@ -16,20 +16,22 @@ import java.util.UUID;
 public class CommandSocialSpy extends AbstractCommand {
 
     private RoseChat plugin;
+    private DataManager dataManager;
     private LocaleManager localeManager;
 
     public CommandSocialSpy(RoseChat plugin) {
-        super(true, "socialspy", "ss");
+        super(true, "socialspy", "ss", "spy");
         this.plugin = plugin;
+        this.dataManager = plugin.getManager(DataManager.class);
         this.localeManager = plugin.getManager(LocaleManager.class);
     }
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        DataManager dataManager = plugin.getManager(DataManager.class);
         UUID uuid = ((Player) sender).getUniqueId();
         PlayerData playerData = dataManager.getPlayerData(uuid);
 
+        // TODO: Channel spying, group spying
         if (playerData.hasSocialSpy()) {
             this.localeManager.sendMessage(sender, "command-socialspy-disabled");
         } else {

@@ -54,6 +54,6 @@ public class CommandHelp extends AbstractCommand {
 
     @Override
     public String getSyntax() {
-        return "null";
+        return "/rc help";
     }
 }

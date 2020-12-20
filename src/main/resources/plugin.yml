@@ -16,29 +16,63 @@ commands:
     aliases: [reply, r]
     description: Replies to a message from another player.
   socialspy:
-    aliases: [ss]
-    description: See private messages.
+    aliases: [ss, spy]
+    description: Allows a player to see private messages.
   togglemessage:
     aliases: [togglemessages, togglepm, togglemsg, togglemsgs]
     description: Toggles receiving messages.
   togglesound:
     aliases: [togglesounds, toggleping, toggletag]
+    description: Toggles receiving sounds on messages or tags.
+  toggleemotes:
+    aliases: [toggleemote]
+    description: Toggles formatting emotes when sent.
+  channel:
+    aliases: [c]
+    description: Talk in a chat channel.
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.
     children:
-      - rosechat.message
-      - rosechat.reply
-      - rosechat.staffchat
-      - rosechat.broadcast
-      - rosechat.togglesound
-      - rosechat.spy
-      - rosechat.togglemessage
-      - rosechat.channels
-      - rosechat.group
       - rosechat.chat
       - rosechat.bypass
-      - rosechat.toggletag
+      - rosechat.message
+      - rosechat.reply
+      - rosechat.spy
+      - rosechat.togglemessage
+      - rosechat.togglesound
+      - rosechat.toggleemotes
+      - rosechat.channel
+  rosechat.chat:
+    description: Allows a player to chat.
+    default: not op
+  rosechat.chat.color:
+    description: Allows a player to use color in chat.
+    default: op
+  rosechat.chat.format:
+    description: Allows a player to use formatting in chat.
+    default: op
+  rosechat.chat.magic:
+    description: Allows a player to use the magic formatting in chat.
+    default: op
+  rosechat.chat.tag:
+    description: Allows a player to tag other players.
+    default: op
+  rosechat.bypass:
+    description: Allows a player to bypass filters.
+    default: op
+  rosechat.bypass.spam:
+    description: Allows a player to bypass the spam filter.
+    default: op
+  rosechat.bypass.language:
+    description: Allows a player to bypass the language filter.
+    default: op
+  rosechat.bypass.caps:
+    description: Allows a player to bypass the caps filter.
+    default: op
+  rosechat.bypass.links:
+    description: Allows a player to bypass the URL filter.
+    default: op
   rosechat.message:
     description: Allows a player to use /message.
     default: op
@@ -66,120 +100,18 @@ permissions:
   rosechat.reply:
     description: Allows a player to use /reply.
     default: op
-  rosechat.staffchat:
-    description: Allows a player to use /staffchat.
-    default: op
-  rosechat.togglesound:
-    description: Allows a player to use /togglesound.
+  rosechat.spy:
+    description: Allows a player to use /socialspy.
     default: op
   rosechat.togglemessage:
     description: Allows a player to use /togglemessage.
     default: op
-  rosechat.spy:
-    description: Allows a player to use /socialspy.
+  rosechat.togglesound:
+    description: Allows a player to use /togglesound.
     default: op
-  rosechat.spy.message:
-    description: Allows a player to use /socialspy.
+  rosechat.toggleemotes:
+    description: Allows a player to use /toggleemotes.
     default: op
-  rosechat.spy.channel:
-    description: Allows a player to use /channelspy.
-    default: op
-  rosechat.spy.group:
-    description: Allows a player to use /groupspy.
-    default: op
-  rosechat.channels:
-    description: Allows a player to use /channel.
-    default: op
-  rosechat.channels.radius:
-    description: Allows a player to use /channel radius.
-    default: op
-  rosechat.channels.world:
-    description: Allows a player to use /channel world.
-    default: op
-  rosechat.channels.global:
-    description: Allows a player to use /channel global.
-    default: not op
-  rosechat.group:
-    description: Allows a player to use /group
-    default: op
-  rosechat.group.create:
-    description: Allows a player to use /group create.
-    default: op
-  rosechat.group.disband:
-    description: Allows a player to use /group disband.
-    default: op
-  rosechat.group.rename:
-    description: Allows a player to use /group rename.
-    default: op
-  rosechat.group.invite:
-    description: Allows a player to use /group invite.
-    default: op
-  rosechat.group.accept:
-    description: Allows a player to use /group accept.
-    default: op
-  rosechat.group.deny:
-    description: Allows a player to use /group deny.
-    default: op
-  rosechat.group.send:
-    description: Allows a player to use /group <message>.
-    default: op
-  rosechat.group.leave:
-    description: Allows a player to use /group leave.
-    default: op
-  rosechat.group.list:
-    description: Allows a player to use /group list.
-    default: op
-  rosechat.group.members:
-    description: Allows a player to use /group members.
-    default: op
-  rosechat.group.promote:
-    description: Allows a player to use /group promote.
-    default: op
-  rosechat.group.mute:
-    description: Allows a player to use /group mute.
-    default: op
-  rosechat.group.mail:
-    description: Allows a player to use /group mail.
-    default: op
-  rosechat.group.kick:
-    description: Allows a player to use /group kick.
-    default: op
-  rosechat.group.admin:
-    description: Allows a player to see groups, and who's in them.
-    default: op
-  rosechat.chat:
-    description: Allows a player to chat.
-    default: not op
-  rosechat.chat.color:
-    description: Allows a player to use color in chat.
-    default: op
-  rosechat.chat.format:
-    description: Allows a player to use formatting in chat.
-    default: op
-  rosechat.chat.magic:
-    description: Allows a player to use the magic formatting in chat.
-    default: op
-  rosechat.chat.tag:
-    description: Allows a player to tag other players.
-    default: op
-  rosechat.chat.placeholders:
-    description: Allows a player to use placeholders in chat.
-    default: op
-  rosechat.bypass:
-    description: Allows a player to bypass filters.
-    default: op
-  rosechat.bypass.spam:
-    description: Allows a player to bypass the spam filter.
-    default: op
-  rosechat.bypass.language:
-    description: Allows a player to bypass the language filter.
-    default: op
-  rosechat.bypass.caps:
-    description: Allows a player to bypass the caps filter.
-    default: op
-  rosechat.bypass.links:
-    description: Allows a player to bypass the URL filter.
-    default: op
-  rosechat.toggletag:
-    description: Allows a player to use /toggletag.
+  rosechat.channel:
+    description: Allows a player to access channels.
     default: op

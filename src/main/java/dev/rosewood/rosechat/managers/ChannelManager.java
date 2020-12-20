@@ -23,6 +23,8 @@ public class ChannelManager extends Manager {
 
     @Override
     public void reload() {
+        this.defaultChannel = null;
+
         for (String id : Setting.CHAT_CHANNELS.getSection().getKeys(false)) {
             CommentedConfigurationSection section = Setting.CHAT_CHANNELS.getSection();
 
@@ -35,6 +37,7 @@ public class ChannelManager extends Manager {
             boolean urlCheck = section.contains(id + ".url-checking-enabled") && section.getBoolean(id + ".url-checking-enabled");
             boolean spamCheck = section.contains(id + ".spam-checking-enabled") && section.getBoolean(id + ".spam-checking-enabled");
             boolean swearCheck = section.contains(id + ".swear-checking-enabled") && section.getBoolean(id + ".swear-checking-enabled");
+            boolean visible = section.contains(id + ".visible") && section.getBoolean(id + ".visible");
             int radius = section.contains(id + ".radius") ? section.getInt(id + ".radius") : -1;
             String world = section.contains(id + ".world") ? section.getString(id + ".world") : null;
             boolean autoJoin = section.contains(id + ".auto-join") && section.getBoolean("auto-join");
@@ -43,7 +46,7 @@ public class ChannelManager extends Manager {
             ChatChannel channel = new ChatChannel(id, format, isDefault)
                     .setChatPlaceholders(placeholders).setDisabledTags(disabledTags).setDisabledReplacements(disabledReplacements)
                     .setCheckCaps(capsCheck).setCheckUrl(urlCheck).setCheckSpam(spamCheck).setCheckLanguage(swearCheck)
-                    .setRadius(radius).setWorld(world).setAutoJoin(autoJoin).setServers(servers);
+                    .setRadius(radius).setWorld(world).setAutoJoin(autoJoin).setServers(servers).setVisible(visible);
 
             channels.put(id, channel);
 

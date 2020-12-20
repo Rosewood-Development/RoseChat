@@ -19,11 +19,13 @@ import java.util.UUID;
 public class CommandReply extends AbstractCommand {
 
     private RoseChat plugin;
+    private DataManager dataManager;
     private LocaleManager localeManager;
 
     public CommandReply(RoseChat plugin) {
         super("reply", "r");
         this.plugin = plugin;
+        this.dataManager = plugin.getManager(DataManager.class);
         this.localeManager = plugin.getManager(LocaleManager.class);
     }
 
@@ -42,7 +44,6 @@ public class CommandReply extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        DataManager dataManager = plugin.getManager(DataManager.class);
         PlayerData playerData = dataManager.getPlayerData(player.getUniqueId());
 
         if (playerData.getReplyTo() == null) {
@@ -65,7 +66,7 @@ public class CommandReply extends AbstractCommand {
             return;
         }
 
-        if (playerData.canBeMessaged()) {
+        if (!playerData.canBeMessaged()) {
             localeManager.sendMessage(sender, "command-togglemessage-cannot-message");
             return;
         }
@@ -96,8 +97,10 @@ public class CommandReply extends AbstractCommand {
         }
 
         try {
-            Sound sound = Sound.valueOf(ConfigurationManager.Setting.MESSAGE_SOUND.getString());
-            target.playSound(target.getLocation(), sound, 1, 1);
+            if (targetData.hasMessageSounds()) {
+                Sound sound = Sound.valueOf(ConfigurationManager.Setting.MESSAGE_SOUND.getString());
+                target.playSound(target.getLocation(), sound, 1, 1);
+            }
         } catch (Exception e) {
 
         }

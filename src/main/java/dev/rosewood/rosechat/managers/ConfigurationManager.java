@@ -110,7 +110,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                         new RoseSettingValue("caps-checking-enabled", false),
                         new RoseSettingValue("url-checking-enabled", false),
                         new RoseSettingValue("spam-checking-enabled", false),
-                        new RoseSettingValue("swear-checking-enabled", false)
+                        new RoseSettingValue("swear-checking-enabled", false),
+                        new RoseSettingValue("visible", true, "Can messages from this channel be sent and read while in other channels?")
                 ), "Staff Channel - /c staff"),
                 new RoseSettingValue("local", new RoseSettingSection(
                         new RoseSettingValue("radius", 200, "If no format is given, the default channel format will be used.", "The radius is the distance between players that can read the messages sent.")

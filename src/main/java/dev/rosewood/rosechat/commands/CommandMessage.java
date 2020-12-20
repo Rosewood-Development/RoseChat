@@ -59,7 +59,7 @@ public class CommandMessage extends AbstractCommand {
             return;
         }
 
-        if (targetData.canBeMessaged()) {
+        if (!targetData.canBeMessaged()) {
             localeManager.sendMessage(sender, "command-togglemessage-cannot-message");
             return;
         }
@@ -93,8 +93,10 @@ public class CommandMessage extends AbstractCommand {
         }
 
         try {
-            Sound sound = Sound.valueOf(Setting.MESSAGE_SOUND.getString());
-            target.playSound(target.getLocation(), sound, 1, 1);
+            if (targetData.hasMessageSounds()) {
+                Sound sound = Sound.valueOf(Setting.MESSAGE_SOUND.getString());
+                target.playSound(target.getLocation(), sound, 1, 1);
+            }
         } catch (Exception e) {
 
         }

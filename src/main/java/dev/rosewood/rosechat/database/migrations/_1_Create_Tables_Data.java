@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.database.migrations;
 
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,7 +20,8 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "social_spy BOOLEAN NOT NULL, " +
                     "can_be_messaged BOOLEAN NOT NULL, " +
                     "has_tag_sounds BOOLEAN NOT NULL, " +
-                    "has_message_sounds BOOLEAN NOT NULL" +
+                    "has_message_sounds BOOLEAN NOT NULL, " +
+                    "current_channel VARCHAR(255) NOT NULL " +
                     ")");
         }
     }

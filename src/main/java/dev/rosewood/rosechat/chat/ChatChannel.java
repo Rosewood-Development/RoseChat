@@ -19,6 +19,7 @@ public class ChatChannel {
     private boolean checkSpam;
     private boolean checkLanguage;
     private boolean chatPlaceholders;
+    private boolean visible;
     private List<String> disabledTags;
     private List<String> disabledReplacements;
     private List<String> servers;
@@ -210,6 +211,15 @@ public class ChatChannel {
 
     public ChatChannel setServers(List<String> servers) {
         this.servers = servers;
+        return this;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public ChatChannel setVisible(boolean visible) {
+        this.visible = visible;
         return this;
     }
 }

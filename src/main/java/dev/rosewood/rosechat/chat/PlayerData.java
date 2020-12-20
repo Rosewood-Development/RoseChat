@@ -14,19 +14,25 @@ public class PlayerData {
     private boolean canBeMessaged;
     private boolean tagSounds;
     private boolean messageSounds;
+    private boolean emotes;
+    private ChatChannel currentChannel;
 
     public PlayerData(UUID uuid) {
         this.uuid = uuid;
         this.messageLog = new MessageLog(uuid);
         this.canBeMessaged = true;
+        this.tagSounds = true;
+        this.messageSounds = true;
+        this.emotes = true;
     }
 
-    public PlayerData(UUID uuid, boolean socialSpy, boolean canBeMessaged, boolean tagSounds, boolean messageSounds) {
+    public PlayerData(UUID uuid, boolean socialSpy, boolean canBeMessaged, boolean tagSounds, boolean messageSounds, boolean emotes) {
         this(uuid);
         this.socialSpy = socialSpy;
         this.canBeMessaged = canBeMessaged;
         this.tagSounds = tagSounds;
         this.messageSounds = messageSounds;
+        this.emotes = emotes;
     }
 
     public void save() {
@@ -79,5 +85,21 @@ public class PlayerData {
 
     public boolean hasMessageSounds() {
         return messageSounds;
+    }
+
+    public void setEmotes(boolean emotes) {
+        this.emotes = emotes;
+    }
+
+    public boolean hasEmotes() {
+        return emotes;
+    }
+
+    public ChatChannel getCurrentChannel() {
+        return currentChannel;
+    }
+
+    public void setCurrentChannel(ChatChannel currentChannel) {
+        this.currentChannel = currentChannel;
     }
 }

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.managers;
 
+import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
@@ -15,11 +16,13 @@ import java.util.function.Consumer;
 
 public class DataManager extends AbstractDataManager {
 
+    private ChannelManager channelManager;
     private Map<UUID, PlayerData> playerData;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
+        this.channelManager = rosePlugin.getManager(ChannelManager.class);
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -52,12 +55,16 @@ public class DataManager extends AbstractDataManager {
                         boolean canBeMessaged = result.getBoolean("can_be_messaged");
                         boolean hasTagSounds = result.getBoolean("has_tag_sounds");
                         boolean hasMessageSounds = result.getBoolean("has_message_sounds");
+                        String currentChannel = result.getString("current_channel");
+                        ChatChannel channel = this.channelManager.getChannel(currentChannel);
 
                         PlayerData playerData = new PlayerData(uuid);
                         playerData.setSocialSpy(socialSpy);
                         playerData.setCanBeMessaged(canBeMessaged);
                         playerData.setTagSounds(hasTagSounds);
                         playerData.setMessageSounds(hasMessageSounds);
+                        playerData.setCurrentChannel(channel);
+                        channel.add(uuid);
                         this.playerData.put(uuid, playerData);
                         callback.accept(playerData);
                     } else {
@@ -84,25 +91,27 @@ public class DataManager extends AbstractDataManager {
 
                 if (create) {
                     String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, social_spy, " +
-                            "can_be_messaged, has_tag_sounds, has_message_sounds) VALUES (?, ?, ?, ?, ?)";
+                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel) VALUES (?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                         statement.setString(1, playerData.getUuid().toString());
                         statement.setBoolean(2, playerData.hasSocialSpy());
                         statement.setBoolean(3, playerData.canBeMessaged());
                         statement.setBoolean(4, playerData.hasTagSounds());
                         statement.setBoolean(5, playerData.hasMessageSounds());
+                        statement.setString(6, playerData.getCurrentChannel().getId());
                         statement.executeUpdate();
                     }
                 } else {
                     String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET " +
-                            "social_spy = ?, can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ? " +
+                            "social_spy = ?, can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ? " +
                             "WHERE uuid = ?";
                     try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
                         statement.setBoolean(1, playerData.hasSocialSpy());
                         statement.setBoolean(2, playerData.canBeMessaged());
                         statement.setBoolean(3, playerData.hasTagSounds());
                         statement.setBoolean(4, playerData.hasMessageSounds());
-                        statement.setString(5, playerData.getUuid().toString());
+                        statement.setString(5, playerData.getCurrentChannel().getId());
+                        statement.setString(6, playerData.getUuid().toString());
                         statement.executeUpdate();
                     }
                 }

@@ -55,7 +55,6 @@ public class PlaceholderSettingManager extends Manager {
             loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), hoverPlaceholder);
             loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), clickPlaceholder);
 
-
             Map<String, String> textPlaceholders = new HashMap<>();
             for (String textGroup : placeholderConfiguration.getConfigurationSection(id + ".text").getKeys(false)) {
                 textPlaceholders.put(textGroup, placeholderConfiguration.getString(id + ".text." + textGroup));

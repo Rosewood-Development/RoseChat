@@ -52,7 +52,7 @@ extra:
 
 staff-prefix:
   text:
-    default: "&8[&cStaffChat&8]"
+    default: "&8[&cStaffChat&8] &f"
   hover:
     default:
       - "&7A chat channel that only staff members can see."
