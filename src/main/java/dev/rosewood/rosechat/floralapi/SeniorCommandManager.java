@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.floralapi;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.managers.LocaleManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 

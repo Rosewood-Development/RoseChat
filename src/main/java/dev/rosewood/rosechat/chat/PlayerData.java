@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.managers.DataManager;
-
 import java.util.UUID;
 
 public class PlayerData {
@@ -15,6 +14,7 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emotes;
+    private boolean muted;
     private ChatChannel currentChannel;
 
     public PlayerData(UUID uuid) {
@@ -101,5 +101,13 @@ public class PlayerData {
 
     public void setCurrentChannel(ChatChannel currentChannel) {
         this.currentChannel = currentChannel;
+    }
+
+    public boolean isMuted() {
+        return muted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 }

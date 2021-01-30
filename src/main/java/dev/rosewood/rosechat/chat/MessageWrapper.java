@@ -8,13 +8,13 @@ import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,161 +27,180 @@ public class MessageWrapper {
 
     private RoseChat plugin;
     private DataManager dataManager;
-
     private PlaceholderSettingManager placeholderManager;
+    private CommandSender sender;
     private Player player;
+    private MessageSender messageSender;
     private PlayerData playerData;
     private String message;
     private ComponentBuilder builder;
     private ChatChannel channel;
-
     private boolean replacements;
     private boolean tags;
-
-    private char[] colourCharacters = { '1', '2', '3', '4',
-            '5', '6', '7', '8',
-            '9', '0', 'a', 'b',
-            'c', 'd', 'e', 'f' };
-    private char[] formattingCharacters = { 'l', 'm', 'n', 'o'};
-    private char magicCharacter = 'k';
 
     private List<String> taggedPlayerNames;
     private boolean isBlocked;
     private FilterType filterType;
     private Sound tagSound;
+    private StringBuilder hoverBuilder;
 
-    public MessageWrapper(Player sender, String message) {
+    // Creates a new message wrapper with all required variables.
+    private MessageWrapper() {
         this.plugin = RoseChat.getInstance();
-        this.dataManager = plugin.getManager(DataManager.class);
-        this.playerData = dataManager.getPlayerData(sender.getUniqueId());
-        this.placeholderManager = plugin.getManager(PlaceholderSettingManager.class);
-        this.player = sender;
-        this.message = message;
+        this.dataManager = this.plugin.getManager(DataManager.class);
+        this.placeholderManager = this.plugin.getManager(PlaceholderSettingManager.class);
         this.builder = new ComponentBuilder();
         this.taggedPlayerNames = new ArrayList<>();
+        this.hoverBuilder = new StringBuilder();
     }
 
-    public MessageWrapper inChannel(ChatChannel channel) {
-        this.channel = channel;
-        return this;
+    // Creates a new message wrapper, specifically for players.
+    public MessageWrapper(Player player, String message) {
+        this();
+        this.sender = player;
+        this.player = player;
+        this.playerData = dataManager.getPlayerData(this.player.getUniqueId());
+        this.message = message;
     }
 
-    public MessageWrapper checkColours() {
-        if (this.player.hasPermission("rosechat.chat.color")) return this;
-        for (char colour : this.colourCharacters)
-            if (this.message.contains("&" + colour))
+    // Creates a new message wrapper, specifically for MessageSenders.
+    public MessageWrapper(MessageSender sender, String message) {
+        this();
+        this.sender = sender;
+        this.messageSender = sender;
+        this.message = message;
+    }
+
+    // Checks if the sender is able to send colour, if not, removes all colour from the message.
+    public MessageWrapper checkColors(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".color")) return this;
+        for (char colour : MessageUtils.COLORS) {
+            if (this.message.contains("&" + colour)) {
                 this.message = this.message.replace("&" + colour, "");
+            }
+        }
+
         return this;
     }
 
-    public MessageWrapper checkFormatting() {
-        if (this.player.hasPermission("rosechat.chat.format")) return this;
-        for (char format : this.formattingCharacters)
-            if (this.message.contains("&" + format))
+    // Checks if the sender is able to send formatting, if not, removes all formatting from the message.
+    public MessageWrapper checkFormatting(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".format")) return this;
+        for (char format : MessageUtils.FORMATTING) {
+            if (this.message.contains("&" + format)) {
                 this.message = this.message.replace("&" + format, "");
+            }
+        }
+
         return this;
     }
 
-    public MessageWrapper checkMagic() {
-        if (this.player.hasPermission("rosechat.chat.magic")) return this;
-        if (this.message.contains("&" + this.magicCharacter))
-            this.message = this.message.replace("&" + this.magicCharacter, "");
+    // Checks if the sender is able to send magic characters, if not, removes all magic characters from the message.
+    public MessageWrapper checkMagic(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".sender")) return this;
+        if (this.message.contains("&" + MessageUtils.MAGIC)) {
+            this.message = this.message.replace("&" + MessageUtils.MAGIC, "");
+        }
+
         return this;
     }
 
-    public MessageWrapper checkAll() {
-        return this.checkColours().checkFormatting().checkMagic();
+    // Checks if the player can send colours, formatting and magic characters.
+    public MessageWrapper checkAll(String basePermission) {
+        return this.checkColors(basePermission).checkFormatting(basePermission).checkMagic(basePermission);
     }
 
+    // Checks if the message breaks the configured rules about capital letters.
     private boolean isCaps() {
-        if (this.player.hasPermission("rosechat.bypass.caps")) return false;
-        if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return false;
-
-        String alpha = message;//.replaceAll("[A-Za-z0-9]*]", "");
+        // Checks if the letter is the same but capitalised.
         int caps = 0;
-
-        // Checks if the letter is the same as the letter capitalised.
-        for (int i = 0; i < alpha.length(); i++)
-            if (alpha.charAt(i) == Character.toUpperCase(alpha.charAt(i))) caps++;
+        for (int i = 0; i < this.message.length(); i++) {
+            char ch = this.message.charAt(i);
+            if (ch == Character.toUpperCase(ch)) caps++;
+        }
 
         return caps > Setting.MAXIMUM_CAPS_ALLOWED.getInt();
     }
 
-    public MessageWrapper filterCaps() {
-        if (player.hasPermission("rosechat.bypass.caps")) return this;
-        if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return this;
+    // Removes the capital letters from the message in accordance to the configuration.
+    public MessageWrapper filterCaps(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".caps") || !Setting.CAPS_CHECKING_ENABLED.getBoolean()) return this;
         if (!isCaps()) return this;
 
-        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) filterType = FilterType.CAPS;
+        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) this.filterType = FilterType.CAPS;
 
+        // If the setting is enabled, lowercase the caps and return.
+        // If not, the message should be blocked.
         if (Setting.LOWERCASE_CAPS_ENABLED.getBoolean()) {
             message = message.toLowerCase();
             return this;
         }
-        isBlocked = true;
 
+        this.isBlocked = true;
         return this;
     }
 
-    public MessageWrapper filterSpam() {
-        if (player.hasPermission("rosechat.bypass.spam")) return this;
-        if (!Setting.SPAM_CHECKING_ENABLED.getBoolean()) return this;
-        if (!playerData.getMessageLog().addMessageWithSpamCheck(message)) return this;
-        if (Setting.WARN_ON_SPAM_SENT.getBoolean()) filterType = FilterType.SPAM;
+    // Removes the spam from the message in accordance to the configuration.
+    public MessageWrapper filterSpam(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".spam") || !Setting.SPAM_CHECKING_ENABLED.getBoolean()) return this;
+        if (this.player != null && !this.playerData.getMessageLog().addMessageWithSpamCheck(message)) return this;
 
-        isBlocked = true;
+        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) this.filterType = FilterType.SPAM;
 
+        this.isBlocked = true;
         return this;
     }
 
-    public MessageWrapper filterURLs() {
-        if (player.hasPermission("rosechat.bypass.links")) return this;
-        if (!Setting.URL_CHECKING_ENABLED.getBoolean()) return this;
+    // Removes the URL from the message in accordance to the configuration.
+    public MessageWrapper filterURLs(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".links") || !Setting.URL_CHECKING_ENABLED.getBoolean()) return this;
 
-        boolean hasUrl = false;
+        boolean hasURL = false;
 
-        Matcher matcher = MessageUtils.URL_PATTERN.matcher(message);
+        Matcher matcher = MessageUtils.URL_PATTERN.matcher(this.message);
         while (matcher.find()) {
             String url = message.substring(matcher.start(0), matcher.end(0));
-            message = message.replace(url, "&m" + url.replace(".", " ") + "&r");
-            hasUrl = true;
+            this.message = message.replace(url, "&m" + url.replace(".", " ") + "&r");
+            hasURL = true;
         }
 
-        if (!hasUrl) return this;
+        if (!hasURL) return this;
+        if (Setting.WARN_ON_URL_SENT.getBoolean()) this.filterType = FilterType.URL;
 
-        if (Setting.WARN_ON_URL_SENT.getBoolean()) filterType = FilterType.URL;
-        isBlocked = !Setting.URL_CENSORING_ENABLED.getBoolean();
-
+        isBlocked = !Setting.URL_CHECKING_ENABLED.getBoolean();
         return this;
     }
 
-    public MessageWrapper filterSwears() {
-        if (player.hasPermission("rosechat.bypass.language")) return this;
-        if (!Setting.SWEAR_CHECKING_ENABLED.getBoolean()) return this;
-        String rawMessage = MessageUtils.stripAccents(message.toLowerCase());
+    // Removes the swears from the message in accordance to the configuration.
+    // Swear filters are never 100% perfect and people will *always* get around them.
+    public MessageWrapper filterSwears(String basePermission) {
+        if (this.sender.hasPermission(basePermission + ".language") || !Setting.SWEAR_CHECKING_ENABLED.getBoolean()) return this;
+        String rawMessage = MessageUtils.stripAccents(this.message.toLowerCase());
 
-        // how to solve the scunthorpe problem :sob:
-        // Sorry server admins, your players can either say "aaaaassssssss" or not "grass"/"assassin"... :(
         for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
             for (String word : rawMessage.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
+
                 if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble() - 1)) {
-                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) filterType = FilterType.SWEAR;
-                    isBlocked = true;
+                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) this.filterType = FilterType.SWEAR;
+                    this.isBlocked = true;
                     return this;
                 }
             }
         }
 
-        // TODO: Merge, or make function for this duplicate code!!!
         for (String replacements : Setting.SWEAR_REPLACEMENTS.getStringList()) {
-            String[] swearReplacement = replacements.split(":");
-            String swear = swearReplacement[0];
-            String replacement = swearReplacement[1];
-            for (String word : message.split(" ")) {
+            String[] replacementSplit = replacements.split(":");
+            String swear = replacementSplit[0];
+            String replacement = replacementSplit[1];
+
+            // TODO: Should probably compare this with the raw message, but will need to manage the replacement better.
+            // TODO: Possibly getting the index of the word and replacing that?
+            for (String word : this.message.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
+
                 if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble() - 1)) {
-                    message = message.replace(word, replacement);
+                    this.message = this.message.replace(word, replacement);
                 }
             }
         }
@@ -189,157 +208,187 @@ public class MessageWrapper {
         return this;
     }
 
-    public MessageWrapper filterAll() {
-        return this.filterCaps().filterSpam().filterURLs().filterSwears();
+    // Checks the message against all filters and filters accordingly.
+    public MessageWrapper filterAll(String basePermission) {
+        return this.filterCaps(basePermission).filterSpam(basePermission).filterURLs(basePermission).filterSwears(basePermission);
     }
 
+    // Marks this MessageWrapper as being able to use replacements.
     public MessageWrapper withReplacements() {
         this.replacements = true;
         return this;
     }
 
+    // Marks this MessageWrapper as being able to use tags.
     public MessageWrapper withTags() {
         this.tags = true;
         return this;
     }
 
-    public MessageWrapper parsePlaceholders(String format, Player other) {
+    // Marks this MessageWrapper as being in a specific channel, useful for retreiving channel members.
+    public MessageWrapper inChannel(ChatChannel channel) {
+        this.channel = channel;
+        return this;
+    }
+
+    public BaseComponent[] getComponentFromPlaceholder(String baseText, CustomPlaceholder placeholder, Player otherPlayer, String group, StringPlaceholders.Builder placeholders) {
+        if (placeholder.getText() == null) return null;
+        placeholders.addPlaceholder("player_name", this.player.getName())
+                .addPlaceholder("player_displayname", this.player.getDisplayName())
+                .addPlaceholder("other_player_name", otherPlayer == null ? "null" : otherPlayer.getName())
+                .addPlaceholder("other_player_displayname", otherPlayer == null ? "null" : otherPlayer.getDisplayName())
+                .build();
+
+        String text = baseText == null ? PlaceholderAPIHook.applyPlaceholders(this.player, placeholders
+                .apply(placeholder.getText().getTextFromGroup(group))) : baseText;
+        BaseComponent[] components = TextComponent.fromLegacyText(HexUtils.colorify(text));
+
+        if (placeholder.getHover() != null && placeholder.getHover().getHoverStringFromGroup(group) != null) {
+            String hover = PlaceholderAPIHook.applyPlaceholders(this.player, placeholders
+                    .apply(placeholder.getHover().getHoverStringFromGroup(group)));
+            BaseComponent[] hoverComponents = TextComponent.fromLegacyText(HexUtils.colorify(hover));
+            HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents);
+
+            for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
+        }
+
+        if (placeholder.getClick() != null && placeholder.getClick().getClickFromGroup(group) != null) {
+            String click = PlaceholderAPIHook.applyPlaceholders(this.player, placeholders
+                    .apply(placeholder.getClick().getValueFromGroup(group)));
+            ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), HexUtils.colorify(click));
+
+            for (BaseComponent component : components) component.setClickEvent(clickEvent);
+        }
+
+        return components;
+    }
+
+    public MessageWrapper parse(String format, Player otherPlayer) {
         this.builder = new ComponentBuilder();
+        String group = this.plugin.getVault() == null ? "default" : this.plugin.getVault().getPrimaryGroup(player);
 
-        String group = plugin.getVault() == null ? "default" : plugin.getVault().getPrimaryGroup(player);
-
-        List<String> unformattedChatFormat = placeholderManager.getParsedFormats().get(format);
+        List<String> unformattedChatFormat = this.placeholderManager.getParsedFormat(format);
 
         for (String placeholderId : unformattedChatFormat) {
-            CustomPlaceholder placeholder = placeholderManager.getPlaceholder(placeholderId);
             if (placeholderId.equalsIgnoreCase("message")) {
-                parseMessage(group, other);
+                this.parseMessage(group, otherPlayer);
                 continue;
             }
 
-            // Text can't be empty.
-            if (placeholder.getText() == null) return this;
-            StringPlaceholders placeholders = StringPlaceholders.builder("player_name", player.getName())
-                    .addPlaceholder("player_displayname", player.getDisplayName())
-                    .addPlaceholder("other_player_name", other == null ? "null" : other.getName())
-                    .addPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName())
-                    .build();
-
-            String text = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getText().getTextFromGroup(group)));
-
-            // Using this, as new TextComponent messes with hex colours.
-            BaseComponent[] components = TextComponent.fromLegacyText(HexUtils.colorify(text));
-
-            if (placeholder.getHover() != null && placeholder.getHover().getHoverStringFromGroup(group) != null) {
-                String hover = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getHover().getHoverStringFromGroup(group)));
-                BaseComponent[] hoverComponents = TextComponent.fromLegacyText(HexUtils.colorify(hover));
-                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents);
-
-                for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
-            }
-
-            if (placeholder.getClick() != null && placeholder.getClick().getClickFromGroup(group) != null) {
-                String click = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getClick().getValueFromGroup(group)));
-                ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), HexUtils.colorify(click));
-
-                for (BaseComponent component : components) component.setClickEvent(clickEvent);
-            }
-
-            builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
+            CustomPlaceholder placeholder = this.placeholderManager.getPlaceholder(placeholderId);
+            this.builder.append(this.getComponentFromPlaceholder(null, placeholder, otherPlayer, group, StringPlaceholders.builder()));
         }
 
         return this;
     }
 
-    public void parseMessage(String group, Player other) {
+    public MessageWrapper parseMessage(String group, Player otherPlayer) {
         boolean hasTagOrEmote;
 
-        // Parse colours before.
-        message = HexUtils.colorify(message);
+        this.message = HexUtils.colorify(message);
 
-        if (parseMessageTags(group, other)) return;
+        if (this.parseMultiTags(group, otherPlayer)) return this;
 
         int index = 0;
-        String[] words = message.split(" ");
+        String[] words = this.message.split(" ");
         for (String word : words) {
-            // Ensures the final word does not have a space at the end.
             if (index != words.length - 1) word += " ";
-            hasTagOrEmote = parseEmotes(word) || parseTags((index == 0 ? null : words[index - 1]), word, group);
+            hasTagOrEmote = this.parseReplacement(word, group) || parseTags((index == 0 ? null : words[index - 1]), word, group);
 
             if (!hasTagOrEmote) {
-                builder.append(TextComponent.fromLegacyText(HexUtils.colorify(word)), ComponentBuilder.FormatRetention.FORMATTING);
+                // I think here is where PlaceholderAPI would be allowed to be used in chat.
+                this.builder.append(TextComponent.fromLegacyText(HexUtils.colorify(word)), ComponentBuilder.FormatRetention.FORMATTING)
+                        .font("default");
             }
 
             index++;
         }
+        return this;
     }
 
-    private boolean parseMessageTags(String group, Player other) {
-        if (!tags) return false;
+    private boolean parseMultiTags(String group, Player otherPlayer) {
+        if (!this.tags) return false;
         boolean hasTag = false;
 
-        // It's nicer to parse the message tags, and then parse the word tags after.
-        // But it's probably more efficient to parse both at once? :thinking:
-        for (Tag tag : placeholderManager.getTags().values()) {
-            if (!player.hasPermission("rosechat.tag." + tag.getId())) return false;
-            if (tag.getSuffix() == null) continue; // Ensures word tags don't get parsed here.
-            if (!message.contains(tag.getPrefix()) && !message.contains(tag.getSuffix())) continue;
-            String tempMessage = message;
+        for (Tag tag : this.placeholderManager.getTags().values()) {
+            if (tag.getSuffix() == null) continue; // Ensures only multitags get parsed here.
+            // If the message doesn't contain the prefix or suffix, ignore it.
+            if (!this.message.contains(tag.getPrefix()) && this.message.contains(tag.getSuffix())) continue;
+            if (!this.player.hasPermission("rosechat.tag." + tag.getId())) continue;
 
+            String tempMessage = this.message;
             while (tempMessage.contains(tag.getPrefix()) && tempMessage.contains(tag.getSuffix())) {
                 int firstPrefix = tempMessage.indexOf(tag.getPrefix()) + tag.getPrefix().length();
                 int firstSuffix = tempMessage.indexOf(tag.getSuffix());
-                String before = tempMessage.substring(0, firstPrefix - tag.getPrefix().length());
-                String tagMessage = tempMessage.substring(firstPrefix, firstSuffix);
-                String after = null;
+                String beforeTag = tempMessage.substring(0, firstPrefix - tag.getPrefix().length());
+                String duringTag = tempMessage.substring(firstPrefix, firstSuffix); // Gets the message between the tags.
+                String afterTag = null;
+
+                // Make sure there's no more tags
                 tempMessage = tempMessage.substring(firstSuffix + tag.getSuffix().length());
-
-
                 if (!tempMessage.contains(tag.getSuffix())) {
-                    after = tempMessage;
+                    afterTag = tempMessage;
                 }
 
-                builder.append(TextComponent.fromLegacyText(HexUtils.colorify(before)), ComponentBuilder.FormatRetention.FORMATTING);
+                this.builder.append(TextComponent.fromLegacyText(HexUtils.colorify(beforeTag)), ComponentBuilder.FormatRetention.FORMATTING).font("default");
 
-                CustomPlaceholder placeholder = placeholderManager.getPlaceholder(tag.getFormat());
-                StringPlaceholders placeholders = StringPlaceholders.builder("tag", tagMessage)
+
+                // Can't use getComponentFromPlaceholder, acts differently.
+                CustomPlaceholder placeholder = this.placeholderManager.getPlaceholder(tag.getFormat());
+
+                StringPlaceholders placeholders = StringPlaceholders.builder("tag", duringTag)
                         .addPlaceholder("player_name", this.player.getName())
                         .addPlaceholder("player_displayname", this.player.getDisplayName())
-                        .addPlaceholder("other_player_name", other == null ? "null" : other.getName())
-                        .addPlaceholder("other_player_displayname", other == null ? "null" : other.getDisplayName()).build();
+                        .addPlaceholder("other_player_name", otherPlayer == null ? "null" : otherPlayer.getName())
+                        .addPlaceholder("other_player_displayname", otherPlayer == null ? "null" : otherPlayer.getDisplayName())
+                        .build();
 
                 StringBuilder textSb = new StringBuilder(HexUtils.colorify(placeholder.getText().getTextFromGroup(group)));
 
+                // Allows multitags to match the length of the message.
                 if (tag.shouldMatchLength()) {
                     String originalText = textSb.toString();
-                    for (int i = 0; i < ChatColor.stripColor(tagMessage).length() - 1; i++) textSb.append(originalText);
+                    for (int i = 0; i < ChatColor.stripColor(duringTag).length() - 1; i++) textSb.append(originalText);
                 }
 
-                // TODO: 'other' placeholders.
-                String text = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(textSb.toString()));
+                String text = PlaceholderAPIHook.applyPlaceholders(this.player, placeholders.apply(textSb.toString()));
+                BaseComponent[] components = this.getComponentFromPlaceholder(text, placeholder, otherPlayer, group, StringPlaceholders.builder("tag", duringTag));
 
-                BaseComponent[] components = TextComponent.fromLegacyText(HexUtils.colorify(text));
+                this.builder.append(components, ComponentBuilder.FormatRetention.FORMATTING).font("default");
 
-                if (placeholder.getHover() != null && placeholder.getHover().getHoverStringFromGroup(group) != null) {
-                    String hover = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getHover().getHoverStringFromGroup(group)));
-                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(hover)));
-                    for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
-                    // If log hover to console,
-                    Bukkit.getConsoleSender().sendMessage("[Hover] " + this.player.getDisplayName() + ": " + hover);
-                }
+                if (afterTag != null)
+                    this.builder.append(TextComponent.fromLegacyText(HexUtils.colorify(afterTag)), ComponentBuilder.FormatRetention.NONE)
+                            .font("default");
 
-                // TODO: Merge Duplicate
-                if (placeholder.getClick() != null && placeholder.getClick().getClickFromGroup(group) != null) {
-                    String click = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getClick().getValueFromGroup(group)));
-                    ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), HexUtils.colorify(click));
-                    for (BaseComponent component : components) component.setClickEvent(clickEvent);
-                }
-
-                builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
-
-                if (after != null)
-                    builder.append(TextComponent.fromLegacyText(HexUtils.colorify(after)), ComponentBuilder.FormatRetention.NONE);
+                hasTag = true;
             }
+        }
+
+        return hasTag;
+    }
+
+    private boolean parseTags(String previousWord, String word, String group) {
+        boolean hasTag = false;
+
+        for (Tag tag : this.placeholderManager.getTags().values()) {
+            if (tag.getSuffix() != null) continue; // Ensures multitags don't get parsed here.
+            if (!word.startsWith(tag.getPrefix())) continue;
+            if (!this.player.hasPermission("rosechat.tag." + tag.getId())) continue;
+
+            String lastColor = previousWord == null ? ChatColor.RESET + "" : org.bukkit.ChatColor.getLastColors(previousWord);
+            String color = lastColor.isEmpty() ? ChatColor.RED + "" : lastColor;
+            word = word.replace(tag.getPrefix(), ""); // Removes the prefix from the tag.
+
+            CustomPlaceholder placeholder = this.placeholderManager.getPlaceholder(tag.getFormat());
+            word = word.trim();
+            Player otherPlayer = Bukkit.getPlayer(word);
+
+            BaseComponent[] components = this.getComponentFromPlaceholder(null, placeholder, otherPlayer, group,
+                    StringPlaceholders.builder("tag", word + " " + color));
+            this.builder.append(components, ComponentBuilder.FormatRetention.FORMATTING).font("default");
+
+            if (tag.shouldTagOnlinePlayers()) taggedPlayerNames.add(word);
+            tagSound = tag.getSound();
 
             hasTag = true;
         }
@@ -351,111 +400,128 @@ public class MessageWrapper {
         return false;
     }
 
-    // TODO: Fix multiple emotes touching.
-    private boolean parseEmotes(String word) {
-        if (!playerData.hasEmotes()) return false;
-        if (!replacements) return false;
-        boolean hasEmote = false;
-        
-        for (ChatReplacement chatReplacement : placeholderManager.getReplacements().values()) {
-            if (!player.hasPermission("rosechat.replacement." + chatReplacement.getId())) continue;
-            String wordLower = word.toLowerCase();
-            if (wordLower.contains(chatReplacement.getText().toLowerCase()) && player.hasPermission("rosechat.replacement." + chatReplacement.getId())) {
-                int i = 0;
-                String[] parts = wordLower.split(chatReplacement.getText());
-                for (String s : parts) {
-                    builder.append(TextComponent.fromLegacyText(HexUtils.colorify(s)), ComponentBuilder.FormatRetention.FORMATTING);
+    private boolean parseReplacement(String word, String group) {
+        if (!this.replacements) return false;
+        if (this.playerData != null && !this.playerData.hasEmotes()) return false;
+        boolean hasReplacement = false;
 
-                    if (i != parts.length - 1) applyEmote(chatReplacement);
+        for (ChatReplacement replacement : this.placeholderManager.getReplacements().values()) {
+            if (!this.player.hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            String wordLower = word.toLowerCase();
+
+            if (wordLower.contains(replacement.getText().toLowerCase()) && this.player.hasPermission("rosechat.replacement." + replacement.getId())) {
+                int i = 0;
+                String[] parts = wordLower.split(replacement.getText());
+
+                for (String s : parts) {
+                    this.builder.append(TextComponent.fromLegacyText(HexUtils.colorify(s)), ComponentBuilder.FormatRetention.FORMATTING)
+                            .font("emotes");
+
+                    if (i != parts.length - 1) this.applyReplacement(replacement, group);
                     i++;
                 }
 
-                // Only the emote is sent.
-                if (wordLower.endsWith(chatReplacement.getText().toLowerCase())) applyEmote(chatReplacement);
-                hasEmote = true;
-            }
-        }
-        
-        return hasEmote;
-    }
-
-    // TODO: Fix colour parsing around the tag.
-    private boolean parseTags(String prevWord, String word, String group) {
-        PlaceholderSettingManager placeholderManager = plugin.getManager(PlaceholderSettingManager.class);
-        boolean hasTag = false;
-
-        for (Tag tag : placeholderManager.getTags().values()) {
-            if (!player.hasPermission("rosechat.tag." + tag.getId())) return false;
-            if (tag.getSuffix() != null) continue; // Ensures full message tags don't get parsed here.
-            if (word.startsWith(tag.getPrefix()) && player.hasPermission("rosechat.chat.tag." + tag.getId())) {
-                String lastColors = prevWord == null ? ChatColor.RESET + "": ChatColor.getLastColors(prevWord);
-                String color = lastColors.isEmpty() ? ChatColor.RESET + "" : lastColors;
-                word = word.replace(tag.getPrefix(), ""); // Removes the prefix from the message
-                CustomPlaceholder placeholder = placeholderManager.getPlaceholder(tag.getFormat());
-
-                // Okay, gotta trim here and later to get the player name.
-                // But then gotta add the spaces back in the placeholder (wait how does this work with PlaceholderAPI??)
-                word = word.trim();
-                Player other = Bukkit.getPlayer(word);
-
-                StringPlaceholders placeholders = StringPlaceholders.builder("tag", word + " " + color)
-                        .addPlaceholder("player_name", this.player.getName() + " " + color)
-                        .addPlaceholder("player_displayname", this.player.getDisplayName() + " " + color)
-                        .addPlaceholder("other_player_name", (other == null ? word : other.getName()) + " " + color)
-                        .addPlaceholder("other_player_displayname", (other == null ? word : other.getDisplayName()) + " " + color).build();
-
-                // TODO: Other???? Somehow??
-                String text = PlaceholderAPIHook.applyPlaceholders(this.player, placeholders.apply(placeholder.getText().getTextFromGroup(group)));
-
-                BaseComponent[] components = TextComponent.fromLegacyText(HexUtils.colorify(text));
-
-                if (placeholder.getHover() != null && placeholder.getHover().getHoverStringFromGroup(group) != null) {
-                    String hover = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getHover().getHoverStringFromGroup(group)));
-                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(hover)));
-                    for (BaseComponent component : components) component.setHoverEvent(hoverEvent);
-                }
-
-                if (placeholder.getClick() != null && placeholder.getClick().getClickFromGroup(group) != null) {
-                    String click = PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder.getClick().getValueFromGroup(group)));
-                    ClickEvent clickEvent = new ClickEvent(placeholder.getClick().getActionFromGroup(group), HexUtils.colorify(click));
-                    for (BaseComponent component : components) component.setClickEvent(clickEvent);
-                }
-
-                builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
-                if (tag.shouldTagOnlinePlayers()) taggedPlayerNames.add(word);
-                tagSound = tag.getSound();
-
-                hasTag = true;
+                if (wordLower.endsWith(replacement.getText().toLowerCase())) applyReplacement(replacement, group);
+                hasReplacement = true;
             }
         }
 
-        return hasTag;
+        return hasReplacement;
     }
 
-    private void applyEmote(ChatReplacement chatReplacement) {
+    // Applies the given chat replacement.
+    // TODO: Regex replacements
+    private void applyReplacement(ChatReplacement chatReplacement, String group) {
+        if (!this.player.hasPermission("rosechat.replacement." + chatReplacement.getId())) return;
         if (chatReplacement.getHoverText() != null) {
+            String text = chatReplacement.getReplacement();
+
             if (chatReplacement.getReplacement().startsWith("{") && chatReplacement.getReplacement().endsWith("}")) {
-                CustomPlaceholder placeholder = placeholderManager.getPlaceholder(chatReplacement.getReplacement().replace("{", "").replace("}", ""));
+                CustomPlaceholder placeholder = this.placeholderManager.getPlaceholder(chatReplacement.getReplacement()
+                        .replace("{", "").replace("}", ""));
+                this.builder.append(this.getComponentFromPlaceholder(null, placeholder, null, group, StringPlaceholders.builder()));
                 return;
             }
 
-            BaseComponent[] components = TextComponent.fromLegacyText(chatReplacement.getReplacement());
+            if (chatReplacement.getReplacement().startsWith("%") && chatReplacement.getReplacement().endsWith("%")) {
+                text = PlaceholderAPIHook.applyPlaceholders(this.player, chatReplacement.getReplacement());
+            }
+
             StringPlaceholders placeholders = StringPlaceholders.single("text", chatReplacement.getText());
+            BaseComponent[] components = TextComponent.fromLegacyText(HexUtils.colorify(placeholders.apply(text)));
             BaseComponent[] hover = TextComponent.fromLegacyText(HexUtils.colorify(placeholders.apply(chatReplacement.getHoverText())));
             for (BaseComponent component : components) component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
-            builder.append(components, ComponentBuilder.FormatRetention.FORMATTING);
+            this.builder.append(components, ComponentBuilder.FormatRetention.FORMATTING).font(chatReplacement.getFont());
         } else {
-            builder.append(TextComponent.fromLegacyText(HexUtils.colorify(chatReplacement.getReplacement())), ComponentBuilder.FormatRetention.FORMATTING);
+            this.builder.append(TextComponent.fromLegacyText(HexUtils.colorify(chatReplacement.getReplacement())), ComponentBuilder.FormatRetention.FORMATTING)
+                    .font(chatReplacement.getFont());
         }
     }
 
+    // Builds the message.
     public BaseComponent[] build() {
-        return builder.create();
+        return this.builder.create();
     }
 
+    // Checks if the message is empty.
     public boolean isEmpty() {
-        BaseComponent[] built = build();
-        return built == null || built.length == 0;
+        BaseComponent[] built = this.build();
+        return built == null || build().length == 0;
+    }
+
+    // Gets all the players in the channel.
+    public List<Player> getChannelMembers() {
+        List<Player> players = new ArrayList<>();
+
+        for (UUID uuid : this.channel.getPlayers()) {
+            if (uuid.equals(player.getUniqueId())) continue;
+            if (Bukkit.getPlayer(uuid) != null) players.add(Bukkit.getPlayer(uuid));
+        }
+
+        return players;
+    }
+
+    // Tags the players in the given channel, or out of all players if no channel is specified.
+    public void tagPlayers() {
+        if (this.tagSound == null) return;
+        if (this.channel != null) {
+            for (UUID taggedUuid : this.channel.getPlayers()) {
+                Player tagged = Bukkit.getPlayer(taggedUuid);
+                if (tagged == null || !this.taggedPlayerNames.contains(tagged.getName())) continue;
+
+                PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
+                if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), this.getTagSound(), 1, 1);
+            }
+
+            return;
+        }
+
+        for (String playerStr : this.taggedPlayerNames) {
+            Player tagged = Bukkit.getPlayer(playerStr);
+            if (tagged == null) continue;
+
+            PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
+            if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), this.getTagSound(), 1, 1);
+        }
+    }
+
+    // Sends the message to a specific command sender.
+    public void send(CommandSender sender) {
+        sender.spigot().sendMessage(this.build());
+    }
+
+    // Sends the message to a specific player.
+    public void send(Player player) {
+        player.spigot().sendMessage(this.build());
+    }
+
+    // Sends the message to a specific channel.
+    public void send(ChatChannel channel) {
+        BaseComponent[] message = this.build();
+
+        for (Player player : this.getChannelMembers()) {
+            player.spigot().sendMessage(message);
+        }
     }
 
     public List<String> getTaggedPlayerNames() {
@@ -478,55 +544,7 @@ public class MessageWrapper {
         return channel;
     }
 
-    public List<Player> getChannelMembers() {
-        List<Player> players = new ArrayList<>();
-
-        for (UUID uuid : this.channel.getPlayers()) {
-            if (uuid.equals(player.getUniqueId())) continue;
-            if (Bukkit.getPlayer(uuid) != null) players.add(Bukkit.getPlayer(uuid));
-        }
-
-        return players;
-    }
-
-    public void send(CommandSender sender) {
-        sender.spigot().sendMessage(build());
-    }
-
-    public void send(Player player) {
-        player.spigot().sendMessage(build());
-    }
-
-    public void send(ChatChannel channel) {
-        BaseComponent[] message = this.build();
-
-        for (UUID uuid : channel.getPlayers()) {
-            Player member = Bukkit.getPlayer(uuid);
-            member.spigot().sendMessage(message);
-        }
-    }
-
-    public void tagPlayers() {
-        if (this.tagSound == null) return;
-
-        if (this.channel != null) {
-            for (UUID taggedUuid : this.channel.getPlayers()) {
-                Player tagged = Bukkit.getPlayer(taggedUuid);
-                if (tagged == null || !this.getTaggedPlayerNames().contains(tagged.getName())) continue;
-
-                PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
-                if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), this.getTagSound(), 1, 1);
-            }
-
-            return;
-        }
-
-        for (String playerStr : getTaggedPlayerNames()) {
-            Player tagged = Bukkit.getPlayer(playerStr);
-            if (tagged == null) continue;
-
-            PlayerData taggedData = dataManager.getPlayerData(tagged.getUniqueId());
-            if (taggedData.hasTagSounds()) tagged.playSound(tagged.getLocation(), getTagSound(), 1, 1);
-        }
+    public String getHoverAsString() {
+        return this.hoverBuilder.toString();
     }
 }

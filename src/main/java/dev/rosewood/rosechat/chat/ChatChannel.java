@@ -9,8 +9,10 @@ public class ChatChannel {
 
     private String id;
     private boolean defaultChannel;
+    private boolean muted;
     private String format;
     private String formatId;
+    private String command;
     private int radius = -1;
     private String world;
     private boolean autoJoin;
@@ -42,8 +44,16 @@ public class ChatChannel {
         this.players = new ArrayList<>();
     }
 
-    public void message(Player sender, String message) {
-        // message wrapper stuff here?
+    public void message(Player sender, String message, boolean sendToConsole) {
+        MessageWrapper messageWrapper = new MessageWrapper(sender, message)
+                .checkAll("rosechat.chat")
+                .filterAll("rosechat.message")
+                .withReplacements()
+                .withTags()
+                .inChannel(this)
+                .parse(this.getFormatId(), null);
+
+        MessageUtils.sendStandardMessage(sender, messageWrapper, this, sendToConsole);
     }
 
     public void add(Player player) {
@@ -221,5 +231,22 @@ public class ChatChannel {
     public ChatChannel setVisible(boolean visible) {
         this.visible = visible;
         return this;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public ChatChannel setCommand(String command) {
+        this.command = command;
+        return this;
+    }
+
+    public boolean isMuted() {
+        return muted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 }

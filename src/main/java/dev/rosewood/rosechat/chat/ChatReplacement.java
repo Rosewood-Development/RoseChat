@@ -6,6 +6,7 @@ public class ChatReplacement {
     private String text;
     private String replacement;
     private String hoverText;
+    private String font = "emotes";
 
     public ChatReplacement(String id, String text, String replacement, String hoverText) {
         this.id = id;
@@ -44,5 +45,13 @@ public class ChatReplacement {
 
     public void setHoverText(String hoverText) {
         this.hoverText = hoverText;
+    }
+
+    public String getFont() {
+        return font;
+    }
+
+    public void setFont(String font) {
+        this.font = font;
     }
 }

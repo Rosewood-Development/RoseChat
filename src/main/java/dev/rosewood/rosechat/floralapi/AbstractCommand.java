@@ -1,9 +1,7 @@
 package dev.rosewood.rosechat.floralapi;
 
 import dev.rosewood.rosechat.RoseChat;
-
 import org.bukkit.command.CommandSender;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -169,8 +169,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         localeManager.sendMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            String colour = localeManager.getLocaleMessage(subcommand.isJuniorCommand() ? mainCommandLabel + "-command-color" : "base-command-color");
-            localeManager.sendCustomMessage(sender, colour + localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
+            localeManager.sendCustomMessage(sender, localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
         }
     }
 
@@ -214,6 +213,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      */
     public String getMainSyntax() {
         return mainSyntax;
+    }
+
+    public LocaleManager getLocaleManager() {
+        return localeManager;
     }
 }
 

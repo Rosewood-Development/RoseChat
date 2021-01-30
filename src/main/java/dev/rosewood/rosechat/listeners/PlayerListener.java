@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.listeners;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.managers.ChannelManager;
 import dev.rosewood.rosechat.managers.DataManager;
 import org.bukkit.Bukkit;
@@ -35,7 +34,7 @@ public class PlayerListener implements Listener {
             if (playerData.getCurrentChannel() == null) {
                 boolean foundChannel = false;
                 for (ChatChannel channel : this.channelManager.getChannels().values()) {
-                    if (channel.isAutoJoin() && channel.getWorld().equalsIgnoreCase(world.getName())) {
+                    if (channel.isAutoJoin() && (channel.getWorld() != null && channel.getWorld().equalsIgnoreCase(world.getName()))) {
                         playerData.setCurrentChannel(channel);
                         foundChannel = true;
                         break;
@@ -54,7 +53,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        dataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
-        dataManager.unloadPlayerData(player.getUniqueId());
+        this.dataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
+        this.dataManager.unloadPlayerData(player.getUniqueId());
     }
 }

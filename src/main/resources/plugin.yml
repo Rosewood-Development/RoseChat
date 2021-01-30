@@ -30,6 +30,15 @@ commands:
   channel:
     aliases: [c]
     description: Talk in a chat channel.
+  chat:
+    aliases: [cc, chatchannel]
+    description: Admin commands for chat channels.
+  color:
+    aliases: [chatcolor]
+    description: Set a default chat color.
+  gc:
+    aliases: [group, groupchat]
+    description: Displays group chat commands.
 permissions:
   rosechat.*:
     description: Gives access to all Rosechat permissions.
@@ -43,6 +52,9 @@ permissions:
       - rosechat.togglesound
       - rosechat.toggleemotes
       - rosechat.channel
+      - rosechat.admin
+      - rosechat.group
+      - rosechat.chatcolor
   rosechat.chat:
     description: Allows a player to chat.
     default: not op
@@ -55,23 +67,23 @@ permissions:
   rosechat.chat.magic:
     description: Allows a player to use the magic formatting in chat.
     default: op
-  rosechat.chat.tag:
-    description: Allows a player to tag other players.
-    default: op
-  rosechat.bypass:
-    description: Allows a player to bypass filters.
-    default: op
-  rosechat.bypass.spam:
+  rosechat.chat.spam:
     description: Allows a player to bypass the spam filter.
     default: op
-  rosechat.bypass.language:
+  rosechat.chat.language:
     description: Allows a player to bypass the language filter.
     default: op
-  rosechat.bypass.caps:
+  rosechat.chat.caps:
     description: Allows a player to bypass the caps filter.
     default: op
-  rosechat.bypass.links:
+  rosechat.chat.links:
     description: Allows a player to bypass the URL filter.
+    default: op
+  rosechat.tag.*:
+    description: Allows a player to use all tags.
+    default: op
+  rosechat.replacement.*:
+    description: Allows a player to use all emotes.
     default: op
   rosechat.message:
     description: Allows a player to use /message.
@@ -114,4 +126,40 @@ permissions:
     default: op
   rosechat.channel:
     description: Allows a player to access channels.
+    default: op
+  rosechat.admin.mute:
+    description: Allows a player to mute a chat channel.
+    default: op
+  rosechat.admin.clear:
+    description: Allows a player to clear a chat channel.
+    default: op
+  rosechat.admin.move:
+    description: Allows a player to move a player to a chat channel.
+    default: op
+  rosechat.admin.sudo:
+    description: Allows a player to chat as another player.
+    default: op
+  rosechat.group.create:
+    description: Allows a player to create a group.
+    default: op
+  rosechat.group.invite:
+    description: Allows a player to invite a player to a group.
+    default: op
+  rosechat.group.kick:
+    description: Allows a player to kick a player from a group.
+    default: op
+  rosechat.group.accept:
+    description: Allows a player to accept a group invite.
+    default: op
+  rosechat.group.leave:
+    description: Allows a player to leave a group.
+    default: op
+  rosechat.group.disband:
+    description: Allows a player to disband a group.
+    default: op
+  rosechat.group.members:
+    description: Allows a player to see group members.
+    default: op
+  rosechat.chatcolor:
+    description: Allows a player to set a default chat color.
     default: op

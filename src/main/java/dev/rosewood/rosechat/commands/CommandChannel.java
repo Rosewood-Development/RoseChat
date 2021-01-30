@@ -10,13 +10,10 @@ import dev.rosewood.rosechat.managers.ChannelManager;
 import dev.rosewood.rosechat.managers.DataManager;
 import dev.rosewood.rosechat.managers.LocaleManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class CommandChannel extends AbstractCommand {
 
@@ -34,11 +31,11 @@ public class CommandChannel extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
-        DataManager dataManager = plugin.getManager(DataManager.class);
+        DataManager dataManager = this.plugin.getManager(DataManager.class);
 
         ChatChannel oldChannel = dataManager.getPlayerData(((Player) sender).getUniqueId()).getCurrentChannel();
         ChatChannel channel = null;
@@ -50,30 +47,30 @@ public class CommandChannel extends AbstractCommand {
         }
 
         if (channel == null) {
-            localeManager.sendMessage(sender, "command-channel-not-found");
+            this.localeManager.sendMessage(sender, "command-channel-not-found");
             return;
         }
 
         if (args.length == 1) {
             Player player = (Player) sender;
 
-            localeManager.sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", channel.getId()));
+            this.localeManager.sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", channel.getId()));
             oldChannel.remove(player);
             channel.add(player);
+
             PlayerData playerData = dataManager.getPlayerData(player.getUniqueId());
             playerData.setCurrentChannel(channel);
             playerData.save();
         } else {
             String message = getAllArgs(1, args);
-            // TODO: Some way for console messaging, too
             //  TODO: Check channel permissions & config settings.
             MessageWrapper messageWrapper = new MessageWrapper((Player) sender, message)
-                    .checkAll()
-                    .filterAll()
+                    .checkAll("rosechat.chat")
+                    .filterAll("rosechat.message")
                     .withReplacements()
                     .withTags()
                     .inChannel(channel)
-                    .parsePlaceholders(channel.getFormatId(), null);
+                    .parse(channel.getFormatId(), null);
 
             MessageUtils.sendStandardMessage(sender, messageWrapper, channel);
         }

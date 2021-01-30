@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.commands.CommandChannel;
+import dev.rosewood.rosechat.commands.CommandChatColor;
 import dev.rosewood.rosechat.commands.CommandHelp;
 import dev.rosewood.rosechat.commands.CommandMessage;
 import dev.rosewood.rosechat.commands.CommandReply;
@@ -8,6 +9,21 @@ import dev.rosewood.rosechat.commands.CommandSocialSpy;
 import dev.rosewood.rosechat.commands.CommandToggleEmotes;
 import dev.rosewood.rosechat.commands.CommandToggleMessages;
 import dev.rosewood.rosechat.commands.CommandToggleSound;
+import dev.rosewood.rosechat.commands.chat.ChatCommandManager;
+import dev.rosewood.rosechat.commands.chat.CommandChatClear;
+import dev.rosewood.rosechat.commands.chat.CommandChatHelp;
+import dev.rosewood.rosechat.commands.chat.CommandChatMove;
+import dev.rosewood.rosechat.commands.chat.CommandChatMute;
+import dev.rosewood.rosechat.commands.chat.CommandChatSudo;
+import dev.rosewood.rosechat.commands.group.CommandGroupAccept;
+import dev.rosewood.rosechat.commands.group.CommandGroupCreate;
+import dev.rosewood.rosechat.commands.group.CommandGroupDisband;
+import dev.rosewood.rosechat.commands.group.CommandGroupHelp;
+import dev.rosewood.rosechat.commands.group.CommandGroupInvite;
+import dev.rosewood.rosechat.commands.group.CommandGroupKick;
+import dev.rosewood.rosechat.commands.group.CommandGroupLeave;
+import dev.rosewood.rosechat.commands.group.CommandGroupMembers;
+import dev.rosewood.rosechat.commands.group.GroupCommandManager;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.floralapi.CommandManager;
 import dev.rosewood.rosechat.floralapi.CommandReload;
@@ -51,6 +67,24 @@ public class RoseChat extends RosePlugin {
         CommandManager toggleSoundCommand = new CommandManager(new CommandToggleSound(this));
         CommandManager toggleEmotesCommand = new CommandManager(new CommandToggleEmotes(this));
         CommandManager channelCommand = new CommandManager(new CommandChannel(this));
+        CommandManager chatColorCommand = new CommandManager(new CommandChatColor(this));
+
+        GroupCommandManager groupCommand = (GroupCommandManager) new GroupCommandManager("gc", "/gc help")
+                .addSubcommand(new CommandGroupCreate())
+                .addSubcommand(new CommandGroupInvite())
+                .addSubcommand(new CommandGroupKick())
+                .addSubcommand(new CommandGroupAccept(this))
+                .addSubcommand(new CommandGroupLeave())
+                .addSubcommand(new CommandGroupDisband())
+                .addSubcommand(new CommandGroupMembers())
+                .addSubcommand(new CommandGroupHelp());
+
+        ChatCommandManager chatCommand = (ChatCommandManager) new ChatCommandManager("chat", "/chat help")
+                .addSubcommand(new CommandChatMute(this))
+                .addSubcommand(new CommandChatClear(this))
+                .addSubcommand(new CommandChatMove(this))
+                .addSubcommand(new CommandChatSudo(this))
+                .addSubcommand(new CommandChatHelp());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)
@@ -59,7 +93,10 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(toggleMessageCommand)
                 .addCommandManager(toggleSoundCommand)
                 .addCommandManager(toggleEmotesCommand)
+                .addCommandManager(chatColorCommand)
                 .addCommandManager(channelCommand)
+                .addCommandManager(chatCommand)
+                .addCommandManager(groupCommand)
                 .addSubcommand(new CommandHelp(this))
                 .addSubcommand(new CommandReload());
 

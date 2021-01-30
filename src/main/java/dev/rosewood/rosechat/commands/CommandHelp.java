@@ -24,21 +24,18 @@ public class CommandHelp extends AbstractCommand {
         for (CommandManager manager : plugin.getCommandManager().getCommandManagers()) {
             if (manager.getMainCommand() == null) {
                 String label = manager.getMainCommandLabel();
-                localeManager.sendCustomMessage(sender, localeManager.getLocaleMessage("base-command-color") +
+                localeManager.sendCustomMessage(sender,
                         localeManager.getLocaleMessage("command-" + label + "-description"));
-                return;
+            } else {
+                AbstractCommand command = manager.getMainCommand();
+                String label = command.getLabels().get(0);
+                localeManager.sendCustomMessage(sender, localeManager.getLocaleMessage("command-" + label + "-description"));
             }
-
-            AbstractCommand command = manager.getMainCommand();
-            String label = command.getLabels().get(0);
-            String colour = localeManager.getLocaleMessage(command.isJuniorCommand() ? label + "-command-color" : "base-command-color");
-            localeManager.sendCustomMessage(sender, colour + localeManager.getLocaleMessage("command-" + label + "-description"));
         }
 
         for (AbstractCommand subcommand : plugin.getCommandManager().getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            String colour = localeManager.getLocaleMessage("base-command-color");
-            localeManager.sendCustomMessage(sender, colour + localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
+            localeManager.sendCustomMessage(sender, localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
         }
     }
 

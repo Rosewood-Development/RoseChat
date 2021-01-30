@@ -30,6 +30,7 @@ public class ChannelManager extends Manager {
 
             boolean isDefault = section.contains(id + ".default") && section.getBoolean(id + ".default");
             String format = section.contains(id + ".format") ? section.getString(id + ".format") : "default-format";
+            String command = section.contains(id + ".command") ? section.getString(id + ".command") : null;
             boolean placeholders = section.contains(id + ".chat-placeholders-enabled") && section.getBoolean(id + ".chat-placeholders-enabled");
             List<String> disabledTags = section.contains(id + ".disabled-tags") ? section.getStringList(id + ".disabled-tags") : new ArrayList<>();
             List<String> disabledReplacements = section.contains(id + ".disabled-replacements") ? section.getStringList(id + ".disabled-replacements") : new ArrayList<>();
@@ -46,7 +47,7 @@ public class ChannelManager extends Manager {
             ChatChannel channel = new ChatChannel(id, format, isDefault)
                     .setChatPlaceholders(placeholders).setDisabledTags(disabledTags).setDisabledReplacements(disabledReplacements)
                     .setCheckCaps(capsCheck).setCheckUrl(urlCheck).setCheckSpam(spamCheck).setCheckLanguage(swearCheck)
-                    .setRadius(radius).setWorld(world).setAutoJoin(autoJoin).setServers(servers).setVisible(visible);
+                    .setRadius(radius).setWorld(world).setAutoJoin(autoJoin).setServers(servers).setVisible(visible).setCommand(command);
 
             channels.put(id, channel);
 
