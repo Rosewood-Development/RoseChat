@@ -1,40 +1,41 @@
 package dev.rosewood.rosechat;
 
-import dev.rosewood.rosechat.commands.CommandChannel;
-import dev.rosewood.rosechat.commands.CommandChatColor;
-import dev.rosewood.rosechat.commands.CommandHelp;
-import dev.rosewood.rosechat.commands.CommandMessage;
-import dev.rosewood.rosechat.commands.CommandReply;
-import dev.rosewood.rosechat.commands.CommandSocialSpy;
-import dev.rosewood.rosechat.commands.CommandToggleEmotes;
-import dev.rosewood.rosechat.commands.CommandToggleMessages;
-import dev.rosewood.rosechat.commands.CommandToggleSound;
-import dev.rosewood.rosechat.commands.chat.ChatCommandManager;
-import dev.rosewood.rosechat.commands.chat.CommandChatClear;
-import dev.rosewood.rosechat.commands.chat.CommandChatHelp;
-import dev.rosewood.rosechat.commands.chat.CommandChatMove;
-import dev.rosewood.rosechat.commands.chat.CommandChatMute;
-import dev.rosewood.rosechat.commands.chat.CommandChatSudo;
-import dev.rosewood.rosechat.commands.group.CommandGroupAccept;
-import dev.rosewood.rosechat.commands.group.CommandGroupCreate;
-import dev.rosewood.rosechat.commands.group.CommandGroupDisband;
-import dev.rosewood.rosechat.commands.group.CommandGroupHelp;
-import dev.rosewood.rosechat.commands.group.CommandGroupInvite;
-import dev.rosewood.rosechat.commands.group.CommandGroupKick;
-import dev.rosewood.rosechat.commands.group.CommandGroupLeave;
-import dev.rosewood.rosechat.commands.group.CommandGroupMembers;
-import dev.rosewood.rosechat.commands.group.GroupCommandManager;
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.command.ChannelCommand;
+import dev.rosewood.rosechat.command.ChatColorCommand;
+import dev.rosewood.rosechat.command.HelpCommand;
+import dev.rosewood.rosechat.command.MessageCommand;
+import dev.rosewood.rosechat.command.ReplyCommand;
+import dev.rosewood.rosechat.command.SocialSpyCommand;
+import dev.rosewood.rosechat.command.ToggleEmojiCommand;
+import dev.rosewood.rosechat.command.ToggleMessageCommand;
+import dev.rosewood.rosechat.command.ToggleSoundCommand;
+import dev.rosewood.rosechat.command.chat.ChatCommandManager;
+import dev.rosewood.rosechat.command.chat.ClearChatCommand;
+import dev.rosewood.rosechat.command.chat.MoveChatCommand;
+import dev.rosewood.rosechat.command.chat.MuteChatCommand;
+import dev.rosewood.rosechat.command.chat.SudoChatCommand;
+import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
+import dev.rosewood.rosechat.command.group.CreateGroupCommand;
+import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
+import dev.rosewood.rosechat.command.group.InviteGroupCommand;
+import dev.rosewood.rosechat.command.group.KickGroupCommand;
+import dev.rosewood.rosechat.command.group.LeaveGroupCommand;
+import dev.rosewood.rosechat.command.group.MembersGroupCommand;
+import dev.rosewood.rosechat.command.group.RenameGroupCommand;
+import dev.rosewood.rosechat.command.group.GroupCommandManager;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
-import dev.rosewood.rosechat.floralapi.CommandManager;
-import dev.rosewood.rosechat.floralapi.CommandReload;
-import dev.rosewood.rosechat.floralapi.SeniorCommandManager;
-import dev.rosewood.rosechat.listeners.ChatListener;
-import dev.rosewood.rosechat.listeners.PlayerListener;
-import dev.rosewood.rosechat.managers.ChannelManager;
-import dev.rosewood.rosechat.managers.ConfigurationManager;
-import dev.rosewood.rosechat.managers.DataManager;
-import dev.rosewood.rosechat.managers.LocaleManager;
-import dev.rosewood.rosechat.managers.PlaceholderSettingManager;
+import dev.rosewood.rosechat.command.api.CommandManager;
+import dev.rosewood.rosechat.command.ReloadCommand;
+import dev.rosewood.rosechat.command.api.SeniorCommandManager;
+import dev.rosewood.rosechat.listener.ChatListener;
+import dev.rosewood.rosechat.listener.PlayerListener;
+import dev.rosewood.rosechat.manager.ChannelManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.GroupManager;
+import dev.rosewood.rosechat.manager.LocaleManager;
+import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -60,31 +61,31 @@ public class RoseChat extends RosePlugin {
     public void enable() {
         initHooks();
 
-        CommandManager messageCommand = new CommandManager(new CommandMessage(this));
-        CommandManager replyCommand = new CommandManager(new CommandReply(this));
-        CommandManager socialSpyCommand = new CommandManager(new CommandSocialSpy(this));
-        CommandManager toggleMessageCommand = new CommandManager(new CommandToggleMessages(this));
-        CommandManager toggleSoundCommand = new CommandManager(new CommandToggleSound(this));
-        CommandManager toggleEmotesCommand = new CommandManager(new CommandToggleEmotes(this));
-        CommandManager channelCommand = new CommandManager(new CommandChannel(this));
-        CommandManager chatColorCommand = new CommandManager(new CommandChatColor(this));
+        // Register Commands
+        CommandManager messageCommand = new CommandManager(new MessageCommand());
+        CommandManager replyCommand = new CommandManager(new ReplyCommand());
+        CommandManager socialSpyCommand = new CommandManager(new SocialSpyCommand());
+        CommandManager toggleMessageCommand = new CommandManager(new ToggleMessageCommand());
+        CommandManager toggleSoundCommand = new CommandManager(new ToggleSoundCommand());
+        CommandManager toggleEmojiCommand = new CommandManager(new ToggleEmojiCommand());
+        CommandManager channelCommand = new CommandManager(new ChannelCommand());
+        CommandManager chatColorCommand = new CommandManager(new ChatColorCommand());
 
         GroupCommandManager groupCommand = (GroupCommandManager) new GroupCommandManager("gc", "/gc help")
-                .addSubcommand(new CommandGroupCreate())
-                .addSubcommand(new CommandGroupInvite())
-                .addSubcommand(new CommandGroupKick())
-                .addSubcommand(new CommandGroupAccept(this))
-                .addSubcommand(new CommandGroupLeave())
-                .addSubcommand(new CommandGroupDisband())
-                .addSubcommand(new CommandGroupMembers())
-                .addSubcommand(new CommandGroupHelp());
+                .addSubcommand(new CreateGroupCommand())
+                .addSubcommand(new InviteGroupCommand())
+                .addSubcommand(new KickGroupCommand())
+                .addSubcommand(new AcceptGroupCommand())
+                .addSubcommand(new LeaveGroupCommand())
+                .addSubcommand(new DisbandGroupCommand())
+                .addSubcommand(new MembersGroupCommand())
+                .addSubcommand(new RenameGroupCommand());
 
         ChatCommandManager chatCommand = (ChatCommandManager) new ChatCommandManager("chat", "/chat help")
-                .addSubcommand(new CommandChatMute(this))
-                .addSubcommand(new CommandChatClear(this))
-                .addSubcommand(new CommandChatMove(this))
-                .addSubcommand(new CommandChatSudo(this))
-                .addSubcommand(new CommandChatHelp());
+                .addSubcommand(new MuteChatCommand())
+                .addSubcommand(new ClearChatCommand())
+                .addSubcommand(new MoveChatCommand())
+                .addSubcommand(new SudoChatCommand());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)
@@ -92,13 +93,13 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(socialSpyCommand)
                 .addCommandManager(toggleMessageCommand)
                 .addCommandManager(toggleSoundCommand)
-                .addCommandManager(toggleEmotesCommand)
+                .addCommandManager(toggleEmojiCommand)
                 .addCommandManager(chatColorCommand)
                 .addCommandManager(channelCommand)
                 .addCommandManager(chatCommand)
                 .addCommandManager(groupCommand)
-                .addSubcommand(new CommandHelp(this))
-                .addSubcommand(new CommandReload());
+                .addSubcommand(new HelpCommand(this))
+                .addSubcommand(new ReloadCommand());
 
         new ChatListener(this);
         new PlayerListener(this);
@@ -118,7 +119,8 @@ public class RoseChat extends RosePlugin {
         return Arrays.asList(
                 PlaceholderSettingManager.class,
                 ChannelManager.class,
-                DataManager.class
+                DataManager.class,
+                GroupManager.class
         );
     }
 
@@ -146,11 +148,11 @@ public class RoseChat extends RosePlugin {
     }
 
     public Permission getVault() {
-        return vault;
+        return this.vault;
     }
 
     public SeniorCommandManager getCommandManager() {
-        return commandManager;
+        return this.commandManager;
     }
 
     public static RoseChat getInstance() {

@@ -12,7 +12,7 @@ public class CustomPlaceholder {
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {
@@ -20,7 +20,7 @@ public class CustomPlaceholder {
     }
 
     public TextPlaceholder getText() {
-        return text;
+        return this.text;
     }
 
     public void setText(TextPlaceholder text) {
@@ -28,7 +28,7 @@ public class CustomPlaceholder {
     }
 
     public HoverPlaceholder getHover() {
-        return hover;
+        return this.hover;
     }
 
     public void setHover(HoverPlaceholder hover) {
@@ -36,7 +36,7 @@ public class CustomPlaceholder {
     }
 
     public ClickPlaceholder getClick() {
-        return click;
+        return this.click;
     }
 
     public void setClick(ClickPlaceholder click) {

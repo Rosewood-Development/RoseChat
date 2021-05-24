@@ -8,19 +8,19 @@ public class ClickPlaceholder extends Placeholder {
     private Map<String, ClickEvent> groups;
 
     public ClickEvent getClickFromGroup(String group) {
-        return groups.containsKey(group) ? groups.get(group) : groups.get("default");
+        return this.groups.containsKey(group) ? this.groups.get(group) : this.groups.get("default");
     }
 
     public ClickEvent.Action getActionFromGroup(String group) {
-        return groups.containsKey(group) ? groups.get(group).getAction() : groups.get("default").getAction();
+        return this.groups.containsKey(group) ? this.groups.get(group).getAction() : this.groups.get("default").getAction();
     }
 
     public String getValueFromGroup(String group) {
-        return groups.containsKey(group) ? groups.get(group).getValue() : groups.get("default").getValue();
+        return this.groups.containsKey(group) ? this.groups.get(group).getValue() : this.groups.get("default").getValue();
     }
 
     public Map<String, ClickEvent> getGroups() {
-        return groups;
+        return this.groups;
     }
 
     public void setGroups(Map<String, ClickEvent> groups) {

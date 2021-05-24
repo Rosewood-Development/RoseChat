@@ -1,7 +1,8 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.managers.DataManager;
+import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.message.MessageLog;
 import java.util.UUID;
 
 public class PlayerData {
@@ -13,101 +14,207 @@ public class PlayerData {
     private boolean canBeMessaged;
     private boolean tagSounds;
     private boolean messageSounds;
-    private boolean emotes;
+    private boolean emojis;
     private boolean muted;
     private ChatChannel currentChannel;
+    private String color;
 
+    /**
+     * Creates a new PlayerData for a specific player.
+     * @param uuid The UUID of the player.
+     */
     public PlayerData(UUID uuid) {
         this.uuid = uuid;
         this.messageLog = new MessageLog(uuid);
         this.canBeMessaged = true;
         this.tagSounds = true;
         this.messageSounds = true;
-        this.emotes = true;
+        this.emojis = true;
+        this.color = "&f";
     }
 
-    public PlayerData(UUID uuid, boolean socialSpy, boolean canBeMessaged, boolean tagSounds, boolean messageSounds, boolean emotes) {
+    /**
+     * Creates a new PlayerData for a specific player.
+     * @param uuid The UUID of the player.
+     * @param socialSpy Whether or not this player has social spy enabled.
+     * @param canBeMessaged Whether or not this player can be messaged.
+     * @param tagSounds Whether or not this player has tag sounds enabled.
+     * @param messageSounds Whether or not this player has message sounds enabled.
+     * @param emojis Whether or not this player has emojis enabled.
+     */
+    public PlayerData(UUID uuid, boolean socialSpy, boolean canBeMessaged, boolean tagSounds, boolean messageSounds, boolean emojis) {
         this(uuid);
         this.socialSpy = socialSpy;
         this.canBeMessaged = canBeMessaged;
         this.tagSounds = tagSounds;
         this.messageSounds = messageSounds;
-        this.emotes = emotes;
+        this.emojis = emojis;
     }
 
+    /**
+     * Saves player data to the database.
+     */
     public void save() {
         RoseChat.getInstance().getManager(DataManager.class).updatePlayerData(this);
     }
 
+    /**
+     * Gets the UUID of the player who owns this player data.
+     * @return The UUID.
+     */
     public UUID getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
+    /**
+     * Gets the message log.
+     * @return The message log.
+     */
     public MessageLog getMessageLog() {
-        return messageLog;
+        return this.messageLog;
     }
 
+    /**
+     * Gets who the player is replying to.
+     * @return The UUID to reply to.
+     */
+    public UUID getReplyTo() {
+        return this.replyTo;
+    }
+
+    /**
+     * Sets who the player is replying to.
+     * @param replyTo The UUID to reply to.
+     */
     public void setReplyTo(UUID replyTo) {
         this.replyTo = replyTo;
     }
 
-    public UUID getReplyTo() {
-        return replyTo;
+    /**
+     * Whether or not the player has social spy enabled.
+     * @return True if the player has social spy enabled.
+     */
+    public boolean hasSocialSpy() {
+        return this.socialSpy;
     }
 
+    /**
+     * Sets whether or not the player has social spy enabled.
+     * @param socialSpy Whether or not the player has social spy enabled.
+     */
     public void setSocialSpy(boolean socialSpy) {
         this.socialSpy = socialSpy;
     }
 
-    public boolean hasSocialSpy() {
-        return socialSpy;
+    /**
+     * Whether or not the player can be messaged.
+     * @return True if the player can be messaged.
+     */
+    public boolean canBeMessaged() {
+        return this.canBeMessaged;
     }
 
+    /**
+     * Sets whether or not the player can be messaged.
+     * @param canBeMessaged Whether or not the player can be messaged.
+     */
     public void setCanBeMessaged(boolean canBeMessaged) {
         this.canBeMessaged = canBeMessaged;
     }
 
-    public boolean canBeMessaged() {
-        return canBeMessaged;
+    /**
+     * Whether or not the player has tag sounds enabled.
+     * @return True if the player has tag sounds enabled.
+     */
+    public boolean hasTagSounds() {
+        return this.tagSounds;
     }
 
+    /**
+     * Sets whether or not the player has tag sounds enabled.
+     * @param tagSounds Whether or not the player has tag sounds enabled.
+     */
     public void setTagSounds(boolean tagSounds) {
         this.tagSounds = tagSounds;
     }
 
-    public boolean hasTagSounds() {
-        return tagSounds;
+    /**
+     * Whether or not the player has message sounds enabled.
+     * @return True if the player has message sounds enabled.
+     */
+    public boolean hasMessageSounds() {
+        return this.messageSounds;
     }
 
+    /**
+     * Sets whether or not the player has message sounds enabled.
+     * @param messageSounds Whether or not the player has message sounds enabled.
+     */
     public void setMessageSounds(boolean messageSounds) {
         this.messageSounds = messageSounds;
     }
 
-    public boolean hasMessageSounds() {
-        return messageSounds;
+    /**
+     * Whether or not the player has emojis enabled.
+     * @return True if the player has emojis enabled.
+     */
+    public boolean hasEmojis() {
+        return this.emojis;
     }
 
-    public void setEmotes(boolean emotes) {
-        this.emotes = emotes;
+    /**
+     * Sets whether or not the player has emojis enabled.
+     * @param emojis Whether or not the player has emojis enabled.
+     */
+    public void setEmojis(boolean emojis) {
+        this.emojis = emojis;
     }
 
-    public boolean hasEmotes() {
-        return emotes;
-    }
-
+    /**
+     * Gets the current channel the player is in.
+     * @return The current channel the player is in.
+     */
     public ChatChannel getCurrentChannel() {
-        return currentChannel;
+        return this.currentChannel;
     }
 
+    /**
+     * Sets the current channel that the player is in.
+     * @param currentChannel The channel to use.
+     */
     public void setCurrentChannel(ChatChannel currentChannel) {
         this.currentChannel = currentChannel;
     }
 
+    /**
+     * Whether or not the player is muted.
+     * @return True if the player is muted.
+     */
     public boolean isMuted() {
-        return muted;
+        return this.muted;
     }
 
+    /**
+     * Sets the player as muted.
+     * @param muted Whether or not the player should be muted.
+     */
     public void setMuted(boolean muted) {
         this.muted = muted;
+    }
+
+    /**
+     * Gets the current chat color of the player.
+     * @return The current chat color of the player.
+     */
+    public String getColor() {
+        return this.color;
+    }
+
+    /**
+     * Sets the current chat color of the player.
+     * @param color The color to use.
+     */
+    public void setColor(String color) {
+        this.color = color;
     }
 }

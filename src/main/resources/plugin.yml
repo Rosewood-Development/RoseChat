@@ -1,165 +1,193 @@
 name: RoseChat
-main: dev.rosewood.rosechat.RoseChat
 version: 1.0.0
-api-version: "1.16"
-description: A customisable chat plugin.
-author: Lilac
-softdepend: [PlaceholderAPI, Vault, Essentials, LuckPerms]
+authors: [Lilac, Esophose]
+website: https://www.spigotmc.org/resources/rosechat/
+main: dev.rosewood.rosechat.RoseChat
+api-version: '1.13'
+softdepend:
+  - Essentials
+  - LuckPerms
+  - PlaceholderAPI
+  - Vault
 commands:
   rosechat:
     aliases: [rc]
     description: Main command for RoseChat.
   message:
-    aliases: [msg, whisper, tell, m, w, t, pm]
+    aliases: [msg, whisper, tell, pm, m, w, t]
     description: Send a message to another player.
   reply:
-    aliases: [reply, r]
+    aliases: [r]
     description: Replies to a message from another player.
   socialspy:
     aliases: [ss, spy]
     description: Allows a player to see private messages.
   togglemessage:
-    aliases: [togglemessages, togglepm, togglemsg, togglemsgs]
+    aliases: [togglemessages, togglepm, togglemsg, togglemsgs, togglepms]
     description: Toggles receiving messages.
   togglesound:
-    aliases: [togglesounds, toggleping, toggletag]
+    aliases: [togglesounds, togglepoing, toggletag]
     description: Toggles receiving sounds on messages or tags.
-  toggleemotes:
-    aliases: [toggleemote]
-    description: Toggles formatting emotes when sent.
+  toggleemoji:
+    aliases: [toggleemojis]
+    description: Toggles automatically creating emojis.
   channel:
     aliases: [c]
-    description: Talk in a chat channel.
+    description: Accesses a chat channel.
   chat:
     aliases: [cc, chatchannel]
-    description: Admin commands for chat channels.
+    description: Displays admin commands for chat channels.
   color:
-    aliases: [chatcolor]
+    aliases: [chatcolor, colour, chatcolour]
     description: Set a default chat color.
   gc:
     aliases: [group, groupchat]
     description: Displays group chat commands.
 permissions:
   rosechat.*:
-    description: Gives access to all Rosechat permissions.
+    description: Inherits all plugin permissions.
     children:
-      - rosechat.chat
-      - rosechat.bypass
-      - rosechat.message
-      - rosechat.reply
-      - rosechat.spy
-      - rosechat.togglemessage
-      - rosechat.togglesound
-      - rosechat.toggleemotes
-      - rosechat.channel
-      - rosechat.admin
-      - rosechat.group
-      - rosechat.chatcolor
+      rosechat.color: true
+      rosechat.hex: true
+      rosechat.rainbow: true
+      rosechat.gradient: true
+      rosechat.format: true
+      rosechat.magic: true
+      rosechat.spam: true
+      rosechat.language: true
+      rosechat.caps: true
+      rosechat.links: true
+      rosechat.placeholders: true
+      rosechat.tags: true
+      rosechat.replacements: true
+      rosechat.emojis: true
+      rosechat.chat: true
+      rosechat.message: true
+      rosechat.reply: true
+      rosechat.tag: true
+      rosechat.replacement: true
+      rosechat.emoji: true
+      rosechat.spy: true
+      rosechat.togglemessage: true
+      rosechat.togglesound: true
+      rosechat.toggleemoji: true
+      rosechat.mute: true
+      rosechat.channel: true
+      rosechat.admin: true
+      rosechat.chatcolor: true
+      rosechat.group: true
+      rosechat.groups: true
   rosechat.chat:
-    description: Allows a player to chat.
+    description: Allows using chat.
     default: not op
-  rosechat.chat.color:
-    description: Allows a player to use color in chat.
+  rosechat.color:
+    description: Allows using color codes.
     default: op
-  rosechat.chat.format:
-    description: Allows a player to use formatting in chat.
+  rosechat.format:
+    description: Allows using formatting codes.
     default: op
-  rosechat.chat.magic:
-    description: Allows a player to use the magic formatting in chat.
+  rosechat.magic:
+    description: Allows using the magic fomatting code.
     default: op
-  rosechat.chat.spam:
-    description: Allows a player to bypass the spam filter.
+  rosechat.spam:
+    description: Allows bypassing the spam filter.
     default: op
-  rosechat.chat.language:
-    description: Allows a player to bypass the language filter.
+  rosechat.language:
+    description: Allows bypassing the language filter.
     default: op
-  rosechat.chat.caps:
-    description: Allows a player to bypass the caps filter.
+  rosechat.caps:
+    description: Allows bypassing the caps filter.
     default: op
-  rosechat.chat.links:
-    description: Allows a player to bypass the URL filter.
+  rosechat.links:
+    description: Allows bypassing the URL filter.
     default: op
-  rosechat.tag.*:
-    description: Allows a player to use all tags.
+  rosechat.placeholders:
+    description: Allows using placeholders.
     default: op
-  rosechat.replacement.*:
-    description: Allows a player to use all emotes.
+  rosechat.tags:
+    description: Allows using tags.
+    default: op
+  rosechat.replacements:
+    description: Allows using replacements.
+    default: op
+  rosechat.emojis:
+    description: Allows using emojis.
     default: op
   rosechat.message:
-    description: Allows a player to use /message.
-    default: op
-  rosechat.message.color:
-    description: Allows a player to use color in /message.
-    default: op
-  rosechat.message.format:
-    description: Allows a player to use formatting in /message.
-    default: op
-  rosechat.message.magic:
-    description: Allows a player to use magic in /message.
-    default: op
-  rosechat.message.caps:
-    description: Allows a player to use caps in /message.
-    default: op
-  rosechat.message.language:
-    description: Allows a player to use bad language in /message.
-    default: op
-  rosechat.message.links:
-    description: Allows a player to use links in /message.
-    default: op
-  rosechat.message.spam:
-    description: Allows a player to spam in /message.
+    description: Allows using the message command.
     default: op
   rosechat.reply:
-    description: Allows a player to use /reply.
+    description: Allows using the reply command.
+    default: op
+  rosechat.tag:
+    description: Allows using a specific tag.
+    default: op
+  rosechat.replacement:
+    description: Allows using a specific replacement.
+    default: op
+  rosechat.emote:
+    description: Allows using a specific emote.
     default: op
   rosechat.spy:
-    description: Allows a player to use /socialspy.
+    description: Allows using socialspy.
     default: op
   rosechat.togglemessage:
-    description: Allows a player to use /togglemessage.
+    description: Allows using the togglemessage command.
     default: op
   rosechat.togglesound:
-    description: Allows a player to use /togglesound.
+    description: Allows using the togglesound command.
     default: op
-  rosechat.toggleemotes:
-    description: Allows a player to use /toggleemotes.
+  rosechat.toggleemoji:
+    description: Allows using the toggleemoji command.
+    default: op
+  rosechat.mute:
+    description: Allows using the mute command.
     default: op
   rosechat.channel:
-    description: Allows a player to access channels.
+    description: Allows using the channel command.
     default: op
   rosechat.admin.mute:
-    description: Allows a player to mute a chat channel.
+    description: Allows using the chat mute command.
     default: op
   rosechat.admin.clear:
-    description: Allows a player to clear a chat channel.
+    description: Allows using the chat clear command.
     default: op
   rosechat.admin.move:
-    description: Allows a player to move a player to a chat channel.
+    description: Allows using the chat move command.
     default: op
   rosechat.admin.sudo:
-    description: Allows a player to chat as another player.
-    default: op
-  rosechat.group.create:
-    description: Allows a player to create a group.
-    default: op
-  rosechat.group.invite:
-    description: Allows a player to invite a player to a group.
-    default: op
-  rosechat.group.kick:
-    description: Allows a player to kick a player from a group.
-    default: op
-  rosechat.group.accept:
-    description: Allows a player to accept a group invite.
-    default: op
-  rosechat.group.leave:
-    description: Allows a player to leave a group.
-    default: op
-  rosechat.group.disband:
-    description: Allows a player to disband a group.
-    default: op
-  rosechat.group.members:
-    description: Allows a player to see group members.
+    description: Allows using the chat sudo command.
     default: op
   rosechat.chatcolor:
-    description: Allows a player to set a default chat color.
+    description: Allows using the chatcolor command.
+    default: op
+  rosechat.group.create:
+    description: Allows using the group create command.
+    default: op
+  rosechat.group.disband:
+    description: Allows using the group disband command.
+    default: op
+  rosechat.group.invite:
+    description: Allows using the group invite command.
+    default: op
+  rosechat.group.kick:
+    description: Allows using the group kick command.
+    default: op
+  rosechat.group.accept:
+    description: Allows using the group accept command.
+    default: op
+  rosechat.group.leave:
+    description: Allows using the group leave command.
+    default: op
+  rosechat.group.members:
+    description: Allows using the group members command.
+    default: op
+  rosechat.group.rename:
+    description: Allows using the group rename command.
+    default: op
+  rosechat.group.promote:
+    description: Allows using the group promote command.
+    default: op
+  rosechat.groups:
+    description: Limits the amount of groups a player can be in.
     default: op

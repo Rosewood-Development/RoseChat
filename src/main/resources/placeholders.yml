@@ -92,6 +92,18 @@ you:
   text:
     default: "&eYou"
 
+group-prefix:
+  text:
+    default: "&9[&b%group%&9]"
+
+group-leader-prefix:
+  text:
+    default: ":crown-u:"
+
+group-member:
+  text:
+    default: "&7%player_name%&f: "
+
 spy-prefix:
   text:
     default: "&6[&eSocialSpy&6] "

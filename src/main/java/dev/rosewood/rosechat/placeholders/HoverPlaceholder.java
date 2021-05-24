@@ -10,25 +10,25 @@ public class HoverPlaceholder extends Placeholder {
     private Map<String, String> groupsAsStrings;
 
     public List<String> getHoverFromGroup(String group) {
-        return groups.containsKey(group) ? groups.get(group) : groups.get("default");
+        return this.groups.containsKey(group) ? this.groups.get(group) : this.groups.get("default");
     }
 
     public String getHoverStringFromGroup(String group) {
-        return groupsAsStrings.containsKey(group) ? groupsAsStrings.get(group) : groupsAsStrings.get("default");
+        return this.groupsAsStrings.containsKey(group) ? this.groupsAsStrings.get(group) : this.groupsAsStrings.get("default");
     }
 
     public Map<String, List<String>> getGroups() {
-        return groups;
+        return this.groups;
     }
 
     public Map<String, String> getGroupsAsStrings() {
-        return groupsAsStrings;
+        return this.groupsAsStrings;
     }
 
     public void setGroups(Map<String, List<String>> groups) {
         this.groups = groups;
 
-        groupsAsStrings = new HashMap<>();
+        this.groupsAsStrings = new HashMap<>();
         for (String group : groups.keySet()) {
             List<String> list = groups.get(group);
             StringBuilder hoverSb = new StringBuilder();
@@ -40,7 +40,7 @@ public class HoverPlaceholder extends Placeholder {
                 i++;
             }
 
-            groupsAsStrings.put(group, hoverSb.toString());
+            this.groupsAsStrings.put(group, hoverSb.toString());
         }
     }
 }

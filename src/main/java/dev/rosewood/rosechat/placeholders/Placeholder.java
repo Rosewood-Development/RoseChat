@@ -19,35 +19,35 @@ public class Placeholder {
     }
 
     public List<String> getConditionResult(Player player, Player viewer) {
-        String toParse = condition;
+        String toParse = this.condition;
 
-        switch (conditionType) {
+        switch (this.conditionType) {
             case PLACEHOLDER:
-                return (PlaceholderAPI.setPlaceholders(player, toParse).equalsIgnoreCase("yes") ? conditionTrue : conditionFalse);
+                return (PlaceholderAPI.setPlaceholders(player, toParse).equalsIgnoreCase("yes") ? this.conditionTrue : this.conditionFalse);
             case OTHER_PLACEHOLDER:
-                return (PlaceholderAPI.setPlaceholders(viewer, toParse).equalsIgnoreCase("yes") ? conditionTrue : conditionFalse);
+                return (PlaceholderAPI.setPlaceholders(viewer, toParse).equalsIgnoreCase("yes") ? this.conditionTrue : this.conditionFalse);
             case PLAYER_PERMISSION:
-                return (player.hasPermission(condition) ? conditionTrue : conditionFalse);
+                return (player.hasPermission(this.condition) ? this.conditionTrue : this.conditionFalse);
             case OTHER_PERMISSION:
-                return (viewer.hasPermission(condition) ? conditionTrue : conditionFalse);
+                return (viewer.hasPermission(this.condition) ? this.conditionTrue : this.conditionFalse);
         }
 
         return null;
     }
 
     public ConditionType getConditionType() {
-        return conditionType;
+        return this.conditionType;
     }
 
     public String getCondition() {
-        return condition;
+        return this.condition;
     }
 
     public List<String> getConditionTrue() {
-        return conditionTrue;
+        return this.conditionTrue;
     }
 
     public List<String> getConditionFalse() {
-        return conditionFalse;
+        return this.conditionFalse;
     }
 }

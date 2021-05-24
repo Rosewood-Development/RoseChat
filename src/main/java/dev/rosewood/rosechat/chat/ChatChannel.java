@@ -1,13 +1,14 @@
 package dev.rosewood.rosechat.chat;
 
+import dev.rosewood.rosechat.message.MessageWrapper;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ChatChannel {
+public class ChatChannel implements GroupReceiver {
 
-    private String id;
+    private final String id;
     private boolean defaultChannel;
     private boolean muted;
     private String format;
@@ -16,236 +17,269 @@ public class ChatChannel {
     private int radius = -1;
     private String world;
     private boolean autoJoin;
-    private boolean checkCaps;
-    private boolean checkUrl;
-    private boolean checkSpam;
-    private boolean checkLanguage;
-    private boolean chatPlaceholders;
-    private boolean visible;
-    private List<String> disabledTags;
-    private List<String> disabledReplacements;
+    private boolean visibleAnywhere;
     private List<String> servers;
-
     private List<UUID> players;
 
+    /**
+     * Creates a new chat channel with the given ID.
+     * @param id The ID of the channel.
+     * @param format The format to use for this channel.
+     * @param defaultChannel Whether or not this should be the channel player's join the first time they join the server.
+     */
     public ChatChannel(String id, String format, boolean defaultChannel) {
-        this(id, format);
-        this.defaultChannel = defaultChannel;
-        this.players = new ArrayList<>();
-        this.disabledTags = new ArrayList<>();
-        this.disabledReplacements = new ArrayList<>();
-        this.servers = new ArrayList<>();
-    }
-
-    public ChatChannel(String id, String format) {
         this.id = id;
         this.format = format;
         this.formatId = "channel-" + id;
+        this.defaultChannel = defaultChannel;
         this.players = new ArrayList<>();
+        this.servers = new ArrayList<>();
     }
 
-    public void message(Player sender, String message, boolean sendToConsole) {
-        MessageWrapper messageWrapper = new MessageWrapper(sender, message)
-                .checkAll("rosechat.chat")
-                .filterAll("rosechat.message")
-                .withReplacements()
-                .withTags()
-                .inChannel(this)
-                .parse(this.getFormatId(), null);
-
-        MessageUtils.sendStandardMessage(sender, messageWrapper, this, sendToConsole);
+    /**
+     * Creates a new chat channel with the given ID.
+     * @param id The ID of the channel.
+     * @param format The format to use for this channel.
+     */
+    public ChatChannel(String id, String format) {
+        this(id, format, false);
     }
 
+    @Override
+    public void send(MessageWrapper messageWrapper) {
+        if (this.isVisibleAnywhere()) {
+            // send to EVERYONE
+        }
+        // get players, in the world, in the server, all members, etc -> send
+    }
+
+    @Override
+    public List<UUID> getMembers() {
+        return this.players;
+    }
+
+    /**
+     * Adds a player to the channel.
+     * @param player The player to add.
+     */
     public void add(Player player) {
         add(player.getUniqueId());
     }
 
+    /**
+     * Removes a player from the channel.
+     * @param player The player to remove.
+     */
     public void remove(Player player) {
         remove(player.getUniqueId());
     }
 
+    /**
+     * Checks if the channel contains a player.
+     * @param player The player to check for.
+     * @return True if the channel contains the given player.
+     */
     public boolean contains(Player player) {
         return contains(player.getUniqueId());
     }
 
+    /**
+     * Adds a UUID to the channel.
+     * @param uuid The UUID to add.
+     */
     public void add(UUID uuid) {
-        players.add(uuid);
+        this.players.add(uuid);
     }
 
+    /**
+     * Removes a UUID from the channel.
+     * @param uuid The UUID to remove.
+     */
     public void remove(UUID uuid) {
-        players.remove(uuid);
+        this.players.remove(uuid);
     }
 
+    /**
+     * Checks if the channel contains a UUID.
+     * @param uuid The UUID to check for.
+     * @return True if the channel contains the given UUID.
+     */
     public boolean contains(UUID uuid) {
-        return players.contains(uuid);
+        return this.players.contains(uuid);
     }
 
+    /**
+     * Gets the ID of the channel.
+     * @return The ID of the channel.
+     */
     public String getId() {
-        return id;
+        return this.id;
     }
 
-    public ChatChannel setId(String id) {
-        this.id = id;
-        return this;
-    }
-
+    /**
+     * Checks if the channel is the default channel.
+     * @return True if the channel is the default channel.
+     */
     public boolean isDefaultChannel() {
-        return defaultChannel;
+        return this.defaultChannel;
     }
 
-    public ChatChannel setDefaultChannel(boolean defaultChannel) {
+    /**
+     * Sets the channel to being the default channel.
+     * @param defaultChannel Whether or not the channel should be the default channel.
+     */
+    public void setDefaultChannel(boolean defaultChannel) {
         this.defaultChannel = defaultChannel;
-        return this;
     }
 
+    /**
+     * Gets the channel format.
+     * @return The channel format.
+     */
     public String getFormat() {
-        return format;
+        return this.format;
     }
 
-    public ChatChannel setFormat(String format) {
+    /**
+     * Sets the channel format.
+     * @param format The format to use.
+     */
+    public void setFormat(String format) {
         this.format = format;
-        return this;
     }
 
+    /**
+     * Gets the channel format ID.
+     * @return The channel format ID.
+     */
     public String getFormatId() {
-        return formatId;
+        return this.formatId;
     }
 
-    public ChatChannel setFormatId(String formatId) {
+    /**
+     * Sets the channel format ID.
+     * @param formatId The format ID to use.
+     */
+    public void setFormatId(String formatId) {
         this.formatId = formatId;
-        return this;
     }
 
+    /**
+     * Gets the radius that messages can be received within.
+     * @return The channel radius.
+     */
     public int getRadius() {
-        return radius;
+        return this.radius;
     }
 
-    public ChatChannel setRadius(int radius) {
+    /**
+     * Sets the channel radius.
+     * @param radius The radius to use.
+     */
+    public void setRadius(int radius) {
         this.radius = radius;
-        return this;
     }
 
+    /**
+     * Gets the world that messages from this channel can be sent and received in.
+     * @return The world.
+     */
     public String getWorld() {
-        return world;
+        return this.world;
     }
 
-    public ChatChannel setWorld(String world) {
+    /**
+     * Sets the world.
+     * @param world The world to use.
+     */
+    public void setWorld(String world) {
         this.world = world;
-        return this;
     }
 
+    /**
+     * Whether or not players will automatically join the channel when entering the world.
+     * @return True if players will automatically join the channel when entering the world.
+     */
     public boolean isAutoJoin() {
-        return autoJoin;
+        return this.autoJoin;
     }
 
-    public ChatChannel setAutoJoin(boolean autoJoin) {
+    /**
+     * Sets whether players will automatically join the channel when entering the world.
+     * @param autoJoin Whether or not players will automatically join the channel when entering the world.
+     */
+    public void setAutoJoin(boolean autoJoin) {
         this.autoJoin = autoJoin;
-        return this;
     }
 
-    public boolean isCheckCaps() {
-        return checkCaps;
-    }
-
-    public ChatChannel setCheckCaps(boolean checkCaps) {
-        this.checkCaps = checkCaps;
-        return this;
-    }
-
-    public boolean isCheckLanguage() {
-        return checkLanguage;
-    }
-
-    public ChatChannel setCheckLanguage(boolean checkLanguage) {
-        this.checkLanguage = checkLanguage;
-        return this;
-    }
-
-    public boolean isCheckSpam() {
-        return checkSpam;
-    }
-
-    public ChatChannel setCheckSpam(boolean checkSpam) {
-        this.checkSpam = checkSpam;
-        return this;
-    }
-
-    public boolean isCheckUrl() {
-        return checkUrl;
-    }
-
-    public ChatChannel setCheckUrl(boolean checkUrl) {
-        this.checkUrl = checkUrl;
-        return this;
-    }
-
-    public List<UUID> getPlayers() {
-        return players;
-    }
-
-    public ChatChannel setPlayers(List<UUID> players) {
+    /**
+     * Sets the players in the channel.
+     * @param players The players to be placed in the channel.
+     */
+    public void setPlayers(List<UUID> players) {
         this.players = players;
-        return this;
     }
 
-    public boolean hasChatPlaceholders() {
-        return chatPlaceholders;
-    }
-
-    public ChatChannel setChatPlaceholders(boolean chatPlaceholders) {
-        this.chatPlaceholders = chatPlaceholders;
-        return this;
-    }
-
-    public List<String> getDisabledEmotes() {
-        return disabledReplacements;
-    }
-
-    public ChatChannel setDisabledReplacements(List<String> disabledReplacements) {
-        this.disabledReplacements = disabledReplacements;
-        return this;
-    }
-
-    public List<String> getDisabledTags() {
-        return disabledTags;
-    }
-
-    public ChatChannel setDisabledTags(List<String> disabledTags) {
-        this.disabledTags = disabledTags;
-        return this;
-    }
-
+    /**
+     * Gets the bungee servers the messages will be sent to.
+     * @return The bungee servers the messages will be sent to.
+     */
     public List<String> getServers() {
-        return servers;
+        return this.servers;
     }
 
-    public ChatChannel setServers(List<String> servers) {
+    /**
+     * Sets the bungee servers the messages will be sent to.
+     * @param servers The servers to use.
+     */
+    public void setServers(List<String> servers) {
         this.servers = servers;
-        return this;
     }
 
-    public boolean isVisible() {
-        return visible;
+    /**
+     * Is this channel visible anywhere?
+     * @return Whether or not this channel is visible anywhere.
+     */
+    public boolean isVisibleAnywhere() {
+        return this.visibleAnywhere;
     }
 
-    public ChatChannel setVisible(boolean visible) {
-        this.visible = visible;
-        return this;
+    /**
+     * Sets this channel as visible, meaning that messages will always be received even if a player is in another channel.
+     * @param visibleAnywhere Whether or not the channel should be visible anywhere.
+     */
+    public void setVisibleAnywhere(boolean visibleAnywhere) {
+        this.visibleAnywhere = visibleAnywhere;
     }
 
+    /**
+     * Gets the command that can be used to access the channel.
+     * @return The command that can be used to access the channel.
+     */
     public String getCommand() {
-        return command;
+        return this.command;
     }
 
-    public ChatChannel setCommand(String command) {
+    /**
+     * Sets the command that can be used to access the channel.
+     * @param command The command to be used.
+     */
+    public void setCommand(String command) {
         this.command = command;
-        return this;
     }
 
+    /**
+     * Gets whether or not the channel is muted.
+     * @return Whether or not the channel is muted.
+     */
     public boolean isMuted() {
-        return muted;
+        return this.muted;
     }
 
+    /**
+     * Sets whether or not the channel is muted.
+     * @param muted Whether or not the channel is muted.
+     */
     public void setMuted(boolean muted) {
         this.muted = muted;
     }

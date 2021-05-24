@@ -34,9 +34,11 @@ public class EnglishLocale implements Locale {
             this.put("#3", "Help Command");
             this.put("command-help-description", "&8 - &d/rc help &7- Displays the help menu... You have arrived.");
             this.put("command-help-title", "&eAvailable Commands:");
+            this.put("command-help-usage", "&e/rc help");
 
             this.put("#4", "Reload Command");
             this.put("command-reload-description", "&8 - &d/rc reload &7- Reloads the plugin.");
+            this.put("command-reload-usage", "&e/rc reload");
             this.put("command-reload-reloaded", "&ePlugin data, configuration, and locale files were reloaded.");
 
             this.put("#5", "Moderation Messages");
@@ -52,7 +54,7 @@ public class EnglishLocale implements Locale {
 
             this.put("#7", "Reply Command");
             this.put("command-reply-description", "&8 - &d/reply &7- Replies to a message from another player.");
-            this.put("command-reply-usage", "&c&e/reply");
+            this.put("command-reply-usage", "&e/reply");
             this.put("command-reply-enter-message", "&cPlease enter a message!");
             this.put("command-reply-no-one", "&cThere is no one to reply to...");
 
@@ -77,11 +79,11 @@ public class EnglishLocale implements Locale {
             this.put("command-togglesound-messages", "messages");
             this.put("command-togglesound-tags", "tags");
 
-            this.put("#11", "ToggleEmote Command");
-            this.put("command-toggleemotes-description", "&8 - &d/toggleemotes &7- Toggles formatting emotes.");
-            this.put("command-toggleemotes-usage", "&e/toggleemotes");
-            this.put("command-toggleemotes-on", "&eYou have &aenabled &eformatting emotes.");
-            this.put("command-toggleemotes-off", "&eYou have &cdisabled &eformatting emotes.");
+            this.put("#11", "ToggleEmoji Command");
+            this.put("command-toggleemoji-description", "&8 - &d/toggleemoji &7- Toggles formatting emojis.");
+            this.put("command-toggleemoji-usage", "&e/toggleemoji");
+            this.put("command-toggleemoji-on", "&eYou have &aenabled &eformatting emoji.");
+            this.put("command-toggleemoji-off", "&eYou have &cdisabled &eformatting emoji.");
 
             this.put("#12", "Channel Command");
             this.put("command-channel-description", "&8 - &d/channel &7- Send a message in a chat channel.");
@@ -96,11 +98,11 @@ public class EnglishLocale implements Locale {
             this.put("#14", "Chat Help Command");
             this.put("command-chat-help-description", "&8 - &c/chat help &7- Displays the admin help menu... You have arrived.");
             this.put("command-chat-help-usage", "&8 - &e/chat help");
+            this.put("command-chat-help-title", "&eAvailable Commands");
 
             this.put("#15", "Chat Clear Command");
             this.put("command-chat-clear-description", "&8 - &c/chat clear &7- Clears the chat.");
             this.put("command-chat-clear-usage", "&e/chat clear [channel]");
-            this.put("command-chat-clear-visible", "&eVisible channels cannot be cleared.");
             this.put("command-chat-clear-cleared", "&eThe &b%channel% &echannel has been cleared.");
 
             this.put("#16", "Chat Move Command");
@@ -114,6 +116,7 @@ public class EnglishLocale implements Locale {
             this.put("command-chat-mute-usage", "&e/chat mute <channel>");
             this.put("command-chat-mute-muted", "&eThe &b%channel% &echannel has been muted.");
             this.put("command-chat-mute-unmuted", "&eThe &b%channel% &echannel has been unmuted.");
+            this.put("channel-muted", "&cYou can not send a message while this channel is muted.");
 
             this.put("#18", "Chat Sudo Command");
             this.put("command-chat-sudo-description", "&8 - &c/chat sudo &7- Send a chat message as another player.");
@@ -129,14 +132,14 @@ public class EnglishLocale implements Locale {
 
             this.put("#22", "Group Chat Create Command");
             this.put("command-gc-create-description", "&8 - &b/gc create &7- Creates a new group chat.");
-            this.put("command-gc-create-usage", "&e/gc create");
+            this.put("command-gc-create-usage", "&e/gc create <name>");
             this.put("command-gc-create-success", "&eYou have created a new group chat. Use &b/gc invite &eto invite a player.");
 
             this.put("#23", "Group Chat Invite Command");
             this.put("command-gc-invite-description", "&8 - &b/gc invite &7- Invites a player to the group chat.");
             this.put("command-gc-invite-usage", "&e/gc invite <player>");
             this.put("command-gc-invite-success", "&eYou have invited &b%player% &eto the group chat.");
-            this.put("command-gc-invite-invited", "&b%player% &ehas invited you to their group chat.");
+            this.put("command-gc-invite-invited", "&b%player% &ehas invited you to their group chat, &b%name%&e.");
 
             this.put("#24", "Group Chat Kick Command");
             this.put("command-gc-kick-description", "&8 - &b/gc kick &7- Kicks a player from the group chat.");
@@ -157,9 +160,9 @@ public class EnglishLocale implements Locale {
             this.put("command-gc-leave-left", "&b%player% &ehas left the group chat.");
 
             this.put("#27", "Group Chat Disband Command");
-            this.put("command-gc-disband-description", "&8 - &b/gc disband &7- Deletes the group chat.");
+            this.put("command-gc-disband-description", "&8 - &b/gc disband &7- Deletes your group chat.");
             this.put("command-gc-disband-usage", "&e/gc disband");
-            this.put("command-gc-disband-success", "&eThe group chat you were in has been disbaned...");
+            this.put("command-gc-disband-success", "&eThe &b%name% &egroup chat you were in has been disbanded...");
 
             this.put("#28", "Group Chat Members Command");
             this.put("command-gc-members-description", "&8 - &b/gc members &7- Lists the members of the group chat.");
@@ -171,6 +174,14 @@ public class EnglishLocale implements Locale {
             this.put("command-color-description", "&8 - &d/color &7- Change your default chat color.");
             this.put("command-color-usage", "&e/color <color>");
             this.put("command-color-success", "&eYour new chat color is %color%&e.");
+            this.put("command-color-invalid", "&eThis is not a valid color!");
+
+            this.put("#30", "Mute Command");
+            this.put("command-mute-description", "&8- &d/mute &7- Mute a player.");
+            this.put("command-mute-usage", "&e/mute <player> [time]");
+            this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time%&e.");
+            this.put("command-mute-indefinite", "an indefinite amount of time");
+            this.put("mute-muted", "&cYou can not send a message while you are muted!");
         }};
     }
 }
