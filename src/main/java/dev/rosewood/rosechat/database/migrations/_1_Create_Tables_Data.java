@@ -28,7 +28,8 @@ public class _1_Create_Tables_Data extends DataMigration {
             statement.execute("CREATE TABLE" + tablePrefix + "group_chats (" +
                     "uuid VARCHAR(36) UNIQUE NOT NULL, " +
                     "name VARCHAR(255) NOT NULL, " +
-                    "owner VARCHAR(36) UNIQUE NOT NULL" +
+                    "owner VARCHAR(36) UNIQUE NOT NULL, " +
+                    "members VARCHAR(4864) NOT NULL" +
                     ")");
         }
     }

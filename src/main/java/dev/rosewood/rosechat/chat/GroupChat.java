@@ -11,13 +11,14 @@ public class GroupChat implements GroupReceiver {
     private final UUID uuid;
     private String name;
     private UUID owner;
-    private final List<UUID> members;
+    private List<UUID> members;
 
     /**
      * Creates a new group chat with a UUID.
      */
-    public GroupChat(UUID uuid) {
-        this.uuid = uuid;
+    public GroupChat(UUID owner) {
+        this.uuid = owner;
+        this.owner = owner;
         this.members = new ArrayList<>();
     }
 
@@ -37,6 +38,10 @@ public class GroupChat implements GroupReceiver {
      */
     public UUID getUuid() {
         return this.uuid;
+    }
+
+    public void setMembers(List<UUID> members) {
+        this.members = members;
     }
 
     /**

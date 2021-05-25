@@ -2,40 +2,92 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.manager.Manager;
-
+import dev.rosewood.rosegarden.manager.AbstractDataManager;
+import org.bukkit.Bukkit;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class GroupManager extends Manager {
+public class GroupManager extends AbstractDataManager {
 
-    private Map<String, GroupChat> groupChats;
+    private Map<UUID, GroupChat> groupChats;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.groupChats = new HashMap<>();
     }
 
-    @Override
-    public void reload() {
-
+    public GroupChat getGroupChat(UUID uuid) {
+        GroupChat groupChat = this.groupChats.get(uuid);
+        if (groupChat == null)
+            throw new IllegalStateException("GroupChat for [" + uuid + "] not yet loaded.");
+        return groupChat;
     }
 
-    @Override
-    public void disable() {
-
+    public void unloadGroupChat(UUID uuid) {
+        this.groupChats.remove(uuid);
     }
+
+    public void getGroupChat(UUID uuid, Consumer<GroupChat> callback) {
+        if (this.groupChats.containsKey(uuid)) {
+            callback.accept(this.groupChats.get(uuid));
+            return;
+        }
+
+        this.async(() -> {
+            this.databaseConnector.connect(connection -> {
+                String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "group_chats WHERE uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
+                    statement.setString(1, uuid.toString());
+
+                    ResultSet result = statement.executeQuery();
+                    if (result.next()) {
+                        String name = result.getString("name");
+                        List<UUID> members = new ArrayList<>();
+
+                        for (String memberStr : result.getString("members").split(",")) {
+                            members.add(UUID.fromString(memberStr));
+                        }
+
+                        GroupChat groupChat = new GroupChat(uuid);
+                        groupChat.setName(name);
+                        groupChat.setMembers(members);
+                        this.groupChats.put(uuid, groupChat);
+                        callback.accept(groupChat);
+                    } else {
+                        GroupChat groupChat = new GroupChat(uuid);
+                        this.groupChats.put(uuid, groupChat);
+                        callback.accept(groupChat);
+                    }
+                }
+            });
+        });
+    }
+
+    private void async(Runnable asyncCallback) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
+    }
+
+    private void sync(Runnable syncCallback) {
+        Bukkit.getScheduler().runTask(this.rosePlugin, syncCallback);
+    }
+
 
     public void addGroupChat(GroupChat groupChat) {
-        this.groupChats.put(groupChat.getUuid().toString(), groupChat);
+        this.groupChats.put(groupChat.getUuid(), groupChat);
     }
 
     public void removeGroupChat(GroupChat groupChat) {
-        this.groupChats.remove(groupChat.getUuid().toString());
+        this.groupChats.remove(groupChat.getUuid());
     }
 
-    public Map<String, GroupChat> getGroupChats() {
+    public Map<UUID, GroupChat> getGroupChats() {
         return this.groupChats;
     }
 
