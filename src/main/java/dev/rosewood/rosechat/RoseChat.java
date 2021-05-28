@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat;
 
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.HelpCommand;
