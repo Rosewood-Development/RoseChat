@@ -53,12 +53,12 @@ public class MessageUtils {
         return caps > ConfigurationManager.Setting.MAXIMUM_CAPS_ALLOWED.getInt();
     }
 
-    public static void sendStandardMessage(CommandSender sender, MessageWrapperOld messageWrapperOld, ChatChannel channel) {
+    /*public static void sendStandardMessage(CommandSender sender, MessageWrapperOld messageWrapperOld, ChatChannel channel) {
         sendStandardMessage(sender, messageWrapperOld, channel, true);
     }
 
     public static void sendStandardMessage(CommandSender sender, MessageWrapperOld messageWrapperOld, ChatChannel channel, boolean sendToConsole) {
-        /*if (messageWrapperOld.isEmpty()) return;
+        if (messageWrapperOld.isEmpty()) return;
         if (messageWrapperOld.isBlocked()) {
             if (messageWrapperOld.getFilterType() != null) messageWrapperOld.getFilterType().sendWarning(sender);
             return;
@@ -122,6 +122,6 @@ public class MessageUtils {
             }
         } catch (Exception e) {
 
-        }*/
-    }
+        }
+    }*/
 }

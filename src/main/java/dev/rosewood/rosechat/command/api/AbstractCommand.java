@@ -74,7 +74,7 @@ public abstract class AbstractCommand {
         this.labels.add(label);
 
         if (juniorCommand) {
-            List<String> aliases = (List<String>) RoseChat.getInstance().getDescription() .getCommands().get(label).get("aliases");
+            List<String> aliases = (List<String>) RoseChat.getInstance().getDescription().getCommands().get(label).get("aliases");
             this.labels.addAll(aliases);
         }
     }

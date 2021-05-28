@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
-import dev.rosewood.rosechat.processor.ChatProcessor;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -206,7 +205,7 @@ public class MessageWrapper {
     }
 
     public BaseComponent[] build() {
-        /*this.isEmpty = this.message.trim().isEmpty();
+        this.isEmpty = this.message.trim().isEmpty();
 
         String[] messageSplit = this.message.split(MessageUtils.REPLACEMENT_PATTERN.pattern());
         for (String section : messageSplit) {
@@ -219,12 +218,8 @@ public class MessageWrapper {
             } else {
                 this.builder.append(TextComponent.fromLegacyText(section), ComponentBuilder.FormatRetention.FORMATTING).font("default");
             }
-        }*/
-
-        ChatProcessor tokenizer = new ChatProcessor(this.message);
-        float time = 1.0f;
-        System.out.printf("Finished processing in %.3fms\nOutput: \n%s", time, tokenizer);
-        return tokenizer.getComponent();
+        }
+        return this.builder.create();
     }
 
     public MessageSender getSender() {

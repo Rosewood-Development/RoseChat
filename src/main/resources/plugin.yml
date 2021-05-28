@@ -1,5 +1,5 @@
 name: RoseChat
-version: 1.0.0
+version: '@version@'
 authors: [Lilac, Esophose]
 website: https://www.spigotmc.org/resources/rosechat/
 main: dev.rosewood.rosechat.RoseChat
