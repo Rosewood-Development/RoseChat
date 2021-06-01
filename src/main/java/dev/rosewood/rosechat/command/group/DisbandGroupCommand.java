@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import org.bukkit.command.CommandSender;
 import java.util.List;
@@ -12,7 +14,8 @@ public class DisbandGroupCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        // delete the group a player owns
+        if (args.length != 0) {
+        }
     }
 
     @Override

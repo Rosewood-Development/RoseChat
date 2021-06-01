@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,13 +22,16 @@ public class CreateGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        String name = getAllArgs(1, args);
+        if (this.getAPI().getGroupChat(player.getUniqueId()) != null) {
+            this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-fail");
+            return;
+        }
+
+        String name = HexUtils.colorify(getAllArgs(0, args));
         GroupChat groupChat = this.getAPI().createGroupChat(player.getUniqueId());
         groupChat.setName(name);
-
-        //groupManager.addGroupChat(groupChat);
-
-        // add group chat, add player
+        groupChat.save();
+        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
     }
 
     @Override

@@ -16,6 +16,7 @@ import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
+import dev.rosewood.rosechat.command.group.DenyGroupCommand;
 import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
 import dev.rosewood.rosechat.command.group.InviteGroupCommand;
 import dev.rosewood.rosechat.command.group.KickGroupCommand;
@@ -75,6 +76,7 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new InviteGroupCommand())
                 .addSubcommand(new KickGroupCommand())
                 .addSubcommand(new AcceptGroupCommand())
+                .addSubcommand(new DenyGroupCommand())
                 .addSubcommand(new LeaveGroupCommand())
                 .addSubcommand(new DisbandGroupCommand())
                 .addSubcommand(new MembersGroupCommand())
@@ -106,6 +108,8 @@ public class RoseChat extends RosePlugin {
         // Load data for all players currently online
         DataManager dataManager = this.getManager(DataManager.class);
         Bukkit.getOnlinePlayers().forEach(x -> dataManager.getPlayerData(x.getUniqueId(), data -> {}));
+
+        GroupManager groupManager = this.getManager(GroupManager.class);
     }
 
     @Override

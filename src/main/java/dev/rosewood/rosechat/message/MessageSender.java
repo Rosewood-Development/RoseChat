@@ -16,7 +16,7 @@ public class MessageSender {
     public MessageSender(Player player) {
         this.plugin = RoseChat.getInstance();
         this.player = player;
-        this.name = player.getName();
+        this.name = player.getDisplayName();
         this.group = this.plugin.getVault() == null ? "default" : this.plugin.getVault().getPrimaryGroup(player);
     }
 

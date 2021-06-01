@@ -35,8 +35,9 @@ public class ChatColorCommand extends AbstractCommand {
             return;
         }
 
-        playerData.setColor(color);
         this.getAPI().getLocaleManager().sendMessage(sender, "command-color-success", StringPlaceholders.single("color", HexUtils.colorify(color + "\\" + color)));
+        playerData.setColor(color);
+        playerData.save();
     }
 
     @Override

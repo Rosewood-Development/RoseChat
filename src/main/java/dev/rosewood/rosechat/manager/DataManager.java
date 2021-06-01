@@ -47,7 +47,6 @@ public class DataManager extends AbstractDataManager {
                 String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
                 try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                     statement.setString(1, uuid.toString());
-
                     ResultSet result = statement.executeQuery();
 
                     if (result.next()) {
@@ -114,18 +113,12 @@ public class DataManager extends AbstractDataManager {
                         statement.setBoolean(3, playerData.hasTagSounds());
                         statement.setBoolean(4, playerData.hasMessageSounds());
                         statement.setString(5, playerData.getCurrentChannel().getId());
-                        statement.setString(6, playerData.getUuid().toString());
-                        statement.setString(7, playerData.getColor());
+                        statement.setString(6, playerData.getColor());
+                        statement.setString(7, playerData.getUuid().toString());
                         statement.executeUpdate();
                     }
                 }
             });
-        });
-    }
-
-    public void removePlayerData(UUID uuid) {
-        this.async(() -> {
-
         });
     }
 

@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.GroupManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -49,6 +50,8 @@ public class PlayerListener implements Listener {
                 playerData.save();
             }
         });
+
+        RoseChat.getInstance().getManager(GroupManager.class).loadMemberGroupChats(player.getUniqueId());
     }
 
     @EventHandler

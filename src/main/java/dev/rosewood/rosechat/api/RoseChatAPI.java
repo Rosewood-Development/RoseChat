@@ -26,10 +26,14 @@ public class RoseChatAPI {
     private static RoseChatAPI instance;
     private final RoseChat plugin;
     private final LocaleManager localeManager;
+    private final DataManager dataManager;
+    private final GroupManager groupManager;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
-        this.localeManager = plugin.getManager(LocaleManager.class);
+        this.localeManager = this.plugin.getManager(LocaleManager.class);
+        this.dataManager = this.plugin.getManager(DataManager.class);
+        this.groupManager = this.plugin.getManager(GroupManager.class);
     }
 
     /**
@@ -194,7 +198,8 @@ public class RoseChatAPI {
      */
     public GroupChat createGroupChat(UUID owner) {
         GroupChat groupChat = new GroupChat(owner);
-        this.plugin.getManager(GroupManager.class).addGroupChat(groupChat);
+        groupChat.addMember(owner);
+        this.groupManager.addGroupChat(groupChat);
         return groupChat;
     }
 
@@ -203,29 +208,29 @@ public class RoseChatAPI {
      * @param groupChat The group chat to delete.
      */
     public void deleteGroupChat(GroupChat groupChat) {
-        this.plugin.getManager(GroupManager.class).removeGroupChat(groupChat);
+        this.groupManager.removeGroupChat(groupChat);
     }
 
     /**
      * @param owner The owner to use.
      * @return The group chat found, or null if it doesn't exist.
      */
-    public GroupChat getGroupChatByOwner(UUID owner) {
-        return this.plugin.getManager(GroupManager.class).getGroupChatByOwner(owner);
+    public GroupChat getGroupChat(UUID owner) {
+        return this.groupManager.getGroupChat(owner);
     }
 
     /**
      * @return A list of all group chats.
      */
     public List<GroupChat> getGroupChats() {
-        return new ArrayList<>(this.plugin.getManager(GroupManager.class).getGroupChats().values());
+        return new ArrayList<>(this.groupManager.getGroupChats().values());
     }
 
     /**
      * @return A list of all group chat IDs.
      */
     public List<UUID> getGroupChatIDs() {
-        return new ArrayList<>(this.plugin.getManager(GroupManager.class).getGroupChats().keySet());
+        return new ArrayList<>(this.groupManager.getGroupChats().keySet());
     }
 
     /**
@@ -274,7 +279,7 @@ public class RoseChatAPI {
      * @return The data of the player.
      */
     public PlayerData getPlayerData(UUID player) {
-        return this.plugin.getManager(DataManager.class).getPlayerData(player);
+        return this.dataManager.getPlayerData(player);
     }
 
     /**
@@ -282,5 +287,12 @@ public class RoseChatAPI {
      */
     public LocaleManager getLocaleManager() {
         return this.localeManager;
+    }
+
+    /**
+     * @return An instance of the group manager.
+     */
+    public GroupManager getGroupManager() {
+        return this.groupManager;
     }
 }

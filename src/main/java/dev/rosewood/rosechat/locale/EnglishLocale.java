@@ -125,6 +125,7 @@ public class EnglishLocale implements Locale {
             this.put("#20", "Group Chat Command");
             this.put("command-gc-description", "&8 - &d/gc &7- DIsplays the group chat help menu.");
             this.put("command-gc-usage", "&e/gc help");
+            this.put("no-gc", "&cYou do not own a group chat!");
 
             this.put("#21", "Group Chat Help Command");
             this.put("command-gc-help-description", "&8 - &b/gc help &7- Displays the group chat help menu... You have arrived.");
@@ -133,50 +134,64 @@ public class EnglishLocale implements Locale {
             this.put("#22", "Group Chat Create Command");
             this.put("command-gc-create-description", "&8 - &b/gc create &7- Creates a new group chat.");
             this.put("command-gc-create-usage", "&e/gc create <name>");
-            this.put("command-gc-create-success", "&eYou have created a new group chat. Use &b/gc invite &eto invite a player.");
+            this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e. Use &b/gc invite &eto invite a player.");
+            this.put("command-gc-create-fail", "&cYou already own a group chat!");
 
             this.put("#23", "Group Chat Invite Command");
             this.put("command-gc-invite-description", "&8 - &b/gc invite &7- Invites a player to the group chat.");
             this.put("command-gc-invite-usage", "&e/gc invite <player>");
-            this.put("command-gc-invite-success", "&eYou have invited &b%player% &eto the group chat.");
-            this.put("command-gc-invite-invited", "&b%player% &ehas invited you to their group chat, &b%name%&e.");
+            this.put("command-gc-invite-full", "&bYour group chat already has 128 members!");
+            this.put("command-gc-invite-success", "&eYou have invited &b%player% &eto the &b%name% &egroup chat.");
+            this.put("command-gc-invite-invited", "&b%player% &ehas invited you to the &b%name% &egroup chat.");
 
             this.put("#24", "Group Chat Kick Command");
-            this.put("command-gc-kick-description", "&8 - &b/gc kick &7- Kicks a player from the group chat.");
+            this.put("command-gc-kick-description", "&8 - &b/gc kick &7- Kicks a player from the &b%name% &egroup chat.");
             this.put("command-gc-kick-usage", "&e/gc kick <player>");
-            this.put("command-gc-kick-success", "&eYou have kicked &b%player% &efrom the group chat.");
-            this.put("command-gc-kick-kicked", "&eYou have been kicked from the group chat.");
+            this.put("command-gc-kick-success", "&eYou have kicked &b%player% &efrom the &b%name% &egroup chat.");
+            this.put("command-gc-kick-kicked", "&eYou have been kicked from the &b%name% &egroup chat.");
 
             this.put("#25", "Group Chat Accept Command");
             this.put("command-gc-accept-description", "&8 - &b/gc accept &7- Accepts a group chat invite.");
-            this.put("command-gc-accept-usage", "&e/gc accept");
-            this.put("command-gc-accept-success", "&eYou have joined &b%player%&e's group chat.");
-            this.put("command-gc-accept-accepted", "&b%player% &ehas joined the group chat.");
+            this.put("command-gc-accept-usage", "&e/gc accept [owner]");
+            this.put("command-gc-accept-success", "&eYou have joined the &b%name% &egroup chat.");
+            this.put("command-gc-accept-accepted", "&b%player% &ehas joined the &b%name% &egroup chat.");
+            this.put("command-gc-accept-no-invites", "&cYou have no group invites :(");
+            this.put("command-gc-accept-not-invited", "&cThis person has not invited you!");
+            this.put("command-gc-accept-hover", "&aClick to Accept the Invite");
+            this.put("command-gc-accept-accept", "&a&lAccept");
 
-            this.put("#26", "Group Chat Leave Command");
+            this.put("#26", "Group Chat Deny Command");
+            this.put("command-gc-deny-description", "&8 - &b/gc deny &7- Denies a group chat invite.");
+            this.put("command-gc-deny-usage", "&e/gc deny [owner]");
+            this.put("command-gc-deny-success", "&eYou have denied &b%player%&e's invite.");
+            this.put("command-gc-deny-denied", "&b%player% &edenied your group chat invite.");
+            this.put("command-gc-deny-hover", "&cClick to Deny the Invite");
+            this.put("command-gc-deny-deny", "&c&lDeny");
+
+            this.put("#27", "Group Chat Leave Command");
             this.put("command-gc-leave-description", "&8 - &b/gc leave &7- Removes you from the group chat.");
             this.put("command-gc-leave-usage", "&e/gc leave");
-            this.put("command-gc-leave-success", "&eYou have left the group chat.");
-            this.put("command-gc-leave-left", "&b%player% &ehas left the group chat.");
+            this.put("command-gc-leave-success", "&eYou have left the &b%name% &egroup chat.");
+            this.put("command-gc-leave-left", "&b%player% &ehas left the &b%name% &egroup chat.");
 
-            this.put("#27", "Group Chat Disband Command");
+            this.put("#28", "Group Chat Disband Command");
             this.put("command-gc-disband-description", "&8 - &b/gc disband &7- Deletes your group chat.");
             this.put("command-gc-disband-usage", "&e/gc disband");
             this.put("command-gc-disband-success", "&eThe &b%name% &egroup chat you were in has been disbanded...");
 
-            this.put("#28", "Group Chat Members Command");
+            this.put("#29", "Group Chat Members Command");
             this.put("command-gc-members-description", "&8 - &b/gc members &7- Lists the members of the group chat.");
             this.put("command-gc-members-usage", "&e/gc members");
-            this.put("command-gc-members-title", "&8[&bGroup Members&8]");
+            this.put("command-gc-members-title", "&8[&b%name% &bMembers&8]");
             this.put("command-gc-members-member", "&8- %player%");
 
-            this.put("#29", "Color Command");
+            this.put("#30", "Color Command");
             this.put("command-color-description", "&8 - &d/color &7- Change your default chat color.");
             this.put("command-color-usage", "&e/color <color>");
             this.put("command-color-success", "&eYour new chat color is %color%&e.");
             this.put("command-color-invalid", "&eThis is not a valid color!");
 
-            this.put("#30", "Mute Command");
+            this.put("#31", "Mute Command");
             this.put("command-mute-description", "&8- &d/mute &7- Mute a player.");
             this.put("command-mute-usage", "&e/mute <player> [time]");
             this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time%&e.");

@@ -3,6 +3,9 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerData {
@@ -18,6 +21,7 @@ public class PlayerData {
     private boolean muted;
     private ChatChannel currentChannel;
     private String color;
+    private List<GroupChat> groupInvites;
 
     /**
      * Creates a new PlayerData for a specific player.
@@ -31,6 +35,7 @@ public class PlayerData {
         this.messageSounds = true;
         this.emojis = true;
         this.color = "&f";
+        this.groupInvites = new ArrayList<>();
     }
 
     /**
@@ -216,5 +221,20 @@ public class PlayerData {
      */
     public void setColor(String color) {
         this.color = color;
+    }
+
+    /**
+     * @return The invites the player has received.
+     */
+    public List<GroupChat> getGroupInvites() {
+        return this.groupInvites;
+    }
+
+    /**
+     * Adds to the group invites list.
+     * @param groupChat The group chat to add.
+     */
+    public void inviteToGroup(GroupChat groupChat) {
+        this.groupInvites.add(groupChat);
     }
 }

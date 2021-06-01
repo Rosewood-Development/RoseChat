@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.chat;
 
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -8,7 +10,6 @@ import java.util.UUID;
 
 public class GroupChat implements GroupReceiver {
 
-    private final UUID uuid;
     private String name;
     private UUID owner;
     private List<UUID> members;
@@ -17,7 +18,6 @@ public class GroupChat implements GroupReceiver {
      * Creates a new group chat with a UUID.
      */
     public GroupChat(UUID owner) {
-        this.uuid = owner;
         this.owner = owner;
         this.members = new ArrayList<>();
     }
@@ -32,12 +32,8 @@ public class GroupChat implements GroupReceiver {
         return this.members;
     }
 
-    /**
-     * Gets the UUID of the group chat.
-     * @return The UUID.
-     */
-    public UUID getUuid() {
-        return this.uuid;
+    public void save() {
+        RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
     }
 
     public void setMembers(List<UUID> members) {
@@ -58,6 +54,7 @@ public class GroupChat implements GroupReceiver {
      */
     public void addMember(UUID uuid) {
         this.members.add(uuid);
+        RoseChat.getInstance().getManager(GroupManager.class).addMember(this, uuid);
     }
 
     /**
@@ -74,6 +71,7 @@ public class GroupChat implements GroupReceiver {
      */
     public void removeMember(UUID uuid) {
         this.members.remove(uuid);
+        RoseChat.getInstance().getManager(GroupManager.class).addMember(this, uuid);
     }
 
     /**

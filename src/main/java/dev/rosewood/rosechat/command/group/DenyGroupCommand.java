@@ -5,23 +5,23 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class AcceptGroupCommand extends AbstractCommand {
+public class DenyGroupCommand extends AbstractCommand {
 
-    public AcceptGroupCommand() {
-        super(true, "accept", "join");
+    public DenyGroupCommand() {
+        super(true, "deny");
     }
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
-
+            // dont add,
         if (playerData.getGroupInvites().isEmpty()) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-no-invites");
             return;
@@ -29,13 +29,13 @@ public class AcceptGroupCommand extends AbstractCommand {
 
         if (args.length == 0) {
             GroupChat invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
-            this.accept(playerData, player, invite);
+            this.deny(playerData, player, invite);
         } else {
             String who = args[0];
 
             for (GroupChat invite : playerData.getGroupInvites()) {
                 if (Bukkit.getOfflinePlayer(invite.getOwner()).getName().equalsIgnoreCase(who)) {
-                    this.accept(playerData, player, invite);
+                    this.deny(playerData, player, invite);
                     return;
                 }
             }
@@ -60,26 +60,25 @@ public class AcceptGroupCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.group.accept";
+        return "rosechat.group.deny";
     }
 
     @Override
     public String getSyntax() {
-        return this.getAPI().getLocaleManager().getLocaleMessage("command-group-accept-usage");
+        return this.getAPI().getLocaleManager().getLocaleMessage("command-group-deny-usage");
     }
 
-    private void accept(PlayerData data, Player player, GroupChat groupChat) {
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-success",
-                StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", player.getDisplayName()).build());
+    private void deny(PlayerData data, Player player, GroupChat groupChat) {
+        OfflinePlayer owner = Bukkit.getOfflinePlayer(groupChat.getOwner());
+        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-deny-success",
+                StringPlaceholders.builder()
+                        .addPlaceholder("player", (owner != null && owner.isOnline()) ? owner.getPlayer().getDisplayName() : owner.getName())
+        .addPlaceholder("name", groupChat.getName()).build());
 
-        for (UUID uuid : groupChat.getMembers()) {
-            Player member = Bukkit.getPlayer(uuid);
-            if (member != null) this.getAPI().getLocaleManager()
-                    .sendMessage(member, "command-gc-accept-accepted",
-                            StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", player.getDisplayName()).build());
+        if (owner != null && owner.isOnline()) {
+            this.getAPI().getLocaleManager().sendMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.single("player", player.getDisplayName()));
         }
 
-        groupChat.addMember(player);
         data.getGroupInvites().remove(groupChat);
     }
 }

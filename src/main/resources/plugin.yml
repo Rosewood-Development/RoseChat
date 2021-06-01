@@ -176,6 +176,9 @@ permissions:
   rosechat.group.accept:
     description: Allows using the group accept command.
     default: op
+  rosechat.group.deny:
+    description: Allows using the group deny command.
+    default: op
   rosechat.group.leave:
     description: Allows using the group leave command.
     default: op
