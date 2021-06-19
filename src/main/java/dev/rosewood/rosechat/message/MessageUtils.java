@@ -1,10 +1,16 @@
 package dev.rosewood.rosechat.message;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.DataManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
+import org.bukkit.entity.Player;
+
 import java.text.Normalizer;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class MessageUtils {
@@ -15,6 +21,8 @@ public class MessageUtils {
             'c', 'd', 'e', 'f' };
     public static final char[] FORMATTING = { 'l', 'm', 'n', 'o'};
     public static final char MAGIC = 'k';
+    public static final Pattern COLOR_PATTERN = Pattern.compile("(?i)&[0-9a-f]");
+    public static final Pattern FORMATTING_PATTERN = Pattern.compile("(?i)&[l-o]");
     public static final Pattern HEX_PATTERN = Pattern.compile("(?i)#[0-9a-f]{6}|#[0-9a-f]{3}");
     public static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
     public static final Pattern GRADIENT_PATTERN = Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>");
@@ -73,55 +81,27 @@ public class MessageUtils {
 
         if (sendToConsole) messageWrapperOld.send(Bukkit.getConsoleSender());
         messageWrapperOld.tagPlayers();
-    }
-
-    public static void sendPrivateMessage(DataManager dataManager, PlayerData playerData, PlayerData targetData, String message) {
-        Player player = Bukkit.getPlayer(playerData.getUuid());
-        Player target = Bukkit.getPlayer(targetData.getUuid());
-
-        MessageWrapperOld messageSentWrapper = new MessageWrapperOld(player, message)
-                .checkAll("rosechat.message")
-                .filterAll("rosechat.message")
-                .withReplacements()
-                .withTags()
-                .parse("message-sent", target);
-
-        MessageWrapperOld messageReceivedWrapper = new MessageWrapperOld(target, message)
-                .checkAll("rosechat.message")
-                .filterAll("rosechat.message")
-                .withReplacements()
-                .withTags()
-                .parse("message-received", player);
-
-        MessageWrapperOld spyMessageWrapperOld = new MessageWrapperOld(player, message)
-                .checkAll("rosechat.message")
-                .filterAll("rosechat.message")
-                .withReplacements()
-                .withTags()
-                .parse("social-spy", target);
-
-        if (messageSentWrapper.isEmpty()) return;
-        if (messageSentWrapper.isBlocked()) {
-            if (messageSentWrapper.getFilterType() != null) messageSentWrapper.getFilterType().sendWarning(player);
-            return;
-        }
-
-        player.spigot().sendMessage(messageSentWrapper.build());
-        target.spigot().sendMessage(messageReceivedWrapper.build());
-
-        for (UUID uuid : dataManager.getSocialSpies()) {
-            if (uuid.equals(player.getUniqueId()) || uuid.equals(target.getUniqueId())) continue;
-            Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(spyMessageWrapperOld.build());
-        }
-
-        try {
-            if (targetData.hasMessageSounds()) {
-                Sound sound = Sound.valueOf(ConfigurationManager.Setting.MESSAGE_SOUND.getString());
-                target.playSound(target.getLocation(), sound, 1, 1);
-            }
-        } catch (Exception e) {
-
-        }
     }*/
+
+
+    public static void sendPrivateMessage(CommandSender sender, Player target, String message) {
+        MessageSender messageSender = new MessageSender(sender);
+        MessageSender messageTarget = new MessageSender(target);
+
+        MessageWrapper sentMessage = new MessageWrapper(messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
+        MessageWrapper receivedMessage = new MessageWrapper(messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
+        MessageWrapper spyMessage = new MessageWrapper("[Spy] " + messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
+
+        sender.spigot().sendMessage(sentMessage.getComponents());
+        target.spigot().sendMessage(receivedMessage.getComponents());
+
+        if (sender instanceof Player) {
+            for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getSocialSpies()) {
+                if (uuid.equals(messageSender.asPlayer().getUniqueId()) || uuid.equals(messageTarget.asPlayer().getUniqueId())) {
+                    Player spy = Bukkit.getPlayer(uuid);
+                    if (spy != null) spy.spigot().sendMessage(spyMessage.getComponents());
+                }
+            }
+        }
+    }
 }

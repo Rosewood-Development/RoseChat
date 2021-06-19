@@ -6,6 +6,7 @@ import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreateGroupCommand extends AbstractCommand {
@@ -16,27 +17,30 @@ public class CreateGroupCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if (args.length == 0) {
+        if (args.length <= 1) {
             this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
         Player player = (Player) sender;
-        if (this.getAPI().getGroupChat(player.getUniqueId()) != null) {
+        if (this.getAPI().getGroupChatByOwner(player.getUniqueId()) != null) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-fail");
             return;
         }
 
-        String name = HexUtils.colorify(getAllArgs(0, args));
-        GroupChat groupChat = this.getAPI().createGroupChat(player.getUniqueId());
+        String id = args[0];
+        String name = getAllArgs(1, args);
+        GroupChat groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
         groupChat.setName(name);
-        groupChat.save();
         this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
-        return null;
+        List<String> tab = new ArrayList<>();
+        if (args.length == 1) tab.add("<id>");
+        if (args.length == 2) tab.add("<display name>");
+        return tab;
     }
 
     @Override

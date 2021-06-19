@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,21 +11,27 @@ import java.util.UUID;
 
 public class GroupChat implements GroupReceiver {
 
+    private String id;
     private String name;
     private UUID owner;
     private List<UUID> members;
 
     /**
-     * Creates a new group chat with a UUID.
+     * Creates a new group chat with an ID.
      */
-    public GroupChat(UUID owner) {
-        this.owner = owner;
+    public GroupChat(String id) {
+        this.id = id;
         this.members = new ArrayList<>();
     }
 
     @Override
     public void send(MessageWrapper messageWrapper) {
-
+        for (UUID uuid : this.members) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+        }
     }
 
     @Override
@@ -54,7 +61,6 @@ public class GroupChat implements GroupReceiver {
      */
     public void addMember(UUID uuid) {
         this.members.add(uuid);
-        RoseChat.getInstance().getManager(GroupManager.class).addMember(this, uuid);
     }
 
     /**
@@ -71,7 +77,18 @@ public class GroupChat implements GroupReceiver {
      */
     public void removeMember(UUID uuid) {
         this.members.remove(uuid);
-        RoseChat.getInstance().getManager(GroupManager.class).addMember(this, uuid);
+    }
+
+    /**
+     * Gets the ID of the group chat.
+     * @return The ID of the group chat.
+     */
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

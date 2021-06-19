@@ -4,8 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
-import dev.rosewood.rosechat.manager.GroupManager;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +19,6 @@ public class PlayerListener implements Listener {
     public PlayerListener(RoseChat plugin) {
         this.dataManager = plugin.getManager(DataManager.class);
         this.channelManager = plugin.getManager(ChannelManager.class);
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -50,13 +47,12 @@ public class PlayerListener implements Listener {
                 playerData.save();
             }
         });
-
-        RoseChat.getInstance().getManager(GroupManager.class).loadMemberGroupChats(player.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        this.dataManager.getPlayerData(player.getUniqueId()).save();
         this.dataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
         this.dataManager.unloadPlayerData(player.getUniqueId());
     }

@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -35,13 +36,6 @@ public class MessageCommand extends AbstractCommand {
             return;
         }
 
-        if (sender instanceof ConsoleCommandSender) {
-
-        }
-
-        Player player = (Player) sender;
-
-        PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
         PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
         String message = getAllArgs(1, args);
 
@@ -55,10 +49,13 @@ public class MessageCommand extends AbstractCommand {
             return;
         }
 
-        //MessageUtils.sendPrivateMessage(this.dataManager, playerData, targetData, message);
+        MessageUtils.sendPrivateMessage(sender, target, message);
 
-        playerData.setReplyTo(target.getUniqueId());
-        targetData.setReplyTo(player.getUniqueId());
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            this.getAPI().getPlayerData(player.getUniqueId()).setReplyTo(target.getUniqueId());
+            targetData.setReplyTo(player.getUniqueId());
+        }
     }
 
     @Override
@@ -66,7 +63,10 @@ public class MessageCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (Player player : Bukkit.getOnlinePlayers()) tab.add(player.getName());
+            for (Player player : Bukkit.getOnlinePlayers()){
+                if (sender instanceof Player && player.getUniqueId().equals(((Player) sender).getUniqueId())) continue;
+                tab.add(player.getName());
+            }
         }
 
         return tab;

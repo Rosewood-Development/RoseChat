@@ -12,10 +12,10 @@ public class GroupCommandManager extends CommandManager {
 
     @Override
     public void sendHelpMessage(CommandSender sender) {
-        getLocaleManager().sendMessage(sender, "command-help-title");
+        this.getLocaleManager().sendMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            getLocaleManager().sendCustomMessage(sender, getLocaleManager().getLocaleMessage("command-gc-" + subcommand.getLabels().get(0) + "-description"));
+            this.getLocaleManager().sendCustomMessage(sender, this.getLocaleManager().getLocaleMessage("command-gc-" + subcommand.getLabels().get(0) + "-description"));
         }
     }
 }

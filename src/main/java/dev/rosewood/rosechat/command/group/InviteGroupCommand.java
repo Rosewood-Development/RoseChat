@@ -28,15 +28,9 @@ public class InviteGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChat(player.getUniqueId());
+        GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
         if (groupChat == null) {
             this.getAPI().getLocaleManager().sendMessage(sender, "no-gc");
-            return;
-        }
-
-        // Hard limit of 128, no one should reach this... right?
-        if (groupChat.getMembers().size() == 128) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-invite-full");
             return;
         }
 
@@ -46,13 +40,18 @@ public class InviteGroupCommand extends AbstractCommand {
             return;
         }
 
+        if (groupChat.getMembers().contains(target.getUniqueId())) {
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-invite-member");
+            return;
+        }
+
         PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
 
         this.getAPI().getLocaleManager().sendMessage(target, "command-gc-invite-invited",
                 StringPlaceholders.builder().addPlaceholder("player", player.getDisplayName()).addPlaceholder("name", groupChat.getName()).build());
         this.getAPI().getLocaleManager().sendMessage(player, "command-gc-invite-success",
                 StringPlaceholders.builder().addPlaceholder("player", target.getDisplayName()).addPlaceholder("name", groupChat.getName()).build());
-        sendAcceptMessage(target, player);
+        sendAcceptMessage(target, groupChat);
 
         data.inviteToGroup(groupChat);
     }
@@ -62,7 +61,7 @@ public class InviteGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                tab.add(player.getName());
+                if (player != sender) tab.add(player.getName());
             }
 
             return tab;
@@ -81,15 +80,15 @@ public class InviteGroupCommand extends AbstractCommand {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-invite-usage");
     }
 
-    private void sendAcceptMessage(Player player, Player owner) {
+    private void sendAcceptMessage(Player player, GroupChat groupChat) {
         ComponentBuilder componentBuilder = new ComponentBuilder();
         componentBuilder.append("          ");
         componentBuilder.append(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-accept"))
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc accept " + owner.getName()))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc accept " + groupChat.getId()))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-hover"))));
         componentBuilder.append("          ").retain(ComponentBuilder.FormatRetention.NONE);
         componentBuilder.append(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-deny"))
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc deny " + owner.getName()))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc deny " + groupChat.getId()))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-hover"))));
         player.spigot().sendMessage(componentBuilder.create());
     }

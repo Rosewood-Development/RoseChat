@@ -17,6 +17,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The API for the RoseChat plugin.
@@ -28,12 +29,14 @@ public class RoseChatAPI {
     private final LocaleManager localeManager;
     private final DataManager dataManager;
     private final GroupManager groupManager;
+    private final ChannelManager channelManager;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
         this.localeManager = this.plugin.getManager(LocaleManager.class);
         this.dataManager = this.plugin.getManager(DataManager.class);
         this.groupManager = this.plugin.getManager(GroupManager.class);
+        this.channelManager = this.plugin.getManager(ChannelManager.class);
     }
 
     /**
@@ -57,7 +60,7 @@ public class RoseChatAPI {
      * @return A BaseComponent[] consisting of the parsed message.
      */
     public BaseComponent[] parse(String string) {
-        return new MessageWrapper(new MessageSender(null, null), string, "other").build();
+        return new MessageWrapper("", new MessageSender(null, null), string).getComponents();
     }
 
     /**
@@ -187,19 +190,22 @@ public class RoseChatAPI {
     /**
      * @return A list of all emoji IDs.
      */
-    public List<String> getEmojiIDs() {
+    public List<String> getEmojiIds() {
         return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getEmojis().keySet());
     }
 
     /**
      * Creates a new group chat.
+     * @param id The ID of the group chat.
      * @param owner The owner of the group chat.
      * @return The new group chat.
      */
-    public GroupChat createGroupChat(UUID owner) {
-        GroupChat groupChat = new GroupChat(owner);
+    public GroupChat createGroupChat(String id, UUID owner) {
+        GroupChat groupChat = new GroupChat(id);
+        groupChat.setOwner(owner);
         groupChat.addMember(owner);
         this.groupManager.addGroupChat(groupChat);
+        this.groupManager.addMember(groupChat, owner);
         return groupChat;
     }
 
@@ -209,14 +215,23 @@ public class RoseChatAPI {
      */
     public void deleteGroupChat(GroupChat groupChat) {
         this.groupManager.removeGroupChat(groupChat);
+        this.groupManager.deleteGroupChat(groupChat);
     }
 
     /**
      * @param owner The owner to use.
      * @return The group chat found, or null if it doesn't exist.
      */
-    public GroupChat getGroupChat(UUID owner) {
-        return this.groupManager.getGroupChat(owner);
+    public GroupChat getGroupChatByOwner(UUID owner) {
+        return this.groupManager.getGroupChatByOwner(owner);
+    }
+
+    /**
+     * @param id The ID to use.
+     * @return THe group chat found, or null if it doesn't exist.
+     */
+    public GroupChat getGroupChatById(String id) {
+        return this.groupManager.getGroupChatById(id);
     }
 
     /**
@@ -227,9 +242,17 @@ public class RoseChatAPI {
     }
 
     /**
+     * @param player The UUID of the player to use.
+     * @return A list of all group chats that the player is in.
+     */
+    public List<GroupChat> getGroupChats(UUID player) {
+        return this.groupManager.getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
+    }
+
+    /**
      * @return A list of all group chat IDs.
      */
-    public List<UUID> getGroupChatIDs() {
+    public List<String> getGroupChatIDs() {
         return new ArrayList<>(this.groupManager.getGroupChats().keySet());
     }
 
@@ -290,9 +313,23 @@ public class RoseChatAPI {
     }
 
     /**
+     * @return An instance of the data manager.
+     */
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    /**
      * @return An instance of the group manager.
      */
     public GroupManager getGroupManager() {
         return this.groupManager;
+    }
+
+    /**
+     * @return An instance of the channel manager.
+     */
+    public ChannelManager getChannelManager() {
+        return this.channelManager;
     }
 }

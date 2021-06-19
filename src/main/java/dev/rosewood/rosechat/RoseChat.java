@@ -4,11 +4,15 @@ import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.HelpCommand;
 import dev.rosewood.rosechat.command.MessageCommand;
+import dev.rosewood.rosechat.command.MuteCommand;
+import dev.rosewood.rosechat.command.ReloadCommand;
 import dev.rosewood.rosechat.command.ReplyCommand;
 import dev.rosewood.rosechat.command.SocialSpyCommand;
 import dev.rosewood.rosechat.command.ToggleEmojiCommand;
 import dev.rosewood.rosechat.command.ToggleMessageCommand;
 import dev.rosewood.rosechat.command.ToggleSoundCommand;
+import dev.rosewood.rosechat.command.api.CommandManager;
+import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
@@ -18,16 +22,14 @@ import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
 import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
+import dev.rosewood.rosechat.command.group.GroupCommandManager;
 import dev.rosewood.rosechat.command.group.InviteGroupCommand;
 import dev.rosewood.rosechat.command.group.KickGroupCommand;
 import dev.rosewood.rosechat.command.group.LeaveGroupCommand;
 import dev.rosewood.rosechat.command.group.MembersGroupCommand;
+import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
-import dev.rosewood.rosechat.command.group.GroupCommandManager;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
-import dev.rosewood.rosechat.command.api.CommandManager;
-import dev.rosewood.rosechat.command.ReloadCommand;
-import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -42,8 +44,10 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class RoseChat extends RosePlugin {
@@ -70,6 +74,8 @@ public class RoseChat extends RosePlugin {
         CommandManager toggleEmojiCommand = new CommandManager(new ToggleEmojiCommand());
         CommandManager channelCommand = new CommandManager(new ChannelCommand());
         CommandManager chatColorCommand = new CommandManager(new ChatColorCommand());
+        CommandManager groupChatMessageCommand = new CommandManager(new MessageGroupCommand());
+        CommandManager muteCommand = new CommandManager(new MuteCommand());
 
         GroupCommandManager groupCommand = (GroupCommandManager) new GroupCommandManager("gc", "/gc help")
                 .addSubcommand(new CreateGroupCommand())
@@ -96,20 +102,28 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(toggleSoundCommand)
                 .addCommandManager(toggleEmojiCommand)
                 .addCommandManager(chatColorCommand)
+                .addCommandManager(muteCommand)
                 .addCommandManager(channelCommand)
                 .addCommandManager(chatCommand)
                 .addCommandManager(groupCommand)
+                .addCommandManager(groupChatMessageCommand)
                 .addSubcommand(new HelpCommand(this))
                 .addSubcommand(new ReloadCommand());
 
-        new ChatListener(this);
-        new PlayerListener(this);
+        // Register Listeners
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        pluginManager.registerEvents(new ChatListener(this), this);
+        pluginManager.registerEvents(new PlayerListener(this), this);
 
         // Load data for all players currently online
         DataManager dataManager = this.getManager(DataManager.class);
-        Bukkit.getOnlinePlayers().forEach(x -> dataManager.getPlayerData(x.getUniqueId(), data -> {}));
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            dataManager.getPlayerData(player.getUniqueId(), data -> {});
+        });
 
+        // Load all group chats.
         GroupManager groupManager = this.getManager(GroupManager.class);
+        //
     }
 
     @Override
@@ -129,7 +143,7 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public List<Class<? extends DataMigration>> getDataMigrations() {
-        return Arrays.asList(
+        return Collections.singletonList(
                 _1_Create_Tables_Data.class
         );
     }
@@ -137,9 +151,9 @@ public class RoseChat extends RosePlugin {
     private void initHooks() {
         LocaleManager localeManager = this.getManager(LocaleManager.class);
 
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+        if (this.getServer().getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> provider = getServer().getServicesManager().getRegistration(Permission.class);
-            this.vault = provider.getProvider();
+            if (provider != null) this.vault = provider.getProvider();
         } else {
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&eVault was not found! Group placeholders will be disabled.");

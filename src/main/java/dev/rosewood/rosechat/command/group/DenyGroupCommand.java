@@ -21,7 +21,7 @@ public class DenyGroupCommand extends AbstractCommand {
     public void onCommand(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
-            // dont add,
+
         if (playerData.getGroupInvites().isEmpty()) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-no-invites");
             return;
@@ -31,10 +31,10 @@ public class DenyGroupCommand extends AbstractCommand {
             GroupChat invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
             this.deny(playerData, player, invite);
         } else {
-            String who = args[0];
+            String id = args[0];
 
             for (GroupChat invite : playerData.getGroupInvites()) {
-                if (Bukkit.getOfflinePlayer(invite.getOwner()).getName().equalsIgnoreCase(who)) {
+                if (invite.getId().equalsIgnoreCase(id)) {
                     this.deny(playerData, player, invite);
                     return;
                 }
@@ -49,7 +49,7 @@ public class DenyGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
             for (GroupChat groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
-                tab.add(Bukkit.getOfflinePlayer(groupChat.getOwner()).getName());
+                tab.add(groupChat.getId());
             }
 
             return tab;
@@ -72,7 +72,6 @@ public class DenyGroupCommand extends AbstractCommand {
         OfflinePlayer owner = Bukkit.getOfflinePlayer(groupChat.getOwner());
         this.getAPI().getLocaleManager().sendMessage(player, "command-gc-deny-success",
                 StringPlaceholders.builder()
-                        .addPlaceholder("player", (owner != null && owner.isOnline()) ? owner.getPlayer().getDisplayName() : owner.getName())
         .addPlaceholder("name", groupChat.getName()).build());
 
         if (owner != null && owner.isOnline()) {

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
@@ -12,7 +13,7 @@ import java.util.List;
 public class MoveChatCommand extends AbstractCommand {
 
     public MoveChatCommand() {
-        super(true, "move");
+        super(false, "move");
     }
 
     @Override
@@ -23,6 +24,7 @@ public class MoveChatCommand extends AbstractCommand {
         }
 
         Player player = Bukkit.getPlayer(args[0]);
+        PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
         String channelStr = args[1];
 
         if (player == null) {
@@ -40,6 +42,8 @@ public class MoveChatCommand extends AbstractCommand {
 
         oldChannel.remove(player);
         channel.add(player);
+        data.setCurrentChannel(channel);
+        data.save();
 
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", player.getDisplayName())
@@ -53,7 +57,7 @@ public class MoveChatCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                tab.add(player.getName());
+                if (player != sender) tab.add(player.getName());
             }
         } else if (args.length == 2) {
             tab.addAll(this.getAPI().getChannelIDs());

@@ -1,2 +1,8 @@
-rootProject.name = 'RoseChat'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://repo.rosewooddev.io/repository/public/' }
+    }
+}
 
+rootProject.name = 'RoseChat'

@@ -10,7 +10,7 @@ import java.util.List;
 public class MuteChatCommand extends AbstractCommand {
 
     public MuteChatCommand() {
-        super(true, "mute");
+        super(false, "mute");
     }
 
     @Override

@@ -31,10 +31,10 @@ public class AcceptGroupCommand extends AbstractCommand {
             GroupChat invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
             this.accept(playerData, player, invite);
         } else {
-            String who = args[0];
+            String id = args[0];
 
             for (GroupChat invite : playerData.getGroupInvites()) {
-                if (Bukkit.getOfflinePlayer(invite.getOwner()).getName().equalsIgnoreCase(who)) {
+                if (invite.getId().equalsIgnoreCase(id)) {
                     this.accept(playerData, player, invite);
                     return;
                 }
@@ -49,7 +49,7 @@ public class AcceptGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
             for (GroupChat groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
-                tab.add(Bukkit.getOfflinePlayer(groupChat.getOwner()).getName());
+                tab.add(groupChat.getId());
             }
 
             return tab;
@@ -81,5 +81,6 @@ public class AcceptGroupCommand extends AbstractCommand {
 
         groupChat.addMember(player);
         data.getGroupInvites().remove(groupChat);
+        this.getAPI().getGroupManager().addMember(groupChat, player.getUniqueId());
     }
 }

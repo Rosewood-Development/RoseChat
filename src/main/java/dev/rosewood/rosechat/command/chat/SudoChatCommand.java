@@ -1,10 +1,12 @@
 package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -13,22 +15,24 @@ import java.util.List;
 public class SudoChatCommand extends AbstractCommand {
 
     public SudoChatCommand() {
-        super(true, "sudo");
+        super(false, "sudo");
     }
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if (args.length != 3) {
+        if (args.length < 3) {
             this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
 
-        String player = args[0];
+        String playerStr = args[0];
         ChatChannel channel = this.getAPI().getChannelById(args[1]);
+        MessageSender sudoSender;
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerStr);
+        if (player != null && player.isOnline()) sudoSender = new MessageSender(player.getPlayer());
+        else sudoSender = new MessageSender(playerStr, "default");
 
-        MessageSender sudoSender = new MessageSender(player, "default");
-
-        //TODO: Sudo
+        channel.send(new MessageWrapper(channel.getId(), sudoSender, getAllArgs(2, args)));
     }
 
     @Override
@@ -36,12 +40,14 @@ public class SudoChatCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (Player player : Bukkit.getOnlinePlayers()) tab.add(player.getName());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
+            }
         } else if (args.length == 2) {
             tab.addAll(this.getAPI().getChannelIDs());
+        } else if (args.length == 3) {
+            tab.add("<message>");
         }
-
-        ///chat sudo <player> <channel> <message>
 
         return tab;
     }

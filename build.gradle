@@ -3,6 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'dev.rosewood.mojang-remapper' version '1.0.0'
 }
 
 group 'dev.rosewood'
@@ -27,13 +28,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot:1.16.4'
+    api 'dev.rosewood:rosegarden:1.0.7-SNAPSHOT'
+
+    compileOnly 'org.spigotmc:spigot:1.17:remapped-mojang'
     compileOnly 'me.clip:placeholderapi:2.10.9'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
 
-    api('dev.rosewood:rosegarden:1.0.7-SNAPSHOT') {
-        changing = true
-    }
+    mojangToObf 'org.spigotmc:minecraft-server:1.17:maps-mojang@txt'
+    mojangRemapped 'org.spigotmc:spigot:1.17:remapped-mojang'
+    obfToRuntime'org.spigotmc:minecraft-server:1.17:maps-spigot@csrg'
+    obfRemapped 'org.spigotmc:spigot:1.17:remapped-obf'
 }
 
 processResources {
@@ -50,8 +54,4 @@ shadowJar {
     minimize()
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-build.dependsOn shadowJar
+build.dependsOn shadowJar, runtimeMappedJar

@@ -124,7 +124,7 @@ public abstract class AbstractCommand {
      * @param args The arguments.
      * @return The arguments as a string.
      */
-    public String getAllArgs(int startArg, String[] args) {
+    public static String getAllArgs(int startArg, String[] args) {
         StringBuilder builder = new StringBuilder();
         for (int i = startArg; i < args.length; i++) {
             builder.append(args[i]).append(" ");

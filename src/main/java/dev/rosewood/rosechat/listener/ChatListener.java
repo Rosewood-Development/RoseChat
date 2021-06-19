@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.listener;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.chat.PlayerData;
 import org.bukkit.Bukkit;
@@ -20,7 +21,6 @@ public class ChatListener implements Listener {
     public ChatListener(RoseChat plugin) {
         this.plugin = plugin;
         this.api = RoseChatAPI.getInstance();
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -39,19 +39,21 @@ public class ChatListener implements Listener {
                 return;
             }
 
-            // Don't send the message if the channel is muted.
-            if (channel.isMuted() && !player.hasPermission("rosechat.bypass.mute")) {
-                this.api.getLocaleManager().sendMessage(player, "channel-muted");
-                return;
+            // Check Mute Expiry
+            if (data.getMuteTime() != -1 && data.getMuteTime() < System.currentTimeMillis()) {
+                data.setMuteTime(0);
             }
 
             // Don't send the message if the player is muted.
-            if (data.isMuted() && !player.hasPermission("rosechat.bypass.mute")) {
+            if (data.getMuteTime() != 0 && !player.hasPermission("rosechat.bypass.mute")) {
                 this.api.getLocaleManager().sendMessage(player, "");
                 return;
             }
 
-            // edit this
+            MessageWrapper message = new MessageWrapper(channel.getId(), new MessageSender(player), event.getMessage());
+            channel.send(message);
+
+            /* edit this
             MessageWrapper message = new MessageWrapper(player, data.getColor() + event.getMessage(), data.getCurrentChannel());
 
             if (message.canBeSent() && !message.isEmpty()) {
@@ -59,7 +61,7 @@ public class ChatListener implements Listener {
                // MessageUtils.sendStandardMessage();
             } else {
                 if (message.getFilterType() != null) message.getFilterType().sendWarning(player);
-            }
+            }*/
 
             // Outputs the message to the console, with information about the hover events.
             /*if (ConfigurationManager.Setting.OUTPUT_HOVER_EVENTS.getBoolean()) {

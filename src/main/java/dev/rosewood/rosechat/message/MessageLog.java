@@ -29,13 +29,13 @@ public class MessageLog {
     public boolean addMessageWithSpamCheck(String messageToAdd) {
         // Refresh the cleanup amount, as it can be changed during a reload.
         this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
-        messages.add(messageToAdd);
+        this.messages.add(messageToAdd);
 
         int similarMessages = 0;
 
-        if (messages.size() > cleanupAmount - 1) {
-            for (int i = 0; i < cleanupAmount; i++) {
-                String message = messages.get((messages.size() - 1) - i);
+        if (this.messages.size() > this.cleanupAmount - 1) {
+            for (int i = 0; i < this.cleanupAmount; i++) {
+                String message = this.messages.get((this.messages.size() - 1) - i);
                 double similarity = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
                 if (similarity >= Math.abs(Setting.SPAM_FILTER_SENSITIVITY.getDouble() - 1)) {
@@ -44,24 +44,24 @@ public class MessageLog {
             }
 
             // Let's maybe not have an array size of... BIG.
-            if (messages.size() > cleanupAmount * 2) {
-                for (int i = 0; i < cleanupAmount; i++) {
-                    messages.remove(i);
+            if (this.messages.size() > this.cleanupAmount * 2) {
+                for (int i = 0; i < this.cleanupAmount; i++) {
+                    this.messages.remove(i);
                 }
             }
 
-            return similarMessages >= cleanupAmount;
+            return similarMessages >= this.cleanupAmount;
         }
 
         return false;
     }
 
     public void addMessage(String message) {
-        messages.add(message);
+        this.messages.add(message);
     }
 
     public UUID getSender() {
-        return sender;
+        return this.sender;
     }
 
     public void setSender(UUID sender) {
@@ -69,7 +69,7 @@ public class MessageLog {
     }
 
     public List<String> getMessages() {
-        return messages;
+        return this.messages;
     }
 
     public void setMessages(List<String> messages) {
@@ -77,7 +77,7 @@ public class MessageLog {
     }
 
     public int getCleanupAmount() {
-        return cleanupAmount;
+        return this.cleanupAmount;
     }
 
     public void setCleanupAmount(int cleanupAmount) {

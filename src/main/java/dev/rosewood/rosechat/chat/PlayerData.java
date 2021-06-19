@@ -1,9 +1,9 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +18,7 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
-    private boolean muted;
+    private long muteTime;
     private ChatChannel currentChannel;
     private String color;
     private List<GroupChat> groupInvites;
@@ -35,6 +35,7 @@ public class PlayerData {
         this.messageSounds = true;
         this.emojis = true;
         this.color = "&f";
+        this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
     }
 
@@ -192,19 +193,19 @@ public class PlayerData {
     }
 
     /**
-     * Whether or not the player is muted.
-     * @return True if the player is muted.
+     * Gets the amount of time left in a player's mute, in seconds.
+     * @return The amount of time left in a player's mute, in seconds.
      */
-    public boolean isMuted() {
-        return this.muted;
+    public long getMuteTime() {
+        return this.muteTime;
     }
 
     /**
-     * Sets the player as muted.
-     * @param muted Whether or not the player should be muted.
+     * Sets the amount of time a player is muted, in seconds.
+     * @param muteTime The time to mute the player, in seconds.
      */
-    public void setMuted(boolean muted) {
-        this.muted = muted;
+    public void setMuteTime(long muteTime) {
+        this.muteTime = muteTime;
     }
 
     /**

@@ -24,11 +24,13 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "has_tag_sounds BOOLEAN NOT NULL, " +
                     "has_message_sounds BOOLEAN NOT NULL, " +
                     "current_channel VARCHAR(255) NOT NULL, " +
-                    "chat_color VARCHAR(32) NOT NULL" +
+                    "chat_color VARCHAR(32) NOT NULL, " +
+                    "mute_time BIGINT NOT NULL" +
                     ")");
 
             statement.execute("CREATE TABLE " + tablePrefix + "group_chat (" +
                     "name VARCHAR(255) NOT NULL, " +
+                    "id VARCHAR(255) NOT NULL," +
                     "owner VARCHAR(36) NOT NULL, " +
                     "UNIQUE (owner)" +
                     ")");

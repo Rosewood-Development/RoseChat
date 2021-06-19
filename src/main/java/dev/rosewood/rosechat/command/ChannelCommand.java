@@ -1,8 +1,11 @@
 package dev.rosewood.rosechat.command;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,46 +21,15 @@ public class ChannelCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
-            return;
-        }
-
-        ChatChannel oldChannel = this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getCurrentChannel();
-        ChatChannel channel = null;
-        for (String channelStr : this.getAPI().getChannelIDs()) {
-            if (channelStr.equalsIgnoreCase(args[0])) {
-                channel = this.getAPI().getChannelById(channelStr);
-                break;
+            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+        } else if (args.length == 1) {
+            if (!switchChannel(sender, args[0])) {
+                this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             }
-        }
-
-        if (channel == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
-            return;
-        }
-
-        if (args.length == 1) {
-            Player player = (Player) sender;
-
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", channel.getId()));
-            oldChannel.remove(player);
-            channel.add(player);
-
-            PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
-            playerData.setCurrentChannel(channel);
-            playerData.save();
         } else {
-            String message = getAllArgs(1, args);
-            //  TODO: Check channel permissions & config settings.
-            /*MessageWrapperOld messageWrapperOld = new MessageWrapperOld((Player) sender, message)
-                    .checkAll("rosechat.chat")
-                    .filterAll("rosechat.message")
-                    .withReplacements()
-                    .withTags()
-                    .inChannel(channel)
-                    .parse(channel.getFormatId(), null);
-
-            MessageUtils.sendStandardMessage(sender, messageWrapperOld, channel);*/
+            ChatChannel channel = this.getAPI().getChannelById(args[0]);
+            MessageWrapper message = new MessageWrapper(channel.getId(), new MessageSender(sender), getAllArgs(1, args));
+            channel.send(message);
         }
     }
 
@@ -78,5 +50,32 @@ public class ChannelCommand extends AbstractCommand {
     @Override
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-channel-usage");
+    }
+
+    public static boolean switchChannel(CommandSender sender, String channel) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            ChatChannel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
+            ChatChannel newChannel = api.getChannelById(channel);
+
+            if (newChannel == null) {
+                api.getLocaleManager().sendMessage(sender, "command-channel-not-found");
+                return true;
+            }
+
+            oldChannel.remove(player);
+            newChannel.add(player);
+
+            PlayerData playerData = api.getPlayerData(player.getUniqueId());
+            playerData.setCurrentChannel(newChannel);
+            playerData.save();
+
+            api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", newChannel.getId()));
+            return true;
+        } else {
+            return false;
+        }
     }
 }

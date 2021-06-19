@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -28,14 +29,25 @@ public class ChatColorCommand extends AbstractCommand {
         }
 
         String color = args[0];
-        String colorified = HexUtils.colorify(color);
+        if (!sender.hasPermission("rosechat.color.chatcolor") && color.matches(MessageUtils.COLOR_PATTERN.pattern())
+                || (!sender.hasPermission("rosechat.format.chatcolor") && color.matches(MessageUtils.FORMATTING_PATTERN.pattern()))
+                || (!sender.hasPermission("rosechat.magic.chatcolor") && color.equalsIgnoreCase("&k"))
+                || (!sender.hasPermission("rosechat.hex.chatcolor") && color.matches(MessageUtils.HEX_PATTERN.pattern()))
+                || (!sender.hasPermission("rosechat.gradient.chatcolor") && color.matches(MessageUtils.GRADIENT_PATTERN.pattern()))
+                || (!sender.hasPermission("rosechat.rainbow.chatcolor") && color.matches(MessageUtils.RAINBOW_PATTERN.pattern()))) {
+            this.getAPI().getLocaleManager().sendMessage(sender, "no-permission");
+            return;
+        }
 
+        String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty()) {
             this.getAPI().getLocaleManager().sendMessage(sender, "command-color-invalid");
             return;
         }
 
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-color-success", StringPlaceholders.single("color", HexUtils.colorify(color + "\\" + color)));
+        String colorStr = color;
+        colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : colorStr;
+        this.getAPI().getLocaleManager().sendMessage(sender, "command-color-success", StringPlaceholders.single("color", ChatColor.stripColor(color + colorStr)));
         playerData.setColor(color);
         playerData.save();
     }
