@@ -50,7 +50,9 @@ public class DataManager extends AbstractDataManager {
                     ResultSet result = statement.executeQuery();
 
                     if (result.next()) {
-                        boolean socialSpy = result.getBoolean("social_spy");
+                        boolean messageSpy = result.getBoolean("has_message_spy");
+                        boolean channelSpy = result.getBoolean("has_channel_spy");
+                        boolean groupSpy = result.getBoolean("has_group_spy");
                         boolean canBeMessaged = result.getBoolean("can_be_messaged");
                         boolean hasTagSounds = result.getBoolean("has_tag_sounds");
                         boolean hasMessageSounds = result.getBoolean("has_message_sounds");
@@ -60,7 +62,9 @@ public class DataManager extends AbstractDataManager {
                         ChatChannel channel = this.channelManager.getChannel(currentChannel);
 
                         PlayerData playerData = new PlayerData(uuid);
-                        playerData.setSocialSpy(socialSpy);
+                        playerData.setMessageSpy(messageSpy);
+                        playerData.setChannelSpy(channelSpy);
+                        playerData.setGroupSpy(groupSpy);
                         playerData.setCanBeMessaged(canBeMessaged);
                         playerData.setTagSounds(hasTagSounds);
                         playerData.setMessageSounds(hasMessageSounds);
@@ -93,32 +97,36 @@ public class DataManager extends AbstractDataManager {
                 }
 
                 if (create) {
-                    String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, social_spy, " +
-                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
+                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                         statement.setString(1, playerData.getUuid().toString());
-                        statement.setBoolean(2, playerData.hasSocialSpy());
-                        statement.setBoolean(3, playerData.canBeMessaged());
-                        statement.setBoolean(4, playerData.hasTagSounds());
-                        statement.setBoolean(5, playerData.hasMessageSounds());
-                        statement.setString(6, playerData.getCurrentChannel().getId());
-                        statement.setString(7, playerData.getColor());
-                        statement.setLong(8, playerData.getMuteTime());
+                        statement.setBoolean(2, playerData.hasMessageSpy());
+                        statement.setBoolean(3, playerData.hasChannelSpy());
+                        statement.setBoolean(4, playerData.hasGroupSpy());
+                        statement.setBoolean(5, playerData.canBeMessaged());
+                        statement.setBoolean(6, playerData.hasTagSounds());
+                        statement.setBoolean(7, playerData.hasMessageSounds());
+                        statement.setString(8, playerData.getCurrentChannel().getId());
+                        statement.setString(9, playerData.getColor());
+                        statement.setLong(10, playerData.getMuteTime());
                         statement.executeUpdate();
                     }
                 } else {
-                    String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET " +
-                            "social_spy = ?, can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ?, chat_color = ?, mute_time = ? " +
+                    String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
+                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ?, chat_color = ?, mute_time = ? " +
                             "WHERE uuid = ?";
                     try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                        statement.setBoolean(1, playerData.hasSocialSpy());
-                        statement.setBoolean(2, playerData.canBeMessaged());
-                        statement.setBoolean(3, playerData.hasTagSounds());
-                        statement.setBoolean(4, playerData.hasMessageSounds());
-                        statement.setString(5, playerData.getCurrentChannel().getId());
-                        statement.setString(6, playerData.getColor());
-                        statement.setLong(7, playerData.getMuteTime());
-                        statement.setString(8, playerData.getUuid().toString());
+                        statement.setBoolean(1, playerData.hasMessageSpy());
+                        statement.setBoolean(2, playerData.hasChannelSpy());
+                        statement.setBoolean(3, playerData.hasGroupSpy());
+                        statement.setBoolean(4, playerData.canBeMessaged());
+                        statement.setBoolean(5, playerData.hasTagSounds());
+                        statement.setBoolean(6, playerData.hasMessageSounds());
+                        statement.setString(7, playerData.getCurrentChannel().getId());
+                        statement.setString(8, playerData.getColor());
+                        statement.setLong(9, playerData.getMuteTime());
+                        statement.setString(10, playerData.getUuid().toString());
                         statement.executeUpdate();
                     }
                 }
@@ -138,10 +146,28 @@ public class DataManager extends AbstractDataManager {
         return this.playerData;
     }
 
-    public List<UUID> getSocialSpies() {
+    public List<UUID> getMessageSpies() {
         List<UUID> spies = new ArrayList<>();
-        for (PlayerData data : getPlayerData().values()) {
-            if (data.hasSocialSpy()) spies.add(data.getUuid());
+        for (PlayerData data : this.getPlayerData().values()) {
+            if (data.hasMessageSpy()) spies.add(data.getUuid());
+        }
+
+        return spies;
+    }
+
+    public List<UUID> getChannelSpies() {
+        List<UUID> spies = new ArrayList<>();
+        for (PlayerData data : this.getPlayerData().values()) {
+            if (data.hasChannelSpy()) spies.add(data.getUuid());
+        }
+
+        return spies;
+    }
+
+    public List<UUID> getGroupSpies() {
+        List<UUID> spies = new ArrayList<>();
+        for (PlayerData data : this.getPlayerData().values()) {
+            if (data.hasGroupSpy()) spies.add(data.getUuid());
         }
 
         return spies;

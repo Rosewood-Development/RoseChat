@@ -28,6 +28,7 @@ public class EnglishLocale implements Locale {
             this.put("player-only", "&cThe console cannot use this command!");
             this.put("invalid-arguments", "&cUsage: &b%syntax%&c.");
             this.put("not-a-number", "&cThis is not a number!");
+            this.put("message-blank", "&cPlease enter a message!");
 
             this.put("#2", "Base Command Message");
             this.put("base-command-help", "&eUse &b/rc help &efor command information.");
@@ -61,9 +62,13 @@ public class EnglishLocale implements Locale {
 
             this.put("#8", "SocialSpy Command");
             this.put("command-socialspy-description", "&8 - &d/socialspy &7- Toggles the ability to see private messages.");
-            this.put("command-socialspy-usage", "&e/socialspy");
-            this.put("command-socialspy-enabled", "&eYou have &aenabled &esocial spy.");
-            this.put("command-socialspy-disabled", "&eYou have &cdisabled &esocial spy.");
+            this.put("command-socialspy-usage", "&e/socialspy <type>");
+            this.put("command-socialspy-enabled", "&eYou have &aenabled &b%type% &espy.");
+            this.put("command-socialspy-disabled", "&eYou have &cdisabled &b%type% &espy.");
+            this.put("command-socialspy-message", "message");
+            this.put("command-socialspy-channel", "channel");
+            this.put("command-socialspy-group", "group");
+            this.put("command-socialspy-all", "message, channel and group");
 
             this.put("#9", "ToggleMessage Command");
             this.put("command-togglemessage-description", "&8 - &d/togglemessage &7- Toggles the ability to receive messages.");
@@ -79,6 +84,7 @@ public class EnglishLocale implements Locale {
             this.put("command-togglesound-off", "&eYou have &cdisabled &esounds when receiving &b%type%&e.");
             this.put("command-togglesound-messages", "messages");
             this.put("command-togglesound-tags", "tags");
+            this.put("command-togglesound-all", "all");
 
             this.put("#11", "ToggleEmoji Command");
             this.put("command-toggleemoji-description", "&8 - &d/toggleemoji &7- Toggles formatting emojis.");

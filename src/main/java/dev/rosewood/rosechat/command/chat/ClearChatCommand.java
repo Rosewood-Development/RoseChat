@@ -2,9 +2,12 @@ package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +15,21 @@ import java.util.List;
 public class ClearChatCommand extends AbstractCommand {
 
     public ClearChatCommand() {
-        super(true, "clear");
+        super(false, "clear");
     }
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         ChatChannel channel = null;
-
         if (args.length == 0) {
-            Player player = (Player) sender;
-            channel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
-        } else if (args.length == 1) {
-            for (ChatChannel chatChannel : this.getAPI().getChannels()) {
-                if (chatChannel.getId().equalsIgnoreCase(args[0])) {
-                    channel = chatChannel;
-                    break;
-                }
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                channel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
+            } else {
+                this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             }
+        } else if (args.length == 1) {
+            channel = this.getAPI().getChannelById(args[0]);
         }
 
         if (channel == null) {
@@ -36,9 +37,13 @@ public class ClearChatCommand extends AbstractCommand {
             return;
         }
 
-        //channel.message((Player) sender, StringUtils.repeat(" \n", 100), false);
+        MessageWrapper message = new MessageWrapper("", new MessageSender(null, null), StringUtils.repeat("\n", 100));
+        channel.send(message);
+
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
-        this.getAPI().getLocaleManager().sendMessage(Bukkit.getConsoleSender(), "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
+        if (sender instanceof Player) {
+            this.getAPI().getLocaleManager().sendMessage(Bukkit.getConsoleSender(), "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
+        }
     }
 
     @Override

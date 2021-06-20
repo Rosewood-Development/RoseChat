@@ -66,6 +66,9 @@ public class MuteCommand extends AbstractCommand {
                             muteTime = (outTime * 364) * 86400;
                         }
                         break;
+                    default:
+                        this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                        return;
                 }
             } catch (NumberFormatException e) {
                 this.getAPI().getLocaleManager().sendMessage(sender, "not-a-number");

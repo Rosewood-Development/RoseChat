@@ -3,7 +3,9 @@ package dev.rosewood.rosechat.command;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -49,12 +51,21 @@ public class MessageCommand extends AbstractCommand {
             return;
         }
 
+        String colorified = HexUtils.colorify(message);
+        if (ChatColor.stripColor(colorified).isEmpty()) {
+            this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
+            return;
+        }
+
         MessageUtils.sendPrivateMessage(sender, target, message);
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            this.getAPI().getPlayerData(player.getUniqueId()).setReplyTo(target.getUniqueId());
+            PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
+            playerData.setReplyTo(target.getUniqueId());
             targetData.setReplyTo(player.getUniqueId());
+            playerData.save();
+            targetData.save();
         }
     }
 

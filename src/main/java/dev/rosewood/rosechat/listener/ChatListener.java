@@ -6,6 +6,8 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,6 +49,13 @@ public class ChatListener implements Listener {
             // Don't send the message if the player is muted.
             if (data.getMuteTime() != 0 && !player.hasPermission("rosechat.bypass.mute")) {
                 this.api.getLocaleManager().sendMessage(player, "");
+                return;
+            }
+
+            // Make sure the message isn't blank.
+            String colorified = HexUtils.colorify(event.getMessage());
+            if (ChatColor.stripColor(colorified).isEmpty()) {
+                this.api.getLocaleManager().sendMessage(player, "message-blank");
                 return;
             }
 

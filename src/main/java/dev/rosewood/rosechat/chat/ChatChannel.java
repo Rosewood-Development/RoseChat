@@ -1,6 +1,11 @@
 package dev.rosewood.rosechat.chat;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +52,60 @@ public class ChatChannel implements GroupReceiver {
 
     @Override
     public void send(MessageWrapper messageWrapper) {
-        if (this.isVisibleAnywhere()) {
-            // send to EVERYONE
+        if (this.isMuted() && !(messageWrapper.getSender().hasPermission("rosechat.mute.bypass")))  {
+            messageWrapper.getSender().send(RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("channel-muted"));
+            return;
         }
-        // get players, in the world, in the server, all members, etc -> send
+
+        if (this.isVisibleAnywhere()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+
+            return;
+        }
+
+        if (this.getRadius() != -1 && messageWrapper.getSender().isPlayer()) {
+            Location playerLocation = messageWrapper.getSender().asPlayer().getLocation();
+
+            if (playerLocation.getWorld() == null) return;
+            for (Player player : playerLocation.getWorld().getPlayers()) {
+                if (player.getLocation().distance(playerLocation) < this.radius) {
+                    player.spigot().sendMessage(messageWrapper.getComponents());
+                }
+            }
+
+            return;
+        }
+
+        if (this.world != null) {
+            World world = Bukkit.getWorld(this.world);
+
+            if (world == null) return;
+            for (Player player : world.getPlayers()) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+        }
+
+        for (String server : this.servers) {
+            // send across bungee
+        }
+
+        for (UUID uuid : this.players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+        }
+
+        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
+        builder.append(messageWrapper.getComponents());
+        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
+            if (!this.players.contains(uuid)) {
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(builder.create());
+            }
+        }
     }
 
     @Override

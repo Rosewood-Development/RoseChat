@@ -13,7 +13,9 @@ public class PlayerData {
     private UUID uuid;
     private MessageLog messageLog;
     private UUID replyTo;
-    private boolean socialSpy;
+    private boolean messageSpy;
+    private boolean channelSpy;
+    private boolean groupSpy;
     private boolean canBeMessaged;
     private boolean tagSounds;
     private boolean messageSounds;
@@ -37,24 +39,6 @@ public class PlayerData {
         this.color = "&f";
         this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
-    }
-
-    /**
-     * Creates a new PlayerData for a specific player.
-     * @param uuid The UUID of the player.
-     * @param socialSpy Whether or not this player has social spy enabled.
-     * @param canBeMessaged Whether or not this player can be messaged.
-     * @param tagSounds Whether or not this player has tag sounds enabled.
-     * @param messageSounds Whether or not this player has message sounds enabled.
-     * @param emojis Whether or not this player has emojis enabled.
-     */
-    public PlayerData(UUID uuid, boolean socialSpy, boolean canBeMessaged, boolean tagSounds, boolean messageSounds, boolean emojis) {
-        this(uuid);
-        this.socialSpy = socialSpy;
-        this.canBeMessaged = canBeMessaged;
-        this.tagSounds = tagSounds;
-        this.messageSounds = messageSounds;
-        this.emojis = emojis;
     }
 
     /**
@@ -97,19 +81,51 @@ public class PlayerData {
     }
 
     /**
-     * Whether or not the player has social spy enabled.
-     * @return True if the player has social spy enabled.
+     * Whether or not the player has message spy enabled.
+     * @return True if the player has message spy enabled.
      */
-    public boolean hasSocialSpy() {
-        return this.socialSpy;
+    public boolean hasMessageSpy() {
+        return this.messageSpy;
     }
 
     /**
-     * Sets whether or not the player has social spy enabled.
-     * @param socialSpy Whether or not the player has social spy enabled.
+     * Sets whether or not the player has message spy enabled.
+     * @param messageSpy Whether or not the player has message spy enabled.
      */
-    public void setSocialSpy(boolean socialSpy) {
-        this.socialSpy = socialSpy;
+    public void setMessageSpy(boolean messageSpy) {
+        this.messageSpy = messageSpy;
+    }
+
+    /**
+     * Whether or not the player has channel spy enabled.
+     * @return True if the player has channel spy enabled.
+     */
+    public boolean hasChannelSpy() {
+        return this.channelSpy;
+    }
+
+    /**
+     * Sets whether or not the player has channel spy enabled.
+     * @param channelSpy Whether or not the player has channel spy enabled.
+     */
+    public void setChannelSpy(boolean channelSpy) {
+        this.channelSpy = channelSpy;
+    }
+
+    /**
+     * Whether or not the player has channel spy enabled.
+     * @return True if the player has channel spy enabled.
+     */
+    public boolean hasGroupSpy() {
+        return this.groupSpy;
+    }
+
+    /**
+     * Sets whether or not the player has group spy enabled.
+     * @param groupSpy Whether or not the player has group spy enabled.
+     */
+    public void setGroupSpy(boolean groupSpy) {
+        this.groupSpy = groupSpy;
     }
 
     /**

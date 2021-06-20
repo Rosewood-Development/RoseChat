@@ -143,7 +143,16 @@ permissions:
     description: Allows using a specific emote.
     default: op
   rosechat.spy:
-    description: Allows using socialspy.
+    description: Allows using social spy.
+    default: op
+  rosechat.spy.message:
+    description: Allows using message social spy.
+    default: op
+  rosechat.spy.channel:
+    description: Allows using channel social spy.
+    default: op
+  rosechat.spy.group:
+    description: Allows using group social spy.
     default: op
   rosechat.togglemessage:
     description: Allows using the togglemessage command.

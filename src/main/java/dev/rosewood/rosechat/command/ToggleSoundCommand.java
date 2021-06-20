@@ -31,28 +31,21 @@ public class ToggleSoundCommand extends AbstractCommand {
 
         switch (args[0].toLowerCase()) {
             case "messages":
-                sendToggleMessage(sender, args, playerData.hasMessageSounds());
                 playerData.setMessageSounds(!playerData.hasMessageSounds());
+                sendToggleMessage(sender, args, playerData.hasMessageSounds());
                 break;
             case "tags":
-                sendToggleMessage(sender, args, playerData.hasTagSounds());
                 playerData.setTagSounds(!playerData.hasTagSounds());
+                sendToggleMessage(sender, args, playerData.hasTagSounds());
                 break;
             case "all":
-                sendToggleMessage(sender, args, playerData.hasTagSounds() || playerData.hasMessageSounds());
                 playerData.setMessageSounds(!playerData.hasMessageSounds());
                 playerData.setTagSounds(!playerData.hasTagSounds());
+                sendToggleMessage(sender, args, playerData.hasTagSounds() || playerData.hasMessageSounds());
                 break;
         }
 
         playerData.save();
-    }
-
-    private void sendToggleMessage(CommandSender sender, String[] args, boolean nowOn) {
-        if (nowOn)
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglesound-on", StringPlaceholders.single("type", args[0].toLowerCase()));
-        else
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglesound-off", StringPlaceholders.single("type", args[0].toLowerCase()));
     }
 
     @Override
@@ -72,5 +65,14 @@ public class ToggleSoundCommand extends AbstractCommand {
     @Override
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-togglesound-usage");
+    }
+
+    private void sendToggleMessage(CommandSender sender, String[] args, boolean nowOn) {
+        if (nowOn)
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglesound-on", StringPlaceholders.single("type",
+                    this.getAPI().getLocaleManager().getLocaleMessage("command-toggle-sound-" + args[0].toLowerCase())));
+        else
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglesound-off", StringPlaceholders.single("type",
+                    this.getAPI().getLocaleManager().getLocaleMessage("command-toggle-sound-" + args[0].toLowerCase())));
     }
 }

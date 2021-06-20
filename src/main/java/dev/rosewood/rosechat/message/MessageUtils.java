@@ -96,8 +96,8 @@ public class MessageUtils {
         target.spigot().sendMessage(receivedMessage.getComponents());
 
         if (sender instanceof Player) {
-            for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getSocialSpies()) {
-                if (uuid.equals(messageSender.asPlayer().getUniqueId()) || uuid.equals(messageTarget.asPlayer().getUniqueId())) {
+            for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getMessageSpies()) {
+                if (!uuid.equals(messageSender.asPlayer().getUniqueId()) && !uuid.equals(messageTarget.asPlayer().getUniqueId())) {
                     Player spy = Bukkit.getPlayer(uuid);
                     if (spy != null) spy.spigot().sendMessage(spyMessage.getComponents());
                 }

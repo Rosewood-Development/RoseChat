@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.MessageSender;
 import org.bukkit.entity.Player;
 
 public enum FilterType {
+
     CAPS("blocked-caps"),
     SPAM("blocked-spam"),
     URL("blocked-url"),

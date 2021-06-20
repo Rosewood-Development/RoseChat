@@ -19,7 +19,9 @@ public class _1_Create_Tables_Data extends DataMigration {
         try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE " + tablePrefix + "player_data (" +
                     "uuid VARCHAR(36) UNIQUE NOT NULL, " +
-                    "social_spy BOOLEAN NOT NULL, " +
+                    "has_message_spy BOOLEAN NOT NULL, " +
+                    "has_channel_spy BOOLEAN NOT NULL, " +
+                    "has_group_spy BOOLEAN NOT NULL, " +
                     "can_be_messaged BOOLEAN NOT NULL, " +
                     "has_tag_sounds BOOLEAN NOT NULL, " +
                     "has_message_sounds BOOLEAN NOT NULL, " +

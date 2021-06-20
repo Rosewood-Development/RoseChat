@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,13 +16,6 @@ public class ReplyCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        // TODO: Maybe allow the console to reply?
-
-        if (!(sender instanceof Player)) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "player-only");
-            return;
-        }
-
         if (args.length == 0) {
             this.getAPI().getLocaleManager().sendMessage(sender, "command-reply-enter-message");
             return;
@@ -54,7 +48,7 @@ public class ReplyCommand extends AbstractCommand {
             return;
         }
 
-        //MessageUtils.sendPrivateMessage(this.dataManager, playerData, targetData, message);
+        MessageUtils.sendPrivateMessage(sender, target, message);
     }
 
     @Override

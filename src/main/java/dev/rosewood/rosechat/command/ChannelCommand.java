@@ -6,7 +6,9 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -28,8 +30,21 @@ public class ChannelCommand extends AbstractCommand {
             }
         } else {
             ChatChannel channel = this.getAPI().getChannelById(args[0]);
-            MessageWrapper message = new MessageWrapper(channel.getId(), new MessageSender(sender), getAllArgs(1, args));
-            channel.send(message);
+            if (channel == null) {
+                this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+                return;
+            }
+
+            String message = getAllArgs(1, args);
+
+            String colorified = HexUtils.colorify(message);
+            if (ChatColor.stripColor(colorified).isEmpty()) {
+                this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
+                return;
+            }
+
+            MessageWrapper messageWrapper = new MessageWrapper(channel.getId(), new MessageSender(sender), message);
+            channel.send(messageWrapper);
         }
     }
 

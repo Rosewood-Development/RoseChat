@@ -23,7 +23,7 @@ public class MessageWrapper {
             components = TextComponent.fromLegacyText(message);
         } else {
             String color = sender.isPlayer() ? this.plugin.getManager(DataManager.class).getPlayerData(sender.asPlayer().getUniqueId()).getColor() : "&f";
-            components = TextComponent.fromLegacyText(HexUtils.colorify("[" + prefix + "&f] " + "[" + sender.getGroup() + "] " + sender.getName() + ": " + color + message));
+            components = TextComponent.fromLegacyText(HexUtils.colorify("[" + prefix + "&f&r] " + "[" + sender.getGroup() + "] " + sender.getName() + ": " + color + message));
         }
     }
 
