@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
@@ -47,6 +48,8 @@ public class PlayerListener implements Listener {
                 playerData.save();
             }
         });
+
+        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
     }
 
     @EventHandler

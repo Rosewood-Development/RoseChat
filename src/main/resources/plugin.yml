@@ -9,6 +9,7 @@ softdepend:
   - LuckPerms
   - PlaceholderAPI
   - Vault
+  - DiscordSRV
 commands:
   rosechat:
     aliases: [rc]

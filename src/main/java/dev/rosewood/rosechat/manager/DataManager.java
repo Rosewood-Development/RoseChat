@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
@@ -18,11 +19,13 @@ public class DataManager extends AbstractDataManager {
 
     private ChannelManager channelManager;
     private Map<UUID, PlayerData> playerData;
+    private Map<UUID, MuteTask> muteTasks;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
+        this.muteTasks = new HashMap<>();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -73,6 +76,7 @@ public class DataManager extends AbstractDataManager {
                         playerData.setMuteTime(muteTime);
                         channel.add(uuid);
                         this.playerData.put(uuid, playerData);
+                        if (muteTime > 0) this.muteTasks.put(uuid, new MuteTask(playerData));
                         callback.accept(playerData);
                     } else {
                         PlayerData playerData = new PlayerData(uuid);
@@ -171,5 +175,9 @@ public class DataManager extends AbstractDataManager {
         }
 
         return spies;
+    }
+
+    public Map<UUID, MuteTask> getMuteTasks() {
+        return muteTasks;
     }
 }

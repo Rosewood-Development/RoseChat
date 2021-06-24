@@ -30,7 +30,9 @@ import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
+import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
+import dev.rosewood.rosechat.listener.DiscordListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
@@ -42,6 +44,8 @@ import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -55,6 +59,7 @@ public class RoseChat extends RosePlugin {
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
+    private DiscordSRV discord;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class);
@@ -63,7 +68,8 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public void enable() {
-        initHooks();
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        initHooks(pluginManager);
 
         // Register Commands
         CommandManager messageCommand = new CommandManager(new MessageCommand());
@@ -111,19 +117,19 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new ReloadCommand());
 
         // Register Listeners
-        PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
 
-        // Load data for all players currently online
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "rosechat:rosechat");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "rosechat:rosechat", new BungeeListener());
+
+        // Load data and group chats for all players currently online
         DataManager dataManager = this.getManager(DataManager.class);
+        GroupManager groupManager = this.getManager(GroupManager.class);
         Bukkit.getOnlinePlayers().forEach(player -> {
             dataManager.getPlayerData(player.getUniqueId(), data -> {});
+            groupManager.loadMemberGroupChats(player.getUniqueId());
         });
-
-        // Load all group chats.
-        GroupManager groupManager = this.getManager(GroupManager.class);
-        //
     }
 
     @Override
@@ -148,11 +154,11 @@ public class RoseChat extends RosePlugin {
         );
     }
 
-    private void initHooks() {
+    private void initHooks(PluginManager pluginManager) {
         LocaleManager localeManager = this.getManager(LocaleManager.class);
 
-        if (this.getServer().getPluginManager().getPlugin("Vault") != null) {
-            RegisteredServiceProvider<Permission> provider = getServer().getServicesManager().getRegistration(Permission.class);
+        if (pluginManager.getPlugin("Vault") != null) {
+            RegisteredServiceProvider<Permission> provider = this.getServer().getServicesManager().getRegistration(Permission.class);
             if (provider != null) this.vault = provider.getProvider();
         } else {
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
@@ -162,10 +168,19 @@ public class RoseChat extends RosePlugin {
         if (!PlaceholderAPIHook.enabled())
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
+
+        if (pluginManager.getPlugin("DiscordSRV") != null) {
+            this.discord = DiscordSRV.getPlugin();
+            DiscordSRV.api.subscribe(new DiscordListener());
+        }
     }
 
     public Permission getVault() {
         return this.vault;
+    }
+
+    public DiscordSRV getDiscord() {
+        return this.discord;
     }
 
     public SeniorCommandManager getCommandManager() {

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command;
 
+import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -35,7 +36,11 @@ public class MuteCommand extends AbstractCommand {
         int muteTime = -1;
         if (args.length == 1)
         {
-            outScale = this.getAPI().getLocaleManager().getLocaleMessage("command-mute-indefinite");
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-indefinite");
+            this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
+            targetData.setMuteTime(-1);
+            targetData.save();
+            return;
         } else if (args.length == 3) {
             try {
                 outTime = Integer.parseInt(args[1]);
@@ -43,21 +48,26 @@ public class MuteCommand extends AbstractCommand {
 
                 switch (scale) {
                     case "seconds":
+                    case "second":
                         outScale = outTime == 1 ? "second" : "seconds";
                         muteTime = outTime;
                         break;
+                    case "minute":
                     case "minutes":
                         outScale = outTime == 1 ? "minute" : "minutes";
                         muteTime = outTime * 60;
                         break;
+                    case "hour":
                     case "hours":
                         outScale = outTime == 1 ? "hour" : "hours";
                         muteTime = outTime * 3600;
                         break;
+                    case "month":
                     case "months":
                         outScale = outTime == 1 ? "month" : "months";
                         muteTime = outTime * 2629800;
                         break;
+                    case "year":
                     case "years":
                         if (outTime > 1000) {
                             outScale = this.getAPI().getLocaleManager().getLocaleMessage("command-mute-indefinite");
@@ -81,7 +91,12 @@ public class MuteCommand extends AbstractCommand {
                         .addPlaceholder("time", outTime)
                         .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
         this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
-        targetData.setMuteTime((muteTime * 1000) + System.currentTimeMillis());
+
+        if (muteTime > 0) {
+            targetData.setMuteTime((muteTime * 1000) + System.currentTimeMillis());
+            this.getAPI().getDataManager().getMuteTasks().put(target.getUniqueId(), new MuteTask(targetData));
+        }
+
         targetData.save();
     }
 

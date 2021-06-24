@@ -2,21 +2,37 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.manager.AbstractDataManager;
+import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class GroupManager extends AbstractDataManager {
+public class GroupManager extends Manager {
 
+    private DataManager dataManager;
     private final Map<String, GroupChat> groupChats;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+        this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
+    }
+
+    @Override
+    public void reload() {
+
+    }
+
+    @Override
+    public void disable() {
+
     }
 
     public GroupChat getGroupChatById(String id) {
@@ -31,67 +47,19 @@ public class GroupManager extends AbstractDataManager {
         return null;
     }
 
+    // Why is this broke :(
     public void loadMemberGroupChats(UUID member) {
         this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String query = "SELECT gc.* FROM " + this.getTablePrefix() + "group_chat_member gcm " +
-                        "JOIN " + this.getTablePrefix() + "group_chat gc ON gcm.group_chat = gc.id WHERE gcm.uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+
+                String groupQuery = "SELECT * FROM " + this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
+                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gcm.uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(groupQuery)) {
                     statement.setString(1, member.toString());
                     ResultSet result = statement.executeQuery();
 
-                    if (result.next()) {
-                        String id = result.getString("id");
-                        String name = result.getString("name");
-                        UUID owner = UUID.fromString(result.getString("owner"));
-                        GroupChat groupChat = this.getGroupChatById(id);
-                        if (groupChat == null) {
-                            groupChat = new GroupChat(id);
-                            groupChat.setOwner(owner);
-                            groupChat.addMember(owner);
-                            groupChat.setName(name);
-                            this.groupChats.put(id, groupChat);
-                        }
-                    }
-                }
-            });
-        });
-    }
+                    while (result.next()) {
 
-    public void loadGroupChats() {
-        this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String query = "SELECT * FROM " + this.getTablePrefix() + "group_chat";
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    ResultSet result = statement.executeQuery();
-                    if (result.next()) {
-                        String id = result.getString("id");
-                        String name = result.getString("name");
-                        UUID owner = UUID.fromString(result.getString("owner"));
-                        if (!this.groupChats.containsKey(id)) {
-                            GroupChat groupChat = new GroupChat(id);
-                            groupChat.setOwner(owner);
-                            groupChat.setName(name);
-                            this.groupChats.put(id, groupChat);
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    public void loadMembers() {
-        this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String query = "SELECT * FROM " + this.getTablePrefix() + "group_chat_member";
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    ResultSet result = statement.executeQuery();
-                    if (result.next()) {
-                        String group = result.getString("group_chat");
-                        UUID member = UUID.fromString(result.getString("uuid"));
-                        if (this.groupChats.containsKey(group)) {
-                            this.groupChats.get(group).addMember(member);
-                        }
                     }
                 }
             });
@@ -100,8 +68,8 @@ public class GroupManager extends AbstractDataManager {
 
     public void addMember(GroupChat groupChat, UUID member) {
         this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "group_chat_member (group_chat, uuid) " +
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                String insertQuery = "INSERT INTO " + this.dataManager.getTablePrefix() + "group_chat_member (group_chat, uuid) " +
                         "VALUES (?, ?)";
                 try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                     statement.setString(1, groupChat.getId());
@@ -114,8 +82,8 @@ public class GroupManager extends AbstractDataManager {
 
     public void removeMember(GroupChat groupChat, UUID member) {
         this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ? AND uuid = ?";
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                String deleteQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ? AND uuid = ?";
                 try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
                     statement.setString(1, groupChat.getId());
                     statement.setString(2, member.toString());
@@ -125,12 +93,32 @@ public class GroupManager extends AbstractDataManager {
         });
     }
 
+    public void getMembers(String id, Consumer<List<UUID>> callback) {
+        this.async(() -> {
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                List<UUID> members = new ArrayList<>();
+
+                String membersQuery = "SELECT * FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
+                try (PreparedStatement statement = connection.prepareStatement(membersQuery)) {
+                    statement.setString(1, id);
+                    ResultSet result = statement.executeQuery();
+
+                    if (result.next()) {
+                        members.add(UUID.fromString(result.getString("uuid")));
+                    }
+                }
+
+                callback.accept(members);
+            });
+        });
+    }
+
     public void createOrUpdateGroupChat(GroupChat groupChat) {
         this.async(() -> {
-            this.databaseConnector.connect(connection -> {
+            this.dataManager.getDatabaseConnector().connect(connection -> {
                 boolean create;
 
-                String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
+                String checkQuery = "SELECT 1 FROM " + this.dataManager.getTablePrefix() + "group_chat WHERE id = ?";
                 try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
                     statement.setString(1, groupChat.getId());
                     ResultSet result = statement.executeQuery();
@@ -138,7 +126,7 @@ public class GroupManager extends AbstractDataManager {
                 }
 
                 if (create) {
-                    String insertQuery = "INSERT INTO " + this.getTablePrefix() + "group_chat (id, name, owner) " +
+                    String insertQuery = "INSERT INTO " + this.dataManager.getTablePrefix() + "group_chat (id, name, owner) " +
                             "VALUES (?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                         statement.setString(1, groupChat.getId());
@@ -147,7 +135,7 @@ public class GroupManager extends AbstractDataManager {
                         statement.executeUpdate();
                     }
                 } else {
-                    String updateQuery = "UPDATE " + this.getTablePrefix() + "group_chat SET " +
+                    String updateQuery = "UPDATE " + this.dataManager.getTablePrefix() + "group_chat SET " +
                             "name = ? WHERE owner = ?";
                     try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
                         statement.setString(1, groupChat.getName());
@@ -161,14 +149,14 @@ public class GroupManager extends AbstractDataManager {
 
     public void deleteGroupChat(GroupChat groupChat) {
         this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                String deleteQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat WHERE id = ?";
                 try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
                     statement.setString(1, groupChat.getId());
                     statement.executeUpdate();
                 }
 
-                String deleteMembersQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
+                String deleteMembersQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
                 try (PreparedStatement statement = connection.prepareStatement(deleteMembersQuery)) {
                     statement.setString(1, groupChat.getId());
                     statement.executeUpdate();

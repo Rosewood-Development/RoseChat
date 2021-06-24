@@ -13,7 +13,9 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
 import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import github.scarsz.discordsrv.DiscordSRV;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.milkbowl.vault.permission.Permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -331,5 +333,19 @@ public class RoseChatAPI {
      */
     public ChannelManager getChannelManager() {
         return this.channelManager;
+    }
+
+    /**
+     * @return An instance of the Permission class from Vault.
+     */
+    public Permission getVault() {
+        return this.plugin.getVault();
+    }
+
+    /**
+     * @return An instance of DiscordSRV.
+     */
+    public DiscordSRV getDiscord() {
+        return this.plugin.getDiscord();
     }
 }

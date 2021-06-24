@@ -7,6 +7,9 @@ import dev.rosewood.rosechat.message.MessageSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.utils.HexUtils;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -42,13 +45,14 @@ public class ChatListener implements Listener {
             }
 
             // Check Mute Expiry
-            if (data.getMuteTime() != -1 && data.getMuteTime() < System.currentTimeMillis()) {
+            if (data.getMuteTime() > 0 && data.getMuteTime() < System.currentTimeMillis()) {
                 data.setMuteTime(0);
+                data.save();
             }
 
             // Don't send the message if the player is muted.
             if (data.getMuteTime() != 0 && !player.hasPermission("rosechat.bypass.mute")) {
-                this.api.getLocaleManager().sendMessage(player, "");
+                this.api.getLocaleManager().sendMessage(player, "command-mute-cannot-send");
                 return;
             }
 
@@ -61,6 +65,22 @@ public class ChatListener implements Listener {
 
             MessageWrapper message = new MessageWrapper(channel.getId(), new MessageSender(player), event.getMessage());
             channel.send(message);
+
+            Bukkit.getConsoleSender().spigot().sendMessage(message.getComponents());
+
+            // DiscordSRV Test - WIP
+            if (this.api.getDiscord() != null) {
+                TextChannel textChannel = this.api.getDiscord().getDestinationTextChannelForGameChannelName(this.api.getDiscord().getMainChatChannel());
+                if (textChannel != null) {
+                    MessageEmbed messageEmbed = new MessageEmbed(null,
+                            "[" + message.getPrefix() + "] [" + message.getSender().getGroup() + "] " + message.getSender().getName() + ": " + message.getMessage(),
+                            null, EmbedType.RICH, null, 12648430,
+                            new MessageEmbed.Thumbnail("https://cravatar.eu/helmavatar/" + player.getName(), "https://cravatar.eu/helmavatar/" + player.getName(), 128, 128),
+                            null, null,
+                            null, null, null, null);
+                    textChannel.sendMessage(messageEmbed).queue();
+                }
+            }
 
             /* edit this
             MessageWrapper message = new MessageWrapper(player, data.getColor() + event.getMessage(), data.getCurrentChannel());

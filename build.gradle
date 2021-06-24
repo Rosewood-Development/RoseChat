@@ -25,6 +25,10 @@ repositories {
     maven { url = 'https://repo.rosewooddev.io/repository/public/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = 'https://nexus.scarsz.me/content/groups/public/' }
+    maven { url = 'https://m2.dv8tion.net/releases' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
 }
 
 dependencies {
@@ -33,6 +37,9 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.17:remapped-mojang'
     compileOnly 'me.clip:placeholderapi:2.10.9'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
+    compileOnly 'com.discordsrv:discordsrv:1.23.0'
+    compileOnly 'net.dv8tion:JDA:4.2.1_262'
+    compileOnly 'net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT'
 
     mojangToObf 'org.spigotmc:minecraft-server:1.17:maps-mojang@txt'
     mojangRemapped 'org.spigotmc:spigot:1.17:remapped-mojang'

@@ -14,10 +14,14 @@ public class MessageWrapper {
     private RoseChat plugin;
     private BaseComponent[] components;
     private MessageSender sender;
+    private String prefix;
+    private String message;
 
     public MessageWrapper(String prefix, MessageSender sender, String message) {
         this.plugin = RoseChat.getInstance();
         this.sender = sender;
+        this.prefix = prefix;
+        this.message = message;
 
         if (sender == null) {
             components = TextComponent.fromLegacyText(message);
@@ -33,5 +37,13 @@ public class MessageWrapper {
 
     public MessageSender getSender() {
         return sender;
+    }
+
+    public String getPrefix() {
+        return this.prefix;
+    }
+
+    public String getMessage() {
+        return this.message;
     }
 }
