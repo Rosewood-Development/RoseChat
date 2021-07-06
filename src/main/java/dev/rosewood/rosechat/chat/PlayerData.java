@@ -12,7 +12,7 @@ public class PlayerData {
 
     private UUID uuid;
     private MessageLog messageLog;
-    private UUID replyTo;
+    private String replyTo;
     private boolean messageSpy;
     private boolean channelSpy;
     private boolean groupSpy;
@@ -66,17 +66,17 @@ public class PlayerData {
 
     /**
      * Gets who the player is replying to.
-     * @return The UUID to reply to.
+     * @return The player to reply to.
      */
-    public UUID getReplyTo() {
+    public String getReplyTo() {
         return this.replyTo;
     }
 
     /**
      * Sets who the player is replying to.
-     * @param replyTo The UUID to reply to.
+     * @param replyTo The player to reply to.
      */
-    public void setReplyTo(UUID replyTo) {
+    public void setReplyTo(String replyTo) {
         this.replyTo = replyTo;
     }
 

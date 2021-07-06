@@ -1,14 +1,13 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.manager.DataManager;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
-
 import java.text.Normalizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -84,16 +83,25 @@ public class MessageUtils {
     }*/
 
 
-    public static void sendPrivateMessage(CommandSender sender, Player target, String message) {
+    public static void sendPrivateMessage(CommandSender sender, String targetName, String message) {
+        Player target = Bukkit.getPlayer(targetName);
         MessageSender messageSender = new MessageSender(sender);
-        MessageSender messageTarget = new MessageSender(target);
+        MessageSender messageTarget = target == null ? new MessageSender(targetName, "") : new MessageSender(target);
 
         MessageWrapper sentMessage = new MessageWrapper(messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
         MessageWrapper receivedMessage = new MessageWrapper(messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
         MessageWrapper spyMessage = new MessageWrapper("[Spy] " + messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
 
         sender.spigot().sendMessage(sentMessage.getComponents());
-        target.spigot().sendMessage(receivedMessage.getComponents());
+        if (target == null) {
+            if (targetName.equalsIgnoreCase("Console")) {
+                Bukkit.getConsoleSender().spigot().sendMessage(sentMessage.getComponents());
+                return;
+            }
+            BungeeListener.sendDirectMessage(targetName, ComponentSerializer.toString(receivedMessage.getComponents()));
+        } else {
+            target.spigot().sendMessage(receivedMessage.getComponents());
+        }
 
         if (sender instanceof Player) {
             for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getMessageSpies()) {

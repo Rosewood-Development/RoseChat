@@ -13,6 +13,12 @@ public interface GroupReceiver {
     void send(MessageWrapper messageWrapper);
 
     /**
+     * Sends a json string to the group.
+     * @param json The json string to send.
+     */
+    void sendJson(String json);
+
+    /**
      * @return The members.
      */
     List<UUID> getMembers();

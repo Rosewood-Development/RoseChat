@@ -34,6 +34,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         OUTPUT_HOVER_EVENTS("chat-settings.output-hover-events", true, "Should hover events be output to the console?"),
+        ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true, "Should players be allowed to message other players on connected servers?"),
         MESSAGE_SOUND("chat-settings.message-sound", Sound.BLOCK_NOTE_BLOCK_PLING.name(), "The sound that will be sent to a player when they receive a message.", "Players can individually disable this in-game with /togglesound.", "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
         CHAT_PLACEHOLDERS_ENABLED("chat-settings.chat-placeholders-enabled", true, "Should players be able to use PlaceholderAPI placeholders in chat?", "This can allow players to put information in chat, such as their ping or coordinates.", "Players will need a permission per placeholder.", "For example, 'rosechat.placeholder.player_name', allows a player to use %player_name% in chat."),
         BLACKLISTED_CHAT_PLACEHOLDERS("chat-settings.blacklisted-chat-placeholders", Arrays.asList("Server", "%player_ip%"), "These are PlaceholderAPI placeholders that are not allowed to be used in chat.", "Placeholders that do not include % symbols will blacklist all placeholders from that expansion.", "For example: 'Server' will block all Server placeholders, such as %server_name% and %server_version%"),
@@ -126,10 +127,10 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         CHAT_FORMATS("chat-formats", null,"These are all of the miscellanous chat formats in the plugin."),
         MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{left-bracket}{you}{arrow-sender}{msg-player}{right-bracket}{message}", "The format of a /msg sent to another player."),
         MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{left-bracket}{msg-player}{arrow-receiver}{you}{right-bracket}{message}", "The format of a /msg received from another player."),
-        SOCIAL_SPY_FORMAT("chat-formats.social-spy", "{spy-prefix}{spy-player}{spy-other}{message}", "The format of a spied /msg."),
+        MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-player}{spy-other}{message}", "The format of a spied /msg."),
         GROUP_FORMAT("chat-formats.group", "{group}{player}{extra}{message}", "The format of a group message."),
         GROUP_SPY_FORMAT("chat-formats.group-spy", "{spy-prefix}{group}{player}{extra}{message}", "The format of a spied group message."),
-        WORLD_SPY_FORMAT("chat-formats.world-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message.");
+        CHANNEL_SPY_FORMAT("chat-formats.channel-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message.");
 
         private final String key;
         private final Object defaultValue;

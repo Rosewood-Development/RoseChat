@@ -20,19 +20,18 @@ public class DataManager extends AbstractDataManager {
     private ChannelManager channelManager;
     private Map<UUID, PlayerData> playerData;
     private Map<UUID, MuteTask> muteTasks;
+    private Map<String, List<String>> bungeePlayers;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
         this.muteTasks = new HashMap<>();
+        this.bungeePlayers = new HashMap<>();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
-        PlayerData data = this.playerData.get(uuid);
-        if (data == null)
-            throw new IllegalStateException("PlayerData for [" + uuid + "] not yet loaded.");
-        return data;
+        return this.playerData.get(uuid);
     }
 
     public void unloadPlayerData(UUID uuid) {
@@ -178,6 +177,14 @@ public class DataManager extends AbstractDataManager {
     }
 
     public Map<UUID, MuteTask> getMuteTasks() {
-        return muteTasks;
+        return this.muteTasks;
+    }
+
+    public Map<String, List<String>> getBungeePlayers() {
+        return this.bungeePlayers;
+    }
+
+    public List<String> getPlayersOnServer(String server) {
+        return this.bungeePlayers.get(server);
     }
 }

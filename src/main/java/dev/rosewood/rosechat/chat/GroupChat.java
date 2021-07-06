@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -41,6 +42,16 @@ public class GroupChat implements GroupReceiver {
             if (!this.members.contains(uuid)) {
                 Player spy = Bukkit.getPlayer(uuid);
                 if (spy != null) spy.spigot().sendMessage(builder.create());
+            }
+        }
+    }
+
+    @Override
+    public void sendJson(String json) {
+        for (UUID uuid : this.members) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.spigot().sendMessage(ComponentSerializer.parse(json));
             }
         }
     }

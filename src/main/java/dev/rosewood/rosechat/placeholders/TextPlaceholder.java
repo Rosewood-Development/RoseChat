@@ -7,7 +7,7 @@ public class TextPlaceholder extends Placeholder {
     private Map<String, String> groups;
 
     public String getTextFromGroup(String group) {
-        return this.groups.containsKey(group) ? groups.get(group) : groups.get("default");
+        return this.groups.containsKey(group) ? this.groups.get(group) : this.groups.get("default");
     }
 
     public Map<String, String> getGroups() {

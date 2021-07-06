@@ -45,7 +45,6 @@ import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -120,8 +119,8 @@ public class RoseChat extends RosePlugin {
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
 
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "rosechat:rosechat");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "rosechat:rosechat", new BungeeListener());
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
 
         // Load data and group chats for all players currently online
         DataManager dataManager = this.getManager(DataManager.class);
@@ -134,7 +133,8 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public void disable() {
-
+        this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
+        this.getServer().getMessenger().unregisterIncomingPluginChannel(this);
     }
 
     @Override

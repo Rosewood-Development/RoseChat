@@ -1,8 +1,11 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -88,7 +91,7 @@ public class ChatChannel implements GroupReceiver {
         }
 
         for (String server : this.servers) {
-            // send across bungee
+           BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(messageWrapper.getComponents()));
         }
 
         for (UUID uuid : this.players) {
@@ -98,12 +101,51 @@ public class ChatChannel implements GroupReceiver {
             }
         }
 
+        if (messageWrapper.getSender().isPlayer() && !this.players.contains(messageWrapper.getSender().asPlayer().getUniqueId())) {
+            messageWrapper.getSender().asPlayer().spigot().sendMessage(messageWrapper.getComponents());
+        }
+
         ComponentBuilder builder = new ComponentBuilder("[Spy] ");
         builder.append(messageWrapper.getComponents());
         for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
             if (!this.players.contains(uuid)) {
                 Player spy = Bukkit.getPlayer(uuid);
                 if (spy != null) spy.spigot().sendMessage(builder.create());
+            }
+        }
+    }
+
+    @Override
+    public void sendJson(String json) {
+        if (this.isMuted()) return;
+
+        BaseComponent[] components = ComponentSerializer.parse(json);
+
+        if (this.isVisibleAnywhere()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.spigot().sendMessage(components);
+            }
+
+            return;
+        }
+
+        if (this.world != null) {
+            World world = Bukkit.getWorld(this.world);
+
+            if (world == null) return;
+            for (Player player : world.getPlayers()) {
+                player.spigot().sendMessage(components);
+            }
+        }
+
+        for (String server : this.servers) {
+            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(components));
+        }
+
+        for (UUID uuid : this.players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.spigot().sendMessage(components);
             }
         }
     }
