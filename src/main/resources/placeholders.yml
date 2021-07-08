@@ -116,6 +116,11 @@ spy-other:
   text:
     default: "&e%other_player_name%&8] &f"
 
+discord:
+  text:
+    # WIP
+    default: "[&bDiscord | &d%channel%] %name% &f"
+
 # Tags
 
 # The "%tag%" placeholder represents the message that the player types.

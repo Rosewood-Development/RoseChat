@@ -3,6 +3,9 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -26,6 +29,7 @@ public class ChatChannel implements GroupReceiver {
     private String world;
     private boolean autoJoin;
     private boolean visibleAnywhere;
+    private String discordChannel;
     private List<String> servers;
     private List<UUID> players;
 
@@ -58,6 +62,20 @@ public class ChatChannel implements GroupReceiver {
         if (this.isMuted() && !(messageWrapper.getSender().hasPermission("rosechat.mute.bypass")))  {
             messageWrapper.getSender().send(RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("channel-muted"));
             return;
+        }
+
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        if (api.getDiscord() != null) {
+            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
+            if (textChannel != null) {
+                MessageEmbed messageEmbed = new MessageEmbed(null,
+                        "[" + messageWrapper.getPrefix() + "] [" + messageWrapper.getSender().getGroup() + "] " + messageWrapper.getSender().getName() + ": " + messageWrapper.getMessage(),
+                        null, EmbedType.RICH, null, 12648430,
+                        new MessageEmbed.Thumbnail("https://cravatar.eu/helmavatar/" + messageWrapper.getSender().getName(), "https://cravatar.eu/helmavatar/" + messageWrapper.getSender().getName(), 128, 128),
+                        null, null,
+                        null, null, null, null);
+                textChannel.sendMessage(messageEmbed).queue();
+            }
         }
 
         if (this.isVisibleAnywhere()) {
@@ -146,6 +164,45 @@ public class ChatChannel implements GroupReceiver {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 player.spigot().sendMessage(components);
+            }
+        }
+    }
+
+    public void sendFromDiscord(MessageWrapper messageWrapper) {
+        if (this.isVisibleAnywhere()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+
+            return;
+        }
+
+        if (this.world != null) {
+            World world = Bukkit.getWorld(this.world);
+
+            if (world == null) return;
+            for (Player player : world.getPlayers()) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+        }
+
+        for (String server : this.servers) {
+            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(messageWrapper.getComponents()));
+        }
+
+        for (UUID uuid : this.players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.spigot().sendMessage(messageWrapper.getComponents());
+            }
+        }
+
+        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
+        builder.append(messageWrapper.getComponents());
+        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
+            if (!this.players.contains(uuid)) {
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(builder.create());
             }
         }
     }
@@ -379,5 +436,21 @@ public class ChatChannel implements GroupReceiver {
      */
     public void setMuted(boolean muted) {
         this.muted = muted;
+    }
+
+    /**
+     * Sets the DiscordSRV channel that the channel is connected to.
+     * @param discordChannel The DiscordSRV channel to use.
+     */
+    public void setDiscordChannel(String discordChannel) {
+        this.discordChannel = discordChannel;
+    }
+
+    /**
+     * Gets the DiscordSRV channel that the channel is connected to.
+     * @return The DiscordSRV channel that the channel is connected to.
+     */
+    public String getDiscordChannel() {
+        return this.discordChannel;
     }
 }

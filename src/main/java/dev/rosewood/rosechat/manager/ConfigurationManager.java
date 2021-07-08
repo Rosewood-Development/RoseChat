@@ -105,7 +105,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 new RoseSettingValue("global", new RoseSettingSection(
                         new RoseSettingValue("default", true, "This sets the channel as the default channel that players will be placed into when they first join the server."),
                         new RoseSettingValue("format", "{prefix}{player}{extra}{message}", "This is the format of the channel.", "The format uses placeholders defined in placeholders.yml"),
-                        new RoseSettingValue("visible-anywhere", true, "Can messages from this channel be sent and read while in other channels?")
+                        new RoseSettingValue("visible-anywhere", true, "Can messages from this channel be sent and read while in other channels?"),
+                        new RoseSettingValue("discord", "global", "The DiscordSRV channel that messages can be sent and received from.", "These can be defined in DiscordSRV's config file.")
                 ), "The ID of the channel, the player will use this to join the channel.", "For example, /c global"),
                 new RoseSettingValue("staff", new RoseSettingSection(
                         new RoseSettingValue("format", "{staff-prefix}{player}{extra}{message}"),
@@ -130,7 +131,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-player}{spy-other}{message}", "The format of a spied /msg."),
         GROUP_FORMAT("chat-formats.group", "{group}{player}{extra}{message}", "The format of a group message."),
         GROUP_SPY_FORMAT("chat-formats.group-spy", "{spy-prefix}{group}{player}{extra}{message}", "The format of a spied group message."),
-        CHANNEL_SPY_FORMAT("chat-formats.channel-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message.");
+        CHANNEL_SPY_FORMAT("chat-formats.channel-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message."),
+        MINECRAFT_TO_DISCORD_FORMAT("chat-formats.minecraft-to-discord", "{}", "WIP"),
+        DISCORD_TO_MINECRAFT_FORMAT("chat-formats.discord-to-minecraft", "{discord}{extra}{message}", "WIP");
 
         private final String key;
         private final Object defaultValue;

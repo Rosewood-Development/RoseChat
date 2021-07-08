@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -67,20 +68,6 @@ public class ChatListener implements Listener {
             channel.send(message);
 
             Bukkit.getConsoleSender().spigot().sendMessage(message.getComponents());
-
-            // DiscordSRV Test - WIP
-            if (this.api.getDiscord() != null) {
-                TextChannel textChannel = this.api.getDiscord().getDestinationTextChannelForGameChannelName(this.api.getDiscord().getMainChatChannel());
-                if (textChannel != null) {
-                    MessageEmbed messageEmbed = new MessageEmbed(null,
-                            "[" + message.getPrefix() + "] [" + message.getSender().getGroup() + "] " + message.getSender().getName() + ": " + message.getMessage(),
-                            null, EmbedType.RICH, null, 12648430,
-                            new MessageEmbed.Thumbnail("https://cravatar.eu/helmavatar/" + player.getName(), "https://cravatar.eu/helmavatar/" + player.getName(), 128, 128),
-                            null, null,
-                            null, null, null, null);
-                    textChannel.sendMessage(messageEmbed).queue();
-                }
-            }
 
             /* edit this
             MessageWrapper message = new MessageWrapper(player, data.getColor() + event.getMessage(), data.getCurrentChannel());

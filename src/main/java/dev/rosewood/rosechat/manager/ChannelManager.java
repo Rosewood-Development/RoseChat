@@ -41,6 +41,7 @@ public class ChannelManager extends Manager {
             String world = section.contains(id + ".world") ? section.getString(id + ".world") : null;
             boolean autoJoin = section.contains(id + ".auto-join") && section.getBoolean("auto-join");
             List<String> servers = section.contains(id + ".servers") ? section.getStringList(id + ".servers") : new ArrayList<>();
+            String discord = section.contains(id + ".discord") ? section.getString(id + ".discord") : null;
 
             if (id.length() > 255) id = id.substring(255);
 
@@ -51,6 +52,7 @@ public class ChannelManager extends Manager {
             channel.setAutoJoin(autoJoin);
             channel.setVisibleAnywhere(visible);
             channel.setServers(servers);
+            channel.setDiscordChannel(discord);
 
             this.channels.put(id, channel);
 
