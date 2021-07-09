@@ -49,6 +49,9 @@ commands:
   gcm:
     aliases: [gcm, gcmsg, gmsg]
     description: Send a message in a group chat.
+  nickname:
+    aliases: [nick]
+    description: Set a nickname.
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
@@ -83,51 +86,136 @@ permissions:
       rosechat.chatcolor: true
       rosechat.group: true
       rosechat.groups: true
+      rosechat.nickname: true
   rosechat.chat:
     description: Allows using chat.
     default: not op
   rosechat.color:
     description: Allows using color codes.
     default: op
+    children:
+      - rosechat.color.chat
+      - rosechat.color.message
+      - rosechat.color.channel
+      - rosechat.color.group
+      - rosechat.color.nickname
   rosechat.format:
     description: Allows using formatting codes.
     default: op
+    children:
+      - rosechat.format.chat
+      - rosechat.format.message
+      - rosechat.format.channel
+      - rosechat.format.group
+      - rosechat.format.nickname
   rosechat.magic:
     description: Allows using the magic fomatting code.
     default: op
+    children:
+      - rosechat.magic.chat
+      - rosechat.magic.message
+      - rosechat.magic.channel
+      - rosechat.magic.group
+      - rosechat.magic.nickname
   rosechat.hex:
     description: Allows using hex color codes.
     default: op
+    children:
+      - rosechat.hex.chat
+      - rosechat.hex.message
+      - rosechat.hex.channel
+      - rosechat.hex.group
+      - rosechat.hex.nickname
   rosechat.gradient:
     description: Allows using the gradient code.
     default: op
+    children:
+      - rosechat.gradient.chat
+      - rosechat.gradient.message
+      - rosechat.gradient.channel
+      - rosechat.gradient.group
+      - rosechat.gradient.nickname
   rosechat.rainbow:
     description: Allows using the rainbow code.
     default: op
+    children:
+      - rosechat.rainbow.chat
+      - rosechat.rainbow.message
+      - rosechat.rainbow.channel
+      - rosechat.rainbow.group
+      - rosechat.rainbow.nickname
   rosechat.spam:
     description: Allows bypassing the spam filter.
     default: op
+    children:
+      - rosechat.spam.chat
+      - rosechat.spam.message
+      - rosechat.spam.channel
+      - rosechat.spam.group
+      - rosechat.spam.nickname
   rosechat.language:
     description: Allows bypassing the language filter.
     default: op
+    children:
+      - rosechat.language.chat
+      - rosechat.language.message
+      - rosechat.language.channel
+      - rosechat.language.group
+      - rosechat.language.nickname
   rosechat.caps:
     description: Allows bypassing the caps filter.
     default: op
+    children:
+      - rosechat.caps.chat
+      - rosechat.caps.message
+      - rosechat.caps.channel
+      - rosechat.caps.group
+      - rosechat.caps.nickname
   rosechat.links:
     description: Allows bypassing the URL filter.
     default: op
+    children:
+      - rosechat.links.chat
+      - rosechat.links.message
+      - rosechat.links.channel
+      - rosechat.links.group
+      - rosechat.links.nickname
   rosechat.placeholders:
     description: Allows using placeholders.
     default: op
+    children:
+      - rosechat.placeholders.chat
+      - rosechat.placeholders.message
+      - rosechat.placeholders.channel
+      - rosechat.placeholders.group
+      - rosechat.placeholders.nickname
   rosechat.tags:
     description: Allows using tags.
     default: op
+    children:
+      - rosechat.tags.chat
+      - rosechat.tags.message
+      - rosechat.tags.channel
+      - rosechat.tags.group
+      - rosechat.tags.nickname
   rosechat.replacements:
     description: Allows using replacements.
     default: op
+    children:
+      - rosechat.replacements.chat
+      - rosechat.replacements.message
+      - rosechat.replacements.channel
+      - rosechat.replacements.group
+      - rosechat.replacements.nickname
   rosechat.emojis:
     description: Allows using emojis.
     default: op
+    children:
+      - rosechat.emojis.chat
+      - rosechat.emojis.message
+      - rosechat.emojis.channel
+      - rosechat.emojis.group
+      - rosechat.emojis.nickname
   rosechat.message:
     description: Allows using the message command.
     default: op
@@ -223,4 +311,10 @@ permissions:
     default: op
   rosechat.groups:
     description: Limits the amount of groups a player can be in.
+    default: op
+  rosechat.nickname:
+    description: Allows using the nickname command.
+    default: op
+  rosechat.nickname.others:
+    description: Allows setting the nickname of another player.
     default: op

@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class PlayerData {
     private long muteTime;
     private ChatChannel currentChannel;
     private String color;
+    private String nickname;
     private List<GroupChat> groupInvites;
 
     /**
@@ -238,6 +240,24 @@ public class PlayerData {
      */
     public void setColor(String color) {
         this.color = color;
+    }
+
+    /**
+     * Gets the current nickname of the player.
+     * This includes gradients, emojis, tags, etc.
+     * Use {@link Player#getDisplayName} for the formatted name
+     * @return The current nickname of the player.
+     */
+    public String getNickname() {
+        return this.nickname;
+    }
+
+    /**
+     * Sets the current nickname of the player.
+     * @param nickname The nickname to use.
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     /**

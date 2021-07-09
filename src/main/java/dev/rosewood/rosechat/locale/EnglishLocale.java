@@ -217,7 +217,7 @@ public class EnglishLocale implements Locale {
             this.put("command-color-invalid", "&eThis is not a valid color!");
 
             this.put("#33", "Mute Command");
-            this.put("command-mute-description", "&8- &d/mute &7- Mute a player.");
+            this.put("command-mute-description", "&8 - &d/mute &7- Mute a player.");
             this.put("command-mute-usage", "&e/mute <player> [time] [days/months/years]");
             this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time% &b%scale%&e.");
             this.put("command-mute-indefinite", "&eYou have muted &b%player% &efor &ban indefinite amount of time&e.");
@@ -234,6 +234,15 @@ public class EnglishLocale implements Locale {
             this.put("command-mute-hours", "hours");
             this.put("command-mute-months", "months");
             this.put("command-mute-years", "years");
+
+            this.put("#34", "Nickname Command");
+            this.put("command-nickname-description", "&8 - &d/nickname &7- Change a display name.");
+            this.put("command-nickname-usage", "&e/nickname <name/player> [name/off]");
+            this.put("command-nickname-success", "&eYour new nickname is: &f%name%&e.");
+            this.put("command-nickname-other", "&b%player%&e's new nickname is: &f%name%&e.");
+            this.put("command-nickname-too-short", "&cThis nickname is too short!");
+            this.put("command-nickname-too-long", "&cThis nickname is too long!");
+            this.put("command-nickname-not-allowed", "&cThis nickname is not allowed!");
         }};
     }
 }

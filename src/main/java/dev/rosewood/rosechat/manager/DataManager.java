@@ -61,6 +61,7 @@ public class DataManager extends AbstractDataManager {
                         String currentChannel = result.getString("current_channel");
                         String color = result.getString("chat_color");
                         long muteTime = result.getLong("mute_time");
+                        String nickname = result.getString("nickname");
                         ChatChannel channel = this.channelManager.getChannel(currentChannel);
 
                         PlayerData playerData = new PlayerData(uuid);
@@ -73,6 +74,7 @@ public class DataManager extends AbstractDataManager {
                         playerData.setCurrentChannel(channel);
                         playerData.setColor(color);
                         playerData.setMuteTime(muteTime);
+                        playerData.setNickname(nickname);
                         channel.add(uuid);
                         this.playerData.put(uuid, playerData);
                         if (muteTime > 0) this.muteTasks.put(uuid, new MuteTask(playerData));
@@ -101,7 +103,8 @@ public class DataManager extends AbstractDataManager {
 
                 if (create) {
                     String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time, nickname) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                         statement.setString(1, playerData.getUuid().toString());
                         statement.setBoolean(2, playerData.hasMessageSpy());
@@ -113,11 +116,12 @@ public class DataManager extends AbstractDataManager {
                         statement.setString(8, playerData.getCurrentChannel().getId());
                         statement.setString(9, playerData.getColor());
                         statement.setLong(10, playerData.getMuteTime());
+                        statement.setString(11, playerData.getNickname());
                         statement.executeUpdate();
                     }
                 } else {
                     String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
-                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ?, chat_color = ?, mute_time = ? " +
+                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
                             "WHERE uuid = ?";
                     try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
                         statement.setBoolean(1, playerData.hasMessageSpy());
@@ -129,7 +133,8 @@ public class DataManager extends AbstractDataManager {
                         statement.setString(7, playerData.getCurrentChannel().getId());
                         statement.setString(8, playerData.getColor());
                         statement.setLong(9, playerData.getMuteTime());
-                        statement.setString(10, playerData.getUuid().toString());
+                        statement.setString(10, playerData.getNickname());
+                        statement.setString(11, playerData.getUuid().toString());
                         statement.executeUpdate();
                     }
                 }

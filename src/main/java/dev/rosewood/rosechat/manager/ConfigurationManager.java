@@ -32,12 +32,16 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         WARN_ON_BLOCKED_SWEAR_SENT("moderation-settings.warn-on-blocked-swear-sent", true, "Should the plugin send a warning message (defined in language.yml) when a player sends a message with a blocked swear in it?"),
         SWEAR_REPLACEMENTS("moderation-settings.swear-replacements", Arrays.asList("fuck:f***", "bitch:dog", "ass:butt"), "If a player sends a message that contains one of these words, then the word will be replaced.", "Format: 'contains:replaced'."),
 
+        NICKNAME_SETTINGS("nickname-settings", null, "Nickname Settings"),
+        MIN_NICKNAME_LENGTH("nickname-settings.min-nickname-length", 3, "The minimum length a nickname can be."),
+        MAX_NICKNAME_LENGTH("nickname-settings.max-nickname-length", 32, "The maximum length a nickname can be."),
+        ALLOW_SPACES_IN_NICKNAMES("nickname-settings.allow-spaces-in-nicknames", true, "Should spaces be allowed in nicknames?"),
+        ALLOW_NONALPHANUMERIC_CHARACTERS_IN_NICKNAMES("nickname-settings.allow-nonalphanumeric-characters", true, "Should non-alphanumeric characters, such as brackets, be allowed in nicknames?"),
+
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         OUTPUT_HOVER_EVENTS("chat-settings.output-hover-events", true, "Should hover events be output to the console?"),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true, "Should players be allowed to message other players on connected servers?"),
         MESSAGE_SOUND("chat-settings.message-sound", Sound.BLOCK_NOTE_BLOCK_PLING.name(), "The sound that will be sent to a player when they receive a message.", "Players can individually disable this in-game with /togglesound.", "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
-        CHAT_PLACEHOLDERS_ENABLED("chat-settings.chat-placeholders-enabled", true, "Should players be able to use PlaceholderAPI placeholders in chat?", "This can allow players to put information in chat, such as their ping or coordinates.", "Players will need a permission per placeholder.", "For example, 'rosechat.placeholder.player_name', allows a player to use %player_name% in chat."),
-        BLACKLISTED_CHAT_PLACEHOLDERS("chat-settings.blacklisted-chat-placeholders", Arrays.asList("Server", "%player_ip%"), "These are PlaceholderAPI placeholders that are not allowed to be used in chat.", "Placeholders that do not include % symbols will blacklist all placeholders from that expansion.", "For example: 'Server' will block all Server placeholders, such as %server_name% and %server_version%"),
         CHAT_REPLACEMENTS("chat-settings.chat-replacements", new RoseSettingSection(
                 new RoseSettingValue("heart", new RoseSettingSection(
                         new RoseSettingValue("text", "<3"),
