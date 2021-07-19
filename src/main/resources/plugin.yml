@@ -5,11 +5,12 @@ website: https://www.spigotmc.org/resources/rosechat/
 main: dev.rosewood.rosechat.RoseChat
 api-version: '1.13'
 softdepend:
+  - Vault
+  - PlaceholderAPI
+  - DiscordSRV
+  - ProtocolLib
   - Essentials
   - LuckPerms
-  - PlaceholderAPI
-  - Vault
-  - DiscordSRV
 commands:
   rosechat:
     aliases: [rc]
@@ -52,6 +53,10 @@ commands:
   nickname:
     aliases: [nick]
     description: Set a nickname.
+  ignore:
+    description: Ignore a player.
+  delmsg:
+    description: Delete a message.
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
@@ -87,6 +92,8 @@ permissions:
       rosechat.group: true
       rosechat.groups: true
       rosechat.nickname: true
+      rosechat.ignore: true
+      rosechat.deletemessages: true
   rosechat.chat:
     description: Allows using chat.
     default: not op
@@ -94,128 +101,128 @@ permissions:
     description: Allows using color codes.
     default: op
     children:
-      - rosechat.color.chat
-      - rosechat.color.message
-      - rosechat.color.channel
-      - rosechat.color.group
-      - rosechat.color.nickname
+      rosechat.color.chat: true
+      rosechat.color.message: true
+      rosechat.color.channel: true
+      rosechat.color.group: true
+      rosechat.color.nickname: true
   rosechat.format:
     description: Allows using formatting codes.
     default: op
     children:
-      - rosechat.format.chat
-      - rosechat.format.message
-      - rosechat.format.channel
-      - rosechat.format.group
-      - rosechat.format.nickname
+      rosechat.format.chat: true
+      rosechat.format.message: true
+      rosechat.format.channel: true
+      rosechat.format.group: true
+      rosechat.format.nickname: true
   rosechat.magic:
     description: Allows using the magic fomatting code.
     default: op
     children:
-      - rosechat.magic.chat
-      - rosechat.magic.message
-      - rosechat.magic.channel
-      - rosechat.magic.group
-      - rosechat.magic.nickname
+      rosechat.magic.chat: true
+      rosechat.magic.message: true
+      rosechat.magic.channel: true
+      rosechat.magic.group: true
+      rosechat.magic.nickname: true
   rosechat.hex:
     description: Allows using hex color codes.
     default: op
     children:
-      - rosechat.hex.chat
-      - rosechat.hex.message
-      - rosechat.hex.channel
-      - rosechat.hex.group
-      - rosechat.hex.nickname
+      rosechat.hex.chat: true
+      rosechat.hex.message: true
+      rosechat.hex.channel: true
+      rosechat.hex.group: true
+      rosechat.hex.nickname: true
   rosechat.gradient:
     description: Allows using the gradient code.
     default: op
     children:
-      - rosechat.gradient.chat
-      - rosechat.gradient.message
-      - rosechat.gradient.channel
-      - rosechat.gradient.group
-      - rosechat.gradient.nickname
+      rosechat.gradient.chat: true
+      rosechat.gradient.message: true
+      rosechat.gradient.channel: true
+      rosechat.gradient.group: true
+      rosechat.gradient.nickname: true
   rosechat.rainbow:
     description: Allows using the rainbow code.
     default: op
     children:
-      - rosechat.rainbow.chat
-      - rosechat.rainbow.message
-      - rosechat.rainbow.channel
-      - rosechat.rainbow.group
-      - rosechat.rainbow.nickname
+      rosechat.rainbow.chat: true
+      rosechat.rainbow.message: true
+      rosechat.rainbow.channel: true
+      rosechat.rainbow.group: true
+      rosechat.rainbow.nickname: true
   rosechat.spam:
     description: Allows bypassing the spam filter.
     default: op
     children:
-      - rosechat.spam.chat
-      - rosechat.spam.message
-      - rosechat.spam.channel
-      - rosechat.spam.group
-      - rosechat.spam.nickname
+      rosechat.spam.chat: true
+      rosechat.spam.message: true
+      rosechat.spam.channel: true
+      rosechat.spam.group: true
+      rosechat.spam.nickname: true
   rosechat.language:
     description: Allows bypassing the language filter.
     default: op
     children:
-      - rosechat.language.chat
-      - rosechat.language.message
-      - rosechat.language.channel
-      - rosechat.language.group
-      - rosechat.language.nickname
+      rosechat.language.chat: true
+      rosechat.language.message: true
+      rosechat.language.channel: true
+      rosechat.language.group: true
+      rosechat.language.nickname: true
   rosechat.caps:
     description: Allows bypassing the caps filter.
     default: op
     children:
-      - rosechat.caps.chat
-      - rosechat.caps.message
-      - rosechat.caps.channel
-      - rosechat.caps.group
-      - rosechat.caps.nickname
+      rosechat.caps.chat: true
+      rosechat.caps.message: true
+      rosechat.caps.channel: true
+      rosechat.caps.group: true
+      rosechat.caps.nickname: true
   rosechat.links:
     description: Allows bypassing the URL filter.
     default: op
     children:
-      - rosechat.links.chat
-      - rosechat.links.message
-      - rosechat.links.channel
-      - rosechat.links.group
-      - rosechat.links.nickname
+      rosechat.links.chat: true
+      rosechat.links.message: true
+      rosechat.links.channel: true
+      rosechat.links.group: true
+      rosechat.links.nickname: true
   rosechat.placeholders:
     description: Allows using placeholders.
     default: op
     children:
-      - rosechat.placeholders.chat
-      - rosechat.placeholders.message
-      - rosechat.placeholders.channel
-      - rosechat.placeholders.group
-      - rosechat.placeholders.nickname
+      rosechat.placeholders.chat: true
+      rosechat.placeholders.message: true
+      rosechat.placeholders.channel: true
+      rosechat.placeholders.group: true
+      rosechat.placeholders.nickname: true
   rosechat.tags:
     description: Allows using tags.
     default: op
     children:
-      - rosechat.tags.chat
-      - rosechat.tags.message
-      - rosechat.tags.channel
-      - rosechat.tags.group
-      - rosechat.tags.nickname
+      rosechat.tags.chat: true
+      rosechat.tags.message: true
+      rosechat.tags.channel: true
+      rosechat.tags.group: true
+      rosechat.tags.nickname: true
   rosechat.replacements:
     description: Allows using replacements.
     default: op
     children:
-      - rosechat.replacements.chat
-      - rosechat.replacements.message
-      - rosechat.replacements.channel
-      - rosechat.replacements.group
-      - rosechat.replacements.nickname
+      rosechat.replacements.chat: true
+      rosechat.replacements.message: true
+      rosechat.replacements.channel: true
+      rosechat.replacements.group: true
+      rosechat.replacements.nickname: true
   rosechat.emojis:
     description: Allows using emojis.
     default: op
     children:
-      - rosechat.emojis.chat
-      - rosechat.emojis.message
-      - rosechat.emojis.channel
-      - rosechat.emojis.group
-      - rosechat.emojis.nickname
+      rosechat.emojis.chat: true
+      rosechat.emojis.message: true
+      rosechat.emojis.channel: true
+      rosechat.emojis.group: true
+      rosechat.emojis.nickname: true
   rosechat.message:
     description: Allows using the message command.
     default: op
@@ -318,3 +325,11 @@ permissions:
   rosechat.nickname.others:
     description: Allows setting the nickname of another player.
     default: op
+  rosechat.deletemessages:
+    description: Allows players to delete messages
+    default: op
+    children:
+      rosechat.deletemessages.client: true
+      rosechat.deletemessages.self: true
+      rosechat.deletemessages.others: true
+      rosechat.deletemessages.see: true

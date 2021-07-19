@@ -201,7 +201,7 @@ public class EnglishLocale implements Locale {
             this.put("command-gc-members-member", "&8- &b%player%");
 
             this.put("#30", "Group Chat Rename Command");
-            this.put("command-gc-rename-description", "&8- &b/gc rename &7- Renames your group chat.");
+            this.put("command-gc-rename-description", "&8 - &b/gc rename &7- Renames your group chat.");
             this.put("command-gc-rename-usage", "&e/gc rename");
             this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&e.");
 
@@ -243,6 +243,12 @@ public class EnglishLocale implements Locale {
             this.put("command-nickname-too-short", "&cThis nickname is too short!");
             this.put("command-nickname-too-long", "&cThis nickname is too long!");
             this.put("command-nickname-not-allowed", "&cThis nickname is not allowed!");
+
+            this.put("#35", "Ignore Command");
+            this.put("command-ignore-description", "&8 - &d/ignore &7- Stops you from seeing a player's messages.");
+            this.put("command-ignore-usage", "&e/ignore <player>");
+            this.put("command-ignore-ignored", "&eYou are now ignoring &b%player%&e.");
+            this.put("command-ignore-unignored", "&eYou are no longer ignoring &b%player%&e.");
         }};
     }
 }

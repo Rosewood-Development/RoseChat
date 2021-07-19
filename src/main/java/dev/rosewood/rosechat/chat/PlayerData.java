@@ -26,6 +26,7 @@ public class PlayerData {
     private String color;
     private String nickname;
     private List<GroupChat> groupInvites;
+    private List<UUID> ignoringPlayers;
 
     /**
      * Creates a new PlayerData for a specific player.
@@ -41,6 +42,7 @@ public class PlayerData {
         this.color = "&f";
         this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
+        this.ignoringPlayers = new ArrayList<>();
     }
 
     /**
@@ -54,7 +56,7 @@ public class PlayerData {
      * Gets the UUID of the player who owns this player data.
      * @return The UUID.
      */
-    public UUID getUuid() {
+    public UUID getUUID() {
         return this.uuid;
     }
 
@@ -246,6 +248,7 @@ public class PlayerData {
      * Gets the current nickname of the player.
      * This includes gradients, emojis, tags, etc.
      * Use {@link Player#getDisplayName} for the formatted name
+     *
      * @return The current nickname of the player.
      */
     public String getNickname() {
@@ -273,5 +276,40 @@ public class PlayerData {
      */
     public void inviteToGroup(GroupChat groupChat) {
         this.groupInvites.add(groupChat);
+    }
+
+    /**
+     * @return A list of UUIDs of players that the player is ignoring.
+     */
+    public List<UUID> getIgnoringPlayers() {
+        return this.ignoringPlayers;
+    }
+
+    /**
+     * Ignores a player.
+     * @param target The player to ignore.
+     */
+    public void ignore(UUID target) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        this.ignoringPlayers.add(target);
+
+        // PlayerData targetData = api.getPlayerData(target);
+        // targetData.ignoredByPlayers.add(this.uuid);
+
+        api.getDataManager().addIgnore(this.getUUID(), target);
+    }
+
+    /**
+     * Stops ignoring a player.
+     * @param target The player to ignore.
+     */
+    public void unignore(UUID target) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        this.ignoringPlayers.remove(target);
+
+        // PlayerData targetData = api.getPlayerData(target);
+        // targetData.ignoredByPlayers.remove(this.uuid);
+
+        api.getDataManager().removeIgnore(this.getUUID(), target);
     }
 }

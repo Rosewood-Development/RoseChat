@@ -3,6 +3,7 @@ package dev.rosewood.rosechat;
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.HelpCommand;
+import dev.rosewood.rosechat.command.IgnoreCommand;
 import dev.rosewood.rosechat.command.MessageCommand;
 import dev.rosewood.rosechat.command.MuteCommand;
 import dev.rosewood.rosechat.command.NicknameCommand;
@@ -21,6 +22,7 @@ import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
+import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
 import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
 import dev.rosewood.rosechat.command.group.GroupCommandManager;
@@ -34,6 +36,7 @@ import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordListener;
+import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
@@ -83,6 +86,8 @@ public class RoseChat extends RosePlugin {
         CommandManager groupChatMessageCommand = new CommandManager(new MessageGroupCommand());
         CommandManager muteCommand = new CommandManager(new MuteCommand());
         CommandManager nicknameCommand = new CommandManager(new NicknameCommand());
+        CommandManager ignoreCommand = new CommandManager(new IgnoreCommand());
+        CommandManager deleteMessageCommand = new CommandManager(new DeleteMessageCommand());
 
         GroupCommandManager groupCommand = (GroupCommandManager) new GroupCommandManager("gc", "/gc help")
                 .addSubcommand(new CreateGroupCommand())
@@ -110,11 +115,13 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(toggleSoundCommand)
                 .addCommandManager(toggleEmojiCommand)
                 .addCommandManager(chatColorCommand)
+                .addCommandManager(ignoreCommand)
                 .addCommandManager(muteCommand)
                 .addCommandManager(channelCommand)
                 .addCommandManager(chatCommand)
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
+                .addCommandManager(deleteMessageCommand)
                 .addSubcommand(new HelpCommand(this))
                 .addSubcommand(new ReloadCommand());
 
@@ -175,6 +182,10 @@ public class RoseChat extends RosePlugin {
         if (pluginManager.getPlugin("DiscordSRV") != null) {
             this.discord = DiscordSRV.getPlugin();
             DiscordSRV.api.subscribe(new DiscordListener());
+        }
+
+        if (pluginManager.getPlugin("ProtocolLib") != null) {
+            new PacketListener(this);
         }
     }
 

@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.api;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -115,6 +116,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         if (this.mainCommand != null) {
             List<String> original = this.mainCommand.onTabComplete(sender, args);
             if (original == null) return tab;
+            if (this.mainCommand.getPermission() != null && !sender.hasPermission(this.mainCommand.getPermission())) return tab;
             StringUtil.copyPartialMatches(args[args.length - 1], original, tab);
             return tab;
         }
@@ -134,11 +136,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
         List<String> temp;
 
-        for (AbstractCommand subcommands : this.subcommands) {
-            if (!subcommands.getLabels().contains(args[0].toLowerCase())) continue;
-            if (subcommands.getPermission() != null && !sender.hasPermission(subcommands.getPermission())) continue;
-            if (!subcommands.isPlayerOnly() && !(sender instanceof Player)) continue;
-            temp = subcommands.onTabComplete(sender, truncateArgs(args));
+        for (AbstractCommand subcommand : this.subcommands) {
+            if (!subcommand.getLabels().contains(args[0].toLowerCase())) continue;
+            if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
+            if (!subcommand.isPlayerOnly() && !(sender instanceof Player)) continue;
+            temp = subcommand.onTabComplete(sender, truncateArgs(args));
 
             if (temp == null) return new ArrayList<>();
 

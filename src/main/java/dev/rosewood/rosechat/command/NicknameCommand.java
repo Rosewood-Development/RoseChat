@@ -17,7 +17,7 @@ import java.util.List;
 public class NicknameCommand extends AbstractCommand {
 
     public NicknameCommand() {
-        super(false, "nickname");
+        super(false, "nickname", "nick");
     }
 
     @Override

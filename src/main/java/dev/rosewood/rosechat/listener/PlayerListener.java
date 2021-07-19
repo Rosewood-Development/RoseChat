@@ -5,10 +5,12 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -58,5 +60,12 @@ public class PlayerListener implements Listener {
         this.dataManager.getPlayerData(player.getUniqueId()).save();
         this.dataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
         this.dataManager.unloadPlayerData(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onCommandSend(PlayerCommandSendEvent event) {
+        // Don't send the delete message command, as it shouldn't be used by players.
+        event.getCommands().remove("delmsg");
+        event.getCommands().remove("rosechat:delmsg");
     }
 }

@@ -1,10 +1,14 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
@@ -60,28 +64,10 @@ public class MessageUtils {
         return caps > ConfigurationManager.Setting.MAXIMUM_CAPS_ALLOWED.getInt();
     }
 
-    /*public static void sendStandardMessage(CommandSender sender, MessageWrapperOld messageWrapperOld, ChatChannel channel) {
-        sendStandardMessage(sender, messageWrapperOld, channel, true);
+    public static boolean isMessageEmpty(String message) {
+        String colorified = HexUtils.colorify(message);
+        return ChatColor.stripColor(colorified).isEmpty();
     }
-
-    public static void sendStandardMessage(CommandSender sender, MessageWrapperOld messageWrapperOld, ChatChannel channel, boolean sendToConsole) {
-        if (messageWrapperOld.isEmpty()) return;
-        if (messageWrapperOld.isBlocked()) {
-            if (messageWrapperOld.getFilterType() != null) messageWrapperOld.getFilterType().sendWarning(sender);
-            return;
-        }
-
-        for (UUID recieverUuid : channel.getPlayers()) {
-            Player receiver = Bukkit.getPlayer(recieverUuid);
-            if (receiver == null) continue;
-            messageWrapperOld.parse(channel.getFormatId(), receiver);
-            messageWrapperOld.send(receiver);
-        }
-
-        if (sendToConsole) messageWrapperOld.send(Bukkit.getConsoleSender());
-        messageWrapperOld.tagPlayers();
-    }*/
-
 
     public static void sendPrivateMessage(CommandSender sender, String targetName, String message) {
         Player target = Bukkit.getPlayer(targetName);
@@ -92,13 +78,24 @@ public class MessageUtils {
         MessageWrapper receivedMessage = new MessageWrapper(messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
         MessageWrapper spyMessage = new MessageWrapper("[Spy] " + messageSender.getName() + " -> " + messageTarget.getName(), messageSender, message);
 
+        if (sender instanceof Player) {
+            OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
+            if (offlineTarget != null) {
+                PlayerData targetData = RoseChatAPI.getInstance().getDataManager().getPlayerData(offlineTarget.getUniqueId());
+                if (targetData != null && targetData.getIgnoringPlayers().contains(((Player) sender).getUniqueId())) {
+                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
+                    return;
+                }
+            }
+        }
+
         sender.spigot().sendMessage(sentMessage.getComponents());
         if (target == null) {
             if (targetName.equalsIgnoreCase("Console")) {
                 Bukkit.getConsoleSender().spigot().sendMessage(sentMessage.getComponents());
                 return;
             }
-            BungeeListener.sendDirectMessage(targetName, ComponentSerializer.toString(receivedMessage.getComponents()));
+            BungeeListener.sendDirectMessage(messageSender.getUUID(), targetName, ComponentSerializer.toString(receivedMessage.getComponents()));
         } else {
             target.spigot().sendMessage(receivedMessage.getComponents());
         }

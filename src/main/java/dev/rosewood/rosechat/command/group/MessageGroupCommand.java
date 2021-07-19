@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -42,8 +43,7 @@ public class MessageGroupCommand extends AbstractCommand {
 
         String message = getAllArgs(1, args);
 
-        String colorified = HexUtils.colorify(message);
-        if (ChatColor.stripColor(colorified).isEmpty()) {
+        if (MessageUtils.isMessageEmpty(message)) {
             this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
             return;
         }

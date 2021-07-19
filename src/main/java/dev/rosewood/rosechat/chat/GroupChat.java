@@ -32,7 +32,7 @@ public class GroupChat implements GroupReceiver {
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                this.sendToPlayer(messageWrapper, player);
             }
         }
 

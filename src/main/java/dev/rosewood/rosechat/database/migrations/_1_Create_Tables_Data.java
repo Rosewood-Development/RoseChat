@@ -28,7 +28,7 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "current_channel VARCHAR(255) NOT NULL, " +
                     "chat_color VARCHAR(32) NOT NULL, " +
                     "mute_time BIGINT NOT NULL, " +
-                    "nickname VARCHAR(255) NOT NULL" +
+                    "nickname VARCHAR(255)" +
                     ")");
 
             statement.execute("CREATE TABLE " + tablePrefix + "group_chat (" +
@@ -42,6 +42,11 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "group_chat INTEGER NOT NULL, " +
                     "uuid VARCHAR(36) NOT NULL, " +
                     "UNIQUE (group_chat, uuid)" +
+                    ")");
+
+            statement.execute("CREATE TABLE " + tablePrefix + "player_data_ignore (" +
+                    "ignoring_uuid VARCHAR(36) NOT NULL, " +
+                    "ignored_uuid VARCHAR(36) NOT NULL" +
                     ")");
         }
     }

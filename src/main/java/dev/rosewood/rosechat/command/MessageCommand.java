@@ -55,8 +55,7 @@ public class MessageCommand extends AbstractCommand {
             return;
         }
 
-        String colorified = HexUtils.colorify(message);
-        if (ChatColor.stripColor(colorified).isEmpty()) {
+        if (MessageUtils.isMessageEmpty(message)) {
             this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
             return;
         }

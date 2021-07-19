@@ -9,10 +9,12 @@ public class MessageLog {
 
     private UUID sender;
     private List<String> messages;
+    private List<DeletableMessage> deletableMessages;
     private int cleanupAmount;
 
     public MessageLog(UUID sender) {
         this.messages = new ArrayList<>();
+        this.deletableMessages = new ArrayList<>();
     }
 
     public MessageLog(UUID sender, boolean doCleanup) {
@@ -74,6 +76,14 @@ public class MessageLog {
 
     public void setMessages(List<String> messages) {
         this.messages = messages;
+    }
+
+    public List<DeletableMessage> getDeletableMessages() {
+        return this.deletableMessages;
+    }
+
+    public void addDeletableMessage(DeletableMessage deletableMessage) {
+        this.deletableMessages.add(deletableMessage);
     }
 
     public int getCleanupAmount() {

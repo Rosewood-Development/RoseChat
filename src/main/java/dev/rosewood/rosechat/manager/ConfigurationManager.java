@@ -136,6 +136,10 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         GROUP_FORMAT("chat-formats.group", "{group}{player}{extra}{message}", "The format of a group message."),
         GROUP_SPY_FORMAT("chat-formats.group-spy", "{spy-prefix}{group}{player}{extra}{message}", "The format of a spied group message."),
         CHANNEL_SPY_FORMAT("chat-formats.channel-spy", "{spy-prefix}{world}{player}{extra}{message}", "The format of a spied world message."),
+        DELETE_CLIENT_MESSAGES_FORMAT("chat-formats.delete-client-messages", "{delete-client}", "WIP"),
+        DELETE_OWN_MESSAGES_FORMAT("chat-formats.delete-own-messages", "{delete-own}", "WIP"),
+        DELETE_OTHER_MESSAGES_FORMAT("chat-formats.delete-other-messages", "{delete-other}", "WIP"),
+        DELETED_MESSAGE_FORMAT("chat-formats.deleted-message-format", "{deleted-message}", "WIP"),
         MINECRAFT_TO_DISCORD_FORMAT("chat-formats.minecraft-to-discord", "{}", "WIP"),
         DISCORD_TO_MINECRAFT_FORMAT("chat-formats.discord-to-minecraft", "{discord}{extra}{message}", "WIP");
 

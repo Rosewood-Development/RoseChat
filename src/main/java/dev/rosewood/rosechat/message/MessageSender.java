@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.UUID;
 
 /**
  * Class for managing 'fake' players and console messages.
@@ -50,7 +51,7 @@ public class MessageSender {
     }
 
     public boolean isConsole() {
-        return this.name.equalsIgnoreCase("console");
+        return this.player == null;
     }
 
     public boolean send(String message) {
@@ -79,6 +80,11 @@ public class MessageSender {
 
     public Player asPlayer() {
         if (this.isPlayer()) return this.player;
+        else return null;
+    }
+
+    public UUID getUUID() {
+        if (this.isPlayer()) return this.player.getUniqueId();
         else return null;
     }
 

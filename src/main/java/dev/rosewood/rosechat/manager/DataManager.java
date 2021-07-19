@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +23,7 @@ public class DataManager extends AbstractDataManager {
     private Map<UUID, PlayerData> playerData;
     private Map<UUID, MuteTask> muteTasks;
     private Map<String, List<String>> bungeePlayers;
+    private List<DeletableMessage> deletableMessageLog;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -28,6 +31,7 @@ public class DataManager extends AbstractDataManager {
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
         this.muteTasks = new HashMap<>();
         this.bungeePlayers = new HashMap<>();
+        this.deletableMessageLog = new ArrayList<>();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -46,6 +50,8 @@ public class DataManager extends AbstractDataManager {
 
         this.async(() -> {
             this.databaseConnector.connect(connection -> {
+                PlayerData playerData;
+
                 String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
                 try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                     statement.setString(1, uuid.toString());
@@ -64,7 +70,7 @@ public class DataManager extends AbstractDataManager {
                         String nickname = result.getString("nickname");
                         ChatChannel channel = this.channelManager.getChannel(currentChannel);
 
-                        PlayerData playerData = new PlayerData(uuid);
+                        playerData = new PlayerData(uuid);
                         playerData.setMessageSpy(messageSpy);
                         playerData.setChannelSpy(channelSpy);
                         playerData.setGroupSpy(groupSpy);
@@ -80,9 +86,20 @@ public class DataManager extends AbstractDataManager {
                         if (muteTime > 0) this.muteTasks.put(uuid, new MuteTask(playerData));
                         callback.accept(playerData);
                     } else {
-                        PlayerData playerData = new PlayerData(uuid);
+                        playerData = new PlayerData(uuid);
                         this.playerData.put(uuid, playerData);
                         callback.accept(playerData);
+                    }
+                }
+
+                String ignoreQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(ignoreQuery)) {
+                    statement.setString(1, uuid.toString());
+                    ResultSet result = statement.executeQuery();
+
+                    if (result.next()) {
+                        UUID ignored = UUID.fromString(result.getString("ignored_uuid"));
+                        playerData.ignore(ignored);
                     }
                 }
             });
@@ -96,7 +113,7 @@ public class DataManager extends AbstractDataManager {
 
                 String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
                 try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
-                    statement.setString(1, playerData.getUuid().toString());
+                    statement.setString(1, playerData.getUUID().toString());
                     ResultSet result = statement.executeQuery();
                     create = !result.next();
                 }
@@ -106,7 +123,7 @@ public class DataManager extends AbstractDataManager {
                             "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time, nickname) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                        statement.setString(1, playerData.getUuid().toString());
+                        statement.setString(1, playerData.getUUID().toString());
                         statement.setBoolean(2, playerData.hasMessageSpy());
                         statement.setBoolean(3, playerData.hasChannelSpy());
                         statement.setBoolean(4, playerData.hasGroupSpy());
@@ -134,9 +151,36 @@ public class DataManager extends AbstractDataManager {
                         statement.setString(8, playerData.getColor());
                         statement.setLong(9, playerData.getMuteTime());
                         statement.setString(10, playerData.getNickname());
-                        statement.setString(11, playerData.getUuid().toString());
+                        statement.setString(11, playerData.getUUID().toString());
                         statement.executeUpdate();
                     }
+                }
+            });
+        });
+    }
+
+    public void addIgnore(UUID ignoring, UUID ignored) {
+        this.async(() -> {
+            this.getDatabaseConnector().connect(connection -> {
+                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data_ignore (ignoring_uuid, ignored_uuid) " +
+                        "VALUES(?, ?)";
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                    statement.setString(1, ignoring.toString());
+                    statement.setString(2, ignored.toString());
+                    statement.executeUpdate();
+                }
+            });
+        });
+    }
+
+    public void removeIgnore(UUID ignoring, UUID ignored) {
+        this.async(() -> {
+            this.getDatabaseConnector().connect(connection -> {
+                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ? AND ignored_uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                    statement.setString(1, ignoring.toString());
+                    statement.setString(2, ignored.toString());
+                    statement.executeUpdate();
                 }
             });
         });
@@ -157,7 +201,7 @@ public class DataManager extends AbstractDataManager {
     public List<UUID> getMessageSpies() {
         List<UUID> spies = new ArrayList<>();
         for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasMessageSpy()) spies.add(data.getUuid());
+            if (data.hasMessageSpy()) spies.add(data.getUUID());
         }
 
         return spies;
@@ -166,7 +210,7 @@ public class DataManager extends AbstractDataManager {
     public List<UUID> getChannelSpies() {
         List<UUID> spies = new ArrayList<>();
         for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasChannelSpy()) spies.add(data.getUuid());
+            if (data.hasChannelSpy()) spies.add(data.getUUID());
         }
 
         return spies;
@@ -175,7 +219,7 @@ public class DataManager extends AbstractDataManager {
     public List<UUID> getGroupSpies() {
         List<UUID> spies = new ArrayList<>();
         for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasGroupSpy()) spies.add(data.getUuid());
+            if (data.hasGroupSpy()) spies.add(data.getUUID());
         }
 
         return spies;
@@ -191,5 +235,9 @@ public class DataManager extends AbstractDataManager {
 
     public List<String> getPlayersOnServer(String server) {
         return this.bungeePlayers.get(server);
+    }
+
+    public List<DeletableMessage> getDeletableMessageLog() {
+        return this.deletableMessageLog;
     }
 }

@@ -16,6 +16,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
 
@@ -39,6 +40,7 @@ public class BungeeListener implements PluginMessageListener {
             String[] commandInfoSplit = commandInfo.split(":");
             String namespace = commandInfoSplit[0];
             String command = commandInfoSplit.length > 1 ? commandInfoSplit[1] : null;
+            String additional = commandInfoSplit.length > 2 ? commandInfoSplit[2] : null;
 
             if (command == null && commandInfo.equalsIgnoreCase("PlayerList")) {
                 String server = in.readUTF();
@@ -54,11 +56,16 @@ public class BungeeListener implements PluginMessageListener {
 
             if (!namespace.equalsIgnoreCase("rosechat")) return;
             if (command.equalsIgnoreCase("message_player")) {
-                player.spigot().sendMessage(ComponentSerializer.parse(received));
+                PlayerData playerData = this.dataManager.getPlayerData(player.getUniqueId());
+                if (additional == null || !playerData.getIgnoringPlayers().contains(UUID.fromString(additional))) {
+                    player.spigot().sendMessage(ComponentSerializer.parse(received));
+                }
             } else if (command.equalsIgnoreCase("update_reply")) {
                 PlayerData playerData = this.plugin.getManager(DataManager.class).getPlayerData(player.getUniqueId());
-                playerData.setReplyTo(received);
-                playerData.save();
+                if (playerData != null) {
+                    playerData.setReplyTo(received);
+                    playerData.save();
+                }
             } else {
                 ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(command);
                 chatChannel.sendJson(received);
@@ -91,14 +98,14 @@ public class BungeeListener implements PluginMessageListener {
         }
     }
 
-    public static void sendDirectMessage(String playerName, String message) {
+    public static void sendDirectMessage(UUID sender, String playerName, String message) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF("ForwardToPlayer");
             out.writeUTF(playerName);
-            out.writeUTF("rosechat:message_player");
+            out.writeUTF("rosechat:message_player:" + sender.toString());
 
             ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
             DataOutputStream msgOut = new DataOutputStream(msgBytes);

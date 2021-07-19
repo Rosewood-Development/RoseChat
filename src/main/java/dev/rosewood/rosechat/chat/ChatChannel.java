@@ -80,7 +80,7 @@ public class ChatChannel implements GroupReceiver {
 
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                this.sendToPlayer(messageWrapper, player);
             }
 
             return;
@@ -92,7 +92,7 @@ public class ChatChannel implements GroupReceiver {
             if (playerLocation.getWorld() == null) return;
             for (Player player : playerLocation.getWorld().getPlayers()) {
                 if (player.getLocation().distance(playerLocation) < this.radius) {
-                    player.spigot().sendMessage(messageWrapper.getComponents());
+                    this.sendToPlayer(messageWrapper, player);
                 }
             }
 
@@ -104,7 +104,7 @@ public class ChatChannel implements GroupReceiver {
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                this.sendToPlayer(messageWrapper, player);
             }
         }
 
@@ -115,12 +115,13 @@ public class ChatChannel implements GroupReceiver {
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                this.sendToPlayer(messageWrapper, player);
             }
         }
 
         if (messageWrapper.getSender().isPlayer() && !this.players.contains(messageWrapper.getSender().asPlayer().getUniqueId())) {
-            messageWrapper.getSender().asPlayer().spigot().sendMessage(messageWrapper.getComponents());
+            Player player = messageWrapper.getSender().asPlayer();
+            this.sendToPlayer(messageWrapper, player);
         }
 
         ComponentBuilder builder = new ComponentBuilder("[Spy] ");

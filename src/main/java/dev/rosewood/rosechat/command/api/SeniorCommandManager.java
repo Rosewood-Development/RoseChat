@@ -62,7 +62,7 @@ public class SeniorCommandManager extends CommandManager {
     @Override
     public void sendHelpMessage(CommandSender sender) {
         this.localeManager.sendCustomMessage(sender, "&eRunning <g:#8A2387:#E94057:#F27121>RoseChat &ev" + RoseChat.getInstance().getDescription().getVersion());
-        this.localeManager.sendCustomMessage(sender, "&ePlugin created by: <g:#e98df4:#41e0f0>Lilac &7& <g:#41e0f0:#ff8dce>Esophose");
+        this.localeManager.sendCustomMessage(sender, "&ePlugin created by: <g:#e98df4:#41e0f0>Lilac &e& <g:#41e0f0:#ff8dce>Esophose");
         this.localeManager.sendCustomMessage(sender, "&eUse &b/rc help &efor command information.");
     }
 

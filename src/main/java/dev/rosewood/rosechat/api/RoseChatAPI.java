@@ -321,7 +321,7 @@ public class RoseChatAPI {
      * @return An instance of the data manager.
      */
     public DataManager getDataManager() {
-        return dataManager;
+        return this.dataManager;
     }
 
     /**
