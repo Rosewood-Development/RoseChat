@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -51,6 +50,7 @@ public class GroupManager extends Manager {
     public void loadMemberGroupChats(UUID member) {
         this.async(() -> {
             this.dataManager.getDatabaseConnector().connect(connection -> {
+                List<GroupChat> gcs = new ArrayList<>();
 
                 String groupQuery = "SELECT * FROM " + this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
                         this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gcm.uuid = ?";
@@ -58,8 +58,8 @@ public class GroupManager extends Manager {
                     statement.setString(1, member.toString());
                     ResultSet result = statement.executeQuery();
 
-                    while (result.next()) {
-
+                    if (result.next()) {
+                        GroupChat gc = new GroupChat(result.getString("id"));
                     }
                 }
             });

@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
-import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -18,7 +17,6 @@ import github.scarsz.discordsrv.DiscordSRV;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.spigotmc.SpigotConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

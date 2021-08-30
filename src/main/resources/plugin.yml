@@ -61,6 +61,7 @@ permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
     children:
+      rosechat.reload: true
       rosechat.color: true
       rosechat.hex: true
       rosechat.rainbow: true
@@ -94,6 +95,9 @@ permissions:
       rosechat.nickname: true
       rosechat.ignore: true
       rosechat.deletemessages: true
+  rosechat.reload:
+    description: Allows using the reload command.
+    default: op
   rosechat.chat:
     description: Allows using chat.
     default: not op

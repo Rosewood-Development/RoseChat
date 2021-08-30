@@ -91,7 +91,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
         }
 
-        this.localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.mainSyntax));
+        //this.localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.mainSyntax));
         return true;
     }
 

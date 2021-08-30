@@ -64,6 +64,15 @@ public class ChatChannel implements GroupReceiver {
             return;
         }
 
+        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
+        builder.append(messageWrapper.getComponents());
+        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
+            if (!this.players.contains(uuid)) {
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(builder.create());
+            }
+        }
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         if (api.getDiscord() != null) {
             TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
@@ -80,6 +89,7 @@ public class ChatChannel implements GroupReceiver {
 
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 this.sendToPlayer(messageWrapper, player);
             }
 
@@ -104,6 +114,7 @@ public class ChatChannel implements GroupReceiver {
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 this.sendToPlayer(messageWrapper, player);
             }
         }
@@ -115,6 +126,7 @@ public class ChatChannel implements GroupReceiver {
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 this.sendToPlayer(messageWrapper, player);
             }
         }
@@ -122,15 +134,6 @@ public class ChatChannel implements GroupReceiver {
         if (messageWrapper.getSender().isPlayer() && !this.players.contains(messageWrapper.getSender().asPlayer().getUniqueId())) {
             Player player = messageWrapper.getSender().asPlayer();
             this.sendToPlayer(messageWrapper, player);
-        }
-
-        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
-        builder.append(messageWrapper.getComponents());
-        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
-            if (!this.players.contains(uuid)) {
-                Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null) spy.spigot().sendMessage(builder.create());
-            }
         }
     }
 
@@ -142,9 +145,15 @@ public class ChatChannel implements GroupReceiver {
 
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(components);
             }
 
+            return;
+        }
+
+        if (this.getRadius() > 0) {
+            // hmm...
             return;
         }
 
@@ -153,6 +162,7 @@ public class ChatChannel implements GroupReceiver {
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(components);
             }
         }
@@ -164,6 +174,7 @@ public class ChatChannel implements GroupReceiver {
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(components);
             }
         }
@@ -172,6 +183,7 @@ public class ChatChannel implements GroupReceiver {
     public void sendFromDiscord(MessageWrapper messageWrapper) {
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(messageWrapper.getComponents());
             }
 
@@ -183,6 +195,7 @@ public class ChatChannel implements GroupReceiver {
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(messageWrapper.getComponents());
             }
         }
@@ -194,6 +207,7 @@ public class ChatChannel implements GroupReceiver {
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(messageWrapper.getComponents());
             }
         }

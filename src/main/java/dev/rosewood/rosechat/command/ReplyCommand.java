@@ -4,14 +4,15 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ReplyCommand extends AbstractCommand {
 
@@ -60,16 +61,26 @@ public class ReplyCommand extends AbstractCommand {
         }
 
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(target);
+        AtomicBoolean canBeMessaged = new AtomicBoolean(true);
         this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (targetPlayer != null && data != null) {
-                if (!data.canBeMessaged()) {
+                if (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer())) {
                     this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
+                    canBeMessaged.set(false);
                     return;
                 }
             }
         });
 
+        if (!canBeMessaged.get()) return;
+
         MessageUtils.sendPrivateMessage(sender, target, message);
+
+        PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
+        if (targetData.hasMessageSounds() && targetPlayer.isOnline() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
+            Player tPlayer = (Player) targetPlayer;
+            tPlayer.playSound(tPlayer.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
+        }
     }
 
     @Override

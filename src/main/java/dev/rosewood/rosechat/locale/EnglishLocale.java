@@ -79,7 +79,7 @@ public class EnglishLocale implements Locale {
 
             this.put("#10", "ToggleSound Command");
             this.put("command-togglesound-description", "&8 - &d/togglesound &7- Toggles message and tag sounds.");
-            this.put("command-togglesound-usage", "&e/togglesound <message/tag/all>");
+            this.put("command-togglesound-usage", "&e/togglesound <messages/tags/all>");
             this.put("command-togglesound-on", "&eYou have &aenabled &esounds when receiving &b%type%&e.");
             this.put("command-togglesound-off", "&eYou have &cdisabled &esounds when receiving &b%type%&e.");
             this.put("command-togglesound-messages", "messages");
@@ -220,7 +220,7 @@ public class EnglishLocale implements Locale {
             this.put("command-mute-description", "&8 - &d/mute &7- Mute a player.");
             this.put("command-mute-usage", "&e/mute <player> [time] [days/months/years]");
             this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time% &b%scale%&e.");
-            this.put("command-mute-indefinite", "&eYou have muted &b%player% &efor &ban indefinite amount of time&e.");
+            this.put("command-mute-indefinite", "an indefinite amount of time");
             this.put("command-mute-muted", "&eYou have been muted.");
             this.put("command-mute-cannot-send", "&cYou can not send a message while you are muted!");
             this.put("command-mute-unmuted", "&eYou are no longer muted.");

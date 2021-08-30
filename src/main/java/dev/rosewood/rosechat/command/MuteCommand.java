@@ -36,7 +36,7 @@ public class MuteCommand extends AbstractCommand {
         int muteTime = -1;
         if (args.length == 1)
         {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-indefinite");
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", target.getName()));
             this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
             targetData.setMuteTime(-1);
             targetData.save();
@@ -70,7 +70,7 @@ public class MuteCommand extends AbstractCommand {
                     case "year":
                     case "years":
                         if (outTime > 1000) {
-                            outScale = this.getAPI().getLocaleManager().getLocaleMessage("command-mute-indefinite");
+                            outScale = "indefinite";
                         } else {
                             outScale = outTime == 1 ? "year" : "years";
                             muteTime = (outTime * 364) * 86400;
@@ -90,6 +90,7 @@ public class MuteCommand extends AbstractCommand {
                 StringPlaceholders.builder("player", target.getDisplayName())
                         .addPlaceholder("time", outTime)
                         .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
+
         this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
 
         if (muteTime > 0) {

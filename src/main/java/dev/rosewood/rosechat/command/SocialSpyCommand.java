@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

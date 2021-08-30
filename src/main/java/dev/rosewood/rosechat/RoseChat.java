@@ -122,8 +122,8 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
                 .addCommandManager(deleteMessageCommand)
-                .addSubcommand(new HelpCommand(this))
-                .addSubcommand(new ReloadCommand());
+                .addSubcommand(new ReloadCommand())
+                .addSubcommand(new HelpCommand(this));
 
         // Register Listeners
         pluginManager.registerEvents(new ChatListener(this), this);

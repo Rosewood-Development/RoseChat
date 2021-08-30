@@ -19,11 +19,15 @@ public class HelpCommand extends AbstractCommand {
     public void onCommand(CommandSender sender, String[] args) {
         this.getAPI().getLocaleManager().sendMessage(sender, "command-help-title");
         for (CommandManager manager : this.plugin.getCommandManager().getCommandManagers()) {
+            if (manager.getMainCommandLabel().equalsIgnoreCase("delmsg")) continue;
+
             if (manager.getMainCommand() == null) {
                 String label = manager.getMainCommandLabel();
                 this.getAPI().getLocaleManager().sendCustomMessage(sender,
                         this.getAPI().getLocaleManager().getLocaleMessage("command-" + label + "-description"));
             } else {
+                if (!sender.hasPermission(manager.getMainCommand().getPermission())) continue;
+
                 AbstractCommand command = manager.getMainCommand();
                 String label = command.getLabels().get(0);
                 this.getAPI().getLocaleManager().sendCustomMessage(sender, this.getAPI().getLocaleManager().getLocaleMessage("command-" + label + "-description"));

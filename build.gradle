@@ -32,10 +32,10 @@ repositories {
 }
 
 dependencies {
-    api 'dev.rosewood:rosegarden:1.0.7-SNAPSHOT'
+    api 'dev.rosewood:rosegarden:1.0.7'
 
-    compileOnly 'org.spigotmc:spigot:1.17:remapped-mojang'
-    compileOnly 'me.clip:placeholderapi:2.10.9'
+    compileOnly 'org.spigotmc:spigot:1.17.1:remapped-mojang'
+    compileOnly 'me.clip:placeholderapi:2.10.10'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
     compileOnly 'com.discordsrv:discordsrv:1.23.0'
     compileOnly 'net.dv8tion:JDA:4.2.1_262'
