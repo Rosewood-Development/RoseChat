@@ -53,15 +53,13 @@ public class PlayerData {
     }
 
     /**
-     * Gets the UUID of the player who owns this player data.
-     * @return The UUID.
+     * @return The UUID of the player who owns this player data.
      */
     public UUID getUUID() {
         return this.uuid;
     }
 
     /**
-     * Gets the message log.
      * @return The message log.
      */
     public MessageLog getMessageLog() {
@@ -69,7 +67,6 @@ public class PlayerData {
     }
 
     /**
-     * Gets who the player is replying to.
      * @return The player to reply to.
      */
     public String getReplyTo() {
@@ -85,7 +82,6 @@ public class PlayerData {
     }
 
     /**
-     * Whether or not the player has message spy enabled.
      * @return True if the player has message spy enabled.
      */
     public boolean hasMessageSpy() {
@@ -93,15 +89,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has message spy enabled.
-     * @param messageSpy Whether or not the player has message spy enabled.
+     * @param messageSpy Whether the player has message spy enabled.
      */
     public void setMessageSpy(boolean messageSpy) {
         this.messageSpy = messageSpy;
     }
 
     /**
-     * Whether or not the player has channel spy enabled.
      * @return True if the player has channel spy enabled.
      */
     public boolean hasChannelSpy() {
@@ -109,15 +103,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has channel spy enabled.
-     * @param channelSpy Whether or not the player has channel spy enabled.
+     * @param channelSpy Whether the player has channel spy enabled.
      */
     public void setChannelSpy(boolean channelSpy) {
         this.channelSpy = channelSpy;
     }
 
     /**
-     * Whether or not the player has channel spy enabled.
      * @return True if the player has channel spy enabled.
      */
     public boolean hasGroupSpy() {
@@ -125,15 +117,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has group spy enabled.
-     * @param groupSpy Whether or not the player has group spy enabled.
+     * @param groupSpy Whether the player has group spy enabled.
      */
     public void setGroupSpy(boolean groupSpy) {
         this.groupSpy = groupSpy;
     }
 
     /**
-     * Whether or not the player can be messaged.
      * @return True if the player can be messaged.
      */
     public boolean canBeMessaged() {
@@ -141,15 +131,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player can be messaged.
-     * @param canBeMessaged Whether or not the player can be messaged.
+     * @param canBeMessaged Whether the player can be messaged.
      */
     public void setCanBeMessaged(boolean canBeMessaged) {
         this.canBeMessaged = canBeMessaged;
     }
 
     /**
-     * Whether or not the player has tag sounds enabled.
      * @return True if the player has tag sounds enabled.
      */
     public boolean hasTagSounds() {
@@ -157,15 +145,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has tag sounds enabled.
-     * @param tagSounds Whether or not the player has tag sounds enabled.
+     * @param tagSounds Whether the player has tag sounds enabled.
      */
     public void setTagSounds(boolean tagSounds) {
         this.tagSounds = tagSounds;
     }
 
     /**
-     * Whether or not the player has message sounds enabled.
      * @return True if the player has message sounds enabled.
      */
     public boolean hasMessageSounds() {
@@ -173,15 +159,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has message sounds enabled.
-     * @param messageSounds Whether or not the player has message sounds enabled.
+     * @param messageSounds Whether the player has message sounds enabled.
      */
     public void setMessageSounds(boolean messageSounds) {
         this.messageSounds = messageSounds;
     }
 
     /**
-     * Whether or not the player has emojis enabled.
      * @return True if the player has emojis enabled.
      */
     public boolean hasEmojis() {
@@ -189,15 +173,13 @@ public class PlayerData {
     }
 
     /**
-     * Sets whether or not the player has emojis enabled.
-     * @param emojis Whether or not the player has emojis enabled.
+     * @param emojis Whether the player has emojis enabled.
      */
     public void setEmojis(boolean emojis) {
         this.emojis = emojis;
     }
 
     /**
-     * Gets the current channel the player is in.
      * @return The current channel the player is in.
      */
     public ChatChannel getCurrentChannel() {
@@ -213,7 +195,6 @@ public class PlayerData {
     }
 
     /**
-     * Gets the amount of time left in a player's mute, in seconds.
      * @return The amount of time left in a player's mute, in seconds.
      */
     public long getMuteTime() {
@@ -221,7 +202,6 @@ public class PlayerData {
     }
 
     /**
-     * Sets the amount of time a player is muted, in seconds.
      * @param muteTime The time to mute the player, in seconds.
      */
     public void setMuteTime(long muteTime) {
@@ -229,7 +209,6 @@ public class PlayerData {
     }
 
     /**
-     * Gets the current chat color of the player.
      * @return The current chat color of the player.
      */
     public String getColor() {
@@ -237,8 +216,7 @@ public class PlayerData {
     }
 
     /**
-     * Sets the current chat color of the player.
-     * @param color The color to use.
+     * @param color The chat color for the player.
      */
     public void setColor(String color) {
         this.color = color;
@@ -292,24 +270,16 @@ public class PlayerData {
     public void ignore(UUID target) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.add(target);
-
-        // PlayerData targetData = api.getPlayerData(target);
-        // targetData.ignoredByPlayers.add(this.uuid);
-
         api.getDataManager().addIgnore(this.getUUID(), target);
     }
 
     /**
      * Stops ignoring a player.
-     * @param target The player to ignore.
+     * @param target The player to stop ignoring.
      */
     public void unignore(UUID target) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.remove(target);
-
-        // PlayerData targetData = api.getPlayerData(target);
-        // targetData.ignoredByPlayers.remove(this.uuid);
-
         api.getDataManager().removeIgnore(this.getUUID(), target);
     }
 }

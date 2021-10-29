@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message;
 
 public enum MessageLocation {
 
-    CHAT,
     MESSAGE,
     CHANNEL,
     GROUP,

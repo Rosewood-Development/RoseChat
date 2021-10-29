@@ -20,7 +20,7 @@ public enum FilterType {
 
     /**
      * Sends a warning message, defined in the language file, to the sender.
-     * @param sender The sender to receive the message.
+     * @param sender The person to receive the message.
      */
     public void sendWarning(RoseSender sender) {
         LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
@@ -29,7 +29,7 @@ public enum FilterType {
 
     /**
      * Sends a warning message, defined in the language file, to the player.
-     * @param player The player to receive the message.
+     * @param player The person to receive the message.
      */
     public void sendWarning(Player player) {
         LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);

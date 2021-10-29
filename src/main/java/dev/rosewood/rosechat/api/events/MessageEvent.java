@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.api.events;
 
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

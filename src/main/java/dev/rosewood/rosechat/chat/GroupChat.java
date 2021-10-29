@@ -33,6 +33,9 @@ public class GroupChat implements Group {
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
+                PlayerData data = RoseChatAPI.getInstance().getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
+
                 player.spigot().sendMessage(message.parse(Setting.GROUP_FORMAT.getString(), new RoseSender(player)));
             }
         }
@@ -60,6 +63,9 @@ public class GroupChat implements Group {
         return this.members;
     }
 
+    /**
+     * Saves the group chat.
+     */
     public void save() {
         RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
     }
@@ -105,7 +111,6 @@ public class GroupChat implements Group {
     }
 
     /**
-     * Gets the ID of the group chat.
      * @return The ID of the group chat.
      */
     public String getId() {
@@ -113,7 +118,6 @@ public class GroupChat implements Group {
     }
 
     /**
-     * Gets the name of the group chat.
      * @return The name of the group chat.
      */
     public String getName() {
@@ -129,7 +133,6 @@ public class GroupChat implements Group {
     }
 
     /**
-     * Gets the owner of the group chat.
      * @return The owner of the group chat.
      */
     public UUID getOwner() {

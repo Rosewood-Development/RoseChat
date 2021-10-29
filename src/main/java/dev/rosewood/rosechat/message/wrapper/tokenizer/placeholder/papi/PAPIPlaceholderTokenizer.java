@@ -5,8 +5,6 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import org.bukkit.Bukkit;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

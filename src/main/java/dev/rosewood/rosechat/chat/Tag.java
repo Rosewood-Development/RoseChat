@@ -7,7 +7,6 @@ public class Tag {
     private final String id;
     private String prefix;
     private String suffix;
-    private String replacement;
     private boolean tagOnlinePlayers;
     private boolean matchLength;
     private Sound sound;
@@ -22,16 +21,14 @@ public class Tag {
     }
 
     /**
-     * Gets the ID of the tag.
-     * @return The ID.
+     * @return The ID of the tag.
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * Gets the prefix of the tag.
-     * @return The prefix.
+     * @return The prefix of the tag.
      */
     public String getPrefix() {
         return this.prefix;
@@ -46,8 +43,7 @@ public class Tag {
     }
 
     /**
-     * Gets the suffix of the tag.
-     * @return The suffix.
+     * @return The suffix of the tag.
      */
     public String getSuffix() {
         return this.suffix;
@@ -62,7 +58,6 @@ public class Tag {
     }
 
     /**
-     * Whether or not this tag should tag online players?
      * @return True if the tag should tag online players.
      */
     public boolean shouldTagOnlinePlayers() {
@@ -70,15 +65,13 @@ public class Tag {
     }
 
     /**
-     * Sets whether this tag should tag online players.
-     * @param tagOnlinePlayers Whether or not this tag should tag online players.
+     * @param tagOnlinePlayers Whether this tag should tag online players.
      */
     public void setTagOnlinePlayers(boolean tagOnlinePlayers) {
         this.tagOnlinePlayers = tagOnlinePlayers;
     }
 
     /**
-     * Whether or not the tag should match the length of the text.
      * @return True if the tag should match the length of the text.
      */
     public boolean shouldMatchLength() {
@@ -86,31 +79,27 @@ public class Tag {
     }
 
     /**
-     * Sets whether the tag should match the length of the text.
-     * @param matchLength Whether or not this tag should match the length of the text.
+     * @param matchLength Whether this tag should match the length of the text.
      */
     public void setMatchLength(boolean matchLength) {
         this.matchLength = matchLength;
     }
 
     /**
-     * Gets the sound that the tag should play.
-     * @return The sound to play.
+     * @return The sound to play when tagged.
      */
     public Sound getSound() {
         return this.sound;
     }
 
     /**
-     * Sets the sound that the tag should play.
-     * @param sound The sound to play.
+     * @param sound The sound to play when tagged.
      */
     public void setSound(Sound sound) {
         this.sound = sound;
     }
 
     /**
-     * Gets the format to use for the tag.
      * @return The format to use.
      */
     public String getFormat() {
@@ -118,7 +107,6 @@ public class Tag {
     }
 
     /**
-     * Sets the format to use for the tag.
      * @param format The format to use.
      */
     public void setFormat(String format) {

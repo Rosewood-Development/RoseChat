@@ -35,7 +35,7 @@ public class ClearChatCommand extends AbstractCommand {
             return;
         }
 
-        channel.clearChat(StringUtils.repeat("\n", 100));
+        channel.clear(StringUtils.repeat("\n", 100));
 
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
         if (sender instanceof Player) {

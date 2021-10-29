@@ -38,7 +38,7 @@ public class ChatChannel implements Group {
      * Creates a new chat channel with the given ID.
      * @param id The ID of the channel.
      * @param format The format to use for this channel.
-     * @param defaultChannel Whether or not this should be the channel player's join the first time they join the server.
+     * @param defaultChannel Whether this should be the channel players join the first time they join the server.
      */
     public ChatChannel(String id, String format, boolean defaultChannel) {
         this.id = id;
@@ -85,6 +85,9 @@ public class ChatChannel implements Group {
         // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
+
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
@@ -96,12 +99,15 @@ public class ChatChannel implements Group {
             return;
         }
 
-        // Send to playes within the radius.
+        // Send to players within the radius.
         if (this.getRadius() != -1 && message.getSender().isPlayer()) {
             Location playerLocation = message.getSender().asPlayer().getLocation();
 
             if (playerLocation.getWorld() == null) return;
             for (Player player : playerLocation.getWorld().getPlayers()) {
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
+
                 if (player.getLocation().distance(playerLocation) < this.radius) {
                     player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
@@ -121,6 +127,10 @@ public class ChatChannel implements Group {
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
+
                 player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
                 if (message.getTaggedPlayers().contains(player.getUniqueId())) {
@@ -136,6 +146,10 @@ public class ChatChannel implements Group {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
+
                 player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
                 if (message.getTaggedPlayers().contains(player.getUniqueId())) {
@@ -172,6 +186,10 @@ public class ChatChannel implements Group {
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+
                 player.spigot().sendMessage(components);
             }
 
@@ -185,6 +203,10 @@ public class ChatChannel implements Group {
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+
                 player.spigot().sendMessage(components);
             }
         }
@@ -194,6 +216,10 @@ public class ChatChannel implements Group {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+
+                PlayerData data = api.getPlayerData(player.getUniqueId());
+                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+
                 player.spigot().sendMessage(components);
             }
         }
@@ -207,12 +233,6 @@ public class ChatChannel implements Group {
         for (UUID uuid : api.getDataManager().getChannelSpies()) {
             Player spy = Bukkit.getPlayer(uuid);
             if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
-        }
-
-        // Send the message to discord.
-        if (api.getDiscord() != null) {
-            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
-            if (textChannel != null) MessageUtils.sendDiscordMessage(message, textChannel);
         }
 
         // Send to everyone who can view it.
@@ -236,8 +256,11 @@ public class ChatChannel implements Group {
             }
         }
 
-        for (String server : this.servers) {
-            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.toComponents()));
+        // Send the message to other servers.
+        if (api.isBungee()) {
+            for (String server : this.servers) {
+                BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.toComponents()));
+            }
         }
 
         // Send to players in the same world.
@@ -271,7 +294,7 @@ public class ChatChannel implements Group {
     /**
      * Clears the channel's chat.
      */
-    public void clearChat(String message) {
+    public void clear(String message) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to other servers.
@@ -303,7 +326,6 @@ public class ChatChannel implements Group {
 
             return;
         }
-
 
         // Send to players in the channel.
         for (UUID uuid : this.players) {
@@ -366,7 +388,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Gets the ID of the channel.
      * @return The ID of the channel.
      */
     public String getId() {
@@ -374,7 +395,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Checks if the channel is the default channel.
      * @return True if the channel is the default channel.
      */
     public boolean isDefaultChannel() {
@@ -383,14 +403,13 @@ public class ChatChannel implements Group {
 
     /**
      * Sets the channel to being the default channel.
-     * @param defaultChannel Whether or not the channel should be the default channel.
+     * @param defaultChannel Whether the channel should be the default channel.
      */
     public void setDefaultChannel(boolean defaultChannel) {
         this.defaultChannel = defaultChannel;
     }
 
     /**
-     * Gets the channel format.
      * @return The channel format.
      */
     public String getFormat() {
@@ -398,7 +417,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Sets the channel format.
      * @param format The format to use.
      */
     public void setFormat(String format) {
@@ -406,8 +424,7 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Gets the radius that messages can be received within.
-     * @return The channel radius.
+     * @return The radius that messages can be received within.
      */
     public int getRadius() {
         return this.radius;
@@ -422,8 +439,7 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Gets the world that messages from this channel can be sent and received in.
-     * @return The world.
+     * @return The world that messages from this channel can be sent and received in.
      */
     public String getWorld() {
         return this.world;
@@ -438,7 +454,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Whether or not players will automatically join the channel when entering the world.
      * @return True if players will automatically join the channel when entering the world.
      */
     public boolean isAutoJoin() {
@@ -446,8 +461,7 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Sets whether players will automatically join the channel when entering the world.
-     * @param autoJoin Whether or not players will automatically join the channel when entering the world.
+     * @param autoJoin Whether players will automatically join the channel when entering the world.
      */
     public void setAutoJoin(boolean autoJoin) {
         this.autoJoin = autoJoin;
@@ -462,7 +476,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Gets the bungee servers the messages will be sent to.
      * @return The bungee servers the messages will be sent to.
      */
     public List<String> getServers() {
@@ -515,7 +528,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Sets whether the channel is muted.
      * @param muted Whether the channel is muted.
      */
     public void setMuted(boolean muted) {
@@ -545,7 +557,6 @@ public class ChatChannel implements Group {
     }
 
     /**
-     * Sets whether the channel can be joined.
      * @param joinable Whether the channel can be joined.
      */
     public void setJoinable(boolean joinable) {

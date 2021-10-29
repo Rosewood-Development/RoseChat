@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
@@ -62,11 +63,11 @@ public class RoseChatAPI {
     }
 
     /**
-     * Parses a string into the RoseChat MessageWrapper and Tokenizer, allowing for hex color, tags and emoji in other text.
+     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
-     * @return A BaseComponent[] consisting of the parsed message.
+     * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message) {
         return new MessageWrapper(sender, MessageLocation.OTHER, null, message).parse(null, viewer);
@@ -118,8 +119,9 @@ public class RoseChatAPI {
      * Creates a new chat replacement.
      * @param id The ID to use.
      * @param text The text that will be replaced.
-     * @param replacement The text that will replace.
+     * @param replacement The text to replace with.
      * @param hoverText The text shown when the replacement is hovered over.
+     * @param regex Whether this replacement uses regex.
      * @return The new chat replacement.
      */
     public ChatReplacement createReplacement(String id, String text, String replacement, String hoverText, boolean regex) {
@@ -162,7 +164,7 @@ public class RoseChatAPI {
      * Creates a new emoji.
      * @param id The ID to use.
      * @param text The text to be replaced.
-     * @param replacement The text that will replace.
+     * @param replacement The text to replace with.
      * @param hoverText The text shown when the replacement is hovered over.
      * @param font The font to use for the emoji.
      * @return The new emoji.
@@ -257,7 +259,7 @@ public class RoseChatAPI {
 
     /**
      * @param id The ID to use.
-     * @return THe group chat found, or null if it doesn't exist.
+     * @return The group chat found, or null if it doesn't exist.
      */
     public GroupChat getGroupChatById(String id) {
         return this.groupManager.getGroupChatById(id);
@@ -305,7 +307,7 @@ public class RoseChatAPI {
     }
 
     /**
-     * @param id The tag to use.
+     * @param id The id to use.
      * @return The tag found, or null if it doesn't exist.
      */
     public Tag getTagById(String id) {
@@ -327,11 +329,11 @@ public class RoseChatAPI {
     }
 
     /**
-     * @param player The player to get the data of.
+     * @param uuid The uuid of the player whose data should be got.
      * @return The data of the player.
      */
-    public PlayerData getPlayerData(UUID player) {
-        return this.dataManager.getPlayerData(player);
+    public PlayerData getPlayerData(UUID uuid) {
+        return this.dataManager.getPlayerData(uuid);
     }
 
     /**

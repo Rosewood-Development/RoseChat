@@ -38,15 +38,13 @@ public class ChatReplacement {
     }
 
     /**
-     * Gets the ID.
-     * @return The ID.
+     * @return The ID of the replacement.
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * Gets the text to be replaced.
      * @return The text to replace.
      */
     public String getText() {
@@ -54,7 +52,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Sets the text.
      * @param text The text to use.
      */
     public void setText(String text) {
@@ -62,7 +59,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Gets the replacement.
      * @return The replacement.
      */
     public String getReplacement() {
@@ -70,7 +66,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Sets the replacement
      * @param replacement The replacement to use.
      */
     public void setReplacement(String replacement) {
@@ -78,8 +73,7 @@ public class ChatReplacement {
     }
 
     /**
-     * Gets the text shown when the replacement is hovered.
-     * @return The hover text.
+     * @return The text shown when the replacement is hovered.
      */
     public String getHoverText() {
         return this.hoverText;
@@ -94,7 +88,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Gets the font.
      * @return The font.
      */
     public String getFont() {
@@ -102,7 +95,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Sets the font.
      * @param font The font to be used.
      */
     public void setFont(String font) {
@@ -110,15 +102,14 @@ public class ChatReplacement {
     }
 
     /**
-     * @return
+     * @return True if the replacement uses regex.
      */
     public boolean isRegex() {
         return this.regex;
     }
 
     /**
-     *
-     * @param regex
+     * @param regex Whether the replacement is using regex.
      */
     public void setRegex(boolean regex) {
         this.regex = regex;

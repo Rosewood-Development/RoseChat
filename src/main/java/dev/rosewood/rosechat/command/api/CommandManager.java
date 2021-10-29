@@ -88,8 +88,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 return true;
             }
         }
-
-        //this.localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.mainSyntax));
         return true;
     }
 
@@ -182,7 +180,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Gets a subcommands for this command.
      * @return A list of subcommands for this command.
      */
     public List<AbstractCommand> getSubcommands() {
@@ -190,7 +187,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Gets the overriden main command.
      * @return The overriden main command.
      */
     public AbstractCommand getMainCommand() {
@@ -198,7 +194,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Gets the main command label.
      * @return The main command label.
      */
     public String getMainCommandLabel() {
@@ -206,7 +201,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Gets the main command syntax.
      * @return The main command syntax.
      */
     public String getMainSyntax() {

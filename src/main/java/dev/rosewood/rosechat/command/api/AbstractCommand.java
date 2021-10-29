@@ -41,7 +41,7 @@ public abstract class AbstractCommand {
 
     /**
      * Creates a new command with the given labels.
-     * @param playerOnly Whether or not this command can only be used by a player.
+     * @param playerOnly Whether this command can only be used by a player.
      * @param labels The names of the command, e.g /command <label>. Multiple for aliases.
      */
     public AbstractCommand(boolean playerOnly, String... labels) {
@@ -51,8 +51,8 @@ public abstract class AbstractCommand {
 
     /**
      * Creates a new command with the given labels.
-     * @param juniorCommand Whether or not this command is running with a senior command manager.
-     * @param playerOnly Whether or not this command can only be used by a player.
+     * @param juniorCommand Whether this command is running with a senior command manager.
+     * @param playerOnly Whether this command can only be used by a player.
      * @param labels The names of the command, e.g. /command <label>. Multiple for aliases.
      */
     public AbstractCommand(boolean juniorCommand, boolean playerOnly, String... labels) {
@@ -65,7 +65,7 @@ public abstract class AbstractCommand {
      * Creates a new command with the given label.
      * Other labels will be taken from the plugin.yml file aliases.
      * @param label The label to use, and also the command in the plugin.yml file for aliases.
-     * @param juniorCommand Whether or not this command is running with a senior command manager.
+     * @param juniorCommand Whether this command is running with a senior command manager.
      */
     public AbstractCommand(String label, boolean juniorCommand) {
         this.api = RoseChatAPI.getInstance();
@@ -83,8 +83,8 @@ public abstract class AbstractCommand {
      * Creates a new command, with the given label.
      * Other labels will be taken from the plugin.yml file aliases.
      * @param label The label to use, and also the command in the plugin.yml file for aliases.
-     * @param juniorCommand Whether or not this command is running with a senior command manager.
-     * @param playerOnly Whether or not this command can only be used by a player.
+     * @param juniorCommand Whether this command is running with a senior command manager.
+     * @param playerOnly Whether this command can only be used by a player.
      */
     public AbstractCommand(String label, boolean juniorCommand, boolean playerOnly) {
         this(label, juniorCommand);
@@ -107,13 +107,11 @@ public abstract class AbstractCommand {
     public abstract List<String> onTabComplete(CommandSender sender, String[] args);
 
     /**
-     * Gets the permission needed to execute this command.
      * @return The permission needed to execute this command.
      */
     public abstract String getPermission();
 
     /**
-     * Gets the syntax for this command. E.g. '/command give <player> <item>'.
      * @return The syntax for this command.
      */
     public abstract String getSyntax();
@@ -133,14 +131,20 @@ public abstract class AbstractCommand {
         return builder.toString().trim();
     }
 
+    /**
+     * @return The labels for the command.
+     */
     public List<String> getLabels() {
         return this.labels;
     }
 
+    /**
+     * @return True if the command can only be used by players.
+     */
     public boolean isPlayerOnly() {
         return this.playerOnly;
     }
-
+    
     public boolean isJuniorCommand() {
         return this.juniorCommand;
     }

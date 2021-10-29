@@ -2,6 +2,7 @@ package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
+import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.command.HelpCommand;
 import dev.rosewood.rosechat.command.IgnoreCommand;
 import dev.rosewood.rosechat.command.MessageCommand;
@@ -22,7 +23,6 @@ import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
-import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
 import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
 import dev.rosewood.rosechat.command.group.GroupCommandManager;

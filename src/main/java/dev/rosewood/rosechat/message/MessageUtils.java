@@ -2,8 +2,8 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.Group;
+import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -27,7 +27,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 

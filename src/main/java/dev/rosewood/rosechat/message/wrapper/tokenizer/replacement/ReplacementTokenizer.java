@@ -12,10 +12,12 @@ public class ReplacementTokenizer implements Tokenizer<ReplacementToken> {
 
     @Override
     public ReplacementToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
-            if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.emojis." + location.toString().toLowerCase()) || !sender.hasPermission("rosechat.emoji." + emoji.getId())) continue;
-            if (input.startsWith(emoji.getText())) {
-                return new ReplacementToken(sender, viewer, emoji, input.substring(0, emoji.getText().length()));
+        if (RoseChatAPI.getInstance().getPlayerData(sender.getUUID()).hasEmojis()) {
+            for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
+                if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.emojis." + location.toString().toLowerCase()) || !sender.hasPermission("rosechat.emoji." + emoji.getId())) continue;
+                if (input.startsWith(emoji.getText())) {
+                    return new ReplacementToken(sender, viewer, emoji, input.substring(0, emoji.getText().length()));
+                }
             }
         }
 

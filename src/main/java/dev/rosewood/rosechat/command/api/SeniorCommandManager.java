@@ -77,7 +77,6 @@ public class SeniorCommandManager extends CommandManager {
     }
 
     /**
-     * Gets all command managers for this manager.
      * @return A list of the command managers.
      */
     public List<CommandManager> getCommandManagers() {

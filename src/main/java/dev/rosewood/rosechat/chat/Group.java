@@ -29,7 +29,7 @@ public interface Group {
     void sendFromDiscord(MessageWrapper message);
 
     /**
-     * @return The members.
+     * @return The members of the group.
      */
     List<UUID> getMembers();
 }

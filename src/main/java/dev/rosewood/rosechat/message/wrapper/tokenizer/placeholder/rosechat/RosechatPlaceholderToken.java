@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat;
 
 import dev.rosewood.rosechat.chat.Group;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -26,19 +26,21 @@ public class RosechatPlaceholderToken extends Token {
                 MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group).build());
 
         for (BaseComponent component : components) {
-            for (BaseComponent extra : component.getExtra()) {
-                if (extra == null || extra.toPlainText() == null || extra.toPlainText().length() == 0) continue;
-                for (char c : extra.toPlainText().toCharArray()) {
-                    componentBuilder.append(String.valueOf(c))
-                            .font(component.getFont())
-                            .color(extra.getColor())
-                            .event(component.getHoverEvent())
-                            .event(component.getClickEvent())
-                            .obfuscated(component.isObfuscated())
-                            .bold(component.isBold())
-                            .underlined(component.isUnderlined())
-                            .strikethrough(component.isStrikethrough())
-                            .italic(component.isItalic());
+            if (component.getExtra() != null) {
+                for (BaseComponent extra : component.getExtra()) {
+                    if (extra == null || extra.toPlainText() == null || extra.toPlainText().length() == 0) continue;
+                    for (char c : extra.toPlainText().toCharArray()) {
+                        componentBuilder.append(String.valueOf(c))
+                                .font(component.getFont())
+                                .color(extra.getColor())
+                                .event(component.getHoverEvent())
+                                .event(component.getClickEvent())
+                                .obfuscated(component.isObfuscated())
+                                .bold(component.isBold())
+                                .underlined(component.isUnderlined())
+                                .strikethrough(component.isStrikethrough())
+                                .italic(component.isItalic());
+                    }
                 }
             }
         }
