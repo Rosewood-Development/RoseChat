@@ -3,9 +3,9 @@ package dev.rosewood.rosechat.placeholders;
 public class CustomPlaceholder {
 
     private String id;
-    private TextPlaceholder text;
-    private HoverPlaceholder hover;
-    private ClickPlaceholder click;
+    private ConditionalPlaceholder text;
+    private ConditionalPlaceholder hover;
+    private ConditionalPlaceholder click;
 
     public CustomPlaceholder(String id) {
         this.id = id;
@@ -19,27 +19,27 @@ public class CustomPlaceholder {
         this.id = id;
     }
 
-    public TextPlaceholder getText() {
+    public ConditionalPlaceholder getText() {
         return this.text;
     }
 
-    public void setText(TextPlaceholder text) {
+    public void setText(ConditionalPlaceholder text) {
         this.text = text;
     }
 
-    public HoverPlaceholder getHover() {
+    public ConditionalPlaceholder getHover() {
         return this.hover;
     }
 
-    public void setHover(HoverPlaceholder hover) {
+    public void setHover(ConditionalPlaceholder hover) {
         this.hover = hover;
     }
 
-    public ClickPlaceholder getClick() {
+    public ConditionalPlaceholder getClick() {
         return this.click;
     }
 
-    public void setClick(ClickPlaceholder click) {
+    public void setClick(ConditionalPlaceholder click) {
         this.click = click;
     }
 }

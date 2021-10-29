@@ -1,20 +1,16 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageSender;
-import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MessageGroupCommand extends AbstractCommand {
 
@@ -48,8 +44,8 @@ public class MessageGroupCommand extends AbstractCommand {
             return;
         }
 
-        MessageSender messageSender = new MessageSender((Player) sender);
-        MessageWrapper messageWrapper = new MessageWrapper(groupChat.getName(), messageSender, message);
+        RoseSender messageSender = new RoseSender((Player) sender);
+        MessageWrapper messageWrapper = new MessageWrapper(messageSender, MessageLocation.GROUP, groupChat, message).validate().filter();
         groupChat.send(messageWrapper);
     }
 

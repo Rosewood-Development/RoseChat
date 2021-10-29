@@ -2,8 +2,9 @@ package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -27,12 +28,11 @@ public class SudoChatCommand extends AbstractCommand {
 
         String playerStr = args[0];
         ChatChannel channel = this.getAPI().getChannelById(args[1]);
-        MessageSender sudoSender;
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerStr);
-        if (player != null && player.isOnline()) sudoSender = new MessageSender(player.getPlayer());
-        else sudoSender = new MessageSender(playerStr, "default");
+        RoseSender sudoSender = (player == null || !player.isOnline()) ? new RoseSender(playerStr, "default") : new RoseSender(player.getPlayer());
+        MessageWrapper message = new MessageWrapper(sudoSender, MessageLocation.CHANNEL, channel, getAllArgs(2, args));
 
-        channel.send(new MessageWrapper(channel.getId(), sudoSender, getAllArgs(2, args)));
+        channel.send(message);
     }
 
     @Override

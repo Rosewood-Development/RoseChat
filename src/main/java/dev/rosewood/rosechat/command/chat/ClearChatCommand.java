@@ -2,8 +2,6 @@ package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageSender;
-import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -37,8 +35,7 @@ public class ClearChatCommand extends AbstractCommand {
             return;
         }
 
-        MessageWrapper message = new MessageWrapper("", new MessageSender(null, null), StringUtils.repeat("\n", 100));
-        channel.send(message);
+        channel.clearChat(StringUtils.repeat("\n", 100));
 
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
         if (sender instanceof Player) {

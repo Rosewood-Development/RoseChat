@@ -7,6 +7,7 @@ public class Tag {
     private final String id;
     private String prefix;
     private String suffix;
+    private String replacement;
     private boolean tagOnlinePlayers;
     private boolean matchLength;
     private Sound sound;

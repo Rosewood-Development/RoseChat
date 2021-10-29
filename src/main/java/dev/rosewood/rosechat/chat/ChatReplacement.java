@@ -7,6 +7,7 @@ public class ChatReplacement {
     private String replacement;
     private String hoverText;
     private String font;
+    private boolean regex;
 
     /**
      * Creates a new chat replacement with the given ID.
@@ -16,12 +17,13 @@ public class ChatReplacement {
      * @param hoverText The text that appears when the replacement is hovered.
      * @param font The font to be used.
      */
-    public ChatReplacement(String id, String text, String replacement, String hoverText, String font) {
+    public ChatReplacement(String id, String text, String replacement, String hoverText, String font, boolean regex) {
         this.id = id;
         this.text = text;
         this.replacement = replacement;
         this.hoverText = hoverText;
         this.font = font;
+        this.regex = regex;
     }
 
     /**
@@ -31,8 +33,8 @@ public class ChatReplacement {
      * @param replacement The replacement to be used.
      * @param hoverText The text that appears when the replacement is hovered.
      */
-    public ChatReplacement(String id, String text, String replacement, String hoverText) {
-        this(id, text, replacement, hoverText, "default");
+    public ChatReplacement(String id, String text, String replacement, String hoverText, boolean regex) {
+        this(id, text, replacement, hoverText, "default", regex);
     }
 
     /**
@@ -105,5 +107,20 @@ public class ChatReplacement {
      */
     public void setFont(String font) {
         this.font = font;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isRegex() {
+        return this.regex;
+    }
+
+    /**
+     *
+     * @param regex
+     */
+    public void setRegex(boolean regex) {
+        this.regex = regex;
     }
 }

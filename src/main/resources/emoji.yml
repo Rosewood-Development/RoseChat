@@ -3,3 +3,6 @@ deer:
   replacement: "\uE000"
   hover: '&b&o:deer:'
   font: "emoji"
+star:
+  text: ':star:'
+  replacement: "✸"

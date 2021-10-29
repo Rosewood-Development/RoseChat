@@ -1,5 +1,6 @@
-package dev.rosewood.rosechat.events;
+package dev.rosewood.rosechat.api.events;
 
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -10,14 +11,20 @@ public class MessageEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final MessageWrapper message;
+    private final RoseSender viewer;
     private boolean cancelled;
 
-    public MessageEvent(MessageWrapper message) {
+    public MessageEvent(MessageWrapper message, RoseSender viewer) {
         this.message = message;
+        this.viewer = viewer;
     }
 
     public MessageWrapper getMessage() {
         return this.message;
+    }
+
+    public RoseSender getViewer() {
+        return this.viewer;
     }
 
     @Override

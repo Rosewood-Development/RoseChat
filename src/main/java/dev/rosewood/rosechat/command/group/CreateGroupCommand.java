@@ -2,8 +2,12 @@ package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -30,9 +34,17 @@ public class CreateGroupCommand extends AbstractCommand {
 
         String id = args[0];
         String name = getAllArgs(1, args);
+        RoseSender roseSender = new RoseSender(player);
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, null, name).validate().filterLanguage();
+        if (!message.canBeSent()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
+            return;
+        }
+
         GroupChat groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
         groupChat.setName(name);
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
+        BaseComponent[] components = message.parse(null, roseSender);
+        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-create-success", StringPlaceholders.single("name", TextComponent.toLegacyText(components)));
     }
 
     @Override

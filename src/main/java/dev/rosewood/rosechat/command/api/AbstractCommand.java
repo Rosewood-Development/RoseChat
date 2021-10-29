@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class AbstractCommand {
 
     /**
-     * The labels for the ommand.
+     * The labels for the command.
      */
     private List<String> labels;
 

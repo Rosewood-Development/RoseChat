@@ -1,8 +1,12 @@
 package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.GroupChat;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -14,7 +18,7 @@ import java.util.UUID;
 public class KickGroupCommand extends AbstractCommand {
 
     public KickGroupCommand() {
-        super(true, "kick");
+        super(true, "kick", "remove");
     }
 
     @Override
@@ -42,10 +46,18 @@ public class KickGroupCommand extends AbstractCommand {
             return;
         }
 
+        RoseSender roseSender = new RoseSender(player);
+        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
+        String formattedGroupName = ComponentSerializer.toString(groupName);
+
+        PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
+        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
+        String formattedName = ComponentSerializer.toString(name);
+
         if (target.isOnline()) {
             Player kicked = Bukkit.getPlayer(target.getUniqueId());
             if (kicked != null) {
-                this.getAPI().getLocaleManager().sendMessage(kicked, "command-gc-kick-kicked", StringPlaceholders.single("name", groupChat.getName()));
+                this.getAPI().getLocaleManager().sendMessage(kicked, "command-gc-kick-kicked", StringPlaceholders.single("name", formattedGroupName));
             }
         }
 
@@ -56,8 +68,8 @@ public class KickGroupCommand extends AbstractCommand {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null){
                 this.getAPI().getLocaleManager().sendMessage(member, "command-gc-kick-success",
-                        StringPlaceholders.builder("player", target.getName())
-                                .addPlaceholder("name", groupChat.getName())
+                        StringPlaceholders.builder("player", formattedName)
+                                .addPlaceholder("name", formattedGroupName)
                                 .build());
             }
         }

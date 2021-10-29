@@ -33,9 +33,11 @@ import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
+import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordListener;
+import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -128,6 +130,7 @@ public class RoseChat extends RosePlugin {
         // Register Listeners
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
+        pluginManager.registerEvents(new MessageListener(this), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
@@ -178,6 +181,7 @@ public class RoseChat extends RosePlugin {
         if (!PlaceholderAPIHook.enabled())
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
+        else new RoseChatPlaceholderExpansion().register();
 
         if (pluginManager.getPlugin("DiscordSRV") != null) {
             this.discord = DiscordSRV.getPlugin();

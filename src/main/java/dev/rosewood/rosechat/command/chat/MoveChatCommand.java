@@ -3,7 +3,10 @@ package dev.rosewood.rosechat.command.chat;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,13 +27,13 @@ public class MoveChatCommand extends AbstractCommand {
         }
 
         Player player = Bukkit.getPlayer(args[0]);
-        PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
-        String channelStr = args[1];
-
         if (player == null) {
             this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
             return;
         }
+
+        PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
+        String channelStr = args[1];
 
         if (this.getAPI().getChannelById(channelStr) == null) {
             this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
@@ -45,8 +48,12 @@ public class MoveChatCommand extends AbstractCommand {
         data.setCurrentChannel(channel);
         data.save();
 
+        RoseSender roseSender = new RoseSender(player);
+        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
+        String formattedName = ComponentSerializer.toString(name);
+
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-move-success",
-                StringPlaceholders.builder("player", player.getDisplayName())
+                StringPlaceholders.builder("player", formattedName)
                         .addPlaceholder("channel", channel.getId()).build());
         this.getAPI().getLocaleManager().sendMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
     }

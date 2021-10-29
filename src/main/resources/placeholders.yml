@@ -1,205 +1,253 @@
-# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI.
+# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI
 # These can be used in several sections within the config.yml to add more information to chat.
 # The {message} placeholder is reserved for sent messages.
-# You can set the colour of a message by using the placeholder before {message}.
-# For example, the {extra} placeholder ends with '&f', this will set the message colour to white.
+# You can set the color of a message by using the placeholder before {message}.
+# For example, the {extra} placeholder ends with '&f' this will set the message color to white.
+# These placeholders may also be used within chat if the player has permission. Example: 'rosechat.placeholders.prefix'
+# Check the wiki for more information:
 
-# The ID of the placeholder. This defines the {prefix} placeholder.
+# RoseChat has a few placeholders that do not require PlaceholderAPI.
+# These include:
+# %player_name% - The player's name.
+# %player_displayname% - The player's display name.
+# %player_nickname% - The player's nickname that they created using RoseChat's /nick command.
+# If a nickname does not exist then the display name will be used, if that does not exist then the name will be used.#
+# %group% - The id of the group a message is sent in.
+# %group_name% - The name of the group a message is sent in.
+# %group_owner% - The owner of the group a message is sent in.
+# %channel% - The name of the channel a message is sent in.
+# Placeholders can be prefixed with "other_" to get the viewer.
+# For example, %other_player_name% gets the name of the viewer.
+
+# The ID of the placeholder.
+# This defines the {prefix} placeholder.
 prefix:
-  # This is the text that will be shown.
+  # This defines the text that will be shown.
   text:
-    # These are groups and the prefixes that will be used for them.
-    # If the player is not in any of the groups, it will use the default group.
-    # If Vault is not installed, it will use the default group.
-    # If the player is in more than one group, the primary group will be used.
+    # Each placeholder has a condition that can be used.
+    condition: "%vault_rank%"
+    # These are the options that the condition needs to hit.
+    # If the player who is sending the message has a rank of "admin", their prefix will be set to "&8[#C0FFEEAdmin&8] ".
+    # If the placeholder fails to get a result, or the placeholder is invalid then the default value will be used.
+    # If a default value doesn't exist, then nothing will happen.
     default: "&7"
-    admin: "&8[#C0FFEEAdmin&8] "
-
-  # This tells the plugin that this placeholder is using a hover event.
-  # Hover events show text and can have multiple lines.
+    admin: "&8[#C0FFEEAdmin&8] #C0FFEE"
+  # This defines the hover event for this placeholder. This is optional.
   hover:
+    condition: "%vault_rank%"
     admin:
       - "&cThis player administrates the server!"
 
 player:
   text:
-    # RoseChat has a few placeholders that do not require PlaceholderAPI.
-    # These include:
-    # %player_name% - The player's name.
-    # %player_displayname% - The player's displayname.
-    # Other placeholders require PlaceholderAPI to be installed.
-    # For example, the %vault_eco_balance_formatted% placeholder requires the Vault expansion for PlaceholderAPI.
-    default: "%player_displayname%"
+    # If no condition is specified, then the default value will be used.
+    default: "%player_nickname%"
   hover:
     default:
       - "&7Username: &f%player_name%"
       - "&7Click to Message"
-      - "&7Balance: &a$vault_eco_balance_formatted%"
-
-  # The tells the plugin that this placeholder is using a click event.
-  # An 'action' is what to do when the message is clicked.
-  # The 'extra' is what will be executed.
-  # Valid Actions: RUN_COMMAND, SUGGEST_COMMAND, OPEN_FILE, OPEN_URL
+  # This defines the hover event for this placeholder. This is optional.
   click:
     default:
       action: SUGGEST_COMMAND
       value: "/msg %player_name% "
 
-extra:
+separator:
   text:
-    default: "&7: &f"
-    admin: " &e» &f"
+    default: " &e» &f"
 
-staff-prefix:
+# Placeholders used in the message format.
+message-sent-sender:
   text:
-    default: "&8[&cStaffChat&8] &f"
-  hover:
-    default:
-      - "&7A chat channel that only staff members can see."
+    default: "&8[&eYou"
 
-left-bracket:
+message-sent-arrow:
   text:
-    default: "&8[&f"
-
-right-bracket:
-  text:
-    default: "&8] &f"
-
-arrow-sender:
-  text:
-    default: " &6->&r "
-
-  # RoseChat allows "other_" to be placed in front of placeholders to target the second player.
-  # This can be used in a /message, or a tag. If used anywhere else, the second player will be the person reading.
+    default: " &6-> "
   hover:
     default:
       - "&6From: &f%player_name%"
       - "&eTo: &f%other_player_name%"
-
-arrow-receiver:
-  text:
-    default: " &6->&r "
-  hover:
-    default:
-      - "&6From: &f%other_player_name%"
-      - "&eTo: &f%player_name%"
-
-msg-player:
-  text:
-    default: "%other_player_displayname%"
-
-you:
-  text:
-    default: "&eYou"
-
-group-prefix:
-  text:
-    default: "&9[&b%group%&9]"
-
-group-leader-prefix:
-  text:
-    default: ":crown-u:"
-
-group-member:
-  text:
-    default: "&7%player_name%&f: "
-
-spy-prefix:
-  text:
-    default: "&6[&eSocialSpy&6] "
-
-spy-player:
-  text:
-    default: "&8[&e%player_name% &6-> "
-
-spy-other:
-  text:
-    default: "&e%other_player_name%&8] &f"
-
-discord:
-  text:
-    # WIP
-    default: "[&bDiscord | &d%channel%] %name% &f"
-
-# Tags
-
-# The "%tag%" placeholder represents the message that the player types.
-# For example, if a player typed "@Lilac", "%tag% will be replaced with "Lilac".
-# For this reason, if neccessary, you must add the prefix (@), before the placeholder.
-player-tag:
-  text:
-    default: "&e@%other_player_displayname%"
-  hover:
-    default:
-      # NOT YET IMPLEMENTED
-      # A conditional placeholder allows messages based on a true or false value.
-      # The condition-type allows the plugin to see which condition is used for this placeholder.
-      # Valid Conditions:
-      # PLACEHOLDER - Based on a true/false value from PlaceholderAPI.
-      # OTHER_PLACEHOLDER - Based on a true/false value from PlaceholderAPI, using the viewer (or second player).
-      # PLAYER_PERMISSION - Based on whether the player has a permission.
-      # OTHER_PERMISSION - Based on whether the viewer (or second player) has a permission.
-      condition-type: PLACEHOLDER
-      # The condition to use.
-      # This can either be a placeholder or permission.
-      condition: "%other_player_online%"
-      # What to display if the condition is true.
-      true:
-        - "&aOnline"
-      # What to display if the condition is false.
-      false:
-        - "&cOffline"
-
-hashtag:
-  text:
-    default: "&9#%tag%"
-
-money-tag:
-  text:
-    default: "&a$%tag%"
-  hover:
-    default:
-      - "&7Click to pay &c%player% &a$%text%"
+      - "&7Click to Reply"
   click:
     default:
       action: SUGGEST_COMMAND
-      value: "/play %player% %tag%"
+      value: "/r "
 
+message-sent-receiver:
+  text:
+    default: "&f%other_player_nickname%&8] "
+
+message-received-sender:
+  text:
+    default: "&8[&f%player_nickname%"
+
+message-received-arrow:
+  text:
+    default: " &6-> "
+  hover:
+    default:
+      - "&6From: &f%player_name%"
+      - "&eTo: &f%other_player_name%"
+      - "&7Click to Reply"
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value: "/r "
+
+message-received-receiver:
+  text:
+    default: "&eYou&8] "
+
+# Placeholders used in the group format.
+group-prefix:
+  text:
+    default: "&8[&b%group_name%&8] "
+  hover:
+    default:
+      - "&7Owner: {group-member-prefix}%group_owner%"
+      - "&7Click to Message"
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value: "/gcm "
+
+group-member-prefix:
+  text:
+    condition: "%group_owner%=%player_name%"
+    default: ""
+    true: ":star:"
+  hover:
+    default:
+      - "&7This person owns the group chat."
+
+# Placeholders in channel formats.
+staffchat:
+  text:
+    default: "&8[&cStaff&8]"
+  hover:
+    default:
+      - "&7A chat channel that only staff members can see."
+      - "&7Command: &c/staff"
+
+channel-prefix:
+  text:
+    condition: "%channel%"
+    staff: "&8[&cStaff&8] "
+    local: "&8[&7&oLocal&8] "
+    skyblock: "&8[&aSkyblock&8] "
+  hover:
+    condition: "%channel%"
+    staff:
+      - "&7A chat channel that only staff members can see."
+      - "&7Command: &f/staff"
+    local:
+      - "&7A chat channel that only nearby players can see."
+    skyblock:
+      - "&aYou're playing Skyblock!"
+
+# Placeholders used for social spy.
+spy-prefix:
+  text:
+    default: "&6[&eSocialSpy&6]"
+
+spy-message:
+  text:
+    default: "&8[&f%player_nickname% &6-> &8%other_player_nickname%&8] "
+
+# Placeholders used for deleting messages.
+# This placeholder does not need conditions.
+# The %id% placeholder is used for the id of the message being deleted.
+delete-message:
+  text:
+    default: "&4&l✖"
+  hover:
+    default:
+      - "&7&oClick to Delete"
+  click:
+    default:
+      action: RUN_COMMAND
+      value: "/delmsg %id%"
+
+# This placeholder is used when a message is deleted.
+# This placeholder can be removed and no message will be shown when a message is deleted.
+# This placeholder does not need conditions.
+# The %original% placeholder is used for the original message that was deleted.
+deleted-message:
+  text:
+    default: "&7&oMessage Deleted"
+  hover:
+    default:
+      - "%original%"
+
+from-discord:
+  text:
+    default: "&dDiscord | &f"
+
+# Placeholders used for tags.
+# The %tagged% placeholder is used for the thing that was tagged.
+# The 'other_player' is the player who was tagged.
+player-tag:
+  text:
+    default: "&e@%other_player_nickname%"
+
+hashtag:
+  text:
+    default: "&9#%tagged%"
+
+money-tag:
+  text:
+    default: "&a$%tagged%"
+  hover:
+    default:
+      - "&7Click to pay &f%player_nickname% &a$%tagged%"
+  click:
+    default:
+      action: SUGGEST_COMMAND
+      value: "/pay %player_name% %tagged%"
+
+# This placeholder uses 1 character in the text.
+# This is because the tag has match-length enabled in the config.yml file.
+# This message will be repeated as many times as the amount of letters in the tag.
 spoiler-tag:
   text:
-    # This uses 1 ⬛, as the tag (defined in config.yml) uses match-length.
-    # This message will be repeated as many times as the amount of letters in the tag.
     default: "&0⬛"
   hover:
     default:
-      - "%tag%"
+      - "%tagged%"
 
-rosechat:
-  text:
-    default: "<g:#8A2387:#E94057:#F27121>RoseChat"
-  hover:
-    default:
-      - "&eYou're using <g:#8A2387:#E94057:#F27121>RoseChat&e"
-
-conditional-example:
-  text:
-    default: "&c⬛"
-  hover:
-    default:
-      condition-type: PERMISSION
-      condition: "rosechat.staffhover"
-      true:
-        - "%tag%"
-      false:
-        - "&cYou do not have permission to view this!"
-
+# This placeholder uses a different action to allow the viewer to copy a mesage.
 copy-paste:
   text:
-    default: "%tag%"
+    default: "%tagged%"
   hover:
     default:
       - "Click to Copy"
   click:
     default:
-      action: SUGGEST_COMMAND
-      value : "%tag%"
+      action: COPY_TO_CLIPBOARD
+      value: "%tagged%"
+
+staff-only:
+  text:
+    default: "&c⬛"
+  hover:
+    condition: "%player_has_permission_rosechat.staffonly%"
+    default: "&cYou do not have permission to view this!"
+    true: "%tagged%"
+
+# This is a unique placeholder.
+# These options will do nothing in-game, only on discord.
+discord:
+  url:
+    default: ""
+  title:
+    default: "[%channel%] {prefix}{player}"
+  description:
+    default: ""
+  color:
+    condition: "%vault_rank%"
+    default: 12648430
+    admin: "%rosechat_chat_color%"
+  thumbnail:
+    default: "https://cravatar.eu/helmavatar/%player_name%"

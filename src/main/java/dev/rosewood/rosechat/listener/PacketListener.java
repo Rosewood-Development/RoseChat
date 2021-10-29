@@ -10,13 +10,12 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
-import net.md_5.bungee.api.ChatColor;
+import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RoseSender;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.entity.Player;
 import java.util.List;
@@ -50,16 +49,20 @@ public class PacketListener {
                         }
 
                         ComponentBuilder builder = new ComponentBuilder();
-                        builder.append(ComponentSerializer.parse(component.getJson()));
+                        builder.append(ComponentSerializer.parse(component.getJson()), ComponentBuilder.FormatRetention.NONE);
                         builder.append(" ", ComponentBuilder.FormatRetention.NONE);
 
                         UUID uuid = UUID.randomUUID();
-                        BaseComponent[] deleteClient = TextComponent.fromLegacyText("✖");
-                        for (BaseComponent deleteComponent : deleteClient) {
-                            deleteComponent.setColor(ChatColor.of("#FFB39C"));
-                            deleteComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Click to Delete")));
-                            deleteComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/delmsg " + uuid.toString()));
+
+                        RoseSender sender = new RoseSender(player);
+                        BaseComponent[] deleteClient = MessageUtils.parseCustomPlaceholder(sender, sender, ConfigurationManager.Setting.DELETE_CLIENT_MESSAGES_FORMAT.getString(),
+                                MessageUtils.getSenderViewerPlaceholders(sender, sender).addPlaceholder("id", uuid.toString()).build());
+
+                        if (deleteClient == null) {
+                            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), component.getJson(), true));
+                            continue;
                         }
+
                         builder.append(deleteClient, ComponentBuilder.FormatRetention.NONE);
                         String json = ComponentSerializer.toString(builder.create());
 

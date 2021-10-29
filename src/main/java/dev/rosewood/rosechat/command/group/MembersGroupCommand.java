@@ -1,10 +1,15 @@
 package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.GroupChat;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -31,12 +36,22 @@ public class MembersGroupCommand extends AbstractCommand {
             return;
         }
 
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-members-title", StringPlaceholders.single("name", groupChat.getName()));
+        RoseSender roseSender = new RoseSender(sender);
+        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
+        String formattedGroupName = ComponentSerializer.toString(groupName);
+
+        this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-members-title", StringPlaceholders.single("name", formattedGroupName));
         for (UUID uuid : groupChat.getMembers()) {
-            Player member = Bukkit.getPlayer(uuid);
-            String name = member == null ? Bukkit.getOfflinePlayer(uuid).getName() : member.getDisplayName();
-            if (uuid.equals(groupChat.getOwner())) name = HexUtils.colorify("&e✵ &b" + name);
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-members-member", StringPlaceholders.single("player", name));
+            OfflinePlayer member = Bukkit.getOfflinePlayer(uuid);
+
+            PlayerData data = this.getAPI().getPlayerData(member.getUniqueId());
+            BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data == null ? member.getName() : (data.getNickname() == null
+                    ? (member.isOnline() ? member.getPlayer().getDisplayName() : member.getName()) : data.getNickname()));
+            String formattedName = ComponentSerializer.toString(name);
+
+            // TODO: change when conditional placeholders are introduced
+            if (uuid.equals(groupChat.getOwner())) formattedName = HexUtils.colorify("&e✵ &b" + formattedName);
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-members-member", StringPlaceholders.single("player", formattedName));
         }
     }
 
@@ -50,8 +65,10 @@ public class MembersGroupCommand extends AbstractCommand {
                     tab.add(groupChat.getId());
                 }
             } else {
-                for (GroupChat groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
-                    tab.add(groupChat.getId());
+                if (sender instanceof Player) {
+                    for (GroupChat groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
+                        tab.add(groupChat.getId());
+                    }
                 }
             }
         }

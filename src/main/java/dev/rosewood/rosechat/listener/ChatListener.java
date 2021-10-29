@@ -3,8 +3,9 @@ package dev.rosewood.rosechat.listener;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -53,6 +54,12 @@ public class ChatListener implements Listener {
                 return;
             }
 
+            // Check if the channel can be sent to.
+            if (channel.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+                this.api.getLocaleManager().sendMessage(player, "channel-muted");
+                return;
+            }
+
             // Make sure the message isn't blank.
             String colorified = HexUtils.colorify(event.getMessage());
             if (ChatColor.stripColor(colorified).isEmpty()) {
@@ -60,27 +67,16 @@ public class ChatListener implements Listener {
                 return;
             }
 
-            MessageWrapper message = new MessageWrapper(channel.getId(), new MessageSender(player), event.getMessage());
+            RoseSender sender = new RoseSender(event.getPlayer());
+            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, data.getColor() + event.getMessage());
+
+            if (!message.canBeSent()) {
+                if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
+                return;
+            }
+
             channel.send(message);
-
-            Bukkit.getConsoleSender().spigot().sendMessage(message.getComponents());
-
-            /* edit this
-            MessageWrapper message = new MessageWrapper(player, data.getColor() + event.getMessage(), data.getCurrentChannel());
-
-            if (message.canBeSent() && !message.isEmpty()) {
-                Bukkit.spigot().broadcast(message.build());
-               // MessageUtils.sendStandardMessage();
-            } else {
-                if (message.getFilterType() != null) message.getFilterType().sendWarning(player);
-            }*/
-
-            // Outputs the message to the console, with information about the hover events.
-            /*if (ConfigurationManager.Setting.OUTPUT_HOVER_EVENTS.getBoolean()) {
-                String hoverOutput = message.getHoverAsString();
-                if (hoverOutput != null && !hoverOutput.isEmpty())
-                    Bukkit.getConsoleSender().sendMessage(hoverOutput);
-            }*/
+            Bukkit.getConsoleSender().spigot().sendMessage(message.toComponents());
         });
     }
 }

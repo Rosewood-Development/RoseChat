@@ -46,20 +46,44 @@ public class GroupManager extends Manager {
         return null;
     }
 
-    // Why is this broke :(
     public void loadMemberGroupChats(UUID member) {
         this.async(() -> {
             this.dataManager.getDatabaseConnector().connect(connection -> {
-                List<GroupChat> gcs = new ArrayList<>();
 
-                String groupQuery = "SELECT * FROM " + this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
-                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gcm.uuid = ?";
+                String groupQuery = "SELECT gc.id, gc.name, gc.owner, gcm.uuid AS member_uuid FROM " + this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
+                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gc.id IN " +
+                        "(SELECT group_chat FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE uuid = ?) ORDER BY id;";
                 try (PreparedStatement statement = connection.prepareStatement(groupQuery)) {
                     statement.setString(1, member.toString());
                     ResultSet result = statement.executeQuery();
+                    List<GroupChat> gcs = new ArrayList<>();
+                    GroupChat current = null;
+                    String previousId = "";
 
-                    if (result.next()) {
-                        GroupChat gc = new GroupChat(result.getString("id"));
+                    while (result.next()) {
+                        String id = result.getString(1);
+                        if (current != null && !id.equals(previousId)) {
+                            gcs.add(current);
+                            current = null;
+                        }
+
+                        if (current == null) {
+                            current = new GroupChat(id);
+                            current.setName(result.getString(2));
+                            current.setOwner(UUID.fromString(result.getString(3)));
+                        }
+
+                        current.addMember(UUID.fromString(result.getString(4)));
+                        previousId = id;
+                    }
+
+                    if (current != null) {
+                        gcs.add(current);
+
+                        for (GroupChat groupChat : gcs) {
+                            if (!this.groupChats.containsKey(groupChat.getId()))
+                                this.groupChats.put(groupChat.getId(), groupChat);
+                        }
                     }
                 }
             });

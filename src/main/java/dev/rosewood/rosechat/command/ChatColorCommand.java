@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -29,12 +29,12 @@ public class ChatColorCommand extends AbstractCommand {
         }
 
         String color = args[0];
-        if (!sender.hasPermission("rosechat.color.chatcolor") && color.matches(MessageUtils.COLOR_PATTERN.pattern())
-                || (!sender.hasPermission("rosechat.format.chatcolor") && color.matches(MessageUtils.FORMATTING_PATTERN.pattern()))
+        if (!sender.hasPermission("rosechat.color.chatcolor") && color.matches(ComponentColorizer.VALID_LEGACY_REGEX.pattern())
                 || (!sender.hasPermission("rosechat.magic.chatcolor") && color.equalsIgnoreCase("&k"))
-                || (!sender.hasPermission("rosechat.hex.chatcolor") && color.matches(MessageUtils.HEX_PATTERN.pattern()))
-                || (!sender.hasPermission("rosechat.gradient.chatcolor") && color.matches(MessageUtils.GRADIENT_PATTERN.pattern()))
-                || (!sender.hasPermission("rosechat.rainbow.chatcolor") && color.matches(MessageUtils.RAINBOW_PATTERN.pattern()))) {
+                || (!sender.hasPermission("rosechat.format.chatcolor") && color.matches(ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.pattern()))
+                || (!sender.hasPermission("rosechat.hex.chatcolor") && color.matches(ComponentColorizer.HEX_REGEX.pattern()))
+                || (!sender.hasPermission("rosechat.gradient.chatcolor") && color.matches(ComponentColorizer.GRADIENT_PATTERN.pattern()))
+                || (!sender.hasPermission("rosechat.rainbow.chatcolor") && color.matches(ComponentColorizer.RAINBOW_PATTERN.pattern()))) {
             this.getAPI().getLocaleManager().sendMessage(sender, "no-permission");
             return;
         }

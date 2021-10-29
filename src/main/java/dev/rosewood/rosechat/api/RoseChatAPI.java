@@ -11,11 +11,13 @@ import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
-import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.entity.Player;
 import org.spigotmc.SpigotConfig;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ public class RoseChatAPI {
     private final DataManager dataManager;
     private final GroupManager groupManager;
     private final ChannelManager channelManager;
+    private final PlaceholderSettingManager placeholderSettingManager;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
@@ -40,6 +43,7 @@ public class RoseChatAPI {
         this.dataManager = this.plugin.getManager(DataManager.class);
         this.groupManager = this.plugin.getManager(GroupManager.class);
         this.channelManager = this.plugin.getManager(ChannelManager.class);
+        this.placeholderSettingManager = this.plugin.getManager(PlaceholderSettingManager.class);
     }
 
     /**
@@ -59,11 +63,13 @@ public class RoseChatAPI {
 
     /**
      * Parses a string into the RoseChat MessageWrapper and Tokenizer, allowing for hex color, tags and emoji in other text.
-     * @param string The string to parse.
+     * @param sender The person sending the message.
+     * @param viewer The person receiving the message.
+     * @param message The string to parse.
      * @return A BaseComponent[] consisting of the parsed message.
      */
-    public BaseComponent[] parse(String string) {
-        return new MessageWrapper("", new MessageSender(null, null), string).getComponents();
+    public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message) {
+        return new MessageWrapper(sender, MessageLocation.OTHER, null, message).parse(null, viewer);
     }
 
     /**
@@ -116,8 +122,8 @@ public class RoseChatAPI {
      * @param hoverText The text shown when the replacement is hovered over.
      * @return The new chat replacement.
      */
-    public ChatReplacement createReplacement(String id, String text, String replacement, String hoverText) {
-        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText);
+    public ChatReplacement createReplacement(String id, String text, String replacement, String hoverText, boolean regex) {
+        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, regex);
         this.plugin.getManager(PlaceholderSettingManager.class).addReplacement(chatReplacement);
         return chatReplacement;
     }
@@ -162,7 +168,7 @@ public class RoseChatAPI {
      * @return The new emoji.
      */
     public ChatReplacement createEmoji(String id, String text, String replacement, String hoverText, String font) {
-        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, font);
+        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, font, false);
         this.plugin.getManager(PlaceholderSettingManager.class).addEmoji(chatReplacement);
         return chatReplacement;
     }
@@ -219,6 +225,26 @@ public class RoseChatAPI {
     public void deleteGroupChat(GroupChat groupChat) {
         this.groupManager.removeGroupChat(groupChat);
         this.groupManager.deleteGroupChat(groupChat);
+    }
+
+    /**
+     * Adds a player to a group chat.
+     * @param groupChat The group chat to be added to.
+     * @param member The player to be added.
+     */
+    public void addGroupChatMember(GroupChat groupChat, Player member) {
+        groupChat.addMember(member);
+        this.groupManager.addMember(groupChat, member.getUniqueId());
+    }
+
+    /**
+     * Removes a player from a group chat.
+     * @param groupChat The group chat to be removed from.
+     * @param member The player to be removed.
+     */
+    public void removeGroupChatMember(GroupChat groupChat, Player member) {
+        groupChat.removeMember(member);
+        this.groupManager.removeMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -334,6 +360,13 @@ public class RoseChatAPI {
      */
     public ChannelManager getChannelManager() {
         return this.channelManager;
+    }
+
+    /**
+     * @return An instance of the placeholder setting manager.
+     */
+    public PlaceholderSettingManager getPlaceholderSettingManager() {
+        return this.placeholderSettingManager;
     }
 
     /**

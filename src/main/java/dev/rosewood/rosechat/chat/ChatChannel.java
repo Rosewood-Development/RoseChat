@@ -2,12 +2,13 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.listener.BungeeListener;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
+import dev.rosewood.rosechat.message.RoseSender;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,18 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ChatChannel implements GroupReceiver {
+public class ChatChannel implements Group {
 
     private final String id;
     private boolean defaultChannel;
     private boolean muted;
     private String format;
-    private String formatId;
     private String command;
     private int radius = -1;
     private String world;
     private boolean autoJoin;
     private boolean visibleAnywhere;
+    private boolean joinable;
     private String discordChannel;
     private List<String> servers;
     private List<UUID> players;
@@ -42,8 +43,8 @@ public class ChatChannel implements GroupReceiver {
     public ChatChannel(String id, String format, boolean defaultChannel) {
         this.id = id;
         this.format = format;
-        this.formatId = "channel-" + id;
         this.defaultChannel = defaultChannel;
+        this.joinable = true;
         this.players = new ArrayList<>();
         this.servers = new ArrayList<>();
     }
@@ -58,91 +59,116 @@ public class ChatChannel implements GroupReceiver {
     }
 
     @Override
-    public void send(MessageWrapper messageWrapper) {
-        if (this.isMuted() && !(messageWrapper.getSender().hasPermission("rosechat.mute.bypass")))  {
-            messageWrapper.getSender().send(RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("channel-muted"));
-            return;
-        }
-
-        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
-        builder.append(messageWrapper.getComponents());
-        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
-            if (!this.players.contains(uuid)) {
-                Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null) spy.spigot().sendMessage(builder.create());
-            }
-        }
-
+    public void send(MessageWrapper message) {
         RoseChatAPI api = RoseChatAPI.getInstance();
+
+        // Send the message to the channel spies.
+        for (UUID uuid : api.getDataManager().getChannelSpies()) {
+            if (uuid == message.getSender().getUUID()) continue;
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        }
+
+        // Send the message to discord.
         if (api.getDiscord() != null) {
             TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
-            if (textChannel != null) {
-                MessageEmbed messageEmbed = new MessageEmbed(null,
-                        "[" + messageWrapper.getPrefix() + "] [" + messageWrapper.getSender().getGroup() + "] " + messageWrapper.getSender().getName() + ": " + messageWrapper.getMessage(),
-                        null, EmbedType.RICH, null, 12648430,
-                        new MessageEmbed.Thumbnail("https://cravatar.eu/helmavatar/" + messageWrapper.getSender().getName(), "https://cravatar.eu/helmavatar/" + messageWrapper.getSender().getName(), 128, 128),
-                        null, null,
-                        null, null, null, null);
-                textChannel.sendMessage(messageEmbed).queue();
+            if (textChannel != null) MessageUtils.sendDiscordMessage(message, textChannel);
+        }
+
+        // Send the message to other servers.
+        if (api.isBungee()) {
+            for (String server : this.servers) {
+                BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.parse(this.getFormat(), null)));
             }
         }
 
+        // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                this.sendToPlayer(messageWrapper, player);
-            }
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
-            return;
-        }
-
-        if (this.getRadius() != -1 && messageWrapper.getSender().isPlayer()) {
-            Location playerLocation = messageWrapper.getSender().asPlayer().getLocation();
-
-            if (playerLocation.getWorld() == null) return;
-            for (Player player : playerLocation.getWorld().getPlayers()) {
-                if (player.getLocation().distance(playerLocation) < this.radius) {
-                    this.sendToPlayer(messageWrapper, player);
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
                 }
             }
 
             return;
         }
 
+        // Send to playes within the radius.
+        if (this.getRadius() != -1 && message.getSender().isPlayer()) {
+            Location playerLocation = message.getSender().asPlayer().getLocation();
+
+            if (playerLocation.getWorld() == null) return;
+            for (Player player : playerLocation.getWorld().getPlayers()) {
+                if (player.getLocation().distance(playerLocation) < this.radius) {
+                    player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+
+                    if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                        if ( message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                    }
+                }
+            }
+
+            return;
+        }
+
+        // Send to players in the same world.
         if (this.world != null) {
             World world = Bukkit.getWorld(this.world);
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                this.sendToPlayer(messageWrapper, player);
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if ( message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
+
+            return;
         }
 
-        for (String server : this.servers) {
-           BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(messageWrapper.getComponents()));
-        }
-
+        // Send to players in the channel.
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                this.sendToPlayer(messageWrapper, player);
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if ( message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
         }
 
-        if (messageWrapper.getSender().isPlayer() && !this.players.contains(messageWrapper.getSender().asPlayer().getUniqueId())) {
-            Player player = messageWrapper.getSender().asPlayer();
-            this.sendToPlayer(messageWrapper, player);
+        // Send to the sender, if they're not in the channel.
+        if (message.getSender().isPlayer() && !this.players.contains(message.getSender().asPlayer().getUniqueId())) {
+            message.getSender().asPlayer().spigot().sendMessage(message.parse(this.getFormat(), message.getSender()));
         }
     }
 
     @Override
-    public void sendJson(String json) {
-        if (this.isMuted()) return;
+    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        BaseComponent[] components = ComponentSerializer.parse(jsonMessage);
+        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).validate().filter();
 
-        BaseComponent[] components = ComponentSerializer.parse(json);
+        // Send the message to the channel spies.
+        for (UUID uuid : api.getDataManager().getChannelSpies()) {
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null) spy.spigot().sendMessage(localMessage.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        }
 
+        // Send the message to discord.
+        if (api.getDiscord() != null) {
+            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
+            if (textChannel != null) MessageUtils.sendDiscordMessage(localMessage, textChannel);
+        }
+
+        // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
@@ -152,11 +178,7 @@ public class ChatChannel implements GroupReceiver {
             return;
         }
 
-        if (this.getRadius() > 0) {
-            // hmm...
-            return;
-        }
-
+        // Send to players in the same world.
         if (this.world != null) {
             World world = Bukkit.getWorld(this.world);
 
@@ -167,10 +189,7 @@ public class ChatChannel implements GroupReceiver {
             }
         }
 
-        for (String server : this.servers) {
-            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(components));
-        }
-
+        // Send to players in the channel.
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
@@ -180,44 +199,66 @@ public class ChatChannel implements GroupReceiver {
         }
     }
 
-    public void sendFromDiscord(MessageWrapper messageWrapper) {
+    @Override
+    public void sendFromDiscord(MessageWrapper message) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        // Send the message to the channel spies.
+        for (UUID uuid : api.getDataManager().getChannelSpies()) {
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        }
+
+        // Send the message to discord.
+        if (api.getDiscord() != null) {
+            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
+            if (textChannel != null) MessageUtils.sendDiscordMessage(message, textChannel);
+        }
+
+        // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
             }
 
             return;
         }
 
+        // Send to players in the same world.
         if (this.world != null) {
             World world = Bukkit.getWorld(this.world);
 
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(messageWrapper.getComponents());
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
             }
         }
 
         for (String server : this.servers) {
-            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(messageWrapper.getComponents()));
+            BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.toComponents()));
         }
 
+        // Send to players in the same world.
+        if (this.world != null) {
+            World world = Bukkit.getWorld(this.world);
+
+            if (world == null) return;
+            for (Player player : world.getPlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+            }
+
+            return;
+        }
+
+        // Send to players in the channel.
         for (UUID uuid : this.players) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(messageWrapper.getComponents());
-            }
-        }
-
-        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
-        builder.append(messageWrapper.getComponents());
-        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getChannelSpies()) {
-            if (!this.players.contains(uuid)) {
-                Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null) spy.spigot().sendMessage(builder.create());
+                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
             }
         }
     }
@@ -225,6 +266,53 @@ public class ChatChannel implements GroupReceiver {
     @Override
     public List<UUID> getMembers() {
         return this.players;
+    }
+
+    /**
+     * Clears the channel's chat.
+     */
+    public void clearChat(String message) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        // Send the message to other servers.
+        if (api.isBungee()) {
+            for (String server : this.servers) {
+                BungeeListener.sendChannelMessage(this.getId(), server, message);
+            }
+        }
+
+        // Send to everyone who can view it.
+        if (this.isVisibleAnywhere()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+                player.sendMessage(message);
+            }
+
+            return;
+        }
+
+        // Send to players in the same world.
+        if (this.world != null) {
+            World world = Bukkit.getWorld(this.world);
+
+            if (world == null) return;
+            for (Player player : world.getPlayers()) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+                player.sendMessage(message);
+            }
+
+            return;
+        }
+
+
+        // Send to players in the channel.
+        for (UUID uuid : this.players) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+                player.sendMessage(message);
+            }
+        }
     }
 
     /**
@@ -318,22 +406,6 @@ public class ChatChannel implements GroupReceiver {
     }
 
     /**
-     * Gets the channel format ID.
-     * @return The channel format ID.
-     */
-    public String getFormatId() {
-        return this.formatId;
-    }
-
-    /**
-     * Sets the channel format ID.
-     * @param formatId The format ID to use.
-     */
-    public void setFormatId(String formatId) {
-        this.formatId = formatId;
-    }
-
-    /**
      * Gets the radius that messages can be received within.
      * @return The channel radius.
      */
@@ -406,8 +478,7 @@ public class ChatChannel implements GroupReceiver {
     }
 
     /**
-     * Is this channel visible anywhere?
-     * @return Whether or not this channel is visible anywhere.
+     * @return Whether this channel is visible anywhere.
      */
     public boolean isVisibleAnywhere() {
         return this.visibleAnywhere;
@@ -415,14 +486,13 @@ public class ChatChannel implements GroupReceiver {
 
     /**
      * Sets this channel as visible, meaning that messages will always be received even if a player is in another channel.
-     * @param visibleAnywhere Whether or not the channel should be visible anywhere.
+     * @param visibleAnywhere Whether the channel should be visible anywhere.
      */
     public void setVisibleAnywhere(boolean visibleAnywhere) {
         this.visibleAnywhere = visibleAnywhere;
     }
 
     /**
-     * Gets the command that can be used to access the channel.
      * @return The command that can be used to access the channel.
      */
     public String getCommand() {
@@ -438,16 +508,15 @@ public class ChatChannel implements GroupReceiver {
     }
 
     /**
-     * Gets whether or not the channel is muted.
-     * @return Whether or not the channel is muted.
+     * @return Whether the channel is muted.
      */
     public boolean isMuted() {
         return this.muted;
     }
 
     /**
-     * Sets whether or not the channel is muted.
-     * @param muted Whether or not the channel is muted.
+     * Sets whether the channel is muted.
+     * @param muted Whether the channel is muted.
      */
     public void setMuted(boolean muted) {
         this.muted = muted;
@@ -462,10 +531,24 @@ public class ChatChannel implements GroupReceiver {
     }
 
     /**
-     * Gets the DiscordSRV channel that the channel is connected to.
      * @return The DiscordSRV channel that the channel is connected to.
      */
     public String getDiscordChannel() {
         return this.discordChannel;
+    }
+
+    /**
+     * @return Whether the channel can be joined.
+     */
+    public boolean isJoinable() {
+        return this.joinable;
+    }
+
+    /**
+     * Sets whether the channel can be joined.
+     * @param joinable Whether the channel can be joined.
+     */
+    public void setJoinable(boolean joinable) {
+        this.joinable = joinable;
     }
 }

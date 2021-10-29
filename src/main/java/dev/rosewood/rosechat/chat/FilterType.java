@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.entity.Player;
 
 public enum FilterType {
@@ -22,7 +22,7 @@ public enum FilterType {
      * Sends a warning message, defined in the language file, to the sender.
      * @param sender The sender to receive the message.
      */
-    public void sendWarning(MessageSender sender) {
+    public void sendWarning(RoseSender sender) {
         LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
         sender.send(localeManager.getLocaleMessage(this.warning));
     }

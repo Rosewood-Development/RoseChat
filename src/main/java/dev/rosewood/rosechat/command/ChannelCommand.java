@@ -4,12 +4,11 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageSender;
-import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -36,6 +35,11 @@ public class ChannelCommand extends AbstractCommand {
                 return;
             }
 
+            if (!channel.isJoinable()) {
+                this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-joinable");
+                return;
+            }
+
             String message = getAllArgs(1, args);
 
             if (MessageUtils.isMessageEmpty(message)) {
@@ -43,7 +47,13 @@ public class ChannelCommand extends AbstractCommand {
                 return;
             }
 
-            MessageWrapper messageWrapper = new MessageWrapper(channel.getId(), new MessageSender(sender), message);
+            RoseSender roseSender = new RoseSender(sender);
+            MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter();
+            if (!messageWrapper.canBeSent()) {
+                if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
+                return;
+            }
+
             channel.send(messageWrapper);
         }
     }

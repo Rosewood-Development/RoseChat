@@ -2,8 +2,6 @@ package dev.rosewood.rosechat.command.api;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

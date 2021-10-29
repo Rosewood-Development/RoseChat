@@ -3,10 +3,15 @@ package dev.rosewood.rosechat.command;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
@@ -51,7 +56,15 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         if (this.isNicknameAllowed(player, nickname)) {
-            String formattedNickname = HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(player, nickname));
+            RoseSender roseSender = new RoseSender(player);
+            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, null, nickname).validate().filterLanguage().filterURLs();;
+            if (!message.canBeSent()) {
+                if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
+                return;
+            }
+
+            BaseComponent[] components = message.parse(null, roseSender);
+            String formattedNickname = TextComponent.toLegacyText(components);
             playerData.setNickname(nickname);
             player.setDisplayName(formattedNickname);
             playerData.save();

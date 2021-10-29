@@ -2,8 +2,6 @@ package dev.rosewood.rosechat.database.migrations;
 
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.database.DatabaseConnector;
-import dev.rosewood.rosegarden.database.MySQLConnector;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;

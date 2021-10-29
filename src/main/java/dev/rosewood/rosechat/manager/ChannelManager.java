@@ -34,9 +34,10 @@ public class ChannelManager extends Manager {
             CommentedConfigurationSection section = Setting.CHAT_CHANNELS.getSection();
 
             boolean isDefault = section.contains(id + ".default") && section.getBoolean(id + ".default");
-            String format = section.contains(id + ".format") ? section.getString(id + ".format") : "default-format";
+            String format = section.contains(id + ".format") ? section.getString(id + ".format") : this.defaultChannel.getFormat();
             String command = section.contains(id + ".command") ? section.getString(id + ".command") : null;
             boolean visible = section.contains(id + ".visible-anywhere") && section.getBoolean(id + ".visible-anywhere");
+            boolean joinable = !section.contains(id + ".joinable") || section.getBoolean(id + ".joinable");
             int radius = section.contains(id + ".radius") ? section.getInt(id + ".radius") : -1;
             String world = section.contains(id + ".world") ? section.getString(id + ".world") : null;
             boolean autoJoin = section.contains(id + ".auto-join") && section.getBoolean("auto-join");
@@ -53,6 +54,7 @@ public class ChannelManager extends Manager {
             channel.setVisibleAnywhere(visible);
             channel.setServers(servers);
             channel.setDiscordChannel(discord);
+            channel.setJoinable(joinable);
 
             this.channels.put(id, channel);
 

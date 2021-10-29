@@ -5,7 +5,10 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -74,7 +77,15 @@ public class ReplyCommand extends AbstractCommand {
 
         if (!canBeMessaged.get()) return;
 
-        MessageUtils.sendPrivateMessage(sender, target, message);
+        RoseSender roseSender = new RoseSender(sender);
+        MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.MESSAGE, null, message).validate().filter();
+        if (!messageWrapper.canBeSent()) {
+            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
+            return;
+        }
+
+        MessageUtils.sendPrivateMessage(roseSender, target, messageWrapper);
+
 
         PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
         if (targetData.hasMessageSounds() && targetPlayer.isOnline() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {

@@ -68,7 +68,8 @@ public class BungeeListener implements PluginMessageListener {
                 }
             } else {
                 ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(command);
-                chatChannel.sendJson(received);
+                // TODO: This
+                //chatChannel.sendJson(received, null);
             }
 
         } catch (IOException e) {

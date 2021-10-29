@@ -3,7 +3,10 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -70,14 +73,19 @@ public class DenyGroupCommand extends AbstractCommand {
 
     private void deny(PlayerData data, Player player, GroupChat groupChat) {
         OfflinePlayer owner = Bukkit.getOfflinePlayer(groupChat.getOwner());
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-deny-success",
-                StringPlaceholders.builder()
-        .addPlaceholder("name", groupChat.getName()).build());
-
-        if (owner != null && owner.isOnline()) {
-            this.getAPI().getLocaleManager().sendMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.single("player", player.getDisplayName()));
-        }
-
         data.getGroupInvites().remove(groupChat);
+
+        RoseSender roseSender = new RoseSender(player);
+        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
+        String formattedGroupName = ComponentSerializer.toString(groupName);
+
+        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
+        String formattedName = ComponentSerializer.toString(name);
+
+        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-deny-success",
+                StringPlaceholders.builder().addPlaceholder("name", formattedGroupName).build());
+        if (owner != null && owner.isOnline()) {
+            this.getAPI().getLocaleManager().sendMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.single("player", formattedName));
+        }
     }
 }

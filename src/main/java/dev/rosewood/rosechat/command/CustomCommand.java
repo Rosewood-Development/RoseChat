@@ -3,8 +3,9 @@ package dev.rosewood.rosechat.command;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageSender;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -36,7 +37,13 @@ public class CustomCommand extends Command {
                         return true;
                     }
 
-                    MessageWrapper messageWrapper = new MessageWrapper(channel.getId(), new MessageSender(sender), message);
+                    RoseSender roseSender = new RoseSender(sender);
+                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter();
+                    if (!messageWrapper.canBeSent()) {
+                        if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
+                        return true;
+                    }
+
                     channel.send(messageWrapper);
                 }
                 return true;

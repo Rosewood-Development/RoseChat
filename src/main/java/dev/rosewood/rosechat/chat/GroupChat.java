@@ -2,19 +2,19 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.chat.ComponentSerializer;
+import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class GroupChat implements GroupReceiver {
+public class GroupChat implements Group {
 
-    private String id;
+    private final String id;
     private String name;
     private UUID owner;
     private List<UUID> members;
@@ -27,33 +27,32 @@ public class GroupChat implements GroupReceiver {
         this.members = new ArrayList<>();
     }
 
+
     @Override
-    public void send(MessageWrapper messageWrapper) {
+    public void send(MessageWrapper message) {
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                this.sendToPlayer(messageWrapper, player);
+                player.spigot().sendMessage(message.parse(Setting.GROUP_FORMAT.getString(), new RoseSender(player)));
             }
         }
 
-        ComponentBuilder builder = new ComponentBuilder("[Spy] ");
-        builder.append(messageWrapper.getComponents());
         for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getGroupSpies()) {
             if (!this.members.contains(uuid)) {
                 Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null) spy.spigot().sendMessage(builder.create());
+                if (spy != null) spy.spigot().sendMessage(message.parse(Setting.GROUP_SPY_FORMAT.getString(), new RoseSender(spy)));
             }
         }
     }
 
     @Override
-    public void sendJson(String json) {
-        for (UUID uuid : this.members) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                player.spigot().sendMessage(ComponentSerializer.parse(json));
-            }
-        }
+    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage) {
+
+    }
+
+    @Override
+    public void sendFromDiscord(MessageWrapper message) {
+
     }
 
     @Override
@@ -65,6 +64,10 @@ public class GroupChat implements GroupReceiver {
         RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
     }
 
+    /**
+     * Sets the members in the group chat.
+     * @param members The members list to be used.
+     */
     public void setMembers(List<UUID> members) {
         this.members = members;
     }
@@ -107,10 +110,6 @@ public class GroupChat implements GroupReceiver {
      */
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     /**

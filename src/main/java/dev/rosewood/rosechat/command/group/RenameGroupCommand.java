@@ -2,8 +2,12 @@ package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -30,9 +34,18 @@ public class RenameGroupCommand extends AbstractCommand {
         }
 
         String name = getAllArgs(1, args);
+        RoseSender roseSender = new RoseSender(sender);
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).validate().filterLanguage().filterURLs();
+
+        if (!message.canBeSent()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
+            return;
+        }
+
         groupChat.setName(name);
         groupChat.save();
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", HexUtils.colorify(name)));
+        BaseComponent[] components = message.parse(null, roseSender);
+        this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", TextComponent.toLegacyText(components)));
     }
 
     @Override

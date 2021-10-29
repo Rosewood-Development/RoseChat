@@ -3,11 +3,14 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,10 +50,17 @@ public class InviteGroupCommand extends AbstractCommand {
 
         PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
 
+        RoseSender roseSender = new RoseSender(player);
+        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
+        String formattedGroupName = ComponentSerializer.toString(groupName);
+
+        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
+        String formattedName = ComponentSerializer.toString(name);
+
         this.getAPI().getLocaleManager().sendMessage(target, "command-gc-invite-invited",
-                StringPlaceholders.builder().addPlaceholder("player", player.getDisplayName()).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().addPlaceholder("player", formattedName).addPlaceholder("name", formattedGroupName).build());
         this.getAPI().getLocaleManager().sendMessage(player, "command-gc-invite-success",
-                StringPlaceholders.builder().addPlaceholder("player", target.getDisplayName()).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().addPlaceholder("player", formattedName).addPlaceholder("name", formattedGroupName).build());
         sendAcceptMessage(target, groupChat);
 
         data.inviteToGroup(groupChat);

@@ -3,16 +3,12 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.placeholders.ClickPlaceholder;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosechat.placeholders.HoverPlaceholder;
-import dev.rosewood.rosechat.placeholders.Placeholder;
-import dev.rosewood.rosechat.placeholders.TextPlaceholder;
+import dev.rosewood.rosechat.placeholders.ConditionalPlaceholder;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Sound;
 import java.io.File;
 import java.util.ArrayList;
@@ -53,41 +49,33 @@ public class PlaceholderSettingManager extends Manager {
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
-            TextPlaceholder textPlaceholder = new TextPlaceholder();
-            HoverPlaceholder hoverPlaceholder = new HoverPlaceholder();
-            ClickPlaceholder clickPlaceholder = new ClickPlaceholder();
 
-            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), textPlaceholder);
-            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), hoverPlaceholder);
-            loadConditionalPlaceholders(placeholderConfiguration.getConfigurationSection(id), clickPlaceholder);
+            if (placeholderConfiguration.contains(id + ".text")) {
+                ConditionalPlaceholder textPlaceholder = new ConditionalPlaceholder();
 
-            Map<String, String> textPlaceholders = new HashMap<>();
-            for (String textGroup : placeholderConfiguration.getConfigurationSection(id + ".text").getKeys(false)) {
-                textPlaceholders.put(textGroup, placeholderConfiguration.getString(id + ".text." + textGroup));
+                String condition = placeholderConfiguration.contains(id + ".text.condition") ? placeholderConfiguration.getString(id + ".text.condition") : null;
+                textPlaceholder.parseCondition(placeholderConfiguration.getConfigurationSection(id + ".text"), condition);
+
+                placeholder.setText(textPlaceholder);
             }
 
-            Map<String, List<String>> hoverPlaceholders = new HashMap<>();
             if (placeholderConfiguration.contains(id + ".hover")) {
-                for (String hoverGroup : placeholderConfiguration.getConfigurationSection(id + ".hover").getKeys(false))
-                    hoverPlaceholders.put(hoverGroup, placeholderConfiguration.getStringList(id + ".hover." + hoverGroup));
+                ConditionalPlaceholder hoverPlaceholder = new ConditionalPlaceholder();
+
+                String condition = placeholderConfiguration.contains(id + ".hover.condition") ? placeholderConfiguration.getString(id + ".hover.condition") : null;
+                hoverPlaceholder.parseCondition(placeholderConfiguration.getConfigurationSection(id + ".hover"), condition);
+
+                placeholder.setHover(hoverPlaceholder);
             }
 
-            Map<String, ClickEvent> clickPlaceholders = new HashMap<>();
             if (placeholderConfiguration.contains(id + ".click")) {
-                for (String clickGroup : placeholderConfiguration.getConfigurationSection(id + ".click").getKeys(false)) {
-                    String action = placeholderConfiguration.getString(id + ".click." + clickGroup + ".action");
-                    String value = placeholderConfiguration.getString(id + ".click." + clickGroup + ".value");
-                    clickPlaceholders.put(clickGroup, new ClickEvent(ClickEvent.Action.valueOf(action), value));
-                }
+                ConditionalPlaceholder clickPlaceholder = new ConditionalPlaceholder();
+
+                String condition = placeholderConfiguration.contains(id + ".click.condition") ? placeholderConfiguration.getString(id + ".click.condition") : null;
+                clickPlaceholder.parseCondition(placeholderConfiguration.getConfigurationSection(id + ".click"), condition);
+
+                placeholder.setClick(clickPlaceholder);
             }
-
-            textPlaceholder.setGroups(textPlaceholders);
-            hoverPlaceholder.setGroups(hoverPlaceholders);
-            clickPlaceholder.setGroups(clickPlaceholders);
-
-            placeholder.setText(textPlaceholder);
-            if (!hoverPlaceholders.isEmpty()) placeholder.setHover(hoverPlaceholder);
-            if (!clickPlaceholders.isEmpty()) placeholder.setClick(clickPlaceholder);
 
             this.placeholders.put(id, placeholder);
         }
@@ -98,7 +86,7 @@ public class PlaceholderSettingManager extends Manager {
             String replacement = emojiConfiguration.getString(id + ".replacement");
             String hover = emojiConfiguration.contains(id + ".hover") ? emojiConfiguration.getString(id + ".hover") : null;
             String font = emojiConfiguration.contains(id + ".font") ? emojiConfiguration.getString(id + ".font") : null;
-            this.emojis.put(id, new ChatReplacement(id, text, replacement, hover, font));
+            this.emojis.put(id, new ChatReplacement(id, text, replacement, hover, font, false));
         }
 
         // Replacements
@@ -107,11 +95,12 @@ public class PlaceholderSettingManager extends Manager {
             String text = section.getString(id + ".text");
             String replacement = section.getString(id + ".replacement");
             String hover = section.contains(id + ".hover") ? section.getString(id + ".hover") : null;
+            boolean regex = section.contains(id + ".regex") && section.getBoolean(id + ".regex");
 
             if (replacement.startsWith("{") && replacement.endsWith("}"))
                 parseFormat("replacement-" + id, replacement);
 
-            this.replacements.put(id, new ChatReplacement(id, text, replacement, hover));
+            this.replacements.put(id, new ChatReplacement(id, text, replacement, hover, regex));
         }
 
         // Tags
@@ -156,7 +145,8 @@ public class PlaceholderSettingManager extends Manager {
     }
 
     // TODO: Conditional Placeholders
-    private boolean loadConditionalPlaceholders(CommentedConfigurationSection config, Placeholder placeholder) {
+    private boolean loadConditionalPlaceholders(CommentedConfigurationSection config, ConditionalPlaceholder placeholder) {
+
         return false;
     }
 
@@ -167,6 +157,7 @@ public class PlaceholderSettingManager extends Manager {
     }
 
     public void parseFormat(String id, String format) {
+        this.chatFormats.put(id, format);
         String[] sections = format.split("[{}]");
 
         List<String> parsed = new ArrayList<>();
