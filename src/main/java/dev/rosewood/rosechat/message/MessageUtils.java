@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 public class MessageUtils {
 
-    public static final Pattern URL_PATTERN = Pattern.compile("[-a-zA-Z0-9@:%._+~#=]{5,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&=]*)");
+    public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
 
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());
@@ -79,6 +79,16 @@ public class MessageUtils {
         else if (group instanceof GroupChat) return getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
         else if (group instanceof ChatChannel) return getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
         else return getSenderViewerPlaceholders(sender, viewer);
+    }
+
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group, StringPlaceholders extra) {
+        StringPlaceholders.Builder builder;
+        if (group == null) builder =  getSenderViewerPlaceholders(sender, viewer);
+        else if (group instanceof GroupChat) builder = getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
+        else if (group instanceof ChatChannel) builder = getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
+        else builder = getSenderViewerPlaceholders(sender, viewer);
+
+        return extra == null ? builder : builder.addAll(extra);
     }
 
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, GroupChat group) {
@@ -129,14 +139,13 @@ public class MessageUtils {
         if (hoverString != null) {
             BaseComponent[] hover = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, hoverString).toComponents();
             hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
-            if (Setting.OUTPUT_HOVER_EVENTS.getBoolean()) Bukkit.getConsoleSender().sendMessage("[Hover] " + sender.getNickname() + ": " + hoverString);
         }
 
         String clickString = placeholder.getClick() != null ? placeholders.apply(placeholder.getClick().parse(sender, viewer, placeholders)) : null;
         ClickEvent.Action action = placeholder.getClick() != null ? placeholder.getClick().parseToAction(sender, viewer, placeholders) : null;
         if (clickString != null && action != null) {
-            String click = sender.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(sender.asPlayer(), clickString) : null;
-            clickEvent = new ClickEvent(action, HexUtils.colorify(click));
+            String click = sender.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(sender.asPlayer(), clickString) : clickString;
+            clickEvent = new ClickEvent(action, ChatColor.stripColor(click));
         }
 
         for (BaseComponent c : component) {
@@ -147,14 +156,8 @@ public class MessageUtils {
         return component;
     }
 
-    public static void sendDiscordMessage(MessageWrapper message, TextChannel channel) {
-        MessageEmbed messageEmbed = new MessageEmbed(null,
-                TextComponent.toLegacyText(message.parse(Setting.MINECRAFT_TO_DISCORD_FORMAT.getString(), null)),
-                null, EmbedType.RICH, null, 12648430,
-                new MessageEmbed.Thumbnail("https://cravatar.eu/helmavatar/" + message.getSender().asPlayer().getName(), "https://cravatar.eu/helmavatar/" + message.getSender().asPlayer().getName(), 128, 128),
-                null, null,
-                null, null, null, null);
-        channel.sendMessage(messageEmbed).queue();
+    public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
+        RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 
     public static void sendPrivateMessage(RoseSender sender, String targetName, MessageWrapper message) {

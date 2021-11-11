@@ -150,6 +150,10 @@ public class RoseSender {
         return this.displayName;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     /**
      * @return If a player, their nickname. If not, returns the display name.
      */

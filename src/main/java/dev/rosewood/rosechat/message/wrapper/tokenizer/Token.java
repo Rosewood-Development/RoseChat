@@ -33,4 +33,8 @@ public class Token {
         componentBuilder.font("default");
         return componentBuilder.create();
     }
+
+    public String asString() {
+        return this.originalContent;
+    }
 }

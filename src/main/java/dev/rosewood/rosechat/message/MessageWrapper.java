@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ public class MessageWrapper {
     private final String locationPermission;
     private String message;
     private PlayerData senderData;
+    private StringPlaceholders placeholders;
 
     private final List<UUID> taggedPlayers;
     private Sound tagSound;
@@ -47,6 +49,11 @@ public class MessageWrapper {
         this.canBeSent = true;
         if (sender.isPlayer()) this.senderData = RoseChatAPI.getInstance().getPlayerData(sender.getUUID());
         this.taggedPlayers = new ArrayList<>();
+    }
+
+    public MessageWrapper(RoseSender sender, MessageLocation location, Group group, String message, StringPlaceholders placeholders) {
+        this(sender, location, group, message);
+        this.placeholders = placeholders;
     }
 
     public MessageWrapper(Player sender, MessageLocation messageLocation, Group group, String message) {
@@ -275,6 +282,36 @@ public class MessageWrapper {
         return this.toComponents();
     }
 
+    public BaseComponent[] parseFromDiscord(String format, RoseSender viewer) {
+        PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
+        Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
+            Bukkit.getPluginManager().callEvent(preParseMessageEvent);
+        });
+
+        if (!preParseMessageEvent.isCancelled()) {
+            ComponentBuilder componentBuilder = new ComponentBuilder();
+
+            if (format == null || !format.contains("{message}")) {
+                componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                return this.tokenized = componentBuilder.create();
+            }
+
+            String[] formatSplit = format.split("\\{message\\}");
+            String before = formatSplit[0];
+            String after = formatSplit.length > 1 ? formatSplit[1] : null;
+
+            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).fromString(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+            return this.tokenized = componentBuilder.create();
+        }
+
+        PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+        Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> Bukkit.getPluginManager().callEvent(postParseMessageEvent));
+        return this.toComponents();
+    }
+
     public BaseComponent[] toComponents() {
         return this.tokenized;
     }
@@ -317,5 +354,9 @@ public class MessageWrapper {
 
     public MessageLocation getLocation() {
         return this.location;
+    }
+
+    public StringPlaceholders getPlaceholders() {
+        return this.placeholders;
     }
 }

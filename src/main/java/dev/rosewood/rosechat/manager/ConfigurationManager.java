@@ -39,7 +39,6 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         ALLOW_NONALPHANUMERIC_CHARACTERS_IN_NICKNAMES("nickname-settings.allow-nonalphanumeric-characters", true, "Should non-alphanumeric characters, such as brackets, be allowed in nicknames?"),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
-        OUTPUT_HOVER_EVENTS("chat-settings.output-hover-events", true, "Should hover events be output to the console?"),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true, "Should players be allowed to message other players on connected servers?", "Requires BungeeCord"),
         MESSAGE_SOUND("chat-settings.message-sound", Sound.BLOCK_NOTE_BLOCK_PLING.name(), "The sound that will be sent to a player when they receive a message.", "Players can individually disable this in-game with /togglesound.", "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
         CHAT_REPLACEMENTS("chat-settings.chat-replacements", new RoseSettingSection(
@@ -47,12 +46,15 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                         new RoseSettingValue("text", "&h"),
                         new RoseSettingValue("replacement", "<r:0.3>")
                 )),
+                new RoseSettingValue("heart", new RoseSettingSection(
+                        new RoseSettingValue("text", "<3>"),
+                        new RoseSettingValue("replacement", "❤")
+                )),
                 new RoseSettingValue("regex-example", new RoseSettingSection(
-                        new RoseSettingValue("text", "[-]{0,1}[\\\\d]*[.]{0,1}[\\\\d]+"),
+                        new RoseSettingValue("text", "\\b[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,4}\\b"),
                         new RoseSettingValue("replacement", "&c%message%"),
-                        new RoseSettingValue("hover", "&b&o<3"),
                         new RoseSettingValue("regex", true)
-                ), "The '%message%' placeholder can be used to get what was replaced.", "For example, this regex matches URLS. The replacement changes the colour and adds an underline.")),
+                ), "The '%message%' placeholder can be used to get what was replaced.", "For example, this regex matches email addresses. The replacement changes the colour and adds a strikethrough.")),
                 "When a message containing the 'text' is sent in chat, it will be replaced with the 'replacment'.", "These can be used for custom color codes, general replacements or regular expressions.", "These replacements can be used with placeholders in placeholder.yml.", "Emoji's can be defined in the emojis.yml file, these are parsed separately from replacements."),
 
         TAGS("tags", new RoseSettingSection(
@@ -126,6 +128,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         DELETED_MESSAGE_FORMAT("chat-formats.deleted-message-format", "{delete-message}", "The format of a previously deleted message."),
         MINECRAFT_TO_DISCORD_FORMAT("chat-formats.minecraft-to-discord", "{discord}", "The format of a message that was sent to discord.", "Requires DiscordSRV"),
         DISCORD_TO_MINECRAFT_FORMAT("chat-formats.discord-to-minecraft", "{from-discord}", "The format of a message that was sent from discord.", "Requires DiscordSRV"),
+        URL_FORMAT("chat-formats.url", "{url}", "The format of a URL in a message."),
+        CENSORED_URL_FORMAT("chat-formats.censored-url", "{censored-url}", "The format of a URL in a message, when it is censored."),
 
         DISCORD_FORMATS("discord-formats", null, "Discord Format Settings", "Requires DiscordSRV"),
         DISCORD_FORMAT_BOLD("discord-formats.bold", "&l"),

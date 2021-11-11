@@ -50,8 +50,8 @@ public class TagToken extends Token {
         taggedName = this.tag.getSuffix() != null ? taggedName : taggedName.replace(punctuation, "");
 
         Player taggedPlayer = MessageUtils.getPlayer(taggedName);
-        if (taggedPlayer != null) this.messageWrapper.getTaggedPlayers().add(taggedPlayer.getUniqueId());
-        if (this.tag.getSound() != null) this.messageWrapper.setTagSound(this.tag.getSound());
+        if (this.messageWrapper != null && taggedPlayer != null) this.messageWrapper.getTaggedPlayers().add(taggedPlayer.getUniqueId());
+        if (this.messageWrapper != null && this.tag.getSound() != null) this.messageWrapper.setTagSound(this.tag.getSound());
 
         RoseSender tagged = taggedPlayer != null && this.tag.shouldTagOnlinePlayers() ? new RoseSender(taggedPlayer) : new RoseSender(taggedName, "default");
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(this.getSender(), tagged, this.group)
@@ -65,10 +65,10 @@ public class TagToken extends Token {
         if (this.tag.shouldMatchLength()) {
             String colorlessContent = ChatColor.stripColor(HexUtils.colorify(taggedName));
             String replacement = placeholder.getText().parse(this.getSender(), this.getViewer(), placeholders);
-            for (int i = 0; i < colorlessContent.length(); i++) textBuilder.append(replacement);
+            for (int i = 0; i < colorlessContent.length(); i++) textBuilder.append(replacement).append("&f&r");
         } else {
             textBuilder.append(placeholder.getText().parse(this.getSender(), tagged, placeholders));
-            textBuilder.append("&f").append(punctuation);
+            textBuilder.append(punctuation);
         }
 
         component = TextComponent.fromLegacyText(placeholders.apply(textBuilder.toString()));

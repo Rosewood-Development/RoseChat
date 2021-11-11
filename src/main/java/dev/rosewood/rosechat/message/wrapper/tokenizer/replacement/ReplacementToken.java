@@ -22,13 +22,14 @@ public class ReplacementToken extends Token {
     public BaseComponent[] toComponents() {
         String replacement = this.replacement.getReplacement();
         replacement = replacement.replace("%message%", this.getOriginalContent());
+        if (this.replacement.isRegex()) replacement = HexUtils.colorify(replacement);
 
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        for (char c : replacement.toCharArray())
-            componentBuilder.append(HexUtils.colorify(c + "&f")).font(this.replacement.getFont());
-
-        if (this.replacement.getHoverText() != null)
-            componentBuilder.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(this.replacement.getHoverText()))));
+        for (char c : replacement.toCharArray()) {
+            componentBuilder.append(this.replacement.isRegex() ? c + "" : HexUtils.colorify(c + "&f")).font(this.replacement.getFont());
+            if (this.replacement.getHoverText() != null)
+                componentBuilder.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(this.replacement.getHoverText()))));
+        }
 
         return componentBuilder.create();
     }

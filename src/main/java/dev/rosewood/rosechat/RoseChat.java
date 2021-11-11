@@ -34,9 +34,11 @@ import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
+import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
-import dev.rosewood.rosechat.listener.DiscordListener;
+import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
@@ -64,7 +66,7 @@ public class RoseChat extends RosePlugin {
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
-    private DiscordSRV discord;
+    private DiscordChatProvider discord;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class);
@@ -184,8 +186,8 @@ public class RoseChat extends RosePlugin {
         else new RoseChatPlaceholderExpansion().register();
 
         if (pluginManager.getPlugin("DiscordSRV") != null) {
-            this.discord = DiscordSRV.getPlugin();
-            DiscordSRV.api.subscribe(new DiscordListener());
+            this.discord = new DiscordSRVProvider();
+            DiscordSRV.api.subscribe(new DiscordSRVListener());
         }
 
         if (pluginManager.getPlugin("ProtocolLib") != null) {
@@ -197,7 +199,7 @@ public class RoseChat extends RosePlugin {
         return this.vault;
     }
 
-    public DiscordSRV getDiscord() {
+    public DiscordChatProvider getDiscord() {
         return this.discord;
     }
 

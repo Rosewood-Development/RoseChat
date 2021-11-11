@@ -71,8 +71,7 @@ public class ChatChannel implements Group {
 
         // Send the message to discord.
         if (api.getDiscord() != null) {
-            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
-            if (textChannel != null) MessageUtils.sendDiscordMessage(message, textChannel);
+            if (this.discordChannel != null) MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
         }
 
         // Send the message to other servers.
@@ -178,8 +177,7 @@ public class ChatChannel implements Group {
 
         // Send the message to discord.
         if (api.getDiscord() != null) {
-            TextChannel textChannel = api.getDiscord().getDestinationTextChannelForGameChannelName(this.getDiscordChannel());
-            if (textChannel != null) MessageUtils.sendDiscordMessage(localMessage, textChannel);
+            if (this.discordChannel != null) MessageUtils.sendDiscordMessage(localMessage, this, this.discordChannel);
         }
 
         // Send to everyone who can view it.
@@ -232,14 +230,14 @@ public class ChatChannel implements Group {
         // Send the message to the channel spies.
         for (UUID uuid : api.getDataManager().getChannelSpies()) {
             Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+            if (spy != null) spy.spigot().sendMessage(message.parseFromDiscord(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
         }
 
         // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
 
             return;
@@ -252,7 +250,7 @@ public class ChatChannel implements Group {
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
         }
 

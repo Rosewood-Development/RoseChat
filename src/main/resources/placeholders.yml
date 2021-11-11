@@ -236,18 +236,54 @@ staff-only:
     default: "&cYou do not have permission to view this!"
     true: "%tagged%"
 
+url:
+  text:
+    default: "&n&9%url%"
+  hover:
+    default:
+      - "&7Click to Open"
+  click:
+    default:
+      action: OPEN_URL
+      value: "%url%"
+
+censored-url:
+  text:
+    default: "&m%url%"
+
+discord-prefix:
+  text:
+    default: "&bDiscord &8| "
+
+# Discord Placeholders:
+# %user_nickname% - The user's nickname.
+# %user_name% - The user's name.
+# %user_role% - The user's role.
+# %user_role_color% - The colour of the role.
+# %user_color% - The user's colour.
+# %user_presence% - The user's activity.
+# %user_status% - The user's status.
+# %user_tag% - The user's tag.
+discord-player:
+  text:
+    default: "&8[%user_role_color%%user_role%&8] %user_role_color%%user_color%%user_nickname%"
+  hover:
+    default:
+      - "&f%user_name%&8#%user_tag%"
+      - "%user_presence%"
+
+discord-status:
+  text:
+    condition: "%user_status%"
+    online: "&a:dot: "
+    idle: "&6:dot: "
+    dnd: "&c:dot: "
+    invisible: "&7:dot: "
+    offline: "&7:dot: "
+    default: ":dot: "
+
 # This is a unique placeholder.
 # These options will do nothing in-game, only on discord.
 discord:
-  url:
-    default: ""
-  title:
-    default: "[%channel%] {prefix}{player}"
-  description:
-    default: ""
-  color:
-    condition: "%vault_rank%"
-    default: 12648430
-    admin: "%rosechat_chat_color%"
-  thumbnail:
-    default: "https://cravatar.eu/helmavatar/%player_name%"
+  text:
+    default: "{channel-prefix}{prefix}{player}{separator}{message}"

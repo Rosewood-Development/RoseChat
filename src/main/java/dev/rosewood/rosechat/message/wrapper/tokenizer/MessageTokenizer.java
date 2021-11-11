@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -8,17 +10,26 @@ import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.from.FromDiscordTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.to.ToDiscordTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.bold.DiscordBoldTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.italic.DiscordItalicTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.strikethrough.DiscordStrikethroughToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.strikethrough.DiscordStrikethroughTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.underline.DiscordUnderlineTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.papi.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat.RosechatFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat.RosechatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.ReplacementToken;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.ReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -32,25 +43,35 @@ public class MessageTokenizer {
     public static final GradientTokenizer GRADIENT_TOKENIZER = new GradientTokenizer();
     public static final RainbowTokenizer RAINBOW_TOKENIZER = new RainbowTokenizer();
     public static final ColorTokenizer COLOR_TOKENIZER = new ColorTokenizer();
-    public static final ToDiscordTokenizer TO_DISCORD_TOKENIZER = new ToDiscordTokenizer();
-    public static final FromDiscordTokenizer FROM_DISCORD_TOKENIZER = new FromDiscordTokenizer();
     public static final PAPIPlaceholderTokenizer PAPI_PLACEHOLDER_TOKENIZER = new PAPIPlaceholderTokenizer();
     public static final RosechatPlaceholderTokenizer ROSECHAT_PLACEHOLDER_TOKENIZER = new RosechatPlaceholderTokenizer();
     public static final TagTokenizer TAG_TOKENIZER = new TagTokenizer();
     public static final RegexReplacementTokenizer REGEX_REPLACEMENT_TOKENIZER = new RegexReplacementTokenizer();
-    public static final ReplacementTokenizer REPLACEMENT_TOKENIZER = new ReplacementTokenizer();
+    public static final EmojiTokenizer EMOJI_TOKENIZER = new EmojiTokenizer();
+    public static final URLTokenizer URL_TOKENIZER = new URLTokenizer();
     public static final WhitespaceTokenizer WHITESPACE_TOKENIZER = new WhitespaceTokenizer();
     public static final CharacterTokenizer CHARACTER_TOKENIZER = new CharacterTokenizer();
+
+    public static final DiscordBoldTokenizer DISCORD_BOLD_TOKENIZER = new DiscordBoldTokenizer();
+    public static final DiscordItalicTokenizer DISCORD_ITALIC_TOKENIZER = new DiscordItalicTokenizer();
+    public static final DiscordUnderlineTokenizer DISCORD_UNDERLINE_TOKENIZER = new DiscordUnderlineTokenizer();
+    public static final DiscordStrikethroughTokenizer DISCORD_STRIKETHROUGH_TOKENIZER = new DiscordStrikethroughTokenizer();
+    public static final DiscordSpoilerTokenizer DISCORD_SPOILER_TOKENIZER = new DiscordSpoilerTokenizer();
+    public static final DiscordCodeTokenizer DISCORD_CODE_TOKENIZER = new DiscordCodeTokenizer();
+    public static final DiscordMultiCodeTokenizer DISCORD_MULTI_CODE_TOKENIZER = new DiscordMultiCodeTokenizer();
+    public static final DiscordQuoteTokenizer DISCORD_QUOTE_TOKENIZER = new DiscordQuoteTokenizer();
+
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
-            add(REPLACEMENT_TOKENIZER);
             add(GRADIENT_TOKENIZER);
             add(RAINBOW_TOKENIZER);
             add(COLOR_TOKENIZER);
             add(ROSECHAT_PLACEHOLDER_TOKENIZER);
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(TAG_TOKENIZER);
+            add(EMOJI_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);
+            add(URL_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
@@ -65,13 +86,29 @@ public class MessageTokenizer {
 
     public static final List<Tokenizer<?>> TAG_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
-            add(REPLACEMENT_TOKENIZER);
-            add(ROSECHAT_FORMATTING_TOKENIZER);
             add(GRADIENT_TOKENIZER);
             add(RAINBOW_TOKENIZER);
             add(COLOR_TOKENIZER);
             add(ROSECHAT_PLACEHOLDER_TOKENIZER);
+            add(PAPI_PLACEHOLDER_TOKENIZER);
+            add(EMOJI_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);
+            add(URL_TOKENIZER);
+            add(WHITESPACE_TOKENIZER);
+            add(CHARACTER_TOKENIZER);
+        }
+    };
+
+    public static final List<Tokenizer<?>> FROM_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
+            add(DISCORD_BOLD_TOKENIZER);
+            add(DISCORD_ITALIC_TOKENIZER);
+            add(DISCORD_UNDERLINE_TOKENIZER);
+            add(DISCORD_STRIKETHROUGH_TOKENIZER);
+            add(DISCORD_SPOILER_TOKENIZER);
+            add(DISCORD_MULTI_CODE_TOKENIZER);
+            add(DISCORD_CODE_TOKENIZER);
+            add(DISCORD_QUOTE_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
@@ -93,7 +130,8 @@ public class MessageTokenizer {
         this.location = location;
         this.tokenizers = tokenizers;
         this.tokens = new ArrayList<>();
-        this.tokenize(message);
+
+        this.tokenize(this.parseReplacements(message));
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message, Tokenizer<?>... tokenizers) {
@@ -114,6 +152,16 @@ public class MessageTokenizer {
 
     public MessageTokenizer(RoseSender sender, RoseSender viewer, MessageLocation location, String message) {
         this(null, null, sender, viewer, location, message, DEFAULT_TOKENIZERS);
+    }
+
+    private String parseReplacements(String message) {
+        for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
+            if (replacement.isRegex()) continue;
+            if (this.location != MessageLocation.NONE && !this.sender.hasPermission("rosechat.replacements." + this.location.toString().toLowerCase()) || !this.sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            message = message.replace(replacement.getText(), replacement.getReplacement());
+        }
+
+        return message;
     }
 
     private void tokenize(String message) {
@@ -147,5 +195,14 @@ public class MessageTokenizer {
         BaseComponent[] colorized = ComponentColorizer.colorize(componentBuilder.create());
 
         return ComponentSimplifier.simplify(colorized);
+    }
+
+    public BaseComponent[] fromString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Token token : this.tokens) {
+            stringBuilder.append(token.asString());
+        }
+
+        return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.DEFAULT_TOKENIZERS).toComponents();
     }
 }

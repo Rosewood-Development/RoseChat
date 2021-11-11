@@ -7,6 +7,8 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
 
@@ -15,8 +17,11 @@ public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (!replacement.isRegex()) continue;
             if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.replacements." + location.toString().toLowerCase()) || !sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
-            if (input.startsWith(replacement.getText())) {
-                return new ReplacementToken(sender, viewer, replacement, input.substring(0, replacement.getText().length()));
+            Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
+            if (matcher.find()) {
+                String found = input.substring(matcher.start(), matcher.end());
+                if (!input.startsWith(found)) return null;
+                return new ReplacementToken(sender, viewer, replacement, input.substring(matcher.start(), matcher.end()));
             }
         }
 

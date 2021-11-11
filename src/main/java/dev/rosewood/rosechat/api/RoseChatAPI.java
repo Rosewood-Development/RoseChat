@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
+import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -15,7 +16,6 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
-import github.scarsz.discordsrv.DiscordSRV;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
@@ -381,7 +381,7 @@ public class RoseChatAPI {
     /**
      * @return An instance of DiscordSRV.
      */
-    public DiscordSRV getDiscord() {
+    public DiscordChatProvider getDiscord() {
         return this.plugin.getDiscord();
     }
 

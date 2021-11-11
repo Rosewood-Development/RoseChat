@@ -5,11 +5,16 @@ import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.placeholders.ConditionalPlaceholder;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.configuration.ConfigurationSection;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +29,7 @@ public class PlaceholderSettingManager extends Manager {
     private Map<String, Tag> tags;
     private Map<String, ChatReplacement> replacements;
     private Map<String, ChatReplacement> emojis;
+    private DiscordPlaceholder discordPlaceholder;
 
     public PlaceholderSettingManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -48,6 +54,11 @@ public class PlaceholderSettingManager extends Manager {
 
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
+            if (id.equalsIgnoreCase(Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().replace("{", "").replace("}", ""))) {
+                parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
+                continue;
+            }
+
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
 
             if (placeholderConfiguration.contains(id + ".text")) {
@@ -144,10 +155,19 @@ public class PlaceholderSettingManager extends Manager {
 
     }
 
-    // TODO: Conditional Placeholders
-    private boolean loadConditionalPlaceholders(CommentedConfigurationSection config, ConditionalPlaceholder placeholder) {
+    private void parseDiscordFormat(String format, ConfigurationSection section) {
+        DiscordPlaceholder discordPlaceholder = new DiscordPlaceholder(format);
 
-        return false;
+        for (String embed : section.getKeys(false)) {
+            CustomPlaceholder customPlaceholder = new CustomPlaceholder(embed);
+            ConditionalPlaceholder conditionalPlaceholder = new ConditionalPlaceholder();
+            String condition = section.contains(embed + ".condition") ? section.getString(embed + ".condition") : null;
+            conditionalPlaceholder.parseCondition(section.getConfigurationSection(embed), condition);
+            customPlaceholder.setText(conditionalPlaceholder);
+            discordPlaceholder.addPlaceholder(embed, customPlaceholder);
+        }
+
+        this.discordPlaceholder = discordPlaceholder;
     }
 
     private void parseFormats() {
@@ -240,5 +260,9 @@ public class PlaceholderSettingManager extends Manager {
 
     public Map<String, ChatReplacement> getEmojis() {
         return this.emojis;
+    }
+
+    public DiscordPlaceholder getDiscordPlaceholder() {
+        return this.discordPlaceholder;
     }
 }
