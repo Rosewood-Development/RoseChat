@@ -63,6 +63,11 @@ public class GroupChat implements Group {
         return this.members;
     }
 
+    @Override
+    public String getLocationPermission() {
+        return "group";
+    }
+
     /**
      * Saves the group chat.
      */

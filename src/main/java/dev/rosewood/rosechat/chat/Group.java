@@ -32,4 +32,9 @@ public interface Group {
      * @return The members of the group.
      */
     List<UUID> getMembers();
+
+    /**
+     * @return A string used in the permissions for this group.
+     */
+    String getLocationPermission();
 }

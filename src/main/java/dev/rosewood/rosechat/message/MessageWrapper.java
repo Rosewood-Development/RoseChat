@@ -44,7 +44,7 @@ public class MessageWrapper {
         this.sender = sender;
         this.group = group;
         this.location = messageLocation;
-        this.locationPermission = this.location.toString().toLowerCase();
+        this.locationPermission = this.location.toString().toLowerCase() + (group == null ? "" : "." + group.getLocationPermission());
         this.message = message;
         this.canBeSent = true;
         if (sender.isPlayer()) this.senderData = RoseChatAPI.getInstance().getPlayerData(sender.getUUID());
@@ -102,10 +102,13 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper validateHex() {
-        if (this.sender.hasPermission("rosechat.hex." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.HEX_REGEX.matcher(this.message);
         List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        while (matcher.find()) {
+            String color = this.message.substring(matcher.start(), matcher.end());
+            if (this.sender.hasPermission("rosechat.hex." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
+            else toRemove.add(color);
+        }
         for (String s : toRemove) this.message = this.message.replace(s, "");
 
         return this;
@@ -116,10 +119,13 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper validateRainbow() {
-        if (this.sender.hasPermission("rosechat.rainbow." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.RAINBOW_PATTERN.matcher(this.message);
         List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        while (matcher.find()) {
+            String color = this.message.substring(matcher.start(), matcher.end());
+            if (this.sender.hasPermission("rosechat.rainbow." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
+            else toRemove.add(color);
+        }
         for (String s : toRemove) this.message = this.message.replace(s, "");
 
         return this;
@@ -130,10 +136,13 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper validateGradient() {
-        if (this.sender.hasPermission("rosechat.gradient." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.GRADIENT_PATTERN.matcher(this.message);
         List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        while (matcher.find()) {
+            String color = this.message.substring(matcher.start(), matcher.end());
+            if (this.sender.hasPermission("rosechat.gradient." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
+            else toRemove.add(color);
+        }
         for (String s : toRemove) this.message = this.message.replace(s, "");
 
         return this;
@@ -144,8 +153,7 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper validate() {
-        this.validateRainbow().validateGradient().validateColors().validateFormatting().validateHex();
-        return this;
+        return this.validateRainbow().validateGradient().validateColors().validateFormatting().validateHex();
     }
 
     private boolean isCaps() {
@@ -153,7 +161,7 @@ public class MessageWrapper {
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return false;
         int caps = 0;
         for (char c : this.message.toCharArray()) {
-            if (c == Character.toUpperCase(c)) caps++;
+            if (Character.isAlphabetic(c) && c == Character.toUpperCase(c)) caps++;
         }
 
         return caps > Setting.MAXIMUM_CAPS_ALLOWED.getInt();

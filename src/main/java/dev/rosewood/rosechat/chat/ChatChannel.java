@@ -289,6 +289,11 @@ public class ChatChannel implements Group {
         return this.players;
     }
 
+    @Override
+    public String getLocationPermission() {
+        return this.getId();
+    }
+
     /**
      * Clears the channel's chat.
      */

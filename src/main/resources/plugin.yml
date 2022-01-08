@@ -106,7 +106,6 @@ permissions:
     default: op
     children:
       rosechat.color.chatcolor: true
-      rosechat.color.chat: true
       rosechat.color.message: true
       rosechat.color.channel: true
       rosechat.color.group: true
@@ -116,7 +115,6 @@ permissions:
     default: op
     children:
       rosechat.format.chatcolor: true
-      rosechat.format.chat: true
       rosechat.format.message: true
       rosechat.format.channel: true
       rosechat.format.group: true
@@ -126,7 +124,6 @@ permissions:
     default: op
     children:
       rosechat.magic.chatcolor: true
-      rosechat.magic.chat: true
       rosechat.magic.message: true
       rosechat.magic.channel: true
       rosechat.magic.group: true
@@ -136,7 +133,6 @@ permissions:
     default: op
     children:
       rosechat.hex.chatcolor: true
-      rosechat.hex.chat: true
       rosechat.hex.message: true
       rosechat.hex.channel: true
       rosechat.hex.group: true
@@ -146,7 +142,6 @@ permissions:
     default: op
     children:
       rosechat.gradient.chatcolor: true
-      rosechat.gradient.chat: true
       rosechat.gradient.message: true
       rosechat.gradient.channel: true
       rosechat.gradient.group: true
@@ -156,7 +151,6 @@ permissions:
     default: op
     children:
       rosechat.rainbow.chatcolor: true
-      rosechat.rainbow.chat: true
       rosechat.rainbow.message: true
       rosechat.rainbow.channel: true
       rosechat.rainbow.group: true
@@ -165,7 +159,6 @@ permissions:
     description: Allows bypassing the spam filter.
     default: op
     children:
-      rosechat.spam.chat: true
       rosechat.spam.message: true
       rosechat.spam.channel: true
       rosechat.spam.group: true
@@ -174,7 +167,6 @@ permissions:
     description: Allows bypassing the language filter.
     default: op
     children:
-      rosechat.language.chat: true
       rosechat.language.message: true
       rosechat.language.channel: true
       rosechat.language.group: true
@@ -183,7 +175,6 @@ permissions:
     description: Allows bypassing the caps filter.
     default: op
     children:
-      rosechat.caps.chat: true
       rosechat.caps.message: true
       rosechat.caps.channel: true
       rosechat.caps.group: true
@@ -192,7 +183,6 @@ permissions:
     description: Allows bypassing the URL filter.
     default: op
     children:
-      rosechat.links.chat: true
       rosechat.links.message: true
       rosechat.links.channel: true
       rosechat.links.group: true
@@ -201,7 +191,6 @@ permissions:
     description: Allows using placeholders.
     default: op
     children:
-      rosechat.placeholders.chat: true
       rosechat.placeholders.message: true
       rosechat.placeholders.channel: true
       rosechat.placeholders.group: true
@@ -210,7 +199,6 @@ permissions:
     description: Allows using tags.
     default: op
     children:
-      rosechat.tags.chat: true
       rosechat.tags.message: true
       rosechat.tags.channel: true
       rosechat.tags.group: true
@@ -219,7 +207,6 @@ permissions:
     description: Allows using replacements.
     default: op
     children:
-      rosechat.replacements.chat: true
       rosechat.replacements.message: true
       rosechat.replacements.channel: true
       rosechat.replacements.group: true
@@ -228,7 +215,6 @@ permissions:
     description: Allows using emojis.
     default: op
     children:
-      rosechat.emojis.chat: true
       rosechat.emojis.message: true
       rosechat.emojis.channel: true
       rosechat.emojis.group: true

@@ -6,6 +6,7 @@ public enum MessageLocation {
     CHANNEL,
     GROUP,
     NICKNAME,
+    CHATCOLOR,
     OTHER,
     NONE // Removes all need for permissions
 }
