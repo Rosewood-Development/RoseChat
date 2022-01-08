@@ -45,7 +45,7 @@ public class MessageGroupCommand extends AbstractCommand {
         }
 
         RoseSender messageSender = new RoseSender((Player) sender);
-        MessageWrapper messageWrapper = new MessageWrapper(messageSender, MessageLocation.GROUP, groupChat, message).validate().filter();
+        MessageWrapper messageWrapper = new MessageWrapper(messageSender, MessageLocation.GROUP, groupChat, message).validate().filter().applyDefaultColor();
         groupChat.send(messageWrapper);
     }
 

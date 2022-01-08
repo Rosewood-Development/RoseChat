@@ -67,9 +67,10 @@ public class MessageWrapper {
     public MessageWrapper validateColors() {
         if (this.sender.hasPermission("rosechat.color." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.VALID_LEGACY_REGEX.matcher(this.message);
-        while (matcher.find()) {
-            this.message = this.message.replace(this.message.substring(matcher.start(), matcher.end()), "");
-        }
+        List<String> toRemove = new ArrayList<>();
+        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        for (String s : toRemove) this.message = this.message.replace(s, "");
+
         return this;
     }
 
@@ -79,17 +80,20 @@ public class MessageWrapper {
      */
     public MessageWrapper validateFormatting() {
         Matcher matcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(this.message);
+        List<String> toRemove = new ArrayList<>();
         while (matcher.find()) {
             if (!this.sender.hasPermission("rosechat.format." + this.locationPermission)) {
                 String code = this.message.substring(matcher.start(), matcher.end());
-                if (!code.endsWith("k")) this.message = this.message.replace(code, "");
+                if (!code.endsWith("k")) toRemove.add(code);
             }
 
             if (!this.sender.hasPermission("rosechat.magic." + this.locationPermission)) {
                 String code = this.message.substring(matcher.start(), matcher.end());
-                if (code.endsWith("k")) this.message = this.message.replace(code, "");
+                if (code.endsWith("k")) toRemove.add(code);
             }
         }
+        for (String s : toRemove) this.message = this.message.replace(s, "");
+
         return this;
     }
 
@@ -100,9 +104,10 @@ public class MessageWrapper {
     public MessageWrapper validateHex() {
         if (this.sender.hasPermission("rosechat.hex." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.HEX_REGEX.matcher(this.message);
-        while (matcher.find()) {
-            this.message = this.message.replace(this.message.substring(matcher.start(), matcher.end()), "");
-        }
+        List<String> toRemove = new ArrayList<>();
+        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        for (String s : toRemove) this.message = this.message.replace(s, "");
+
         return this;
     }
 
@@ -113,9 +118,10 @@ public class MessageWrapper {
     public MessageWrapper validateRainbow() {
         if (this.sender.hasPermission("rosechat.rainbow." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.RAINBOW_PATTERN.matcher(this.message);
-        while (matcher.find()) {
-            this.message = this.message.replace(this.message.substring(matcher.start(), matcher.end()), "");
-        }
+        List<String> toRemove = new ArrayList<>();
+        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        for (String s : toRemove) this.message = this.message.replace(s, "");
+
         return this;
     }
 
@@ -126,9 +132,10 @@ public class MessageWrapper {
     public MessageWrapper validateGradient() {
         if (this.sender.hasPermission("rosechat.gradient." + this.locationPermission)) return this;
         Matcher matcher = ComponentColorizer.GRADIENT_PATTERN.matcher(this.message);
-        while (matcher.find()) {
-            this.message = this.message.replace(this.message.substring(matcher.start(), matcher.end()), "");
-        }
+        List<String> toRemove = new ArrayList<>();
+        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
+        for (String s : toRemove) this.message = this.message.replace(s, "");
+
         return this;
     }
 
@@ -137,11 +144,12 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper validate() {
-        return this.validateColors().validateFormatting().validateHex().validateRainbow().validateGradient();
+        this.validateRainbow().validateGradient().validateColors().validateFormatting().validateHex();
+        return this;
     }
 
     private boolean isCaps() {
-        if (this.sender.hasPermission("rosechat.caps." + this.location.toString().toLowerCase())) return false;
+        if (this.sender.hasPermission("rosechat.caps." + this.locationPermission)) return false;
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return false;
         int caps = 0;
         for (char c : this.message.toCharArray()) {
@@ -179,7 +187,6 @@ public class MessageWrapper {
         if (!Setting.SPAM_CHECKING_ENABLED.getBoolean()) return this;
         if (this.senderData != null && !this.senderData.getMessageLog().addMessageWithSpamCheck(this.message)) return this;
         if (Setting.WARN_ON_SPAM_SENT.getBoolean()) this.filterType = FilterType.SPAM;
-
         this.canBeSent = false;
         return this;
     }
@@ -221,7 +228,7 @@ public class MessageWrapper {
         for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
             for (String word : rawMessage.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble()) - 1) {
+                if (similarity >= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100)) {
                     if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) this.filterType = FilterType.SWEAR;
                     this.canBeSent = false;
                     return this;
@@ -233,9 +240,9 @@ public class MessageWrapper {
             String[] swearReplacement = replacements.split(":");
             String swear = swearReplacement[0];
             String replacement = swearReplacement[1];
-            for (String word : message.split(" ")) {
+            for (String word : this.message.split(" ")) {
                 double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similarity >= Math.abs(Setting.SWEAR_FILTER_SENSITIVITY.getDouble()) - 1) {
+                if (similarity >= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100)) {
                     this.message = this.message.replace(word, replacement);
                 }
             }
@@ -249,7 +256,17 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper filter() {
-        return this.filterCaps().filterSpam().filterURLs().filterLanguage();
+        return this.filterCaps().filterSpam().filterLanguage().filterURLs();
+    }
+
+    /**
+     * Applys the sender's default chat colour.
+     * This should be used after validating and filtering as it may cause issues.
+     * @return The MessageWrapper.
+     */
+    public MessageWrapper applyDefaultColor() {
+        this.message = this.senderData.getColor() + this.message;
+        return this;
     }
 
     public BaseComponent[] parse(String format, RoseSender viewer) {
@@ -302,6 +319,36 @@ public class MessageWrapper {
 
             if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).fromString(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+
+            return this.tokenized = componentBuilder.create();
+        }
+
+        PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+        Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> Bukkit.getPluginManager().callEvent(postParseMessageEvent));
+        return this.toComponents();
+    }
+
+    public BaseComponent[] parseToDiscord(String format, RoseSender viewer) {
+        PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
+        Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
+            Bukkit.getPluginManager().callEvent(preParseMessageEvent);
+        });
+
+        if (!preParseMessageEvent.isCancelled()) {
+            ComponentBuilder componentBuilder = new ComponentBuilder();
+
+            if (format == null || !format.contains("{message}")) {
+                componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                return this.tokenized = componentBuilder.create();
+            }
+
+            String[] formatSplit = format.split("\\{message\\}");
+            String before = formatSplit[0];
+            String after = formatSplit.length > 1 ? formatSplit[1] : null;
+
+            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.TO_DISCORD_TOKENIZERS).fromString(), ComponentBuilder.FormatRetention.FORMATTING);
             if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
 
             return this.tokenized = componentBuilder.create();

@@ -45,9 +45,12 @@ import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
+import dev.rosewood.rosechat.manager.PlaceholderManager;
+import dev.rosewood.rosechat.manager.ReplacementManager;
+import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -155,7 +158,11 @@ public class RoseChat extends RosePlugin {
     @Override
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
-                PlaceholderSettingManager.class,
+                ChannelManager.class,
+                EmojiManager.class,
+                ReplacementManager.class,
+                TagManager.class,
+                PlaceholderManager.class,
                 ChannelManager.class,
                 DataManager.class,
                 GroupManager.class
@@ -174,7 +181,7 @@ public class RoseChat extends RosePlugin {
 
         if (pluginManager.getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> provider = this.getServer().getServicesManager().getRegistration(Permission.class);
-            if (provider != null) this.vault = provider.getProvider();
+            if (provider != null && provider.getProvider().hasGroupSupport()) this.vault = provider.getProvider();
         } else {
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&eVault was not found! Group placeholders will be disabled.");

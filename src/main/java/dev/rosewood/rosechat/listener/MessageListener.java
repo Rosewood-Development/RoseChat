@@ -27,7 +27,7 @@ public class MessageListener implements Listener {
             ComponentBuilder componentBuilder = new ComponentBuilder();
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
             componentBuilder.append(" ", ComponentBuilder.FormatRetention.NONE);
-            BaseComponent[] deleteButton = MessageUtils.parseCustomPlaceholder(event.getMessage().getSender(), event.getViewer(), Setting.DELETE_OWN_MESSAGES_FORMAT.getString(),
+            BaseComponent[] deleteButton = MessageUtils.parseCustomPlaceholder(event.getMessage().getSender(), event.getViewer(), Setting.DELETE_OWN_MESSAGE_FORMAT.getString(),
                     MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer()).build());
             if (deleteButton != null) componentBuilder.append(deleteButton);
             event.getMessage().setComponents(componentBuilder.create());
@@ -38,7 +38,7 @@ public class MessageListener implements Listener {
             ComponentBuilder componentBuilder = new ComponentBuilder();
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
             componentBuilder.append(" ", ComponentBuilder.FormatRetention.NONE);
-            BaseComponent[] deleteButton = MessageUtils.parseCustomPlaceholder(event.getMessage().getSender(), event.getViewer(), Setting.DELETE_OTHER_MESSAGES_FORMAT.getString(),
+            BaseComponent[] deleteButton = MessageUtils.parseCustomPlaceholder(event.getMessage().getSender(), event.getViewer(), Setting.DELETE_OTHER_MESSAGE_FORMAT.getString(),
                     MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer()).build());
             if (deleteButton != null) componentBuilder.append(deleteButton);
             event.getMessage().setComponents(componentBuilder.create());

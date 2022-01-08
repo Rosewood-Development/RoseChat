@@ -94,7 +94,7 @@ public class MuteCommand extends AbstractCommand {
         this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
 
         if (muteTime > 0) {
-            targetData.setMuteTime((muteTime * 1000) + System.currentTimeMillis());
+            targetData.setMuteTime((muteTime * 1000L) + System.currentTimeMillis());
             this.getAPI().getDataManager().getMuteTasks().put(target.getUniqueId(), new MuteTask(targetData));
         }
 

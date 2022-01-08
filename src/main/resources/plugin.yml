@@ -278,6 +278,9 @@ permissions:
   rosechat.channel:
     description: Allows using the channel command.
     default: op
+  rosechat.channel.global:
+    description: Allows access to the global channel.
+    default: not op
   rosechat.admin.mute:
     description: Allows using the chat mute command.
     default: op

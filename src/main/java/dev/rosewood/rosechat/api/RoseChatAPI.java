@@ -9,9 +9,12 @@ import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
+import dev.rosewood.rosechat.manager.PlaceholderManager;
+import dev.rosewood.rosechat.manager.ReplacementManager;
+import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -19,7 +22,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
-import org.spigotmc.SpigotConfig;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +39,12 @@ public class RoseChatAPI {
     private final DataManager dataManager;
     private final GroupManager groupManager;
     private final ChannelManager channelManager;
-    private final PlaceholderSettingManager placeholderSettingManager;
+    private final PlaceholderManager placeholderManager;
+    private final EmojiManager emojiManager;
+    private final ReplacementManager replacementManager;
+    private final TagManager tagManager;
+    private Class<?> spigotConfigClass;
+    private Field bungeeField;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
@@ -44,7 +52,10 @@ public class RoseChatAPI {
         this.dataManager = this.plugin.getManager(DataManager.class);
         this.groupManager = this.plugin.getManager(GroupManager.class);
         this.channelManager = this.plugin.getManager(ChannelManager.class);
-        this.placeholderSettingManager = this.plugin.getManager(PlaceholderSettingManager.class);
+        this.placeholderManager = this.plugin.getManager(PlaceholderManager.class);
+        this.emojiManager = this.plugin.getManager(EmojiManager.class);
+        this.replacementManager = this.plugin.getManager(ReplacementManager.class);
+        this.tagManager = this.plugin.getManager(TagManager.class);
     }
 
     /**
@@ -81,7 +92,7 @@ public class RoseChatAPI {
      */
     public ChatChannel createChannel(String id, String format) {
         ChatChannel channel = new ChatChannel(id, format);
-        this.plugin.getManager(ChannelManager.class).addChannel(channel);
+        this.channelManager.addChannel(channel);
         return channel;
     }
 
@@ -90,7 +101,7 @@ public class RoseChatAPI {
      * @param channel The channel to delete.
      */
     public void deleteChannel(ChatChannel channel) {
-        this.plugin.getManager(ChannelManager.class).removeChannel(channel);
+        this.channelManager.removeChannel(channel);
     }
 
     /**
@@ -98,21 +109,21 @@ public class RoseChatAPI {
      * @return The channel found, or null if it doesn't exist.
      */
     public ChatChannel getChannelById(String id) {
-        return this.plugin.getManager(ChannelManager.class).getChannel(id);
+        return this.channelManager.getChannel(id);
     }
 
     /**
      * @return A list of all the chat channels.
      */
     public List<ChatChannel> getChannels() {
-        return new ArrayList<>(this.plugin.getManager(ChannelManager.class).getChannels().values());
+        return new ArrayList<>(this.channelManager.getChannels().values());
     }
 
     /**
      * @return A list of all the chat channel IDs.
      */
     public List<String> getChannelIDs() {
-        return new ArrayList<>(this.plugin.getManager(ChannelManager.class).getChannels().keySet());
+        return new ArrayList<>(this.channelManager.getChannels().keySet());
     }
 
     /**
@@ -120,13 +131,12 @@ public class RoseChatAPI {
      * @param id The ID to use.
      * @param text The text that will be replaced.
      * @param replacement The text to replace with.
-     * @param hoverText The text shown when the replacement is hovered over.
      * @param regex Whether this replacement uses regex.
      * @return The new chat replacement.
      */
-    public ChatReplacement createReplacement(String id, String text, String replacement, String hoverText, boolean regex) {
-        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, regex);
-        this.plugin.getManager(PlaceholderSettingManager.class).addReplacement(chatReplacement);
+    public ChatReplacement createReplacement(String id, String text, String replacement, boolean regex) {
+        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, regex);
+        this.replacementManager.addReplacement(chatReplacement);
         return chatReplacement;
     }
 
@@ -135,7 +145,7 @@ public class RoseChatAPI {
      * @param replacement The replacement to delete.
      */
     public void deleteReplacement(ChatReplacement replacement) {
-        this.plugin.getManager(PlaceholderSettingManager.class).removeReplacement(replacement);
+        this.replacementManager.removeReplacement(replacement);
     }
 
     /**
@@ -143,21 +153,21 @@ public class RoseChatAPI {
      * @return The chat replacement found, or null if it doesn't exist.
      */
     public ChatReplacement getReplacementById(String id) {
-        return this.plugin.getManager(PlaceholderSettingManager.class).getReplacement(id);
+        return this.replacementManager.getReplacement(id);
     }
 
     /**
      * @return A list of all chat replacements.
      */
     public List<ChatReplacement> getReplacements() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getReplacements().values());
+        return new ArrayList<>(this.replacementManager.getReplacements().values());
     }
 
     /**
      * @return A list of all chat replacement IDs.
      */
     public List<String> getReplacementIDs() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getReplacements().keySet());
+        return new ArrayList<>(this.replacementManager.getReplacements().keySet());
     }
 
     /**
@@ -171,7 +181,7 @@ public class RoseChatAPI {
      */
     public ChatReplacement createEmoji(String id, String text, String replacement, String hoverText, String font) {
         ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, font, false);
-        this.plugin.getManager(PlaceholderSettingManager.class).addEmoji(chatReplacement);
+        this.emojiManager.addEmoji(chatReplacement);
         return chatReplacement;
     }
 
@@ -180,7 +190,7 @@ public class RoseChatAPI {
      * @param emoji The emoji to delete.
      */
     public void deleteEmoji(ChatReplacement emoji) {
-        this.plugin.getManager(PlaceholderSettingManager.class).removeEmoji(emoji);
+        this.emojiManager.removeEmoji(emoji);
     }
 
     /**
@@ -188,21 +198,21 @@ public class RoseChatAPI {
      * @return The emoji found, or null if it doesn't exist.
      */
     public ChatReplacement getEmojiById(String id) {
-        return this.plugin.getManager(PlaceholderSettingManager.class).getEmoji(id);
+        return this.emojiManager.getEmoji(id);
     }
 
     /**
-     * @return A list of all emojis, specified in emoji.yml.
+     * @return A list of all emojis, specified in emojis.yml.
      */
     public List<ChatReplacement> getEmojis() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getEmojis().values());
+        return new ArrayList<>(this.emojiManager.getEmojis().values());
     }
 
     /**
      * @return A list of all emoji IDs.
      */
     public List<String> getEmojiIds() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getEmojis().keySet());
+        return new ArrayList<>(this.emojiManager.getEmojis().keySet());
     }
 
     /**
@@ -294,7 +304,7 @@ public class RoseChatAPI {
      */
     public Tag createTag(String id) {
         Tag tag = new Tag(id);
-        this.plugin.getManager(PlaceholderSettingManager.class).addTag(tag);
+        this.tagManager.addTag(tag);
         return tag;
     }
 
@@ -303,7 +313,7 @@ public class RoseChatAPI {
      * @param tag The tag to delete
      */
     public void deleteTag(Tag tag) {
-        this.plugin.getManager(PlaceholderSettingManager.class).removeTag(tag);
+        this.tagManager.removeTag(tag);
     }
 
     /**
@@ -311,21 +321,21 @@ public class RoseChatAPI {
      * @return The tag found, or null if it doesn't exist.
      */
     public Tag getTagById(String id) {
-        return this.plugin.getManager(PlaceholderSettingManager.class).getTag(id);
+        return this.tagManager.getTag(id);
     }
 
     /**
      * @return A list of all tags.
      */
     public List<Tag> getTags() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getTags().values());
+        return new ArrayList<>(this.tagManager.getTags().values());
     }
 
     /**
      * @return A list of all tag IDs.
      */
     public List<String> getTagIDs() {
-        return new ArrayList<>(this.plugin.getManager(PlaceholderSettingManager.class).getTags().keySet());
+        return new ArrayList<>(this.tagManager.getTags().keySet());
     }
 
     /**
@@ -365,10 +375,31 @@ public class RoseChatAPI {
     }
 
     /**
-     * @return An instance of the placeholder setting manager.
+     * @return An instance of the placeholder manager.
      */
-    public PlaceholderSettingManager getPlaceholderSettingManager() {
-        return this.placeholderSettingManager;
+    public PlaceholderManager getPlaceholderManager() {
+        return this.placeholderManager;
+    }
+
+    /**
+     * @return An instance of the emoji manager.
+     */
+    public EmojiManager getEmojiManager() {
+        return this.emojiManager;
+    }
+
+    /**
+     * @return An instance of the replacement manager.
+     */
+    public ReplacementManager getReplacementManager() {
+        return this.replacementManager;
+    }
+
+    /**
+     * @return An instance of the tag manager.
+     */
+    public TagManager getTagManager() {
+        return this.tagManager;
     }
 
     /**
@@ -389,6 +420,22 @@ public class RoseChatAPI {
      * @return True if the server is on BungeeCord.
      */
     public boolean isBungee() {
-        return SpigotConfig.bungee;
+        if (this.spigotConfigClass == null || this.bungeeField == null) {
+            try {
+                this.spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
+                this.bungeeField = this.spigotConfigClass.getDeclaredField("bungee");
+                return this.bungeeField.getBoolean(null);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                return this.bungeeField.getBoolean(null);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
     }
 }

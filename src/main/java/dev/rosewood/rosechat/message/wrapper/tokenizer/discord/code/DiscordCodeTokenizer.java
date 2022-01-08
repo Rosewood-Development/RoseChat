@@ -15,7 +15,7 @@ public class DiscordCodeTokenizer implements Tokenizer<DiscordCodeToken> {
             int lastIndex = 0;
 
             char[] chars = input.toCharArray();
-            for (int i = 2; i < chars.length; i++) {
+            for (int i = 1; i < chars.length; i++) {
                 if (chars[i] == '`') {
                     lastIndex = i;
                     break;

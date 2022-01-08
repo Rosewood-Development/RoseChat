@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
@@ -25,7 +24,7 @@ public class ChatChannel implements Group {
     private boolean muted;
     private String format;
     private String command;
-    private int radius = -1;
+    private int radius;
     private String world;
     private boolean autoJoin;
     private boolean visibleAnywhere;
@@ -47,6 +46,7 @@ public class ChatChannel implements Group {
         this.joinable = true;
         this.players = new ArrayList<>();
         this.servers = new ArrayList<>();
+        this.radius = -1;
     }
 
     /**
@@ -167,7 +167,7 @@ public class ChatChannel implements Group {
     public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         BaseComponent[] components = ComponentSerializer.parse(jsonMessage);
-        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).validate().filter();
+        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).validate().filter().applyDefaultColor();
 
         // Send the message to the channel spies.
         for (UUID uuid : api.getDataManager().getChannelSpies()) {

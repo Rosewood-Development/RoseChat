@@ -55,7 +55,7 @@ public class PacketListener {
                         UUID uuid = UUID.randomUUID();
 
                         RoseSender sender = new RoseSender(player);
-                        BaseComponent[] deleteClient = MessageUtils.parseCustomPlaceholder(sender, sender, ConfigurationManager.Setting.DELETE_CLIENT_MESSAGES_FORMAT.getString(),
+                        BaseComponent[] deleteClient = MessageUtils.parseCustomPlaceholder(sender, sender, ConfigurationManager.Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString(),
                                 MessageUtils.getSenderViewerPlaceholders(sender, sender).addPlaceholder("id", uuid.toString()).build());
 
                         if (deleteClient == null) {

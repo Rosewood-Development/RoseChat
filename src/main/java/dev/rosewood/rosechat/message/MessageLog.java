@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +42,7 @@ public class MessageLog {
                 String message = this.messages.get((this.messages.size() - 1) - i);
                 double similarity = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if (similarity >= Math.abs(Setting.SPAM_FILTER_SENSITIVITY.getDouble() - 1)) {
+                if (similarity >= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
                     similarMessages++;
                 }
             }

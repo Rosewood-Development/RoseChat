@@ -18,11 +18,11 @@ import java.util.function.Consumer;
 
 public class DataManager extends AbstractDataManager {
 
-    private ChannelManager channelManager;
-    private Map<UUID, PlayerData> playerData;
-    private Map<UUID, MuteTask> muteTasks;
-    private Map<String, List<String>> bungeePlayers;
-    private List<DeletableMessage> deletableMessageLog;
+    private final ChannelManager channelManager;
+    private final Map<UUID, PlayerData> playerData;
+    private final Map<UUID, MuteTask> muteTasks;
+    private final Map<String, List<String>> bungeePlayers;
+    private final List<DeletableMessage> deletableMessageLog;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);

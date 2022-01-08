@@ -1,0 +1,17 @@
+# When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
+# These are similar to replacements, however, a font can be specified.
+# This allows for using custom characters or images within a resource pack.
+# Check the wiki for more information:
+
+# This emoji is used in group chats by default.
+star:
+  text: ':star:'
+  replacement: "✸"
+
+# This is an example of an emoji using a custom font.
+# A custom resource pack would need to be used for users to see the emoji.
+deer:
+  text: ':deer:'
+  replacement: "\uE000"
+  hover: '&b&o:deer:'
+  font: "emoji"

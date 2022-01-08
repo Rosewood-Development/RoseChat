@@ -4,7 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.GroupManager;
-import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
+import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -21,7 +21,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         RoseChatAPI api = RoseChatAPI.getInstance();
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
         GroupManager groupManager = api.getGroupManager();
-        PlaceholderSettingManager placeholderSettingManager = api.getPlaceholderSettingManager();
+        PlaceholderManager placeholderSettingManager = api.getPlaceholderManager();
         if (playerData == null) return null;
 
         switch (placeholder) {

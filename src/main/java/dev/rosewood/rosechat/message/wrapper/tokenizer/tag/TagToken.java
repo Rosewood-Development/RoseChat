@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.tag;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.chat.Tag;
-import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
+import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -39,7 +39,7 @@ public class TagToken extends Token {
 
     @Override
     public BaseComponent[] toComponents() {
-        PlaceholderSettingManager manager = RoseChatAPI.getInstance().getPlaceholderSettingManager();
+        PlaceholderManager manager = RoseChatAPI.getInstance().getPlaceholderManager();
         CustomPlaceholder placeholder = manager.getPlaceholder(this.tag.getFormat());
         if (placeholder == null) return null;
 

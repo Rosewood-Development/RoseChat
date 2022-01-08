@@ -1,4 +1,4 @@
-# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI
+# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI.
 # These can be used in several sections within the config.yml to add more information to chat.
 # The {message} placeholder is reserved for sent messages.
 # You can set the color of a message by using the placeholder before {message}.
@@ -6,17 +6,16 @@
 # These placeholders may also be used within chat if the player has permission. Example: 'rosechat.placeholders.prefix'
 # Check the wiki for more information:
 
-# RoseChat has a few placeholders that do not require PlaceholderAPI.
-# These include:
+# RoseChat has a few placeholders that do not require PlaceholderAPI:
 # %player_name% - The player's name.
 # %player_displayname% - The player's display name.
 # %player_nickname% - The player's nickname that they created using RoseChat's /nick command.
-# If a nickname does not exist then the display name will be used, if that does not exist then the name will be used.#
+# If a nickname does not exist then the display name will be used, if that does not exist then the name will be used.
 # %group% - The id of the group a message is sent in.
 # %group_name% - The name of the group a message is sent in.
 # %group_owner% - The owner of the group a message is sent in.
 # %channel% - The name of the channel a message is sent in.
-# Placeholders can be prefixed with "other_" to get the viewer.
+# Placeholders can be prefixed with "other_" to get the viewer rather than the sender.
 # For example, %other_player_name% gets the name of the viewer.
 
 # The ID of the placeholder.
@@ -46,7 +45,7 @@ player:
     default:
       - "&7Username: &f%player_name%"
       - "&7Click to Message"
-  # This defines the hover event for this placeholder. This is optional.
+  # This defines the click event for this placeholder. This is optional.
   click:
     default:
       action: SUGGEST_COMMAND
@@ -259,8 +258,8 @@ discord-prefix:
 # %user_nickname% - The user's nickname.
 # %user_name% - The user's name.
 # %user_role% - The user's role.
-# %user_role_color% - The colour of the role.
-# %user_color% - The user's colour.
+# %user_role_color% - The color of the role.
+# %user_color% - The user's color.
 # %user_presence% - The user's activity.
 # %user_status% - The user's status.
 # %user_tag% - The user's tag.

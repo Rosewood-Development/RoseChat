@@ -17,19 +17,14 @@ import java.util.List;
 public class CommandManager implements CommandExecutor, TabCompleter {
 
     /**
-     * An instance of the main class.
-     */
-    private RoseChat plugin;
-
-    /**
      * The main command label.
      */
-    private String mainCommandLabel;
+    private final String mainCommandLabel;
 
     /**
      * The main command syntax.
      */
-    private String mainSyntax;
+    private final String mainSyntax;
 
     /**
      * The main command. Useful for overriding the main help command.
@@ -39,9 +34,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     /**
      * A list of subcommands used by this command.
      */
-    private List<AbstractCommand> subcommands;
+    private final List<AbstractCommand> subcommands;
 
-    private LocaleManager localeManager;
+    /**
+     * An instance of the locale manager.
+     */
+    private final LocaleManager localeManager;
 
     /**
      * Creates a new instance of the CommandManager. This also creates a new command.
@@ -49,13 +47,13 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @param mainSyntax The main syntax that the player will see. E.g. '/command <reload|help>'
      */
     public CommandManager(String mainCommandLabel, String mainSyntax) {
-        this.plugin = RoseChat.getInstance();
+        RoseChat plugin = RoseChat.getInstance();
         this.mainCommandLabel = mainCommandLabel;
         this.mainSyntax = mainSyntax;
         this.subcommands = new ArrayList<>();
         this.localeManager = plugin.getManager(LocaleManager.class);
-        this.plugin.getCommand(mainCommandLabel).setExecutor(this);
-        this.plugin.getCommand(mainCommandLabel).setTabCompleter(this);
+        plugin.getCommand(mainCommandLabel).setExecutor(this);
+        plugin.getCommand(mainCommandLabel).setTabCompleter(this);
     }
 
     /**

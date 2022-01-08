@@ -33,11 +33,17 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MessageTokenizer {
+
+    private final Pattern DISCORD_MARKDOWN = Pattern.compile("\\*(.*)\\*|_(.*)_|~~(.*)~~|`(.*)`|\\|\\|(.*)\\|\\|", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     public static final RosechatFormattingTokenizer ROSECHAT_FORMATTING_TOKENIZER = new RosechatFormattingTokenizer();
     public static final GradientTokenizer GRADIENT_TOKENIZER = new GradientTokenizer();
@@ -102,14 +108,20 @@ public class MessageTokenizer {
     public static final List<Tokenizer<?>> FROM_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
             add(DISCORD_BOLD_TOKENIZER);
-            add(DISCORD_ITALIC_TOKENIZER);
             add(DISCORD_UNDERLINE_TOKENIZER);
             add(DISCORD_STRIKETHROUGH_TOKENIZER);
             add(DISCORD_SPOILER_TOKENIZER);
             add(DISCORD_MULTI_CODE_TOKENIZER);
             add(DISCORD_CODE_TOKENIZER);
             add(DISCORD_QUOTE_TOKENIZER);
+            add(DISCORD_ITALIC_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
+            add(CHARACTER_TOKENIZER);
+        }
+    };
+
+    public static final List<Tokenizer<?>> TO_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
             add(CHARACTER_TOKENIZER);
         }
     };
@@ -165,6 +177,7 @@ public class MessageTokenizer {
     }
 
     private void tokenize(String message) {
+        this.tokens.clear();
         for (int i = 0; i < message.length(); i++) {
             String substring = message.substring(i);
             for (Tokenizer<?> tokenizer : tokenizers) {
@@ -202,6 +215,18 @@ public class MessageTokenizer {
         for (Token token : this.tokens) {
             stringBuilder.append(token.asString());
         }
+
+        String output = stringBuilder.toString();
+
+        Matcher matcher = this.DISCORD_MARKDOWN.matcher(output);
+
+        // Do it again! and again! and again!
+        if (matcher.find()) {
+            tokenize(output);
+            return fromString();
+        }
+
+        Bukkit.broadcastMessage(output);
 
         return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.DEFAULT_TOKENIZERS).toComponents();
     }

@@ -1,0 +1,55 @@
+# Chat channels are different chats that players can use to communicate.
+# These can be accessed with /channel, /c or a custom command.
+# Check the wiki for more information:
+
+# The ID of the channel, the player can use this to join the channel.
+# For example, '/c global'
+global:
+  # This sets the channel as the default channel, players will be placed into it when they first join the server.
+  default: true
+
+  # This is the format of the channel.
+  # The format uses placeholders defined in placeholders.yml
+  format: '{prefix}{player}{separator}{message}'
+
+  # Can messages from this channel be sent and read while in other channels?
+  visible-anywhere: true
+
+  # The DiscordSRV channel that messages can be sent and received from.
+  # These can be defined in DiscordSRV's config file.
+  # Requires DiscordSRV
+  discord: global
+
+  # This allows messages to be sent to the listed servers.
+  # These are the same server names as defined in bungeecord.yml
+  servers:
+    - factions
+
+# Staff Channel - /c staff or /staff
+staff:
+  format: '{channel-prefix}{player}{separator}{message}'
+  visible-anywhere: true
+
+  # Creates a command alias, /staff, for this channel.
+  command: staff
+
+
+# Local Channel - /c local
+# If no format is given, then the format of the default channel will be used.
+local:
+
+  # The radius is the disatance between players that can read the messages that are sent/
+  radius: 200
+
+# Skyblock Channel - /c skyblock
+skyblock:
+  format: '{channel-prefix}{player}{separator}{message}'
+
+  # This option makes messages only able to be sent and received when the player is in this world.
+  world: skyblock
+
+  # This stops players from joining the channel with a command.
+  joinable: false
+
+  # When auto-join is true and combined with a world channel, as soon as the player enters the world, they will also enter the channel.
+  auto-join: true

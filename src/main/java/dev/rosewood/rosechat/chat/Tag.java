@@ -20,6 +20,16 @@ public class Tag {
         this.id = id;
     }
 
+    public Tag(String id, String prefix, String suffix, boolean tagOnlinePlayers, boolean matchLength, String format, Sound sound) {
+        this(id);
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.tagOnlinePlayers = tagOnlinePlayers;
+        this.matchLength = matchLength;
+        this.format = format;
+        this.sound = sound;
+    }
+
     /**
      * @return The ID of the tag.
      */

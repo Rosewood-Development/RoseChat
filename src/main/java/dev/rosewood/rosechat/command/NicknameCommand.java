@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -14,7 +15,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class NicknameCommand extends AbstractCommand {
 
         if (this.isNicknameAllowed(player, nickname)) {
             RoseSender roseSender = new RoseSender(player);
-            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, null, nickname).validate().filterLanguage().filterURLs();;
+            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, null, nickname).validate().filterLanguage().filterURLs();
             if (!message.canBeSent()) {
                 if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
                 return;
@@ -66,7 +66,7 @@ public class NicknameCommand extends AbstractCommand {
             BaseComponent[] components = message.parse(null, roseSender);
             String formattedNickname = TextComponent.toLegacyText(components);
             playerData.setNickname(nickname);
-            player.setDisplayName(formattedNickname);
+            player.setDisplayName(HexUtils.colorify(nickname));
             playerData.save();
 
             if (target == null) {
@@ -111,19 +111,19 @@ public class NicknameCommand extends AbstractCommand {
     private boolean isNicknameAllowed(Player player, String nickname) {
         String formattedNickname = ChatColor.stripColor(HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(player, nickname)));
 
-        if (formattedNickname.length() < ConfigurationManager.Setting.MIN_NICKNAME_LENGTH.getInt()) {
+        if (formattedNickname.length() < ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt()) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-too-short");
             return false;
         }
 
-        if (formattedNickname.length() > ConfigurationManager.Setting.MAX_NICKNAME_LENGTH.getInt()) {
+        if (formattedNickname.length() > ConfigurationManager.Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-too-long");
             return false;
         }
 
         String colorified = HexUtils.colorify(nickname);
         if ((formattedNickname.contains(" ") && !ConfigurationManager.Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean())
-                || (!StringUtils.isAlphanumericSpace(formattedNickname) && !ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS_IN_NICKNAMES.getBoolean())
+                || (!MessageUtils.isAlphanumericSpace(formattedNickname) && !ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean())
                 || ChatColor.stripColor(colorified).isEmpty()) {
             this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-not-allowed");
             return false;

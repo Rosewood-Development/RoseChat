@@ -3,16 +3,24 @@ package dev.rosewood.rosechat.command;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HelpCommand extends AbstractCommand {
 
     private final RoseChat plugin;
+    private final List<String> gcPermissions;
+    private final List<String> chatPermissions;
 
     public HelpCommand(RoseChat plugin) {
         super(false, "help", "?");
         this.plugin = plugin;
+        this.gcPermissions = new ArrayList<>(Arrays.asList("create", "disband", "invite", "kick", "accept", "deny", "leave", "members", "rename", "message", "admin"));
+        this.chatPermissions = new ArrayList<>(Arrays.asList("mute", "clear", "move", "sudo"));
     }
 
     @Override
@@ -23,6 +31,25 @@ public class HelpCommand extends AbstractCommand {
 
             if (manager.getMainCommand() == null) {
                 String label = manager.getMainCommandLabel();
+
+                boolean hasPerm = false;
+                if (label.equals("gc")) {
+                    for (String perm : this.gcPermissions) {
+                        if (sender.hasPermission("rosechat.group." + perm)) {
+                            hasPerm = true;
+                            break;
+                        }
+                    }
+                } else if (label.equals("chat")) {
+                    for (String perm : this.chatPermissions) {
+                        if (sender.hasPermission("rosechat.admin." + perm)) {
+                            hasPerm = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasPerm) continue;
                 this.getAPI().getLocaleManager().sendCustomMessage(sender,
                         this.getAPI().getLocaleManager().getLocaleMessage("command-" + label + "-description"));
             } else {

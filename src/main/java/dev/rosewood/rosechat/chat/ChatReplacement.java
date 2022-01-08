@@ -31,10 +31,9 @@ public class ChatReplacement {
      * @param id The ID to use.
      * @param text The text to be replaced.
      * @param replacement The replacement to be used.
-     * @param hoverText The text that appears when the replacement is hovered.
      */
-    public ChatReplacement(String id, String text, String replacement, String hoverText, boolean regex) {
-        this(id, text, replacement, hoverText, "default", regex);
+    public ChatReplacement(String id, String text, String replacement, boolean regex) {
+        this(id, text, replacement, null, "default", regex);
     }
 
     /**

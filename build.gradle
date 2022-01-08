@@ -33,14 +33,15 @@ repositories {
 }
 
 dependencies {
-    api 'dev.rosewood:rosegarden:1.0.8-SNAPSHOT'
+    api 'dev.rosewood:rosegarden:1.0.9'
+    implementation 'org.apache.commons:commons-text:1.9'
 
-    compileOnly 'org.spigotmc:spigot:1.17.1:remapped-mojang'
-    compileOnly 'me.clip:placeholderapi:2.10.10'
+    compileOnly 'org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.11.1'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
     compileOnly 'com.discordsrv:discordsrv:1.24.0'
     compileOnly 'net.dv8tion:JDA:4.2.1_262'
-    compileOnly 'net.kyori:adventure-platform-bukkit:4.0.0'
+    compileOnly 'net.kyori:adventure-platform-bukkit:4.0.1'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     compileOnly 'net.essentialsx:EssentialsXDiscord:2.19.0'
 }
@@ -56,6 +57,8 @@ processResources {
 shadowJar {
     archiveClassifier.set(null);
     relocate('dev.rosewood.rosegarden', 'dev.rosewood.rosechat.lib.rosegarden')
+    relocate('org.apache.commons.text', 'dev.rosewood.rosechat.lib.apache')
+
     minimize()
 }
 

@@ -20,9 +20,12 @@ public class SeniorCommandManager extends CommandManager {
     /**
      * A list of command managers used by this manager.
      */
-    private List<CommandManager> commandManagers;
+    private final List<CommandManager> commandManagers;
 
-    private LocaleManager localeManager;
+    /**
+     * An instance of the locale manager.
+     */
+    private final LocaleManager localeManager;
 
     /**
      * Creates a new instance of the senior command manager.

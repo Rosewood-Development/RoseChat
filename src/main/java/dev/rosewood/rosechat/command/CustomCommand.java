@@ -24,6 +24,11 @@ public class CustomCommand extends Command {
     public boolean execute(CommandSender sender, String cmd, String[] args) {
         for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
             if (channel.getCommand() != null && channel.getCommand().equalsIgnoreCase(cmd)) {
+                if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
+                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "no-permission");
+                    return false;
+                }
+
                 if (args.length == 0) {
                     if (!ChannelCommand.switchChannel(sender, cmd)) {
                         RoseChatAPI.getInstance().getLocaleManager()
@@ -38,7 +43,7 @@ public class CustomCommand extends Command {
                     }
 
                     RoseSender roseSender = new RoseSender(sender);
-                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter();
+                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
                     if (!messageWrapper.canBeSent()) {
                         if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
                         return true;

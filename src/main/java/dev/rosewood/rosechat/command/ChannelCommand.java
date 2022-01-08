@@ -48,7 +48,7 @@ public class ChannelCommand extends AbstractCommand {
             }
 
             RoseSender roseSender = new RoseSender(sender);
-            MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter();
+            MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
             if (!messageWrapper.canBeSent()) {
                 if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
                 return;

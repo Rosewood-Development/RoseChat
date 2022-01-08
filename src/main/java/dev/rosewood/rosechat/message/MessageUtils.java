@@ -12,19 +12,15 @@ import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
 import java.util.UUID;
@@ -46,8 +42,7 @@ public class MessageUtils {
     }
 
     public static double getLevenshteinDistancePercent(String first, String second) {
-        int levDistance = StringUtils.getLevenshteinDistance(MessageUtils.stripAccents(first.toLowerCase()),
-                MessageUtils.stripAccents(second.toLowerCase()));
+        int levDistance = LevenshteinDistance.getDefaultInstance().apply(MessageUtils.stripAccents(first.toLowerCase()), MessageUtils.stripAccents(second.toLowerCase()));
 
         String longerMessage = second;
 
@@ -59,6 +54,20 @@ public class MessageUtils {
         String colorified = HexUtils.colorify(message);
         return ChatColor.stripColor(colorified).isEmpty();
     }
+
+    public static boolean isAlphanumericSpace(final CharSequence cs) {
+        if (cs == null) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isLetterOrDigit(cs.charAt(i)) && cs.charAt(i) != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
@@ -124,7 +133,7 @@ public class MessageUtils {
     }
 
     public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
-        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderSettingManager().getPlaceholder(id);
+        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
         if (placeholder == null) return null;
 
         BaseComponent[] component;
@@ -213,5 +222,9 @@ public class MessageUtils {
         }
 
         return null;
+    }
+
+    public static void parseFormat(String id, String format) {
+        RoseChatAPI.getInstance().getPlaceholderManager().parseFormat(id, format);
     }
 }

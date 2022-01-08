@@ -1,0 +1,58 @@
+# Tags can be used to tag specific players or add extra detail to messages.
+# Check the wiki for more information:
+
+# This tag allows players to use @<player>, e.g. "Hey @Lilac!"
+# The ID of the tag.
+player:
+  # This is what will be used to start the tag.
+  prefix: '@'
+
+  # This allows the tag to target online players.
+  tag-online-players: true
+
+  # The sound that will be sent to the player who receives the tag.
+  # Players can individually disable this in-game with /togglesound.
+  # Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+  # Set to 'none' for no sound.
+  sound: BLOCK_NOTE_BLOCK_PLING
+
+  # The format for this tag. These are placeholders defined in placeholders.yml.
+  format: '{player-tag}'
+
+# This tag allows players to use hashtags in-game.
+# For example, '#Rosewood' will turn blue.
+hashtag:
+  prefix: '#'
+  format: '{hashtag}'
+
+# This tag allows players to type money in-game, and make it formatted and hoverable.
+# For example, '$500'
+money:
+  prefix: '$'
+  format: '{money-tag}'
+
+# This tag allows for a spoiler in-game.
+# This makes the message black and players can over it to see the real message.
+# Format: <spoiler>Your Message</spoiler>
+spoiler:
+  prefix: '<spoiler>'
+  suffix: '</spoiler>'
+  format: '{spoiler-tag}'
+
+  # Match length allows the tag replacement to be the same length as the message sent.
+  # This is useful with suffixes as it can replace a 3 letter long word with 3 of the same character.
+  match-length: true
+
+
+# This tag allows players to copy a message.
+copy-paste:
+  prefix: '{'
+  suffix: '}'
+  format: '{copy-paste}'
+
+# This tag is like the spoiler tag, but only players with a certain permission can view it.
+staff-only:
+  prefix: '<staff>'
+  suffix: '</staff>'
+  format: '{staff-only}'
+  match-length: true

@@ -3,16 +3,13 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.url;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.manager.PlaceholderSettingManager;
+import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -32,7 +29,7 @@ public class URLToken extends Token {
     @Override
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        PlaceholderSettingManager manager = RoseChatAPI.getInstance().getPlaceholderSettingManager();
+        PlaceholderManager manager = RoseChatAPI.getInstance().getPlaceholderManager();
         CustomPlaceholder placeholder = manager.getPlaceholder(Setting.URL_CENSORING_ENABLED.getBoolean() ? "censored-url" : "url");
         if (placeholder == null) return null;
 

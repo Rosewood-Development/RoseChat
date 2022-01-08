@@ -2,12 +2,12 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.CustomCommand;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
+import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,19 +30,22 @@ public class ChannelManager extends Manager {
     public void reload() {
         this.defaultChannel = null;
 
-        for (String id : Setting.CHAT_CHANNELS.getSection().getKeys(false)) {
-            CommentedConfigurationSection section = Setting.CHAT_CHANNELS.getSection();
+        File channelsFile = new File(this.rosePlugin.getDataFolder(), "channels.yml");
+        if (!channelsFile.exists()) this.rosePlugin.saveResource("channels.yml", false);
 
-            boolean isDefault = section.contains(id + ".default") && section.getBoolean(id + ".default");
-            String format = section.contains(id + ".format") ? section.getString(id + ".format") : this.defaultChannel.getFormat();
-            String command = section.contains(id + ".command") ? section.getString(id + ".command") : null;
-            boolean visible = section.contains(id + ".visible-anywhere") && section.getBoolean(id + ".visible-anywhere");
-            boolean joinable = !section.contains(id + ".joinable") || section.getBoolean(id + ".joinable");
-            int radius = section.contains(id + ".radius") ? section.getInt(id + ".radius") : -1;
-            String world = section.contains(id + ".world") ? section.getString(id + ".world") : null;
-            boolean autoJoin = section.contains(id + ".auto-join") && section.getBoolean("auto-join");
-            List<String> servers = section.contains(id + ".servers") ? section.getStringList(id + ".servers") : new ArrayList<>();
-            String discord = section.contains(id + ".discord") ? section.getString(id + ".discord") : null;
+        CommentedFileConfiguration channelsConfig = CommentedFileConfiguration.loadConfiguration(channelsFile);
+
+        for (String id : channelsConfig.getKeys(false)) {
+            boolean isDefault = channelsConfig.contains(id + ".default") && channelsConfig.getBoolean(id + ".default");
+            String format = channelsConfig.contains(id + ".format") ? channelsConfig.getString(id + ".format") : this.defaultChannel.getFormat();
+            String command = channelsConfig.contains(id + ".command") ? channelsConfig.getString(id + ".command") : null;
+            boolean visible = channelsConfig.contains(id + ".visible-anywhere") && channelsConfig.getBoolean(id + ".visible-anywhere");
+            boolean joinable = !channelsConfig.contains(id + ".joinable") || channelsConfig.getBoolean(id + ".joinable");
+            int radius = channelsConfig.contains(id + ".radius") ? channelsConfig.getInt(id + ".radius") : -1;
+            String world = channelsConfig.contains(id + ".world") ? channelsConfig.getString(id + ".world") : null;
+            boolean autoJoin = channelsConfig.contains(id + ".auto-join") && channelsConfig.getBoolean("auto-join");
+            List<String> servers = channelsConfig.contains(id + ".servers") ? channelsConfig.getStringList(id + ".servers") : new ArrayList<>();
+            String discord = channelsConfig.contains(id + ".discord") ? channelsConfig.getString(id + ".discord") : null;
 
             if (id.length() > 255) id = id.substring(255);
 
@@ -62,7 +65,7 @@ public class ChannelManager extends Manager {
                 this.defaultChannel = channel;
 
             if (command != null) this.registerCommand(command);
-            this.rosePlugin.getManager(PlaceholderSettingManager.class).parseFormat("channel-" + id, format);
+            this.rosePlugin.getManager(PlaceholderManager.class).parseFormat("channel-" + id, format);
         }
 
         if (this.defaultChannel == null) {

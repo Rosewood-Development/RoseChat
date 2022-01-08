@@ -24,12 +24,12 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         BaseComponent[] message;
         boolean hasMessagePlaceholder = false;
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(messageWrapper.getSender(), messageWrapper.getSender(), group).build();
-        DiscordPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderSettingManager().getDiscordPlaceholder();
+        DiscordPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordPlaceholder();
 
         CustomPlaceholder textPlaceholder = placeholder.getPlaceholder("text");
         String text = textPlaceholder != null ? textPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
-            message = messageWrapper.parse(text, messageWrapper.getSender());
+            message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
             text = TextComponent.toPlainText(message);
         }
 
@@ -39,7 +39,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         CustomPlaceholder titlePlaceholder = placeholder.getPlaceholder("title");
         String title = titlePlaceholder != null ? titlePlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (title != null && title.contains("{message}")) {
-            message = messageWrapper.parse(title, messageWrapper.getSender());
+            message = messageWrapper.parseToDiscord(title, messageWrapper.getSender());
             title = TextComponent.toPlainText(message);
             hasMessagePlaceholder = true;
         }
@@ -47,7 +47,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         CustomPlaceholder descriptionPlaceholder = placeholder.getPlaceholder("description");
         String description = descriptionPlaceholder != null ? descriptionPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (description != null && description.contains("{message}")) {
-            message = messageWrapper.parse(description, messageWrapper.getSender());
+            message = messageWrapper.parseToDiscord(description, messageWrapper.getSender());
             description = TextComponent.toPlainText(message);
             hasMessagePlaceholder = true;
         }
