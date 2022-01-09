@@ -195,6 +195,9 @@ permissions:
       rosechat.placeholders.channel: true
       rosechat.placeholders.group: true
       rosechat.placeholders.nickname: true
+  rosechat.placeholder:
+    description: Allows using a specific placeholder.
+    default: op
   rosechat.tags:
     description: Allows using tags.
     default: op
@@ -203,6 +206,9 @@ permissions:
       rosechat.tags.channel: true
       rosechat.tags.group: true
       rosechat.tags.nickname: true
+  rosechat.tag:
+    description: Allows using a specific tag.
+    default: op
   rosechat.replacements:
     description: Allows using replacements.
     default: op
@@ -211,6 +217,9 @@ permissions:
       rosechat.replacements.channel: true
       rosechat.replacements.group: true
       rosechat.replacements.nickname: true
+  rosechat.replacement:
+    description: Allows using a specific replacement.
+    default: op
   rosechat.emojis:
     description: Allows using emojis.
     default: op
@@ -219,20 +228,14 @@ permissions:
       rosechat.emojis.channel: true
       rosechat.emojis.group: true
       rosechat.emojis.nickname: true
+  rosechat.emoji:
+    description: Allows using a specific emoji.
+    default: op
   rosechat.message:
     description: Allows using the message command.
     default: op
   rosechat.reply:
     description: Allows using the reply command.
-    default: op
-  rosechat.tag:
-    description: Allows using a specific tag.
-    default: op
-  rosechat.replacement:
-    description: Allows using a specific replacement.
-    default: op
-  rosechat.emote:
-    description: Allows using a specific emote.
     default: op
   rosechat.spy:
     description: Allows using social spy.

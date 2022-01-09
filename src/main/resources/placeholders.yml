@@ -246,10 +246,6 @@ url:
       action: OPEN_URL
       value: "%url%"
 
-censored-url:
-  text:
-    default: "&m%url%"
-
 discord-prefix:
   text:
     default: "&bDiscord &8| "

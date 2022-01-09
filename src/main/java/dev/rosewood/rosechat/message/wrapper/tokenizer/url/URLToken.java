@@ -30,7 +30,7 @@ public class URLToken extends Token {
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
         PlaceholderManager manager = RoseChatAPI.getInstance().getPlaceholderManager();
-        CustomPlaceholder placeholder = manager.getPlaceholder(Setting.URL_CENSORING_ENABLED.getBoolean() ? "censored-url" : "url");
+        CustomPlaceholder placeholder = manager.getPlaceholder("url");
         if (placeholder == null) return null;
 
         BaseComponent[] component;
@@ -49,6 +49,7 @@ public class URLToken extends Token {
 
         if (placeholder.getClick() != null) {
             String clickString = placeholders.apply(placeholder.getClick().parse(this.getSender(), this.getViewer(), placeholders));
+            clickString = clickString.startsWith("http") ? clickString : "https://" + clickString;
             ClickEvent.Action action = placeholder.getClick().parseToAction(this.getSender(), this.getViewer(), placeholders);
             clickEvent = new ClickEvent(action, clickString);
         }

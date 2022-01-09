@@ -16,7 +16,8 @@ public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
     public ReplacementToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (!replacement.isRegex()) continue;
-            if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.replacements." + location.toString().toLowerCase()) || !sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            String groupPermission = group == null ? "" : "." + group.getLocationPermission();
+            if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.replacements." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
             Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
             if (matcher.find()) {
                 String found = input.substring(matcher.start(), matcher.end());

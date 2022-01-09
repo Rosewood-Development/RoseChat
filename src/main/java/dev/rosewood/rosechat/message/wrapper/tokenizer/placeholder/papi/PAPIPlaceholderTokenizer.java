@@ -20,7 +20,8 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<PAPIPlaceholderToken>
         if (matcher.find()) {
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
-            if (location != MessageLocation.OTHER && !sender.hasPermission("rosechat.placeholders." + location.toString().toLowerCase()) || !sender.hasPermission("rosechat.placeholder." + placeholderPermission)) return null;
+            String groupPermission = group == null ? "" : "." + group.getLocationPermission();
+            if (location != MessageLocation.OTHER && !sender.hasPermission("rosechat.placeholders." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.placeholder." + placeholderPermission)) return null;
             return new PAPIPlaceholderToken(sender, viewer, input.substring(matcher.start(), matcher.end()));
         }
 

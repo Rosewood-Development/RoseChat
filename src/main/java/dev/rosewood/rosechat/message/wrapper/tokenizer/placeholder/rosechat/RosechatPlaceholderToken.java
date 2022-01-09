@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
 
 public class RosechatPlaceholderToken extends Token {
 
