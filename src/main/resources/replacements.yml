@@ -1,6 +1,6 @@
 # When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
 # These can be used for custom colour codes, general replacements or regular expressions.
-# These replacmeents can be used with placeholders in placeholder.yml.
+# These replacements can be used with placeholders in placeholder.yml.
 # Emoji's can be defined in the emojis.yml, as they are parsed separately from replacements.
 # Check the wiki for more information:
 rainbow:
@@ -9,7 +9,7 @@ rainbow:
 
 heart:
   text: '<3'
-  replacement: '\u2764'
+  replacement: "❤"
 
 # The '%message%' placeholder can be used to get what was replaced.
 # For example, this regex matches URLs. The replacement uses a placeholder (defined in placeholders.yml) to make it hoverable and clickable.

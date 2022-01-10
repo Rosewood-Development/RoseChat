@@ -15,9 +15,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeT
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.italic.DiscordItalicTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.strikethrough.DiscordStrikethroughToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.strikethrough.DiscordStrikethroughTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.underline.DiscordUnderlineTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
@@ -29,7 +27,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenize
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.ReplacementToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -54,7 +51,6 @@ public class MessageTokenizer {
     public static final TagTokenizer TAG_TOKENIZER = new TagTokenizer();
     public static final RegexReplacementTokenizer REGEX_REPLACEMENT_TOKENIZER = new RegexReplacementTokenizer();
     public static final EmojiTokenizer EMOJI_TOKENIZER = new EmojiTokenizer();
-    public static final URLTokenizer URL_TOKENIZER = new URLTokenizer();
     public static final WhitespaceTokenizer WHITESPACE_TOKENIZER = new WhitespaceTokenizer();
     public static final CharacterTokenizer CHARACTER_TOKENIZER = new CharacterTokenizer();
 
@@ -77,7 +73,6 @@ public class MessageTokenizer {
             add(TAG_TOKENIZER);
             add(EMOJI_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);
-            add(URL_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
@@ -99,7 +94,19 @@ public class MessageTokenizer {
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(EMOJI_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);
-            add(URL_TOKENIZER);
+            add(WHITESPACE_TOKENIZER);
+            add(CHARACTER_TOKENIZER);
+        }
+    };
+
+    public static final List<Tokenizer<?>> REPLACEMENT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
+            add(GRADIENT_TOKENIZER);
+            add(RAINBOW_TOKENIZER);
+            add(COLOR_TOKENIZER);
+            add(ROSECHAT_PLACEHOLDER_TOKENIZER);
+            add(PAPI_PLACEHOLDER_TOKENIZER);
+            add(EMOJI_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
@@ -169,7 +176,9 @@ public class MessageTokenizer {
     private String parseReplacements(String message) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex()) continue;
-            if (this.location != MessageLocation.NONE && !this.sender.hasPermission("rosechat.replacements." + this.location.toString().toLowerCase()) || !this.sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            String groupPermission = this.group == null ? "" : "." + this.group.getLocationPermission();
+            if (this.location != MessageLocation.NONE && !this.sender.hasPermission("rosechat.replacements." + this.location.toString().toLowerCase() + groupPermission)
+                    || !this.sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
             message = message.replace(replacement.getText(), replacement.getReplacement());
         }
 

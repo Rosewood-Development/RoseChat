@@ -237,14 +237,14 @@ staff-only:
 
 url:
   text:
-    default: "&n&9%url%"
+    default: "&n&9%message%"
   hover:
     default:
       - "&7Click to Open"
   click:
     default:
       action: OPEN_URL
-      value: "%url%"
+      value: "%message%"
 
 discord-prefix:
   text:

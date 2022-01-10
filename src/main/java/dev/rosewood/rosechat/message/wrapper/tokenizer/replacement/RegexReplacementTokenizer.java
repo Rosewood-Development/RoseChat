@@ -22,7 +22,7 @@ public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
             if (matcher.find()) {
                 String found = input.substring(matcher.start(), matcher.end());
                 if (!input.startsWith(found)) return null;
-                return new ReplacementToken(sender, viewer, replacement, input.substring(matcher.start(), matcher.end()));
+                return new ReplacementToken(sender, viewer, group, replacement, input.substring(matcher.start(), matcher.end()));
             }
         }
 

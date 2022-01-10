@@ -20,7 +20,7 @@ public class EmojiTokenizer implements Tokenizer<ReplacementToken> {
                 String groupPermission = group == null ? "" : "." + group.getLocationPermission();
                 if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.emojis." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.emoji." + emoji.getId())) continue;
                 if (input.startsWith(emoji.getText())) {
-                    return new ReplacementToken(sender, viewer, emoji, input.substring(0, emoji.getText().length()));
+                    return new ReplacementToken(sender, viewer, group, emoji, input.substring(0, emoji.getText().length()));
                 }
             }
         }
