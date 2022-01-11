@@ -88,6 +88,7 @@ public class ReplyCommand extends AbstractCommand {
 
 
         PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
+        if (targetData == null) return;
         if (targetData.hasMessageSounds() && targetPlayer.isOnline() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
             Player tPlayer = (Player) targetPlayer;
             tPlayer.playSound(tPlayer.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);

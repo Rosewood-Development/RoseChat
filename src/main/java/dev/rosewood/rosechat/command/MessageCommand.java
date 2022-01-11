@@ -98,6 +98,8 @@ public class MessageCommand extends AbstractCommand {
             BungeeListener.updateReply(sender.getName(), target);
         } else {
             PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
+            if (targetData == null) return;
+
             if (targetData.hasMessageSounds() && targetPlayer.isOnline() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
                 Player player = (Player) targetPlayer;
                 player.playSound(player.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);

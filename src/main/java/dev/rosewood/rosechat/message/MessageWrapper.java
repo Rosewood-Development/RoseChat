@@ -273,7 +273,7 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper applyDefaultColor() {
-        this.message = this.senderData.getColor() + this.message;
+        if (this.senderData != null) this.message = this.senderData.getColor() + this.message;
         return this;
     }
 

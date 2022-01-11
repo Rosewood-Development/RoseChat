@@ -31,7 +31,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceToke
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
