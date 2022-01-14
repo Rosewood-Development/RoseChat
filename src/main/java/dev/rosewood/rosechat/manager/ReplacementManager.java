@@ -1,22 +1,11 @@
 package dev.rosewood.rosechat.manager;
 
-import com.google.common.base.Charsets;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,14 +23,7 @@ public class ReplacementManager extends Manager {
         File replacementFile = new File(this.rosePlugin.getDataFolder(), "replacements.yml");
         if (!replacementFile.exists()) this.rosePlugin.saveResource("replacements.yml", false);
 
-        YamlConfiguration replacementConfiguration = new YamlConfiguration();
-
-        try {
-            FileInputStream stream = new FileInputStream(replacementFile);
-            replacementConfiguration.load(new InputStreamReader(stream, Charsets.UTF_8));
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
+        CommentedFileConfiguration replacementConfiguration = CommentedFileConfiguration.loadConfiguration(replacementFile);
 
         for (String id : replacementConfiguration.getKeys(false)) {
             String text = replacementConfiguration.getString(id + ".text");

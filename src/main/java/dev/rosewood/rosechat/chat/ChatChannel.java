@@ -66,7 +66,7 @@ public class ChatChannel implements Group {
         for (UUID uuid : api.getDataManager().getChannelSpies()) {
             if (uuid == message.getSender().getUUID()) continue;
             Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), message.getSender()));
+            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
         }
 
         // Send the message to discord.
