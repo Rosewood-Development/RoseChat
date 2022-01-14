@@ -68,7 +68,7 @@ public class MessageCommand extends AbstractCommand {
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
         this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (targetPlayer != null && data != null) {
-                if (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer())) {
+                if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer()))) {
                     this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
                     return;

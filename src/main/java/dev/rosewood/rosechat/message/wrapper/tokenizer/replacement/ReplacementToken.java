@@ -64,7 +64,7 @@ public class ReplacementToken extends Token {
             String clickString = placeholder.getClick() != null ? placeholders.apply(placeholder.getClick().parse(this.getSender(), this.getViewer(), placeholders)) : null;
             ClickEvent.Action action = placeholder.getClick() != null ? placeholder.getClick().parseToAction(this.getSender(), this.getViewer(), placeholders) : null;
             if (clickString != null && action != null) {
-                String click = this.getSender().isPlayer() ? PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), clickString) : null;
+                String click = this.getSender().isPlayer() ? PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), clickString) : clickString;
                 if (click != null) {
                     click = click.startsWith("http") ? click : "https://" + click;
                     clickEvent = new ClickEvent(action, click);

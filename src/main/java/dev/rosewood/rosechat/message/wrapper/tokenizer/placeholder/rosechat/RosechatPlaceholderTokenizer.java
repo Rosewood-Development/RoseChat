@@ -22,12 +22,12 @@ public class RosechatPlaceholderTokenizer implements Tokenizer<RosechatPlacehold
 
         Matcher matcher = RC_PATTERN.matcher(input);
         if (matcher.find()) {
-            String placeholder = input.substring(matcher.start(), matcher.end());
+            String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String groupPermission = group == null ? "" : "." + group.getLocationPermission();
             if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.placeholders." + location.toString().toLowerCase() + groupPermission)
                     || !sender.hasPermission("rosechat.placeholder.rosechat." + placeholder)) return null;
 
-            CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder.substring(1, placeholder.length() - 1));
+            CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder);
             if (customPlaceholder == null) return null;
             return new RosechatPlaceholderToken(wrapper, group, sender, viewer, customPlaceholder);
         }

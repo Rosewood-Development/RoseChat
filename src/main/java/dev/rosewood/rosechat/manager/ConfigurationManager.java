@@ -76,7 +76,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The format of a /message sent to another player."),
         MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{message-received-sender}{message-received-arrow}{message-received-receiver}{message}",
                 "The format of a /message received from another player."),
-        MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-message}",
+        MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-players}{message}",
                 "The format of a spied /message."),
         GROUP_FORMAT("chat-formats.group", "{group-prefix}{group-member-prefix}{player}{separator}{message}",
                 "The format of a group message."),

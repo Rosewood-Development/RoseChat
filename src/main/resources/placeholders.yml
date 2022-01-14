@@ -148,11 +148,11 @@ channel-prefix:
 # Placeholders used for social spy.
 spy-prefix:
   text:
-    default: "&6[&eSocialSpy&6]"
+    default: "&6[&eSocialSpy&6] "
 
-spy-message:
+spy-players:
   text:
-    default: "&8[&f%player_nickname% &6-> &8%other_player_nickname%&8] "
+    default: "&8[&f%player_nickname% &6-> &f%other_player_nickname%&8] "
 
 # Placeholders used for deleting messages.
 # This placeholder does not need conditions.
@@ -237,7 +237,7 @@ staff-only:
 
 url:
   text:
-    default: "&n&9%message%"
+    default: "&9&n%message%"
   hover:
     default:
       - "&7Click to Open"

@@ -73,10 +73,13 @@ public class MessageUtils {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
                 .addPlaceholder("player_name", sender.getName())
                 .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname())
-                .addPlaceholder("other_player_name", viewer.getName())
-                .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                .addPlaceholder("other_player_nickname", viewer.getNickname());
+                .addPlaceholder("player_nickname", sender.getNickname());
+
+        if (viewer != null) {
+            builder.addPlaceholder("other_player_name", viewer.getName())
+                    .addPlaceholder("other_player_displayname", viewer.getDisplayName())
+                    .addPlaceholder("other_player_nickname", viewer.getNickname());
+        }
 
         Permission vault = RoseChatAPI.getInstance().getVault();
         if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
@@ -101,34 +104,17 @@ public class MessageUtils {
     }
 
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, GroupChat group) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .addPlaceholder("player_name", sender.getName())
-                .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname())
-                .addPlaceholder("other_player_name", viewer.getName())
-                .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                .addPlaceholder("other_player_nickname", viewer.getNickname())
-                .addPlaceholder("group", group.getId())
+        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
+        builder.addPlaceholder("group", group.getId())
                 .addPlaceholder("group_name", group.getName())
                 .addPlaceholder("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
 
-        Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
         return builder;
     }
 
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, ChatChannel inChannel) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .addPlaceholder("player_name", sender.getName())
-                .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname())
-                .addPlaceholder("other_player_name", viewer.getName())
-                .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                .addPlaceholder("other_player_nickname", viewer.getNickname())
-                .addPlaceholder("channel", inChannel.getId());;
-
-        Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
+        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
+        builder.addPlaceholder("channel", inChannel.getId());;
         return builder;
     }
 
@@ -171,11 +157,11 @@ public class MessageUtils {
 
     public static void sendPrivateMessage(RoseSender sender, String targetName, MessageWrapper message) {
         Player target = Bukkit.getPlayer(targetName);
-        RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
+        RoseSender messageTarget = target == null ? new RoseSender(Bukkit.getConsoleSender()) : new RoseSender(target);
 
         BaseComponent[] sentMessage = message.parse(Setting.MESSAGE_SENT_FORMAT.getString(), messageTarget);
         BaseComponent[] receivedMessage = message.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
-        BaseComponent[] spyMessage = message.parse(Setting.MESSAGE_SPY_FORMAT.getString(), null);
+        BaseComponent[] spyMessage = message.parse(Setting.MESSAGE_SPY_FORMAT.getString(), messageTarget);
 
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
@@ -191,21 +177,22 @@ public class MessageUtils {
         sender.send(sentMessage);
         if (target == null) {
             if (targetName.equalsIgnoreCase("Console")) {
-                Bukkit.getConsoleSender().spigot().sendMessage(sentMessage);
-                return;
+                Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
+            } else {
+                BungeeListener.sendDirectMessage(sender.getUUID(), targetName, ComponentSerializer.toString(receivedMessage));
             }
-            BungeeListener.sendDirectMessage(sender.getUUID(), targetName, ComponentSerializer.toString(receivedMessage));
         } else {
             target.spigot().sendMessage(receivedMessage);
         }
 
-        if (sender instanceof Player) {
-            for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getMessageSpies()) {
-                if (!uuid.equals(sender.asPlayer().getUniqueId()) && !uuid.equals(messageTarget.asPlayer().getUniqueId())) {
-                    Player spy = Bukkit.getPlayer(uuid);
-                    if (spy != null) spy.spigot().sendMessage(spyMessage);
-                }
-            }
+        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getMessageSpies()) {
+            boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
+            boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
+            if (isSpySender || isSpyTarget) continue;
+
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null)
+                spy.spigot().sendMessage(spyMessage);
         }
     }
 
