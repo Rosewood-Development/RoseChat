@@ -64,11 +64,11 @@ public class MessageCommand extends AbstractCommand {
             return;
         }
 
-        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(target);
+        Player targetPlayer = Bukkit.getPlayer(target);
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
         this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (targetPlayer != null && data != null) {
-                if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer()))) {
+                if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
                     this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
                     return;
@@ -97,11 +97,13 @@ public class MessageCommand extends AbstractCommand {
         if (this.getAPI().isBungee()) {
             BungeeListener.updateReply(sender.getName(), target);
         } else {
-            PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
+            if (!targetPlayer.isOnline()) return;
+            Player player = targetPlayer.getPlayer();
+
+            PlayerData targetData = this.getAPI().getPlayerData(player.getUniqueId());
             if (targetData == null) return;
 
-            if (targetData.hasMessageSounds() && targetPlayer.isOnline() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
-                Player player = (Player) targetPlayer;
+            if (targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
                 player.playSound(player.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
             }
 

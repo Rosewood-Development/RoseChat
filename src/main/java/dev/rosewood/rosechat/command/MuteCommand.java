@@ -30,6 +30,11 @@ public class MuteCommand extends AbstractCommand {
             return;
         }
 
+        if (target.hasPermission("rosechat.mute.bypass")) {
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-cannot-be-muted");
+            return;
+        }
+
         PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
         int outTime = 0;
         String outScale = "";
@@ -111,7 +116,7 @@ public class MuteCommand extends AbstractCommand {
                 tab.add(player.getName());
             }
         } else if (args.length == 2) {
-            for (int i = 0; i < 10; i++) tab.add("" + i);
+            tab.add("<time>");
         } else if (args.length == 3) {
             tab.addAll(Arrays.asList("seconds", "minutes", "hours", "days", "months", "years"));
         }

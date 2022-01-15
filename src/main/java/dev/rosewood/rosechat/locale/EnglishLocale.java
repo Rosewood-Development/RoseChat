@@ -221,8 +221,9 @@ public class EnglishLocale implements Locale {
             this.put("command-mute-description", "&8 - &d/mute &7- Mute a player.");
             this.put("command-mute-usage", "&e/mute <player> [time] [days/months/years]");
             this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time% &b%scale%&e.");
-            this.put("command-mute-indefinite", "an indefinite amount of time");
+            this.put("command-mute-indefinite", "&eYou have muted &b%player% &efor an indefinite amount of time.");
             this.put("command-mute-muted", "&eYou have been muted.");
+            this.put("command-mute-cannot-be-muted", "&cYou cannot mute this player!");
             this.put("command-mute-cannot-send", "&cYou can not send a message while you are muted!");
             this.put("command-mute-unmuted", "&eYou are no longer muted.");
             this.put("command-mute-second", "second");

@@ -15,7 +15,7 @@ public class EmojiTokenizer implements Tokenizer<ReplacementToken> {
     public ReplacementToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
         PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(sender.getUUID());
 
-        if (playerData == null || playerData.hasEmojis()) {
+        if (playerData != null && playerData.hasEmojis()) {
             for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
                 String groupPermission = group == null ? "" : "." + group.getLocationPermission();
                 if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.emojis." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.emoji." + emoji.getId())) continue;

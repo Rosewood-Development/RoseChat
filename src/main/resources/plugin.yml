@@ -277,7 +277,7 @@ permissions:
     description: Allows using the mute command.
     default: op
   rosechat.mute.bypass:
-    description: Allows chatting while being muted.
+    description: Stops the player from being able to be muted.
     default: op
   rosechat.channel:
     description: Allows using the channel command.

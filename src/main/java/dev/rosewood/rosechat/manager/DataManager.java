@@ -63,6 +63,7 @@ public class DataManager extends AbstractDataManager {
                         boolean canBeMessaged = result.getBoolean("can_be_messaged");
                         boolean hasTagSounds = result.getBoolean("has_tag_sounds");
                         boolean hasMessageSounds = result.getBoolean("has_message_sounds");
+                        boolean hasEmojis = result.getBoolean("has_emojis");
                         String currentChannel = result.getString("current_channel");
                         String color = result.getString("chat_color");
                         long muteTime = result.getLong("mute_time");
@@ -76,6 +77,7 @@ public class DataManager extends AbstractDataManager {
                         playerData.setCanBeMessaged(canBeMessaged);
                         playerData.setTagSounds(hasTagSounds);
                         playerData.setMessageSounds(hasMessageSounds);
+                        playerData.setEmojis(hasEmojis);
                         playerData.setCurrentChannel(channel);
                         playerData.setColor(color);
                         playerData.setMuteTime(muteTime);
@@ -119,8 +121,8 @@ public class DataManager extends AbstractDataManager {
 
                 if (create) {
                     String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                            "can_be_messaged, has_tag_sounds, has_message_sounds, current_channel, chat_color, mute_time, nickname) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                         statement.setString(1, playerData.getUUID().toString());
                         statement.setBoolean(2, playerData.hasMessageSpy());
@@ -129,15 +131,16 @@ public class DataManager extends AbstractDataManager {
                         statement.setBoolean(5, playerData.canBeMessaged());
                         statement.setBoolean(6, playerData.hasTagSounds());
                         statement.setBoolean(7, playerData.hasMessageSounds());
-                        statement.setString(8, playerData.getCurrentChannel().getId());
-                        statement.setString(9, playerData.getColor());
-                        statement.setLong(10, playerData.getMuteTime());
-                        statement.setString(11, playerData.getNickname());
+                        statement.setBoolean(8, playerData.hasEmojis());
+                        statement.setString(9, playerData.getCurrentChannel().getId());
+                        statement.setString(10, playerData.getColor());
+                        statement.setLong(11, playerData.getMuteTime());
+                        statement.setString(12, playerData.getNickname());
                         statement.executeUpdate();
                     }
                 } else {
                     String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
-                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
+                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, has_emojis = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
                             "WHERE uuid = ?";
                     try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
                         statement.setBoolean(1, playerData.hasMessageSpy());
@@ -146,11 +149,12 @@ public class DataManager extends AbstractDataManager {
                         statement.setBoolean(4, playerData.canBeMessaged());
                         statement.setBoolean(5, playerData.hasTagSounds());
                         statement.setBoolean(6, playerData.hasMessageSounds());
-                        statement.setString(7, playerData.getCurrentChannel().getId());
-                        statement.setString(8, playerData.getColor());
-                        statement.setLong(9, playerData.getMuteTime());
-                        statement.setString(10, playerData.getNickname());
-                        statement.setString(11, playerData.getUUID().toString());
+                        statement.setBoolean(7, playerData.hasEmojis());
+                        statement.setString(8, playerData.getCurrentChannel().getId());
+                        statement.setString(9, playerData.getColor());
+                        statement.setLong(10, playerData.getMuteTime());
+                        statement.setString(11, playerData.getNickname());
+                        statement.setString(12, playerData.getUUID().toString());
                         statement.executeUpdate();
                     }
                 }

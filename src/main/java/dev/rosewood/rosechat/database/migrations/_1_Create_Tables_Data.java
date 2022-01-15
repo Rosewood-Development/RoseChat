@@ -23,6 +23,7 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "can_be_messaged BOOLEAN NOT NULL, " +
                     "has_tag_sounds BOOLEAN NOT NULL, " +
                     "has_message_sounds BOOLEAN NOT NULL, " +
+                    "has_emojis BOOLEAN NOT NULL, " +
                     "current_channel VARCHAR(255) NOT NULL, " +
                     "chat_color VARCHAR(32) NOT NULL, " +
                     "mute_time BIGINT NOT NULL, " +
