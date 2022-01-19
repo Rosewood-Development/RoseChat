@@ -58,6 +58,47 @@ public class ChatChannel implements Group {
         this(id, format, false);
     }
 
+    public boolean canSendMessage(RoseSender sender, PlayerData data, String message) {
+        // Don't send the message if the player doesn't have permission.
+        if (!sender.hasPermission("rosechat.chat") && !sender.hasPermission("rosechat.channel." + this.id)) {
+            sender.sendLocaleMessage("no-permission");
+            return false;
+        }
+
+        if (!this.joinable) {
+            sender.sendLocaleMessage("command-channel-not-joinable");
+            return false;
+        }
+
+        if (data != null) {
+            // Check Mute Expiry
+            if (data.getMuteTime() > 0 && data.getMuteTime() < System.currentTimeMillis()) {
+                data.setMuteTime(0);
+                data.save();
+            }
+
+            // Don't send the message if the player is muted.
+            if (data.getMuteTime() != 0 && !sender.hasPermission("rosechat.mute.bypass")) {
+                sender.sendLocaleMessage("command-mute-cannot-send");
+                return false;
+            }
+        }
+
+        // Check if the channel can be sent to.
+        if (this.muted && !sender.hasPermission("rosechat.mute.bypass")) {
+            sender.sendLocaleMessage("channel-muted");
+            return false;
+        }
+
+        // Make sure the message isn't blank.
+        if (MessageUtils.isMessageEmpty(message)) {
+            sender.sendLocaleMessage("message-blank");
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void send(MessageWrapper message) {
         RoseChatAPI api = RoseChatAPI.getInstance();

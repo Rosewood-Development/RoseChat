@@ -79,6 +79,14 @@ public class RoseSender {
     }
 
     /**
+     * Sends a localized message to the RoseSender.
+     * @param key The key of the message to send.
+     */
+    public void sendLocaleMessage(String key) {
+        RoseChatAPI.getInstance().getLocaleManager().sendMessage(this.isPlayer() ? this.asPlayer() : Bukkit.getConsoleSender(), key);
+    }
+
+    /**
      * Sends a message to the RoseSender.
      * @param message The message to send.
      * @return True if a message was sent.

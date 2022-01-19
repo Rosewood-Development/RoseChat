@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -35,19 +34,13 @@ public class ChannelCommand extends AbstractCommand {
                 return;
             }
 
-            if (!channel.isJoinable()) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-joinable");
-                return;
-            }
-
             String message = getAllArgs(1, args);
-
-            if (MessageUtils.isMessageEmpty(message)) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
-                return;
-            }
-
+            PlayerData data = null;
             RoseSender roseSender = new RoseSender(sender);
+            if (roseSender.isPlayer() && roseSender.getUUID() != null) data = this.getAPI().getPlayerData(roseSender.getUUID());
+
+            if (!channel.canSendMessage(roseSender, data, message)) return;
+
             MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
             if (!messageWrapper.canBeSent()) {
                 if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
@@ -62,7 +55,11 @@ public class ChannelCommand extends AbstractCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         List<String> tab = new ArrayList<>();
 
-        if (args.length == 1) tab.addAll(this.getAPI().getChannelIDs());
+        if (args.length == 1) {
+            for (String channel : this.getAPI().getChannelIDs()) {
+                if (sender.hasPermission("rosechat.channel." + channel)) tab.add(channel);
+            }
+        }
 
         return tab;
     }
@@ -87,6 +84,11 @@ public class ChannelCommand extends AbstractCommand {
 
             if (newChannel == null) {
                 api.getLocaleManager().sendMessage(sender, "command-channel-not-found");
+                return true;
+            }
+
+            if (!sender.hasPermission("rosechat.channel." + newChannel.getId())) {
+                api.getLocaleManager().sendMessage(sender, "no-permission");
                 return true;
             }
 

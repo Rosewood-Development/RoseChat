@@ -2,13 +2,12 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import java.util.Collections;
@@ -36,13 +35,12 @@ public class CustomCommand extends Command {
                     }
                 } else {
                     String message = AbstractCommand.getAllArgs(0, args);
-                    String colorified = HexUtils.colorify(message);
-                    if (ChatColor.stripColor(colorified).isEmpty()) {
-                        RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "message-blank");
-                        return true;
-                    }
 
+                    PlayerData data = null;
                     RoseSender roseSender = new RoseSender(sender);
+                    if (roseSender.isPlayer() && roseSender.getUUID() != null) data = RoseChatAPI.getInstance().getPlayerData(roseSender.getUUID());
+                    if (!channel.canSendMessage(roseSender, data, message)) return false;
+
                     MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
                     if (!messageWrapper.canBeSent()) {
                         if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);

@@ -7,8 +7,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,48 +34,19 @@ public class ChatListener implements Listener {
             Player player = event.getPlayer();
             PlayerData data = this.api.getPlayerData(player.getUniqueId());
             ChatChannel channel = data.getCurrentChannel();
+            RoseSender sender = new RoseSender(player);
 
-            // Don't send the message if the player doesn't have permission.
-            if (!player.hasPermission("rosechat.chat")) {
-                this.api.getLocaleManager().sendMessage(player, "no-permission");
-                return;
-            }
+            if (!channel.canSendMessage(sender, data, event.getMessage())) return;
 
-            // Check Mute Expiry
-            if (data.getMuteTime() > 0 && data.getMuteTime() < System.currentTimeMillis()) {
-                data.setMuteTime(0);
-                data.save();
-            }
-
-            // Don't send the message if the player is muted.
-            if (data.getMuteTime() != 0 && !player.hasPermission("rosechat.bypass.mute")) {
-                this.api.getLocaleManager().sendMessage(player, "command-mute-cannot-send");
-                return;
-            }
-
-            // Check if the channel can be sent to.
-            if (channel.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
-                this.api.getLocaleManager().sendMessage(player, "channel-muted");
-                return;
-            }
-
-            // Make sure the message isn't blank.
-            String colorified = HexUtils.colorify(event.getMessage());
-            if (ChatColor.stripColor(colorified).isEmpty()) {
-                this.api.getLocaleManager().sendMessage(player, "message-blank");
-                return;
-            }
-
-            RoseSender sender = new RoseSender(event.getPlayer());
             MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).validate().filter().applyDefaultColor();
-
             if (!message.canBeSent()) {
                 if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
                 return;
             }
 
             channel.send(message);
-            Bukkit.getConsoleSender().spigot().sendMessage(message.toComponents());
+            BaseComponent[] messageComponents = message.toComponents();
+            if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
         });
     }
 }
