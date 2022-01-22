@@ -87,8 +87,7 @@ public class NicknameCommand extends AbstractCommand {
             tab.add("<nickname>");
             if (sender.hasPermission("rosechat.nickname.others")) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (sender instanceof Player && player.getUniqueId().equals(((Player) sender).getUniqueId())) continue;
-                    tab.add(player.getName());
+                    if (player != sender) tab.add(player.getName());
                 }
             }
         } else if (args.length == 2 && sender.hasPermission("rosechat.nickname.others")) {

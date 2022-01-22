@@ -111,9 +111,8 @@ public class MuteCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (Player player : Bukkit.getOnlinePlayers()){
-                if (sender instanceof Player && player.getUniqueId().equals(((Player) sender).getUniqueId())) continue;
-                tab.add(player.getName());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
             }
         } else if (args.length == 2) {
             tab.add("<time>");

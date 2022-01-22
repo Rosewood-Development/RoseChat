@@ -214,7 +214,7 @@ public class EnglishLocale implements Locale {
             this.put("#32", "Color Command");
             this.put("command-color-description", "&8 - &d/color &7- Change your default chat color.");
             this.put("command-color-usage", "&e/color <color>");
-            this.put("command-color-success", "&eYour new chat color is %color%&e.");
+            this.put("command-color-success", "&eYour new chat color is &f%color%&e.");
             this.put("command-color-invalid", "&eThis is not a valid color!");
 
             this.put("#33", "Mute Command");

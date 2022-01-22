@@ -46,9 +46,8 @@ public class IgnoreCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (Player player : Bukkit.getOnlinePlayers()){
-                if (sender instanceof Player && player.getUniqueId().equals(((Player) sender).getUniqueId())) continue;
-                tab.add(player.getName());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
             }
         }
 

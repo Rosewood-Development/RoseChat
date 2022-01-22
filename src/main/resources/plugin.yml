@@ -342,6 +342,9 @@ permissions:
   rosechat.nickname.others:
     description: Allows setting the nickname of another player.
     default: op
+  rosechat.ignore:
+    description: Allows using the ignore command.
+    default: op
   rosechat.deletemessages:
     description: Allows players to delete messages
     default: op

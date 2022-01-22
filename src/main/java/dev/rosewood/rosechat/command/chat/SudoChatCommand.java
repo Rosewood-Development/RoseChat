@@ -28,6 +28,12 @@ public class SudoChatCommand extends AbstractCommand {
 
         String playerStr = args[0];
         ChatChannel channel = this.getAPI().getChannelById(args[1]);
+
+        if (channel == null) {
+            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+            return;
+        }
+
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerStr);
         RoseSender sudoSender = (player == null || !player.isOnline()) ? new RoseSender(playerStr, "default") : new RoseSender(player.getPlayer());
         MessageWrapper message = new MessageWrapper(sudoSender, MessageLocation.CHANNEL, channel, getAllArgs(2, args));

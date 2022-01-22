@@ -119,9 +119,8 @@ public class MessageCommand extends AbstractCommand {
         if (args.length == 1) {
             BungeeListener.getPlayers("ALL");
 
-            for (Player player : Bukkit.getOnlinePlayers()){
-                if (sender instanceof Player && player.getUniqueId().equals(((Player) sender).getUniqueId())) continue;
-                tab.add(player.getName());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
             }
 
             if (ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {

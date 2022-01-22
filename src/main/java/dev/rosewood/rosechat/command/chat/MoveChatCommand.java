@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,7 @@ public class MoveChatCommand extends AbstractCommand {
 
         RoseSender roseSender = new RoseSender(player);
         BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
-        String formattedName = ComponentSerializer.toString(name);
+        String formattedName = TextComponent.toLegacyText(name);
 
         this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", formattedName)
