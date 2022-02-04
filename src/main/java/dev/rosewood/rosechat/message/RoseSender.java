@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -83,7 +84,7 @@ public class RoseSender {
      * @param key The key of the message to send.
      */
     public void sendLocaleMessage(String key) {
-        RoseChatAPI.getInstance().getLocaleManager().sendMessage(this.isPlayer() ? this.asPlayer() : Bukkit.getConsoleSender(), key);
+        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(this, key);
     }
 
     /**

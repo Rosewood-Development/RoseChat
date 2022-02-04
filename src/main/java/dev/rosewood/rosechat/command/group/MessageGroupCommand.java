@@ -21,26 +21,26 @@ public class MessageGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
         if (args.length == 1) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-message-enter-message");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-message-enter-message");
             return;
         }
 
         GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
 
         if (groupChat == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "gc-invalid");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
         }
 
         String message = getAllArgs(1, args);
 
         if (MessageUtils.isMessageEmpty(message)) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "message-blank");
             return;
         }
 

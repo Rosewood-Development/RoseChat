@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.chat;
 
-import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.entity.Player;
 
@@ -23,8 +21,7 @@ public enum FilterType {
      * @param sender The person to receive the message.
      */
     public void sendWarning(RoseSender sender) {
-        LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
-        sender.send(localeManager.getLocaleMessage(this.warning));
+        sender.sendLocaleMessage(this.warning);
     }
 
     /**
@@ -32,7 +29,7 @@ public enum FilterType {
      * @param player The person to receive the message.
      */
     public void sendWarning(Player player) {
-        LocaleManager localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
-        player.sendMessage(localeManager.getLocaleMessage(this.warning));
+        RoseSender sender = new RoseSender(player);
+        this.sendWarning(sender);
     }
 }

@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,7 +226,8 @@ public class PlayerData {
     /**
      * Gets the current nickname of the player.
      * This includes gradients, emojis, tags, etc.
-     * Use {@link Player#getDisplayName} for the formatted name
+     * Use {@link Player#getDisplayName} for the current formatted name.
+     * {@link RoseChatAPI#parse} this to get the 'live' name, e.g. with placeholders for things like coords.
      *
      * @return The current nickname of the player.
      */

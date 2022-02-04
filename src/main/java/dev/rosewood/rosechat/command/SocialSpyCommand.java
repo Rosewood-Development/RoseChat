@@ -22,7 +22,7 @@ public class SocialSpyCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || !this.arguments.contains(args[0])) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
@@ -79,10 +79,10 @@ public class SocialSpyCommand extends AbstractCommand {
 
     private void sendToggleMessage(CommandSender sender, String[] args, boolean nowOn) {
         if (nowOn)
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-socialspy-enabled", StringPlaceholders.single("type",
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-socialspy-enabled", StringPlaceholders.single("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-socialspy-" + args[0].toLowerCase())));
         else
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-socialspy-disabled", StringPlaceholders.single("type",
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-socialspy-disabled", StringPlaceholders.single("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-socialspy-" + args[0].toLowerCase())));
     }
 }

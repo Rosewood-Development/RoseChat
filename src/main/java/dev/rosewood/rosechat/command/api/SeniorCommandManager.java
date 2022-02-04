@@ -58,7 +58,7 @@ public class SeniorCommandManager extends CommandManager {
             }
         }
 
-        this.localeManager.sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getMainSyntax()));
+        this.localeManager.sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getMainSyntax()));
         return true;
     }
 

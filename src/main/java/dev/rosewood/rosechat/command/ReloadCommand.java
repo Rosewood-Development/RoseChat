@@ -22,7 +22,7 @@ public class ReloadCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         RoseChat.getInstance().reload();
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-reload-reloaded");
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-reload-reloaded");
     }
 
     @Override

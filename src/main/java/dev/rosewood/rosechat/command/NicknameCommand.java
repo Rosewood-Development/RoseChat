@@ -11,8 +11,6 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,7 +26,7 @@ public class NicknameCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || (args.length == 1 && !(sender instanceof Player))) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
@@ -38,7 +36,7 @@ public class NicknameCommand extends AbstractCommand {
         String nickname = target == null ? getAllArgs(0, args) : getAllArgs(1, args);
 
         if (target != null && !sender.hasPermission("rosechat.nickname.others")) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "no-permission");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-permission");
             return;
         }
 
@@ -46,10 +44,10 @@ public class NicknameCommand extends AbstractCommand {
             playerData.setNickname(null);
             player.setDisplayName(null);
             if (target == null) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
             } else {
-                this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-nickname-other",
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
                         StringPlaceholders.builder("name", player.getName()).addPlaceholder("player", player.getName()).build());
             }
             return;
@@ -63,18 +61,16 @@ public class NicknameCommand extends AbstractCommand {
                 return;
             }
 
-            BaseComponent[] components = message.parse(null, roseSender);
-            String formattedNickname = TextComponent.toLegacyText(components);
             playerData.setNickname(nickname);
             player.setDisplayName(HexUtils.colorify(nickname));
             playerData.save();
 
             if (target == null) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-nickname-success", StringPlaceholders.single("name", formattedNickname));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", nickname));
             } else {
-                this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-success", StringPlaceholders.single("name", formattedNickname));
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-nickname-other",
-                        StringPlaceholders.builder("name", formattedNickname).addPlaceholder("player", player.getName()).build());
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.single("name", nickname));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
+                        StringPlaceholders.builder("name", nickname).addPlaceholder("player", player.getName()).build());
             }
         }
     }
@@ -111,12 +107,12 @@ public class NicknameCommand extends AbstractCommand {
         String formattedNickname = ChatColor.stripColor(HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(player, nickname)));
 
         if (formattedNickname.length() < ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt()) {
-            this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-too-short");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-too-short");
             return false;
         }
 
         if (formattedNickname.length() > ConfigurationManager.Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
-            this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-too-long");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-too-long");
             return false;
         }
 
@@ -124,7 +120,7 @@ public class NicknameCommand extends AbstractCommand {
         if ((formattedNickname.contains(" ") && !ConfigurationManager.Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean())
                 || (!MessageUtils.isAlphanumericSpace(formattedNickname) && !ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean())
                 || ChatColor.stripColor(colorified).isEmpty()) {
-            this.getAPI().getLocaleManager().sendMessage(player, "command-nickname-not-allowed");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-not-allowed");
             return false;
         }
 

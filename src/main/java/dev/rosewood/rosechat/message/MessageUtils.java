@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -21,9 +22,11 @@ import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MessageUtils {
@@ -213,5 +216,27 @@ public class MessageUtils {
 
     public static void parseFormat(String id, String format) {
         RoseChatAPI.getInstance().getPlaceholderManager().parseFormat(id, format);
+    }
+
+    public static boolean canColor(CommandSender sender, String str, String permissionArea) {
+        Matcher colorMatcher = ComponentColorizer.VALID_LEGACY_REGEX.matcher(str);
+        Matcher formatMatcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(str);
+        Matcher hexMatcher = ComponentColorizer.HEX_REGEX.matcher(str);
+        Matcher gradientMatcher = ComponentColorizer.GRADIENT_PATTERN.matcher(str);
+        Matcher rainbowMatcher = ComponentColorizer.RAINBOW_PATTERN.matcher(str);
+
+        boolean canColor = !colorMatcher.find() || sender.hasPermission("rosechat.color." + permissionArea);
+        boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + permissionArea);
+        boolean canFormat = !formatMatcher.find() || sender.hasPermission("rosechat.format." + permissionArea);
+        boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + permissionArea);
+        boolean canGradient = !gradientMatcher.find() || sender.hasPermission("rosechat.gradient." + permissionArea);
+        boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + permissionArea);
+
+        if (!(canColor && canMagic && canFormat && canHex && canGradient && canRainbow)) {
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "no-permission");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -3,16 +3,17 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AcceptGroupCommand extends AbstractCommand {
 
@@ -26,7 +27,7 @@ public class AcceptGroupCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
 
         if (playerData.getGroupInvites().isEmpty()) {
-            this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-no-invites");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-no-invites");
             return;
         }
 
@@ -43,7 +44,7 @@ public class AcceptGroupCommand extends AbstractCommand {
                 }
             }
 
-            this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-not-invited");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-not-invited");
         }
     }
 
@@ -74,26 +75,37 @@ public class AcceptGroupCommand extends AbstractCommand {
     }
 
     private void accept(PlayerData data, Player player, GroupChat groupChat) {
+        int currentGroups = (int) this.getAPI().getGroupChats().stream().filter(gc -> (gc.getMembers().contains(player.getUniqueId()))).count();
+
+        int amount = 1;
+        for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
+            String target = info.getPermission().toLowerCase();
+            if (target.startsWith("rosechat.groups.") && info.getValue()) {
+                try {
+                    amount = Math.max(amount, Integer.parseInt(target.substring(target.lastIndexOf(".") + 1)));
+                } catch (NumberFormatException e) {}
+            }
+        }
+
+        if (currentGroups >= amount) {
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "gc-limit");
+            return;
+        }
+
         data.getGroupInvites().remove(groupChat);
-        this.getAPI().addGroupChatMember(groupChat, player);
 
-        RoseSender roseSender = new RoseSender(player);
-        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
-        String formattedGroupName = ComponentSerializer.toString(groupName);
-
-        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
-        String formattedName = ComponentSerializer.toString(name);
-
-        this.getAPI().getLocaleManager().sendMessage(player, "some-msg", StringPlaceholders.single("player_name", player.getName()));
-
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-success",
-                StringPlaceholders.builder().addPlaceholder("name", formattedGroupName).addPlaceholder("player", formattedGroupName).build());
+        String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
         for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
-            if (member != null) this.getAPI().getLocaleManager()
-                    .sendMessage(member, "command-gc-accept-accepted",
-                            StringPlaceholders.builder().addPlaceholder("name", formattedGroupName).addPlaceholder("player", formattedName).build());
+            if (member != null)
+                this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-accept-accepted",
+                            StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
         }
+
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-success",
+                StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
+
+        this.getAPI().addGroupChatMember(groupChat, player);
     }
 }

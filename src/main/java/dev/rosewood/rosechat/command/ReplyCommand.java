@@ -26,7 +26,7 @@ public class ReplyCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-reply-enter-message");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-reply-enter-message");
             return;
         }
 
@@ -35,31 +35,31 @@ public class ReplyCommand extends AbstractCommand {
         String target = playerData.getReplyTo();
 
         if (target == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-reply-no-one");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-reply-no-one");
             return;
         }
 
         if (!target.equalsIgnoreCase("Console") && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
             BungeeListener.getPlayers("ALL");
             if (!this.getAPI().getDataManager().getPlayersOnServer("ALL").contains(target)) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
         } else {
             if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(target) == null) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
         }
 
         String message = getAllArgs(0, args);
         if (message.isEmpty()) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-reply-enter-message");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-reply-enter-message");
             return;
         }
 
         if (MessageUtils.isMessageEmpty(message)) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "message-blank");
             return;
         }
 
@@ -68,7 +68,7 @@ public class ReplyCommand extends AbstractCommand {
         this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (targetPlayer != null && data != null) {
                 if (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer())) {
-                    this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
                     return;
                 }

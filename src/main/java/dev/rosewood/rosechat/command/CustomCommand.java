@@ -24,14 +24,14 @@ public class CustomCommand extends Command {
         for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
             if (channel.getCommand() != null && channel.getCommand().equalsIgnoreCase(cmd)) {
                 if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
-                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "no-permission");
+                    RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "no-permission");
                     return false;
                 }
 
                 if (args.length == 0) {
                     if (!ChannelCommand.switchChannel(sender, cmd)) {
                         RoseChatAPI.getInstance().getLocaleManager()
-                                .sendMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getCommand()));
+                                .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getCommand()));
                     }
                 } else {
                     String message = AbstractCommand.getAllArgs(0, args);

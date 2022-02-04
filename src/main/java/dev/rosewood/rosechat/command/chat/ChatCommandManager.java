@@ -12,11 +12,10 @@ public class ChatCommandManager extends CommandManager {
 
     @Override
     public void sendHelpMessage(CommandSender sender) {
-        this.getLocaleManager().sendMessage(sender, "command-help-title");
+        this.getLocaleManager().sendComponentMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            this.getLocaleManager().sendCustomMessage(sender,
-                    this.getLocaleManager().getLocaleMessage("command-chat-" + subcommand.getLabels().get(0) + "-description"));
+            this.getLocaleManager().sendComponentMessage(sender, "command-chat-" + subcommand.getLabels().get(0) + "-description");
         }
     }
 }

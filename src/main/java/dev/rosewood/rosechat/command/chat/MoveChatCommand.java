@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,13 +22,13 @@ public class MoveChatCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-move-usage");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-usage");
             return;
         }
 
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
 
@@ -37,7 +36,7 @@ public class MoveChatCommand extends AbstractCommand {
         String channelStr = args[1];
 
         if (this.getAPI().getChannelById(channelStr) == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
         }
 
@@ -53,10 +52,10 @@ public class MoveChatCommand extends AbstractCommand {
         BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
         String formattedName = TextComponent.toLegacyText(name);
 
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-move-success",
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", formattedName)
                         .addPlaceholder("channel", channel.getId()).build());
-        this.getAPI().getLocaleManager().sendMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
     }
 
     @Override

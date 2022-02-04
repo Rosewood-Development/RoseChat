@@ -20,9 +20,9 @@ public class ToggleEmojiCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(uuid);
 
         if (playerData.hasEmojis()) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-toggleemoji-off");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-toggleemoji-off");
         } else {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-toggleemoji-on");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-toggleemoji-on");
         }
 
         playerData.setEmojis(!playerData.hasEmojis());

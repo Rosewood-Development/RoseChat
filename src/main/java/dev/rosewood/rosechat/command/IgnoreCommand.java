@@ -19,14 +19,14 @@ public class IgnoreCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
 
         Player player = (Player) sender;
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
         if (target == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
 
@@ -34,10 +34,10 @@ public class IgnoreCommand extends AbstractCommand {
 
         if (playerData.getIgnoringPlayers().contains(target.getUniqueId())) {
             playerData.unignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-ignore-unignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-unignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
         } else {
             playerData.ignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-ignore-ignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-ignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
         }
     }
 

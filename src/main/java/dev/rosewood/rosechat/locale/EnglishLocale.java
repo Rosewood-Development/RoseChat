@@ -137,6 +137,7 @@ public class EnglishLocale implements Locale {
             this.put("no-gc", "&cYou do not own a group chat!");
             this.put("gc-invalid", "&cYou are not in this group chat!");
             this.put("gc-does-not-exist", "&cThis group chat does not exist!");
+            this.put("gc-limit", "&cYou cannot join any more group chats!");
 
             this.put("#21", "Group Chat Help Command");
             this.put("command-gc-help-description", "&8 - &b/gc help &7- Displays the group chat help menu... You have arrived.");
@@ -145,7 +146,7 @@ public class EnglishLocale implements Locale {
             this.put("#22", "Group Chat Create Command");
             this.put("command-gc-create-description", "&8 - &b/gc create &7- Creates a new group chat.");
             this.put("command-gc-create-usage", "&e/gc create <id> <display name>");
-            this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e. Use &b/gc invite &eto invite a player.");
+            this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e&r. Use &b/gc invite &eto invite a player.");
             this.put("command-gc-create-fail", "&cYou already own a group chat!");
 
             this.put("#23", "Group Chat Invite Command");
@@ -191,7 +192,7 @@ public class EnglishLocale implements Locale {
 
             this.put("#28", "Group Chat Disband Command");
             this.put("command-gc-disband-description", "&8 - &b/gc disband &7- Deletes your group chat.");
-            this.put("command-gc-disband-usage", "&e/gc disband");
+            this.put("command-gc-disband-usage", "&e/gc disband [group]");
             this.put("command-gc-disband-success", "&eThe &b%name% &egroup chat you were in has been disbanded...");
             this.put("command-gc-disband-admin", "&eYou disbanded the &b%name% &egroup chat.");
 
@@ -199,12 +200,13 @@ public class EnglishLocale implements Locale {
             this.put("command-gc-members-description", "&8 - &b/gc members &7- Lists the members of the group chat.");
             this.put("command-gc-members-usage", "&e/gc members <group>");
             this.put("command-gc-members-title", "&8[&b%name% &bMembers&8]");
+            this.put("command-gc-members-owner", "&8- &e:star: &b%player%");
             this.put("command-gc-members-member", "&8- &b%player%");
 
             this.put("#30", "Group Chat Rename Command");
             this.put("command-gc-rename-description", "&8 - &b/gc rename &7- Renames your group chat.");
             this.put("command-gc-rename-usage", "&e/gc rename");
-            this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&e.");
+            this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&r&e.");
 
             this.put("#31", "Group Chat Message Command");
             this.put("command-gcm-description", " &8- &d/gcm &7- Sends a message in a group chat.");

@@ -76,7 +76,7 @@ public class ReplacementToken extends Token {
             }
         } else {
             for (char c : replacement.toCharArray()) {
-                componentBuilder.append(HexUtils.colorify(c + "&f")).font(this.replacement.getFont());
+                componentBuilder.append(HexUtils.colorify(c + "")).font(this.replacement.getFont());
                 if (this.replacement.getHoverText() != null)
                     componentBuilder.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(HexUtils.colorify(this.replacement.getHoverText()))));
             }

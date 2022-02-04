@@ -22,7 +22,7 @@ public class SudoChatCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
 
@@ -30,7 +30,7 @@ public class SudoChatCommand extends AbstractCommand {
         ChatChannel channel = this.getAPI().getChannelById(args[1]);
 
         if (channel == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
         }
 

@@ -3,9 +3,7 @@ package dev.rosewood.rosechat.command;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,20 +48,19 @@ public class HelpCommand extends AbstractCommand {
                 }
 
                 if (!hasPerm) continue;
-                this.getAPI().getLocaleManager().sendCustomMessage(sender,
-                        this.getAPI().getLocaleManager().getLocaleMessage("command-" + label + "-description"));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description");
             } else {
                 if (!sender.hasPermission(manager.getMainCommand().getPermission())) continue;
 
                 AbstractCommand command = manager.getMainCommand();
                 String label = command.getLabels().get(0);
-                this.getAPI().getLocaleManager().sendCustomMessage(sender, this.getAPI().getLocaleManager().getLocaleMessage("command-" + label + "-description"));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description");
             }
         }
 
         for (AbstractCommand subcommand : this.plugin.getCommandManager().getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            this.getAPI().getLocaleManager().sendCustomMessage(sender, this.getAPI().getLocaleManager().getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description");
         }
     }
 

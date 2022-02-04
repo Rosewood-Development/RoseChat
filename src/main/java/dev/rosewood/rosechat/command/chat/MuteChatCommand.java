@@ -16,22 +16,22 @@ public class MuteChatCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
 
         ChatChannel channel = this.getAPI().getChannelById(args[0]);
         if (channel == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
         }
 
         channel.setMuted(!channel.isMuted());
 
         if (channel.isMuted()) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-mute-muted", StringPlaceholders.single("channel", channel.getId()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-muted", StringPlaceholders.single("channel", channel.getId()));
         } else {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.single("channel", channel.getId()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.single("channel", channel.getId()));
         }
     }
 

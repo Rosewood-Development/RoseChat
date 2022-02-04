@@ -22,15 +22,15 @@ public class ChannelCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
         } else if (args.length == 1) {
             if (!switchChannel(sender, args[0])) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             }
         } else {
             ChatChannel channel = this.getAPI().getChannelById(args[0]);
             if (channel == null) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "command-channel-not-found");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
                 return;
             }
 

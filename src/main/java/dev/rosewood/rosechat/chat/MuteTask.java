@@ -24,7 +24,7 @@ public class MuteTask extends BukkitRunnable {
         if (player == null || this.data.getMuteTime() < 0) this.cancel();
         if (this.data.getMuteTime() < System.currentTimeMillis()) {
             this.data.setMuteTime(0);
-            this.api.getLocaleManager().sendMessage(player, "command-mute-unmuted");
+            this.api.getLocaleManager().sendComponentMessage(player, "command-mute-unmuted");
             this.api.getDataManager().getMuteTasks().remove(this.data.getUUID());
             this.data.save();
             this.cancel();

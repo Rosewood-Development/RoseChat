@@ -20,18 +20,18 @@ public class MuteCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || args.length == 2) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
 
         if (target.hasPermission("rosechat.mute.bypass")) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-cannot-be-muted");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-cannot-be-muted");
             return;
         }
 
@@ -41,8 +41,8 @@ public class MuteCommand extends AbstractCommand {
         int muteTime = -1;
         if (args.length == 1)
         {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", target.getName()));
-            this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", target.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
             targetData.setMuteTime(-1);
             targetData.save();
             return;
@@ -82,21 +82,21 @@ public class MuteCommand extends AbstractCommand {
                         }
                         break;
                     default:
-                        this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
                         return;
                 }
             } catch (NumberFormatException e) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "not-a-number");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "not-a-number");
                 return;
             }
         }
 
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-mute-success",
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-success",
                 StringPlaceholders.builder("player", target.getDisplayName())
                         .addPlaceholder("time", outTime)
                         .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
 
-        this.getAPI().getLocaleManager().sendMessage(target, "command-mute-muted");
+        this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
 
         if (muteTime > 0) {
             targetData.setMuteTime((muteTime * 1000L) + System.currentTimeMillis());

@@ -19,9 +19,9 @@ public class ToggleMessageCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(uuid);
 
         if (playerData.canBeMessaged()) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-off");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-off");
         } else {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-on");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-on");
         }
 
         playerData.setCanBeMessaged(!playerData.canBeMessaged());

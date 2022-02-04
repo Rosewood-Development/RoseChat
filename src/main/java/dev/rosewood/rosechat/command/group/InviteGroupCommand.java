@@ -3,14 +3,11 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,44 +23,41 @@ public class InviteGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
         Player player = (Player) sender;
         GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
         if (groupChat == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "no-gc");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-gc");
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
 
         if (groupChat.getMembers().contains(target.getUniqueId())) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-invite-member");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-invite-member");
             return;
         }
 
-        PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
+        PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
+        PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
 
-        RoseSender roseSender = new RoseSender(player);
-        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
-        String formattedGroupName = ComponentSerializer.toString(groupName);
+        String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
+        String targetName = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
 
-        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
-        String formattedName = ComponentSerializer.toString(name);
-
-        this.getAPI().getLocaleManager().sendMessage(target, "command-gc-invite-invited",
-                StringPlaceholders.builder().addPlaceholder("player", formattedName).addPlaceholder("name", formattedGroupName).build());
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-invite-success",
-                StringPlaceholders.builder().addPlaceholder("player", formattedName).addPlaceholder("name", formattedGroupName).build());
+        this.getAPI().getLocaleManager().sendComponentMessage(target, "command-gc-invite-invited",
+                StringPlaceholders.builder().addPlaceholder("player", name).addPlaceholder("name", groupChat.getName()).build());
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-invite-success",
+                StringPlaceholders.builder().addPlaceholder("player", targetName).addPlaceholder("name", groupChat.getName()).build());
         sendAcceptMessage(target, groupChat);
 
-        data.inviteToGroup(groupChat);
+        targetData.inviteToGroup(groupChat);
     }
 
     @Override

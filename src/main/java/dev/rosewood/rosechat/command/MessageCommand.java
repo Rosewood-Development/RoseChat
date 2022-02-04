@@ -11,7 +11,6 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,12 +27,12 @@ public class MessageCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
             return;
         }
 
         if (args.length == 1) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-message-enter-message");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-message-enter-message");
             return;
         }
 
@@ -42,12 +41,12 @@ public class MessageCommand extends AbstractCommand {
         if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
             BungeeListener.getPlayers("ALL");
             if (!this.getAPI().getDataManager().getPlayersOnServer("ALL").contains(target)) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
         } else {
             if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(target) == null) {
-                this.getAPI().getLocaleManager().sendMessage(sender, "player-not-found");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
         }
@@ -55,12 +54,12 @@ public class MessageCommand extends AbstractCommand {
         String message = getAllArgs(1, args);
 
         if (message.isEmpty()) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "command-message-enter-message");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-message-enter-message");
             return;
         }
 
         if (MessageUtils.isMessageEmpty(message)) {
-            this.getAPI().getLocaleManager().sendMessage(sender, "message-blank");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "message-blank");
             return;
         }
 
@@ -69,7 +68,7 @@ public class MessageCommand extends AbstractCommand {
         this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (targetPlayer != null && data != null) {
                 if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
-                    this.getAPI().getLocaleManager().sendMessage(sender, "command-togglemessage-cannot-message");
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
                     return;
                 }

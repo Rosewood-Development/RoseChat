@@ -91,12 +91,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
     public boolean canSend(CommandSender sender, AbstractCommand command) {
         if (command.getPermission() != null && !sender.hasPermission(command.getPermission())) {
-            this.localeManager.sendMessage(sender, "no-permission");
+            this.localeManager.sendComponentMessage(sender, "no-permission");
             return false;
         }
 
         if (command.isPlayerOnly() && !(sender instanceof Player)) {
-            this.localeManager.sendMessage(sender, "player-only");
+            this.localeManager.sendComponentMessage(sender, "player-only");
             return false;
         }
 
@@ -160,10 +160,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
      * @param sender The player of console who sent the command.
      */
     public void sendHelpMessage(CommandSender sender) {
-        this.localeManager.sendMessage(sender, "command-help-title");
+        this.localeManager.sendComponentMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : this.subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            this.localeManager.sendCustomMessage(sender, this.localeManager.getLocaleMessage("command-" + subcommand.getLabels().get(0) + "-description"));
+            this.localeManager.sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description");
         }
     }
 

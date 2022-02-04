@@ -3,10 +3,7 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -26,7 +23,7 @@ public class DenyGroupCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
 
         if (playerData.getGroupInvites().isEmpty()) {
-            this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-no-invites");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-no-invites");
             return;
         }
 
@@ -43,7 +40,7 @@ public class DenyGroupCommand extends AbstractCommand {
                 }
             }
 
-            this.getAPI().getLocaleManager().sendMessage(player, "command-gc-accept-not-invited");
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-not-invited");
         }
     }
 
@@ -75,17 +72,12 @@ public class DenyGroupCommand extends AbstractCommand {
         OfflinePlayer owner = Bukkit.getOfflinePlayer(groupChat.getOwner());
         data.getGroupInvites().remove(groupChat);
 
-        RoseSender roseSender = new RoseSender(player);
-        BaseComponent[] groupName = this.getAPI().parse(roseSender, roseSender, groupChat.getName());
-        String formattedGroupName = ComponentSerializer.toString(groupName);
+        String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
-        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
-        String formattedName = ComponentSerializer.toString(name);
-
-        this.getAPI().getLocaleManager().sendMessage(player, "command-gc-deny-success",
-                StringPlaceholders.builder().addPlaceholder("name", formattedGroupName).build());
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-deny-success",
+                StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).build());
         if (owner != null && owner.isOnline()) {
-            this.getAPI().getLocaleManager().sendMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.single("player", formattedName));
+            this.getAPI().getLocaleManager().sendComponentMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.single("player", name));
         }
     }
 }

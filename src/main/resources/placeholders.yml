@@ -104,18 +104,18 @@ group-prefix:
     default: "&8[&b%group_name%&8] "
   hover:
     default:
-      - "&7Owner: {group-member-prefix}%group_owner%"
+      - "&7Owner: &e:star: &7%group_owner%"
       - "&7Click to Message"
   click:
     default:
       action: SUGGEST_COMMAND
-      value: "/gcm "
+      value: "/gcm %group% "
 
 group-member-prefix:
   text:
     condition: "%group_owner%=%player_name%"
     default: ""
-    true: ":star:"
+    true: "&e:star: "
   hover:
     default:
       - "&7This person owns the group chat."
