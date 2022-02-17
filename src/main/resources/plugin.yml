@@ -174,7 +174,6 @@ permissions:
       rosechat.spam.message: true
       rosechat.spam.channel: true
       rosechat.spam.group: true
-      rosechat.spam.nickname: true
   rosechat.language:
     description: Allows bypassing the language filter.
     default: op

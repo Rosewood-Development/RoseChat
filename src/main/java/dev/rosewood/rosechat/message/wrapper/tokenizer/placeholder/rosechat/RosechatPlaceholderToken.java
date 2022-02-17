@@ -28,25 +28,7 @@ public class RosechatPlaceholderToken extends Token {
         BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(),
                 MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build());
 
-        for (BaseComponent component : components) {
-            if (component.getExtra() != null) {
-                for (BaseComponent extra : component.getExtra()) {
-                    if (extra == null || extra.toPlainText() == null || extra.toPlainText().length() == 0) continue;
-                    for (char c : extra.toPlainText().toCharArray()) {
-                        componentBuilder.append(String.valueOf(c))
-                                .font(component.getFont())
-                                .color(extra.getColor())
-                                .event(component.getHoverEvent())
-                                .event(component.getClickEvent())
-                                .obfuscated(component.isObfuscated())
-                                .bold(component.isBold())
-                                .underlined(component.isUnderlined())
-                                .strikethrough(component.isStrikethrough())
-                                .italic(component.isItalic());
-                    }
-                }
-            }
-        }
+        if (components != null) componentBuilder.append(components);
 
         return componentBuilder.create();
     }

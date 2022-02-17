@@ -234,8 +234,6 @@ public class MessageTokenizer {
             return fromString();
         }
 
-        Bukkit.broadcastMessage(output);
-
         return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.DEFAULT_TOKENIZERS).toComponents();
     }
 }
