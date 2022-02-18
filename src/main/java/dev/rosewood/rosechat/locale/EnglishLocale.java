@@ -26,7 +26,7 @@ public class EnglishLocale implements Locale {
             this.put("no-permission", "&cYou do not have permission to do this!");
             this.put("player-not-found", "&cThis player is not online!");
             this.put("player-only", "&cThe console cannot use this command!");
-            this.put("invalid-arguments", "&cUsage: &b%syntax%&c.");
+            this.put("invalid-arguments", "&cUsage: &e%syntax%&c.");
             this.put("not-a-number", "&cThis is not a number!");
             this.put("message-blank", "&cPlease enter a message!");
 
@@ -47,7 +47,7 @@ public class EnglishLocale implements Locale {
             this.put("blocked-caps", "&cYour message could not be sent as it contains too many capital letters!");
             this.put("blocked-spam", "&cPlease do not spam!");
             this.put("blocked-language", "&cYou used a bad word. :(");
-            this.put("blocked-url", "&cPlease do not send URLs!");
+            this.put("blocked-url", "&cPlease do not send URLs or IPs!");
 
             this.put("#6", "Message Command");
             this.put("command-message-description", "&8 - &d/msg &7- Message a player.");
@@ -97,7 +97,7 @@ public class EnglishLocale implements Locale {
             this.put("command-channel-usage", "&e/channel <channel> [message]");
             this.put("command-channel-not-found", "&cThis channel does not exist.");
             this.put("command-channel-joined", "&eYou are now using the &b%id% &echannel.");
-            this.put("command-channel-custom-usage", "&e/%channel% <message>");
+            this.put("command-channel-custom-usage", "&e/%channel% &e<message>");
             this.put("command-channel-not-joinable", "&cThis channel cannot be joined.");
 
             this.put("#13", "Chat Command");
@@ -107,7 +107,7 @@ public class EnglishLocale implements Locale {
             this.put("#14", "Chat Help Command");
             this.put("command-chat-help-description", "&8 - &c/chat help &7- Displays the admin help menu... You have arrived.");
             this.put("command-chat-help-usage", "&8 - &e/chat help");
-            this.put("command-chat-help-title", "&eAvailable Commands");
+            this.put("command-chat-help-title", "&eAvailable Commands:");
 
             this.put("#15", "Chat Clear Command");
             this.put("command-chat-clear-description", "&8 - &c/chat clear &7- Clears the chat.");
@@ -146,7 +146,7 @@ public class EnglishLocale implements Locale {
             this.put("#22", "Group Chat Create Command");
             this.put("command-gc-create-description", "&8 - &b/gc create &7- Creates a new group chat.");
             this.put("command-gc-create-usage", "&e/gc create <id> <display name>");
-            this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e&r. Use &b/gc invite &eto invite a player.");
+            this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e. Use &b/gc invite &eto invite a player.");
             this.put("command-gc-create-fail", "&cYou already own a group chat!");
 
             this.put("#23", "Group Chat Invite Command");
@@ -206,17 +206,17 @@ public class EnglishLocale implements Locale {
             this.put("#30", "Group Chat Rename Command");
             this.put("command-gc-rename-description", "&8 - &b/gc rename &7- Renames your group chat.");
             this.put("command-gc-rename-usage", "&e/gc rename");
-            this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&r&e.");
+            this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&e.");
 
             this.put("#31", "Group Chat Message Command");
-            this.put("command-gcm-description", " &8- &d/gcm &7- Sends a message in a group chat.");
+            this.put("command-gcm-description", "&8 - &d/gcm &7- Sends a message in a group chat.");
             this.put("command-gcm-usage", "&e/gcm <group> <message>");
             this.put("command-gcm-enter-message", "&cPlease enter a message.");
 
             this.put("#32", "Color Command");
             this.put("command-color-description", "&8 - &d/color &7- Change your default chat color.");
             this.put("command-color-usage", "&e/color <color>");
-            this.put("command-color-success", "&eYour new chat color is &f%color%&e.");
+            this.put("command-color-success", "&eYour new chat color is &f%color%&e&r.");
             this.put("command-color-invalid", "&eThis is not a valid color!");
 
             this.put("#33", "Mute Command");

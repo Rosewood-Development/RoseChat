@@ -48,19 +48,19 @@ public class HelpCommand extends AbstractCommand {
                 }
 
                 if (!hasPerm) continue;
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description", false);
             } else {
                 if (!sender.hasPermission(manager.getMainCommand().getPermission())) continue;
 
                 AbstractCommand command = manager.getMainCommand();
                 String label = command.getLabels().get(0);
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description");
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + label + "-description", false);
             }
         }
 
         for (AbstractCommand subcommand : this.plugin.getCommandManager().getSubcommands()) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description", false);
         }
     }
 

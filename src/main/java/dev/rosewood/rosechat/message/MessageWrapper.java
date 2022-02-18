@@ -277,6 +277,10 @@ public class MessageWrapper {
         return this;
     }
 
+    public String parseToString() {
+        return this.message;
+    }
+
     public BaseComponent[] parse(String format, RoseSender viewer) {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {

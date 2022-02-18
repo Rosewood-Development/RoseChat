@@ -163,7 +163,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         this.localeManager.sendComponentMessage(sender, "command-help-title");
         for (AbstractCommand subcommand : this.subcommands) {
             if (subcommand.getPermission() != null && !sender.hasPermission(subcommand.getPermission())) continue;
-            this.localeManager.sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description");
+            this.localeManager.sendComponentMessage(sender, "command-" + subcommand.getLabels().get(0) + "-description", false);
         }
     }
 

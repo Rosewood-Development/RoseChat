@@ -36,16 +36,18 @@ public class RenameGroupCommand extends AbstractCommand {
         if (!MessageUtils.canColor(sender, name, "group")) return;
 
         RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).validate().filterLanguage();
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).validate().filterLanguage().filterCaps().filterURLs();
 
         if (!message.canBeSent()) {
             if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
             return;
         }
 
+        // Reset colour & formatting so uncoloured names don't take colour from previous words.
+        name = "&f&r" + message.parseToString() + "&f&r";
         groupChat.setName(name);
         groupChat.save();
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));
     }
 
     @Override
@@ -61,6 +63,10 @@ public class RenameGroupCommand extends AbstractCommand {
                 GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
                 if (groupChat != null) tab.add(groupChat.getId());
             }
+        }
+
+        if (args.length == 2) {
+            tab.add("<name>");
         }
 
         return tab;

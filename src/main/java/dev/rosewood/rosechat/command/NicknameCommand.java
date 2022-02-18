@@ -36,7 +36,7 @@ public class NicknameCommand extends AbstractCommand {
         Player target = Bukkit.getPlayer(args[0]);
         Player player = target == null ? (Player) sender : target;
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
-        String nickname = "&f" + (target == null ? getAllArgs(0, args) : getAllArgs(1, args));
+        String nickname = (target == null ? getAllArgs(0, args) : getAllArgs(1, args));
 
         if (target != null && !sender.hasPermission("rosechat.nickname.others")) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-permission");
@@ -71,11 +71,10 @@ public class NicknameCommand extends AbstractCommand {
                 return;
             }
 
+            // Reset colour & formatting so uncoloured names don't take colour from previous words.
+            nickname = "&f&r" + message.parseToString() + "&f&r";
             player.setDisplayName(nickname);
             playerData.setNickname(nickname);
-
-            BaseComponent[] nicknameComponents = message.parse(null, roseSender);
-            nickname = TextComponent.toLegacyText(nicknameComponents);
 
             playerData.save();
 

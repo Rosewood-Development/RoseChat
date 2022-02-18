@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.locale.EnglishLocale;
+import dev.rosewood.rosechat.locale.JapaneseLocale;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.locale.Locale;
@@ -9,7 +10,7 @@ import dev.rosewood.rosegarden.manager.AbstractLocaleManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class LocaleManager extends AbstractLocaleManager {
@@ -20,7 +21,16 @@ public class LocaleManager extends AbstractLocaleManager {
 
     @Override
     public List<Locale> getLocales() {
-        return Collections.singletonList(new EnglishLocale());
+        return Arrays.asList(new EnglishLocale(), new JapaneseLocale());
+    }
+
+    public void sendComponentMessage(CommandSender sender, String messageKey, boolean prefix) {
+        if (!prefix) {
+            RoseSender roseSender = new RoseSender(sender);
+            roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey)));
+        } else {
+            this.sendComponentMessage(sender, messageKey);
+        }
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey) {

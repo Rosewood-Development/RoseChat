@@ -45,6 +45,9 @@ public class CreateGroupCommand extends AbstractCommand {
         }
 
         GroupChat groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
+
+        // Reset colour & formatting so uncoloured names don't take colour from previous words.
+        name = "&f&r" + message.parseToString() + "&f&r";
         groupChat.setName(name);
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
     }
