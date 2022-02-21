@@ -1,16 +1,16 @@
-package dev.rosewood.rosechat.api.events;
+package dev.rosewood.rosechat.api.event;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 
-public class PostParseMessageEvent extends MessageEvent {
+public class PreParseMessageEvent extends MessageEvent {
 
     /**
-     * Called after a message has been parsed.
+     * Called when a message is about to be parsed. Useful for editing the message.
      * @param message The {@link MessageWrapper} for the message that will be parsed.
      * @param viewer The {@link RoseSender} for the person viewing the message.
      */
-    public PostParseMessageEvent(MessageWrapper message, RoseSender viewer) {
+    public PreParseMessageEvent(MessageWrapper message, RoseSender viewer) {
         super(message, viewer);
     }
 }

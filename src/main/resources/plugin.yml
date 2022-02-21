@@ -68,7 +68,6 @@ commands:
     permission: rosechat.ignore
   delmsg:
     description: Delete a message.
-    permission: rosechat
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.

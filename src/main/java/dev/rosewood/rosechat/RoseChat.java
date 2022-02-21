@@ -135,7 +135,6 @@ public class RoseChat extends RosePlugin {
         // Register Listeners
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new MessageListener(this), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
@@ -199,6 +198,7 @@ public class RoseChat extends RosePlugin {
 
         if (pluginManager.getPlugin("ProtocolLib") != null) {
             new PacketListener(this);
+            pluginManager.registerEvents(new MessageListener(this), this);
         }
     }
 

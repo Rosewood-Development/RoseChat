@@ -155,11 +155,13 @@ spy-players:
     default: "&8[&f%player_nickname% &6-> &f%other_player_nickname%&8] "
 
 # Placeholders used for deleting messages.
-# This placeholder does not need conditions.
+# This placeholder does not need conditions, permissions are checked internally.
 # The %id% placeholder is used for the id of the message being deleted.
 delete-message:
   text:
-    default: "&4&l✖"
+    condition: "%type%"
+    client: " &c&l✖"
+    server: " &4&l✖"
   hover:
     default:
       - "&7&oClick to Delete"
@@ -174,14 +176,13 @@ delete-message:
 # The %original% placeholder is used for the original message that was deleted.
 deleted-message:
   text:
-    default: "&7&oMessage Deleted"
+    condition: "%type%"
+    client: ""
+    server: "&7&oMessage Deleted"
   hover:
-    default:
+    condition: "%player_has_permission_rosechat.deletemessages.see%"
+    true:
       - "%original%"
-
-from-discord:
-  text:
-    default: "&dDiscord | &f"
 
 # Placeholders used for tags.
 # The %tagged% placeholder is used for the thing that was tagged.
@@ -282,3 +283,7 @@ discord-status:
 discord:
   text:
     default: "{channel-prefix}{prefix}{player}{separator}{message}"
+
+from-discord:
+  text:
+    default: "&dDiscord | &f"

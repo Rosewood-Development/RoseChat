@@ -1,8 +1,6 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +13,7 @@ public class MessageLog {
     private int cleanupAmount;
 
     public MessageLog(UUID sender) {
+        this.sender = sender;
         this.messages = new ArrayList<>();
         this.deletableMessages = new ArrayList<>();
     }
@@ -82,6 +81,13 @@ public class MessageLog {
 
     public List<DeletableMessage> getDeletableMessages() {
         return this.deletableMessages;
+    }
+
+    public boolean containsDeletableMessage(String json) {
+        for (DeletableMessage message : this.deletableMessages) {
+            if (json.equalsIgnoreCase(message.getJson())) return true;
+        }
+        return false;
     }
 
     public void addDeletableMessage(DeletableMessage deletableMessage) {
