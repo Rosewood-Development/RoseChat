@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.listener;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -11,6 +12,7 @@ import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import org.bukkit.event.Listener;
 
@@ -40,12 +42,20 @@ public class DiscordSRVListener implements Listener {
                     .addPlaceholder("user_color", "#" + this.getColor(member))
                     .addPlaceholder("user_tag", member.getUser().getDiscriminator()).build();
 
-            String message = this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw());
+            StringBuilder message = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw()));
             RoseSender sender = new RoseSender(member.getEffectiveName(), "default");
             sender.setDisplayName(member.getNickname());
 
-            MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message, placeholders);
-            channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
+            // Also send all attachments.
+            for (Message.Attachment attachment : event.getMessage().getAttachments()) {
+                if (attachment.getUrl() == null) continue;
+                message.append("\n").append(attachment.getUrl());
+            }
+
+            if (!MessageUtils.isMessageEmpty(message.toString())) {
+                MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message.toString(), placeholders);
+                channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
+            }
 
             return;
         }
