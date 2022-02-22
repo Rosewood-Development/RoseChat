@@ -22,7 +22,7 @@ public class DataManager extends AbstractDataManager {
     private final Map<UUID, PlayerData> playerData;
     private final Map<UUID, MuteTask> muteTasks;
     private final Map<String, List<String>> bungeePlayers;
-    private final List<DeletableMessage> deletableMessageLog;
+    private final List<ChatChannel> mutedChannels;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -30,7 +30,7 @@ public class DataManager extends AbstractDataManager {
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
         this.muteTasks = new HashMap<>();
         this.bungeePlayers = new HashMap<>();
-        this.deletableMessageLog = new ArrayList<>();
+        this.mutedChannels = new ArrayList<>();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -82,7 +82,6 @@ public class DataManager extends AbstractDataManager {
                         playerData.setColor(color);
                         playerData.setMuteTime(muteTime);
                         playerData.setNickname(nickname);
-                        channel.add(uuid);
                         this.playerData.put(uuid, playerData);
                         if (muteTime > 0) this.muteTasks.put(uuid, new MuteTask(playerData));
                         callback.accept(playerData);
@@ -189,6 +188,58 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
+    public void getMutedChannels(Consumer<List<ChatChannel>> callback) {
+        if (!this.mutedChannels.isEmpty()) {
+            callback.accept(this.mutedChannels);
+            return;
+        }
+
+        this.async(() -> {
+            this.databaseConnector.connect(connection -> {
+                List<ChatChannel> mutedChannels = new ArrayList<>();
+                String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
+                try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
+                    ResultSet result = statement.executeQuery();
+
+                    while (result.next()) {
+                        ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
+                        channel.setMuted(true);
+                        mutedChannels.add(channel);
+                    }
+
+                    callback.accept(mutedChannels);
+                }
+            });
+        });
+    }
+
+    public void addMutedChannel(ChatChannel channel) {
+        this.mutedChannels.add(channel);
+        this.async(() -> {
+            this.getDatabaseConnector().connect(connection -> {
+                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "muted_channels (id) " +
+                        "VALUES(?)";
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                    statement.setString(1, channel.getId());
+                    statement.executeUpdate();
+                }
+            });
+        });
+    }
+
+    public void removeMutedChannel(ChatChannel channel) {
+        this.mutedChannels.remove(channel);
+        this.async(() -> {
+            this.getDatabaseConnector().connect(connection -> {
+                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "muted_channels WHERE id = ?";
+                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                    statement.setString(1, channel.getId());
+                    statement.executeUpdate();
+                }
+            });
+        });
+    }
+
     private void async(Runnable asyncCallback) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
     }
@@ -238,9 +289,5 @@ public class DataManager extends AbstractDataManager {
 
     public List<String> getPlayersOnServer(String server) {
         return this.bungeePlayers.get(server);
-    }
-
-    public List<DeletableMessage> getDeletableMessageLog() {
-        return this.deletableMessageLog;
     }
 }

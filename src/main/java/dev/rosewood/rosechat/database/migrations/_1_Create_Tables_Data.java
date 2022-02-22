@@ -47,6 +47,10 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "ignoring_uuid VARCHAR(36) NOT NULL, " +
                     "ignored_uuid VARCHAR(36) NOT NULL" +
                     ")");
+
+            statement.execute("CREATE TABLE " + tablePrefix + "muted_channels (" +
+                    "id VARCHAR(255) UNIQUE NOT NULL" +
+                    ")");
         }
     }
 }

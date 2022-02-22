@@ -150,6 +150,8 @@ public class RoseChat extends RosePlugin {
             dataManager.getPlayerData(player.getUniqueId(), data -> {});
             groupManager.loadMemberGroupChats(player.getUniqueId());
         });
+
+        dataManager.getMutedChannels((channels) -> {});
     }
 
     @Override
