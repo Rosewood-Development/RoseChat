@@ -17,6 +17,7 @@ import dev.rosewood.rosechat.command.ToggleSoundCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
+import dev.rosewood.rosechat.command.chat.ChatInfoCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
@@ -26,6 +27,7 @@ import dev.rosewood.rosechat.command.group.CreateGroupCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
 import dev.rosewood.rosechat.command.group.DisbandGroupCommand;
 import dev.rosewood.rosechat.command.group.GroupCommandManager;
+import dev.rosewood.rosechat.command.group.InfoGroupCommand;
 import dev.rosewood.rosechat.command.group.InviteGroupCommand;
 import dev.rosewood.rosechat.command.group.KickGroupCommand;
 import dev.rosewood.rosechat.command.group.LeaveGroupCommand;
@@ -105,13 +107,15 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new LeaveGroupCommand())
                 .addSubcommand(new DisbandGroupCommand())
                 .addSubcommand(new MembersGroupCommand())
-                .addSubcommand(new RenameGroupCommand());
+                .addSubcommand(new RenameGroupCommand())
+                .addSubcommand(new InfoGroupCommand());
 
         ChatCommandManager chatCommand = (ChatCommandManager) new ChatCommandManager("chat", "/chat help")
                 .addSubcommand(new MuteChatCommand())
                 .addSubcommand(new ClearChatCommand())
                 .addSubcommand(new MoveChatCommand())
-                .addSubcommand(new SudoChatCommand());
+                .addSubcommand(new SudoChatCommand())
+                .addSubcommand(new ChatInfoCommand());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)

@@ -131,6 +131,14 @@ public class EnglishLocale implements Locale {
             this.put("command-chat-sudo-description", "&8 - &c/chat sudo &7- Send a chat message as another player.");
             this.put("command-chat-sudo-usage", "&e/chat sudo <player> <channel> <message>");
 
+            this.put("#19", "Chat Info Command");
+            this.put("command-chat-info-description", "&8 - &c/chat info &7- View information about a chat channel.");
+            this.put("command-chat-info-usage", "&e/chat info <channel>");
+            this.put("command-chat-info-title", "&7[&c%id% Info&7]");
+            this.put("command-chat-info-format", "&eDefault: &b%default% &7| &eMuted: &b%muted% &7| &eCommand: &c%command%\n" +
+                    "&eWorld: &a%world% &7| &eJoinable: &b%joinable% &7| &eDiscord: &b%discord%\n" +
+                    "&ePlayers: &b%players% &7| &eServers: &b%servers%");
+
             this.put("#20", "Group Chat Command");
             this.put("command-gc-description", "&8 - &d/gc &7- Displays the group chat help menu.");
             this.put("command-gc-usage", "&e/gc help");
@@ -205,21 +213,27 @@ public class EnglishLocale implements Locale {
 
             this.put("#30", "Group Chat Rename Command");
             this.put("command-gc-rename-description", "&8 - &b/gc rename &7- Renames your group chat.");
-            this.put("command-gc-rename-usage", "&e/gc rename");
+            this.put("command-gc-rename-usage", "&e/gc rename <group> <name>");
             this.put("command-gc-rename-success", "&eYour group chat is now called &b%name%&e.");
 
-            this.put("#31", "Group Chat Message Command");
+            this.put("#31", "Group Chat Info Command");
+            this.put("command-gc-info-description", "&8 - &b/gc info &7- View information about a group chat.");
+            this.put("command-gc-info-usage", "&e/gc info <group>");
+            this.put("command-gc-info-title", "&7[&b%group% &bInfo&7]");
+            this.put("command-gc-info-format", "&eID: &b%id% &7| &eOwner: &b%owner% &7| &eMembers: &b%members%");
+
+            this.put("#32", "Group Chat Message Command");
             this.put("command-gcm-description", "&8 - &d/gcm &7- Sends a message in a group chat.");
             this.put("command-gcm-usage", "&e/gcm <group> <message>");
             this.put("command-gcm-enter-message", "&cPlease enter a message.");
 
-            this.put("#32", "Color Command");
+            this.put("#33", "Color Command");
             this.put("command-color-description", "&8 - &d/color &7- Change your default chat color.");
             this.put("command-color-usage", "&e/color <color>");
             this.put("command-color-success", "&eYour new chat color is &f%color%&e&r.");
             this.put("command-color-invalid", "&eThis is not a valid color!");
 
-            this.put("#33", "Mute Command");
+            this.put("#34", "Mute Command");
             this.put("command-mute-description", "&8 - &d/mute &7- Mute a player.");
             this.put("command-mute-usage", "&e/mute <player> [time] [days/months/years]");
             this.put("command-mute-success", "&eYou have muted &b%player% &efor &b%time% &b%scale%&e.");
@@ -239,7 +253,7 @@ public class EnglishLocale implements Locale {
             this.put("command-mute-months", "months");
             this.put("command-mute-years", "years");
 
-            this.put("#34", "Nickname Command");
+            this.put("#35", "Nickname Command");
             this.put("command-nickname-description", "&8 - &d/nickname &7- Change a display name.");
             this.put("command-nickname-usage", "&e/nickname <name/player> [name/off]");
             this.put("command-nickname-success", "&eYour new nickname is: &f%name%&e.");
@@ -248,7 +262,7 @@ public class EnglishLocale implements Locale {
             this.put("command-nickname-too-long", "&cThis nickname is too long!");
             this.put("command-nickname-not-allowed", "&cThis nickname is not allowed!");
 
-            this.put("#35", "Ignore Command");
+            this.put("#36", "Ignore Command");
             this.put("command-ignore-description", "&8 - &d/ignore &7- Stops you from seeing a player's messages.");
             this.put("command-ignore-usage", "&e/ignore <player>");
             this.put("command-ignore-ignored", "&eYou are now ignoring &b%player%&e.");

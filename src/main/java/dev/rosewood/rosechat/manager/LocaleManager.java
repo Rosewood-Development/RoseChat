@@ -33,6 +33,15 @@ public class LocaleManager extends AbstractLocaleManager {
         }
     }
 
+    public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders, boolean prefix) {
+        if (!prefix) {
+            RoseSender roseSender = new RoseSender(sender);
+            roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey, stringPlaceholders)));
+        } else {
+            this.sendComponentMessage(sender, messageKey, stringPlaceholders);
+        }
+    }
+
     public void sendComponentMessage(CommandSender sender, String messageKey) {
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }

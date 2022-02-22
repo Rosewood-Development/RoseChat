@@ -131,6 +131,14 @@ public class JapaneseLocale implements Locale {
             this.put("command-chat-sudo-description", "&8 - &c/chat sudo &7- あなたは他のプレイヤーからメッセージをセンドします。");
             this.put("command-chat-sudo-usage", "&e/chat sudo <プレイヤー> <チャンネル> <メッセージ>");
 
+            this.put("#19", "チャット・インフォ・コマンド");
+            this.put("command-chat-info-description", "&8 - &c/chat info &7- チャットチャンネルのインフォメーションを見せます。");
+            this.put("command-chat-info-usage", "&e/chat info <チャンネル>");
+            this.put("command-chat-info-title", "&7[&c%id% インフォ&7]");
+            this.put("command-chat-info-format", "&eデフォルト： &b%default% &7| &eミュート： &b%muted% &7| &eコマンド： &c%command%\n" +
+                    "&eワールド： &a%world% &7| &e参加できる： &b%joinable% &7| &eディスコード： &b%discord%\n" +
+                    "&eプレイヤー： &b%players% &7| &eサーバー： &b%servers%");
+
             this.put("#20", "グループチャット・コマンド");
             this.put("command-gc-description", "&8 - &d/gc &7- グループチャットのヘルプメニューを見せます。");
             this.put("command-gc-usage", "&e/gc help");
@@ -205,21 +213,27 @@ public class JapaneseLocale implements Locale {
 
             this.put("#30", "グループチャット・リネーム・コマンド");
             this.put("command-gc-rename-description", "&8 - &b/gc rename &7- グループチャットをリネームします。");
-            this.put("command-gc-rename-usage", "&e/gc rename");
+            this.put("command-gc-rename-usage", "&e/gc rename <グループチャット> <新しい名前>");
             this.put("command-gc-rename-success", "&eグループチャットの名前は今&b%name%&e。");
 
-            this.put("#31", "グループチャット・メッセージ・コマンド");
+            this.put("#31", "グループチャット・インフォ・コマンド");
+            this.put("command-gc-info-description", "&8 - &b/gc info &7- グループチャットのインフォメーションを見せます。");
+            this.put("command-gc-info-usage", "&e/gc info <グループチャット>");
+            this.put("command-gc-info-title", "&7[&b%group% &bインフォ&7]");
+            this.put("command-gc-info-format", "&eID: &b%id% &7| &eオーナー: &b%owner% &7| &eメンバー: &b%members%");
+
+            this.put("#32", "グループチャット・メッセージ・コマンド");
             this.put("command-gcm-description", "&8 - &d/gcm &7- グループチャットにメッセージをセンドします。");
             this.put("command-gcm-usage", "&e/gcm <グループチャット> <メッセージ>");
             this.put("command-gcm-enter-message", "&cメッセージを入力してください！");
 
-            this.put("#32", " チャット・カラー ・コマンド");
+            this.put("#33", " チャット・カラー ・コマンド");
             this.put("command-color-description", "&8 - &d/color &7- あなたのデフォルトのチャット色を変更します。");
             this.put("command-color-usage", "&e/color <装飾コード>");
             this.put("command-color-success", "&e新しいチャット色は&f%color%&e&r。");
             this.put("command-color-invalid", "&eこれは有効な装飾コードではありません。");
 
-            this.put("#33", "ミュート・コマンド");
+            this.put("#34", "ミュート・コマンド");
             this.put("command-mute-description", "&8 - &d/mute &7- プレイヤーをミュートします。");
             this.put("command-mute-usage", "&e/mute <プレイヤー> [時間] [days/months/years]");
             this.put("command-mute-success", "&b%player%&eを&b%time%&b%scale%&eにミュートしました。");
@@ -239,7 +253,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-mute-months", "か月間");
             this.put("command-mute-years", "年間");
 
-            this.put("#34", "ニックネーム・コマンド");
+            this.put("#35", "ニックネーム・コマンド");
             this.put("command-nickname-description", "&8 - &d/nickname &7- ニックネームを変更します。");
             this.put("command-nickname-usage", "&e/nickname <ニックネーム/プレイヤー> [ニックネーム/off]");
             this.put("command-nickname-success", "&e新しいニックネームは&f%name%&e。");
@@ -248,7 +262,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-nickname-too-long", "&cこのニックネームは長すぎます！");
             this.put("command-nickname-not-allowed", "&cこのニックネームを使うことができません！");
 
-            this.put("#35", "イグノア・コマンド");
+            this.put("#36", "イグノア・コマンド");
             this.put("command-ignore-description", "&8 - &d/ignore &7- 他のプレイヤーのメッセージを見るのをやめます。");
             this.put("command-ignore-usage", "&e/ignore <プレイヤー>");
             this.put("command-ignore-ignored", "&b%player%&eを無視しています。");

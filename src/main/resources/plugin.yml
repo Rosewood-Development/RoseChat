@@ -295,6 +295,9 @@ permissions:
   rosechat.admin.sudo:
     description: Allows using the chat sudo command.
     default: op
+  rosechat.admin.info:
+    description: Allows using the chat info command.
+    default: op
   rosechat.chatcolor:
     description: Allows using the chatcolor command.
     default: op
@@ -330,6 +333,9 @@ permissions:
     default: op
   rosechat.group.admin:
     description: Allows managing other groups.
+    default: op
+  rosechat.group.info:
+    description: Allows using the group info command.
     default: op
   rosechat.groups:
     description: Limits the amount of groups a player can be in.
