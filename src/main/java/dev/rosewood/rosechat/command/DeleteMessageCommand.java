@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -42,7 +42,7 @@ public class DeleteMessageCommand extends AbstractCommand {
                     if (!deletableMessage.getUUID().equals(uuid)) continue;
 
                     RoseSender roseSender = new RoseSender(player);
-                    String placeholder = ConfigurationManager.Setting.DELETED_MESSAGE_FORMAT.getString();
+                    String placeholder = Setting.DELETED_MESSAGE_FORMAT.getString();
                     String originalMessage = TextComponent.toLegacyText(ComponentSerializer.parse(deletableMessage.getJson()));
                     BaseComponent[] deletedMessage = MessageUtils.parseCustomPlaceholder(roseSender, roseSender, placeholder.substring(1, placeholder.length() - 1),
                             MessageUtils.getSenderViewerPlaceholders(roseSender, roseSender)
@@ -69,6 +69,12 @@ public class DeleteMessageCommand extends AbstractCommand {
                 for (int i = 0; i < 100; i++) player.sendMessage("\n");
                 for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
                     player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+            }
+
+            // Delete this message from Discord too, if enabled.
+            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
+            if (this.getAPI().getDiscord() != null && message.getDiscordId() != null) {
+                this.getAPI().getDiscord().deleteMessage(message.getDiscordId());
             }
         } catch (IllegalArgumentException ignored) {}
     }

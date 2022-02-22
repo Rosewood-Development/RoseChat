@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.Collections;
@@ -45,7 +44,7 @@ public class ConditionalPlaceholder {
 
         leftPlaceholder = leftPlaceholder == null ? null : this.parsePlaceholders(leftPlayer, leftPlaceholder, placeholders);
         rightPlaceholder = rightPlaceholder == null ? null : this.parsePlaceholders(rightPlayer, rightPlaceholder, placeholders);
-        conditionPlaceholder = conditionPlayer == null ? null : this.parsePlaceholders(conditionPlayer, conditionPlaceholder, placeholders);
+        conditionPlaceholder = conditionPlaceholder == null ? null : this.parsePlaceholders(conditionPlayer, conditionPlaceholder, placeholders);
 
         String resultId = null;
         switch (this.conditionType) {
@@ -98,7 +97,7 @@ public class ConditionalPlaceholder {
         String rightPlaceholder = this.right == null ? null : this.right.replace("other_", "");
         String conditionPlaceholder = this.condition == null ? null : this.condition.replace("other_", "");
 
-        leftPlaceholder = leftPlayer == null ? null : this.parsePlaceholders(leftPlayer, leftPlaceholder, placeholders);
+        leftPlaceholder = leftPlaceholder == null ? null : this.parsePlaceholders(leftPlayer, leftPlaceholder, placeholders);
         rightPlaceholder = rightPlaceholder == null ? null : this.parsePlaceholders(rightPlayer, rightPlaceholder, placeholders);
         conditionPlaceholder = conditionPlaceholder == null ? null : this.parsePlaceholders(conditionPlayer, conditionPlaceholder, placeholders);
 

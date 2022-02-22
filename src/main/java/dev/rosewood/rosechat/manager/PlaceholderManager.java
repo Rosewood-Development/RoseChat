@@ -7,10 +7,8 @@ import dev.rosewood.rosechat.placeholders.ConditionalPlaceholder;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import java.io.File;
 import java.util.ArrayList;
@@ -45,10 +43,6 @@ public class PlaceholderManager extends Manager {
 
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
-            if (id.equalsIgnoreCase(Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().replace("{", "").replace("}", ""))) {
-                parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
-                continue;
-            }
 
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
 

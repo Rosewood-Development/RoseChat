@@ -247,36 +247,18 @@ url:
       action: OPEN_URL
       value: "%message%"
 
-discord-prefix:
-  text:
-    default: "&bDiscord &8| "
-
 # Discord Placeholders:
 # %user_nickname% - The user's nickname.
 # %user_name% - The user's name.
 # %user_role% - The user's role.
-# %user_role_color% - The color of the role.
 # %user_color% - The user's color.
-# %user_presence% - The user's activity.
-# %user_status% - The user's status.
 # %user_tag% - The user's tag.
 discord-player:
   text:
-    default: "&8[%user_role_color%%user_role%&8] %user_role_color%%user_color%%user_nickname%"
+    default: "&8[%user_color%%user_role%&8] %user_color%%user_nickname%"
   hover:
     default:
       - "&f%user_name%&8#%user_tag%"
-      - "%user_presence%"
-
-discord-status:
-  text:
-    condition: "%user_status%"
-    online: "&a:dot: "
-    idle: "&6:dot: "
-    dnd: "&c:dot: "
-    invisible: "&7:dot: "
-    offline: "&7:dot: "
-    default: ":dot: "
 
 # This is a unique placeholder.
 # These options will do nothing in-game, only on discord.
@@ -286,4 +268,4 @@ discord:
 
 from-discord:
   text:
-    default: "&dDiscord | &f"
+    default: "&dDiscord &7| "

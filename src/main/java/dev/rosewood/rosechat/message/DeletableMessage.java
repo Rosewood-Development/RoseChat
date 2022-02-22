@@ -6,12 +6,18 @@ public class DeletableMessage {
 
     private UUID uuid;
     private String json;
+    private String discordId;
     private boolean isClient;
 
     public DeletableMessage(UUID uuid, String json, boolean isClient) {
         this.uuid = uuid;
         this.json = json;
         this.isClient = isClient;
+    }
+
+    public DeletableMessage(UUID uuid, String json, boolean isClient, String discordId) {
+        this(uuid, json, isClient);
+        this.discordId = discordId;
     }
 
     public UUID getUUID() {
@@ -28,5 +34,9 @@ public class DeletableMessage {
 
     public boolean isClient() {
         return this.isClient;
+    }
+
+    public String getDiscordId() {
+        return this.discordId;
     }
 }

@@ -54,7 +54,7 @@ public class GroupChat implements Group {
     }
 
     @Override
-    public void sendFromDiscord(MessageWrapper message) {
+    public void sendFromDiscord(String id, MessageWrapper message) {
 
     }
 

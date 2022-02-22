@@ -17,9 +17,11 @@ import java.time.OffsetDateTime;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
 
+    private DiscordSRV discord = DiscordSRV.getPlugin();
+
     @Override
     public void sendMessage(MessageWrapper messageWrapper, Group group, String channel) {
-        TextChannel textChannel = DiscordSRV.getPlugin().getDestinationTextChannelForGameChannelName(channel);
+        TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
 
         BaseComponent[] message;
         boolean hasMessagePlaceholder = false;
@@ -84,6 +86,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             textChannel.sendMessageEmbeds(messageEmbed).queue();
         } else {
             if (text != null) textChannel.sendMessage(text).queue();
+        }
+    }
+
+    @Override
+    public void deleteMessage(String id) {
+        // Check every channel for the message (as we don't know where it came from) and delete it.
+        for (String channel : this.discord.getChannels().keySet()) {
+            this.discord.getDestinationTextChannelForGameChannelName(channel).deleteMessageById(id).queue();
         }
     }
 }

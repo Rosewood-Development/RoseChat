@@ -60,7 +60,6 @@ public class PacketListener {
                     return;
                 }
 
-
                 // Allow the client message to be deletable.
                 ComponentBuilder builder = new ComponentBuilder();
                 builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);

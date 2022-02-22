@@ -283,8 +283,8 @@ public class MessageWrapper {
         return this.message;
     }
 
-    private void logMessage(MessageLog log) {
-        log.addDeletableMessage(new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false));
+    private void logMessage(MessageLog log, String discordId) {
+        log.addDeletableMessage(new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false, discordId));
     }
 
     public BaseComponent[] parse(String format, RoseSender viewer) {
@@ -314,7 +314,7 @@ public class MessageWrapper {
 
             if (viewer != null) {
                 PlayerData viewerData = RoseChatAPI.getInstance().getPlayerData(viewer.getUUID());
-                if (viewerData != null) this.logMessage(viewerData.getMessageLog());
+                if (viewerData != null) this.logMessage(viewerData.getMessageLog(), null);
             }
 
             return this.tokenized;
@@ -323,7 +323,7 @@ public class MessageWrapper {
         return this.toComponents();
     }
 
-    public BaseComponent[] parseFromDiscord(String format, RoseSender viewer) {
+    public BaseComponent[] parseFromDiscord(String id, String format, RoseSender viewer) {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
@@ -350,7 +350,7 @@ public class MessageWrapper {
 
             if (viewer != null) {
                 PlayerData viewerData = RoseChatAPI.getInstance().getPlayerData(viewer.getUUID());
-                if (viewerData != null) this.logMessage(viewerData.getMessageLog());
+                if (viewerData != null) this.logMessage(viewerData.getMessageLog(), id);
             }
 
             return this.tokenized;

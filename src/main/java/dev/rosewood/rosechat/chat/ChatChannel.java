@@ -265,20 +265,20 @@ public class ChatChannel implements Group {
     }
 
     @Override
-    public void sendFromDiscord(MessageWrapper message) {
+    public void sendFromDiscord(String id, MessageWrapper message) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to the channel spies.
         for (UUID uuid : api.getDataManager().getChannelSpies()) {
             Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(message.parseFromDiscord(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+            if (spy != null) spy.spigot().sendMessage(message.parseFromDiscord(id, Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
         }
 
         // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parseFromDiscord(Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
 
             return;
@@ -291,7 +291,7 @@ public class ChatChannel implements Group {
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parseFromDiscord(Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
         }
 
@@ -309,7 +309,7 @@ public class ChatChannel implements Group {
             if (world == null) return;
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
 
             return;
@@ -320,7 +320,7 @@ public class ChatChannel implements Group {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
+                player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
             }
         }
     }

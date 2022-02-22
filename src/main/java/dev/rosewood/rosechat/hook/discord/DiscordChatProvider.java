@@ -7,4 +7,5 @@ public interface DiscordChatProvider {
 
     void sendMessage(MessageWrapper messageWrapper, Group group, String channel);
 
+    void deleteMessage(String id);
 }

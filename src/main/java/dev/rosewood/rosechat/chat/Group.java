@@ -26,7 +26,7 @@ public interface Group {
      * Sends a message from discord.
      * @param message The message that was sent.
      */
-    void sendFromDiscord(MessageWrapper message);
+    void sendFromDiscord(String id, MessageWrapper message);
 
     /**
      * @return The members of the group.

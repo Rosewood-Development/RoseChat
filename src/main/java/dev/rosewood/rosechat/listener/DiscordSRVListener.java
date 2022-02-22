@@ -11,6 +11,8 @@ import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
 public class DiscordSRVListener implements Listener {
@@ -36,18 +38,29 @@ public class DiscordSRVListener implements Listener {
                     .addPlaceholder("user_nickname", member.getNickname() == null ? member.getUser().getName() : member.getNickname())
                     .addPlaceholder("user_name", member.getUser().getName())
                     .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
-                    .addPlaceholder("user_color", "#" + (member.getColor() == null ? "FFFFFF" : Integer.toHexString(member.getColor().getRGB()).substring(2)))
+                    .addPlaceholder("user_color", "#" + this.getColor(member))
                     .addPlaceholder("user_tag", member.getUser().getDiscriminator()).build();
 
             String message = event.getMessage().getContentRaw();
-
+            Bukkit.broadcastMessage(event.getMessage().getContentStripped() + " / ");
             RoseSender sender = new RoseSender(member.getEffectiveName(), "default");
             sender.setDisplayName(member.getNickname());
 
             MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message, placeholders);
-            channel.sendFromDiscord(messageWrapper);
+            channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
 
             return;
         }
+    }
+
+    private String getColor(Member member) {
+        if (member.getColor() != null) return Integer.toHexString(member.getColorRaw());
+        if (member.getRoles().isEmpty()) return "FFFFFF";
+
+        for (Role role : member.getRoles()) {
+            if (role.getColor() != null) return Integer.toHexString(role.getColorRaw());
+        }
+
+        return "FFFFFF";
     }
 }
