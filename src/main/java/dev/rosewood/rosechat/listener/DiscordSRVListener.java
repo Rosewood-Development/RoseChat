@@ -12,7 +12,6 @@ import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
-import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
 public class DiscordSRVListener implements Listener {
@@ -41,8 +40,7 @@ public class DiscordSRVListener implements Listener {
                     .addPlaceholder("user_color", "#" + this.getColor(member))
                     .addPlaceholder("user_tag", member.getUser().getDiscriminator()).build();
 
-            String message = event.getMessage().getContentRaw();
-            Bukkit.broadcastMessage(event.getMessage().getContentStripped() + " / ");
+            String message = this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw());
             RoseSender sender = new RoseSender(member.getEffectiveName(), "default");
             sender.setDisplayName(member.getNickname());
 

@@ -43,6 +43,11 @@ public class PlaceholderManager extends Manager {
 
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
+            // TODO: Adjust this
+            if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)) {
+                parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
+                continue;
+            }
 
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
 

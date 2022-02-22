@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
@@ -43,6 +44,7 @@ public class RoseChatAPI {
     private final EmojiManager emojiManager;
     private final ReplacementManager replacementManager;
     private final TagManager tagManager;
+    private final DiscordEmojiManager discordEmojiManager;
     private Class<?> spigotConfigClass;
     private Field bungeeField;
 
@@ -56,6 +58,7 @@ public class RoseChatAPI {
         this.emojiManager = this.plugin.getManager(EmojiManager.class);
         this.replacementManager = this.plugin.getManager(ReplacementManager.class);
         this.tagManager = this.plugin.getManager(TagManager.class);
+        this.discordEmojiManager = this.plugin.getManager(DiscordEmojiManager.class);
     }
 
     /**
@@ -400,6 +403,13 @@ public class RoseChatAPI {
      */
     public TagManager getTagManager() {
         return this.tagManager;
+    }
+
+    /**
+     * @return An instance of the discord emoji manager.
+     */
+    public DiscordEmojiManager getDiscordEmojiManager() {
+        return this.discordEmojiManager;
     }
 
     /**
