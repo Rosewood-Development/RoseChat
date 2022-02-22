@@ -19,6 +19,8 @@ public class MessageListener implements Listener {
 
     @EventHandler
     public void onPostParseMessage(PostParseMessageEvent event) {
+        if (event.isToDiscord()) return;
+
         // If the sender is the same as the viewer (player looking at their own message)
         if (event.getMessage().getSender().isPlayer() && event.getMessage().getSender().getUUID() == event.getViewer().getUUID()) {
             if (!event.getViewer().hasPermission("rosechat.deletemessages.self")) return;

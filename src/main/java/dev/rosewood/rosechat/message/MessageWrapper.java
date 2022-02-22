@@ -40,6 +40,7 @@ public class MessageWrapper {
     private FilterType filterType;
     private BaseComponent[] tokenized;
     private UUID id;
+    private DeletableMessage deletableMessage;
 
     public MessageWrapper(RoseSender sender, MessageLocation messageLocation, Group group, String message) {
         this.sender = sender;
@@ -284,7 +285,8 @@ public class MessageWrapper {
     }
 
     private void logMessage(MessageLog log, String discordId) {
-        log.addDeletableMessage(new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false, discordId));
+        this.deletableMessage = new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false, discordId);
+        log.addDeletableMessage(this.deletableMessage);
     }
 
     public BaseComponent[] parse(String format, RoseSender viewer) {
@@ -374,13 +376,13 @@ public class MessageWrapper {
             String before = formatSplit[0];
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
-            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.TO_DISCORD_TOKENIZERS).fromString(), ComponentBuilder.FormatRetention.FORMATTING);
-            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, true);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
             return this.tokenized;
         }
@@ -438,5 +440,9 @@ public class MessageWrapper {
 
     public UUID getId() {
         return this.id;
+    }
+
+    public DeletableMessage getDeletableMessage() {
+        return this.deletableMessage;
     }
 }

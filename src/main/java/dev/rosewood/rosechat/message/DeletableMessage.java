@@ -39,4 +39,8 @@ public class DeletableMessage {
     public String getDiscordId() {
         return this.discordId;
     }
+
+    public void setDiscordId(String discordId) {
+        this.discordId = discordId;
+    }
 }

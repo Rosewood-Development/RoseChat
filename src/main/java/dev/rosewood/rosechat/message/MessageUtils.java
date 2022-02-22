@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -25,6 +26,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -121,7 +123,7 @@ public class MessageUtils {
         return builder;
     }
 
-    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, List<Tokenizer<?>> tokenizers, StringPlaceholders placeholders) {
         CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
         if (placeholder == null) return null;
 
@@ -131,11 +133,11 @@ public class MessageUtils {
 
         String text = placeholder.getText().parse(sender, viewer, placeholders);
         if (text == null) return null;
-        component = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, placeholders.apply(text)).toComponents();
+        component = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, placeholders.apply(text), tokenizers).toComponents();
 
         String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
         if (hoverString != null) {
-            BaseComponent[] hover = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, hoverString).toComponents();
+            BaseComponent[] hover = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, hoverString, tokenizers).toComponents();
             hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
         }
 
@@ -154,7 +156,11 @@ public class MessageUtils {
         return component;
     }
 
-    public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
+        return parseCustomPlaceholder(sender, viewer, id, MessageTokenizer.DEFAULT_TOKENIZERS, placeholders);
+    }
+
+        public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 

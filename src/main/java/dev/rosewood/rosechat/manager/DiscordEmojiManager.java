@@ -70,6 +70,18 @@ public class DiscordEmojiManager extends Manager {
 
     }
 
+    public String formatUnicode(String message) {
+        for (String unicode : this.discordEmojis.keySet()) {
+            List<String> names = this.discordEmojis.get(unicode);
+            for (String name : names) {
+                if (!message.contains(":" + name + ":")) continue;
+                message = message.replace(":" + name + ":", unicode);
+            }
+        }
+
+        return message;
+    }
+
     public String unformatUnicode(String message) {
         for (String unicode : this.discordEmojis.keySet()) {
             if (message.contains(unicode))

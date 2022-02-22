@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.bold.DiscordBoldTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.DiscordFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.italic.DiscordItalicTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
@@ -30,7 +31,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,8 @@ public class MessageTokenizer {
 
     private final Pattern DISCORD_MARKDOWN = Pattern.compile("\\*(.*)\\*|_(.*)_|~~(.*)~~|`(.*)`|\\|\\|(.*)\\|\\|", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
-    public static final RosechatFormattingTokenizer ROSECHAT_FORMATTING_TOKENIZER = new RosechatFormattingTokenizer();
+    public static final RosechatFormattingTokenizer ROSECHAT_FORMATTING_TOKENIZER = new RosechatFormattingTokenizer(); // Ignores permissions.
+    public static final DiscordFormattingTokenizer DISCORD_FORMATTING_TOKENIZER = new DiscordFormattingTokenizer(); // Formatting, but with optional other tokenizers.
     public static final GradientTokenizer GRADIENT_TOKENIZER = new GradientTokenizer();
     public static final RainbowTokenizer RAINBOW_TOKENIZER = new RainbowTokenizer();
     public static final ColorTokenizer COLOR_TOKENIZER = new ColorTokenizer();
@@ -128,6 +129,8 @@ public class MessageTokenizer {
 
     public static final List<Tokenizer<?>> TO_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
+            add(REGEX_REPLACEMENT_TOKENIZER);
+            add(DISCORD_FORMATTING_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
     };
@@ -166,6 +169,10 @@ public class MessageTokenizer {
 
     public MessageTokenizer(Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message, Tokenizer<?>... tokenizers) {
         this(null, group, sender, viewer, location, message, Arrays.asList(tokenizers));
+    }
+
+    public MessageTokenizer(RoseSender sender, RoseSender viewer, MessageLocation location, String message, List<Tokenizer<?>> tokenizers) {
+        this(null, null, sender, viewer, location, message, tokenizers);
     }
 
     public MessageTokenizer(RoseSender sender, RoseSender viewer, MessageLocation location, String message) {
@@ -234,6 +241,6 @@ public class MessageTokenizer {
             return fromString();
         }
 
-        return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.DEFAULT_TOKENIZERS).toComponents();
+        return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents();
     }
 }

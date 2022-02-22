@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.Group;
+import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
@@ -11,6 +12,7 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import java.time.OffsetDateTime;
@@ -18,6 +20,7 @@ import java.time.OffsetDateTime;
 public class DiscordSRVProvider implements DiscordChatProvider {
 
     private DiscordSRV discord = DiscordSRV.getPlugin();
+    private DiscordEmojiManager emojiManager = RoseChatAPI.getInstance().getDiscordEmojiManager();
 
     @Override
     public void sendMessage(MessageWrapper messageWrapper, Group group, String channel) {
@@ -32,7 +35,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String text = textPlaceholder != null ? textPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
-            text = TextComponent.toPlainText(message);
+            text = ChatColor.stripColor(TextComponent.toPlainText(message));
         }
 
         CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
@@ -71,8 +74,8 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         if (hasMessagePlaceholder) {
             MessageEmbed messageEmbed = new MessageEmbed(url,
-                    title,
-                    description,
+                    this.emojiManager.formatUnicode(title),
+                    this.emojiManager.formatUnicode(description),
                     EmbedType.RICH,
                     timestamp ? OffsetDateTime.now(): null,
                     color,
@@ -83,9 +86,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                     null,
                     null,
                     null);
-            textChannel.sendMessageEmbeds(messageEmbed).queue();
+            // Unfortunately, may not always be able to be deleted.
+            textChannel.sendMessageEmbeds(messageEmbed).queue((m) -> {
+                messageWrapper.getDeletableMessage().setDiscordId(m.getId());
+            });
         } else {
-            if (text != null) textChannel.sendMessage(text).queue();
+            if (text != null) textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
+                messageWrapper.getDeletableMessage().setDiscordId(m.getId());
+            });
         }
     }
 
