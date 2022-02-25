@@ -19,8 +19,13 @@ import java.time.OffsetDateTime;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
 
-    private DiscordSRV discord = DiscordSRV.getPlugin();
-    private DiscordEmojiManager emojiManager = RoseChatAPI.getInstance().getDiscordEmojiManager();
+    private DiscordSRV discord;
+    private DiscordEmojiManager emojiManager;
+
+    public DiscordSRVProvider() {
+        this.discord = DiscordSRV.getPlugin();
+        this.emojiManager = RoseChatAPI.getInstance().getDiscordEmojiManager();
+    }
 
     @Override
     public void sendMessage(MessageWrapper messageWrapper, Group group, String channel) {

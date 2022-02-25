@@ -8,6 +8,8 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import java.util.Collections;
@@ -48,6 +50,8 @@ public class CustomCommand extends Command {
                     }
 
                     channel.send(messageWrapper);
+                    BaseComponent[] messageComponents = messageWrapper.toComponents();
+                    if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
                 }
                 return true;
             }

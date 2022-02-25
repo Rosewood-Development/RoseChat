@@ -2,9 +2,9 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.UUID;
@@ -18,6 +18,7 @@ public class RoseSender {
     private Player player;
     private String displayName;
     private String group;
+    private OfflinePlayer offlinePlayer;
 
     /**
      * Creates a new RoseSender.
@@ -58,10 +59,29 @@ public class RoseSender {
     }
 
     /**
+     * Creates a new RoseSender.
+     * @param offlinePlayer The offline player to use.
+     */
+    public RoseSender(OfflinePlayer offlinePlayer) {
+        this.offlinePlayer = offlinePlayer;
+    }
+
+    /**
      * @param permission The permission to check for.
      * @return True if the RoseSender has the permission.
      */
     public boolean hasPermission(String permission) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        if (api.getVault() != null) {
+            if (this.offlinePlayer != null) {
+                return api.getVault().playerHas(null, this.offlinePlayer, permission);
+            }
+
+            if (this.group != null && this.player == null) {
+                return api.getVault().groupHas((String) null, this.group, permission);
+            }
+        }
+
         return this.player == null || this.player.hasPermission(permission);
     }
 

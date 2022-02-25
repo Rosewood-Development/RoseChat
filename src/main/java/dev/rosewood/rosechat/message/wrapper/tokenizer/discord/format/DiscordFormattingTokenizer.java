@@ -6,9 +6,7 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat.RosechatPlaceholderToken;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

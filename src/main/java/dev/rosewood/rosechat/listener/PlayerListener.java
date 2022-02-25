@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

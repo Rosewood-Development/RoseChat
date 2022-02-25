@@ -122,6 +122,7 @@ public class MessageTokenizer {
             add(DISCORD_CODE_TOKENIZER);
             add(DISCORD_QUOTE_TOKENIZER);
             add(DISCORD_ITALIC_TOKENIZER);
+            add(DISCORD_FORMATTING_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
@@ -131,6 +132,7 @@ public class MessageTokenizer {
         {
             add(REGEX_REPLACEMENT_TOKENIZER);
             add(DISCORD_FORMATTING_TOKENIZER);
+            add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }
     };

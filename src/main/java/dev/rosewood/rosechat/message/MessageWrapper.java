@@ -194,7 +194,7 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper filterSpam() {
-        if (this.sender.hasPermission("rosechat.spam." + this.locationPermission)) return this;
+        if (this.sender.hasPermission("rosechat.spam." + this.locationPermission) || this.senderData == null) return this;
         if (!Setting.SPAM_CHECKING_ENABLED.getBoolean()) return this;
         if (this.senderData != null && !this.senderData.getMessageLog().addMessageWithSpamCheck(this.message)) return this;
         if (Setting.WARN_ON_SPAM_SENT.getBoolean()) this.filterType = FilterType.SPAM;
@@ -341,9 +341,9 @@ public class MessageWrapper {
             String before = formatSplit[0];
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
-            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.FROM_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).fromString(), ComponentBuilder.FormatRetention.FORMATTING);
-            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.DEFAULT_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.FROM_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
 
             this.tokenized = componentBuilder.create();
 
