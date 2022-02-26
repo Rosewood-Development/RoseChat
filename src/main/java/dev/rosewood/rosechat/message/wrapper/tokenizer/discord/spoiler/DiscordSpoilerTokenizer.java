@@ -12,6 +12,7 @@ public class DiscordSpoilerTokenizer implements Tokenizer<DiscordSpoilerToken> {
 
     @Override
     public DiscordSpoilerToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
+        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("||")) {
             int lastIndex = 0;
 

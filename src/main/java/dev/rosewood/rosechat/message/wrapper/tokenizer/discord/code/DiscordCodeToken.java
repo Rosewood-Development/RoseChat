@@ -13,6 +13,8 @@ public class DiscordCodeToken extends Token {
     @Override
     public String asString() {
         String content = this.getOriginalContent().substring(1, this.getOriginalContent().length() - 1);
-        return Setting.DISCORD_FORMAT_CODE_BLOCK_ONE.getString() + content + "&r";
+        return Setting.DISCORD_FORMAT_CODE_BLOCK_ONE.getString().contains("%message%") ?
+                Setting.DISCORD_FORMAT_CODE_BLOCK_ONE.getString().replace("%message%", content) :
+                Setting.DISCORD_FORMAT_CODE_BLOCK_ONE.getString() + content + "&r";
     }
 }

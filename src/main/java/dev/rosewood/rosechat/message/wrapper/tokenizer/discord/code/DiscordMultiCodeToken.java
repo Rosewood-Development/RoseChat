@@ -13,6 +13,8 @@ public class DiscordMultiCodeToken extends Token {
     @Override
     public String asString() {
         String content = this.getOriginalContent().substring(3, this.getOriginalContent().length() - 3).trim();
-        return Setting.DISCORD_FORMAT_CODE_BLOCK_MULTIPLE.getString() + content + "&r";
+        return Setting.DISCORD_FORMAT_CODE_BLOCK_MULTIPLE.getString().contains("%message%") ?
+                Setting.DISCORD_FORMAT_CODE_BLOCK_MULTIPLE.getString().replace("%message%", content) :
+                Setting.DISCORD_FORMAT_CODE_BLOCK_MULTIPLE.getString() + content + "&r";
     }
 }

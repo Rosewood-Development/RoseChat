@@ -13,6 +13,8 @@ public class DiscordUnderlineToken extends Token {
     @Override
     public String asString() {
         String content = this.getOriginalContent().substring(2, this.getOriginalContent().length() - 2);
-        return Setting.DISCORD_FORMAT_UNDERLINE.getString() + content + "&r";
+        return Setting.DISCORD_FORMAT_UNDERLINE.getString().contains("%message%") ?
+                Setting.DISCORD_FORMAT_UNDERLINE.getString().replace("%message%", content) :
+                Setting.DISCORD_FORMAT_UNDERLINE.getString() + content + "&r";
     }
 }

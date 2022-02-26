@@ -13,6 +13,8 @@ public class DiscordStrikethroughToken extends Token {
     @Override
     public String asString() {
         String content = this.getOriginalContent().substring(2, this.getOriginalContent().length() - 2);
-        return Setting.DISCORD_FORMAT_STRIKETHROUGH.getString() + content + "&r";
+        return Setting.DISCORD_FORMAT_STRIKETHROUGH.getString().contains("%message%") ?
+                Setting.DISCORD_FORMAT_STRIKETHROUGH.getString().replace("%message%", content) :
+                Setting.DISCORD_FORMAT_STRIKETHROUGH.getString() + content + "&r";
     }
 }

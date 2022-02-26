@@ -13,6 +13,8 @@ public class DiscordItalicToken extends Token {
     @Override
     public String asString() {
         String content = this.getOriginalContent().substring(1, this.getOriginalContent().length() - 1);
-        return Setting.DISCORD_FORMAT_ITALIC.getString() + content + "&r";
+        return Setting.DISCORD_FORMAT_ITALIC.getString().contains("%message%") ?
+                Setting.DISCORD_FORMAT_ITALIC.getString().replace("%message%", content) :
+                Setting.DISCORD_FORMAT_ITALIC.getString() + content + "&r";
     }
 }

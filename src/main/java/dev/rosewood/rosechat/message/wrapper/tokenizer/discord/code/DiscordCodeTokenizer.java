@@ -11,6 +11,7 @@ public class DiscordCodeTokenizer implements Tokenizer<DiscordCodeToken> {
 
     @Override
     public DiscordCodeToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
+        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("`")) {
             int lastIndex = 0;
 

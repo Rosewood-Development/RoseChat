@@ -11,6 +11,7 @@ public class DiscordQuoteTokenizer implements Tokenizer<DiscordQuoteToken> {
 
     @Override
     public DiscordQuoteToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
+        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("> ")) {
             return new DiscordQuoteToken(sender, viewer, input);
         }

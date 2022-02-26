@@ -120,8 +120,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
 
         DISCORD_FORMATS("discord-formats", null, "Discord Format Settings", "Requires DiscordSRV"),
         DISCORD_FORMAT_BOLD("discord-formats.bold", "&l"),
-        DISCORD_FORMAT_UNDERLINE("discord-formats.underline", "&m"),
-        DISCORD_FORMAT_STRIKETHROUGH("discord-formats.strikethrough", "&n"),
+        DISCORD_FORMAT_UNDERLINE("discord-formats.underline", "&n"),
+        DISCORD_FORMAT_STRIKETHROUGH("discord-formats.strikethrough", "&m"),
         DISCORD_FORMAT_ITALIC("discord-formats.italic", "&o"),
         DISCORD_FORMAT_SPOILER("discord-formats.spoiler", "<spoiler>%message%</spoiler>"),
         DISCORD_FORMAT_CODE_BLOCK_ONE("discord-formats.code-block-one", ""),

@@ -230,7 +230,7 @@ public class MessageTokenizer {
     public BaseComponent[] fromString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Token token : this.tokens) {
-            stringBuilder.append(token.asString());
+            if (token != null) stringBuilder.append(token.asString());
         }
 
         String output = stringBuilder.toString();
@@ -238,9 +238,10 @@ public class MessageTokenizer {
         Matcher matcher = this.DISCORD_MARKDOWN.matcher(output);
 
         // Do it again! and again! and again!
-        if (matcher.find()) {
+        // Make sure the player has formatting permissions.
+        if (matcher.find() && this.sender.hasPermission("rosechat.discord." + this.group.getLocationPermission())) {
             tokenize(output);
-            return fromString();
+            return this.fromString();
         }
 
         return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents();
