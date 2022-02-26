@@ -93,11 +93,11 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                     null);
             // Unfortunately, may not always be able to be deleted.
             textChannel.sendMessageEmbeds(messageEmbed).queue((m) -> {
-                messageWrapper.getDeletableMessage().setDiscordId(m.getId());
+                if (messageWrapper.getDeletableMessage() != null) messageWrapper.getDeletableMessage().setDiscordId(m.getId());
             });
         } else {
             if (text != null) textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
-                messageWrapper.getDeletableMessage().setDiscordId(m.getId());
+                if (messageWrapper.getDeletableMessage() != null) messageWrapper.getDeletableMessage().setDiscordId(m.getId());
             });
         }
     }

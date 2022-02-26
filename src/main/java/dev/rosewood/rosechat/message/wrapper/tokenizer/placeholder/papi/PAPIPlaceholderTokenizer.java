@@ -5,6 +5,8 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import org.bukkit.Bukkit;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +23,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<PAPIPlaceholderToken>
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
             String groupPermission = group == null ? "" : "." + group.getLocationPermission();
-            if (location != MessageLocation.OTHER && !sender.hasPermission("rosechat.placeholders." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.placeholder." + placeholderPermission)) return null;
+            if ((location != MessageLocation.NONE && !sender.hasPermission("rosechat.placeholders." + location.toString().toLowerCase() + groupPermission)) || !sender.hasPermission("rosechat.placeholder." + placeholderPermission)) return null;
             return new PAPIPlaceholderToken(sender, viewer, input.substring(matcher.start(), matcher.end()));
         }
 

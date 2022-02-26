@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.bold.DiscordBoldTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.DiscordFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.italic.DiscordItalicTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
@@ -31,6 +32,8 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +65,7 @@ public class MessageTokenizer {
     public static final DiscordCodeTokenizer DISCORD_CODE_TOKENIZER = new DiscordCodeTokenizer();
     public static final DiscordMultiCodeTokenizer DISCORD_MULTI_CODE_TOKENIZER = new DiscordMultiCodeTokenizer();
     public static final DiscordQuoteTokenizer DISCORD_QUOTE_TOKENIZER = new DiscordQuoteTokenizer();
+    public static final DiscordEmojiTokenizer DISCORD_EMOJI_TOKENIZER = new DiscordEmojiTokenizer();
 
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
@@ -114,6 +118,8 @@ public class MessageTokenizer {
 
     public static final List<Tokenizer<?>> FROM_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
+            add(PAPI_PLACEHOLDER_TOKENIZER);
+            add(DISCORD_EMOJI_TOKENIZER);
             add(DISCORD_BOLD_TOKENIZER);
             add(DISCORD_UNDERLINE_TOKENIZER);
             add(DISCORD_STRIKETHROUGH_TOKENIZER);
@@ -227,7 +233,7 @@ public class MessageTokenizer {
         return ComponentSimplifier.simplify(colorized);
     }
 
-    public BaseComponent[] fromString() {
+    public BaseComponent[] fromString(List<Tokenizer<?>> finalTokenizers) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Token token : this.tokens) {
             if (token != null) stringBuilder.append(token.asString());
@@ -239,11 +245,12 @@ public class MessageTokenizer {
 
         // Do it again! and again! and again!
         // Make sure the player has formatting permissions.
-        if (matcher.find() && this.sender.hasPermission("rosechat.discord." + this.group.getLocationPermission())) {
+        if (matcher.find() && (this.location != MessageLocation.NONE && this.sender.hasPermission("rosechat.discord." + this.group.getLocationPermission()))) {
+            this.tokens.clear();
             tokenize(output);
-            return this.fromString();
+            return this.fromString(finalTokenizers);
         }
 
-        return new MessageTokenizer(this.messageWrapper, this.group, this.sender, viewer, this.location, stringBuilder.toString(), MessageTokenizer.TO_DISCORD_TOKENIZERS).toComponents();
+        return new MessageTokenizer(this.messageWrapper, this.group, this.sender, this.viewer, this.location, output, finalTokenizers).toComponents();
     }
 }

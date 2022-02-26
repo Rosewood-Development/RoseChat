@@ -154,6 +154,7 @@ public class RoseSender {
      */
     public UUID getUUID() {
         if (this.isPlayer()) return this.player.getUniqueId();
+        else if (this.offlinePlayer != null) return this.offlinePlayer.getUniqueId();
         else return null;
     }
 

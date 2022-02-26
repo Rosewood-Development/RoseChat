@@ -88,7 +88,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The require-permissions setting needs to be enabled for this to work.",
                 "Requires DiscordSRV"),
         DISCORD_MESSAGE_LIMIT("discord-settings.message-limit", 3,
-                "Players can sent messages with multiple lines when using DiscordSRV. This may spam the chat.",
+                "Players can send messages with multiple lines when using DiscordSRV. This may spam the chat.",
                 "How many lines can a player send from discord? The rest will not be sent.",
                 "Requires DiscordSRV"),
 
