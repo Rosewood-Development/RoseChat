@@ -87,6 +87,10 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Should messages that are blocked by moderation settings (e.g. swears) be deleted when sent from Discord?",
                 "The require-permissions setting needs to be enabled for this to work.",
                 "Requires DiscordSRV"),
+        DISCORD_MESSAGE_LIMIT("discord-settings.message-limit", 3,
+                "Players can sent messages with multiple lines when using DiscordSRV. This may spam the chat.",
+                "How many lines can a player send from discord? The rest will not be sent.",
+                "Requires DiscordSRV"),
 
         CHAT_FORMATS("chat-formats", null, "These are the the other chat formats in the plugin."),
         MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{message-sent-sender}{message-sent-arrow}{message-sent-receiver}{message}",

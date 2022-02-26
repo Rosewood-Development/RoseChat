@@ -95,27 +95,34 @@ public class DiscordSRVListener implements Listener {
     }
 
     private void processMessage(OfflinePlayer player, DiscordGuildMessagePostProcessEvent event, String name, ChatChannel channel, StringPlaceholders.Builder placeholders) {
-        StringBuilder message= new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw()));
+        StringBuilder message = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw()));
         RoseSender sender = player == null ? new RoseSender(name, "default") : new RoseSender(player);
 
         // Also send all attachments.
         for (Message.Attachment attachment : event.getMessage().getAttachments())
             message.append("\n").append(attachment.getUrl());
 
-        if (!MessageUtils.isMessageEmpty(message.toString())) {
-            MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message.toString(),
-                    placeholders.addPlaceholder("user_nickname", name).build());
 
-            if (Setting.REQUIRE_PERMISSIONS.getBoolean()) messageWrapper.validate().filter();
+        String[] lines = message.toString().split("\n");
+        int index = 0;
+        for (String line : lines) {
+            index++;
+            if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt()) return;
+            if (!MessageUtils.isMessageEmpty(line)) {
+                MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, line,
+                        placeholders.addPlaceholder("user_nickname", name).build());
 
-            if (!messageWrapper.canBeSent() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
-                event.getMessage().delete().queue();
-                return;
+                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) messageWrapper.validate().filter();
+
+                if (!messageWrapper.canBeSent() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                    event.getMessage().delete().queue();
+                    return;
+                }
+
+                channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
+                BaseComponent[] messageComponents = messageWrapper.toComponents();
+                if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
             }
-
-            channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
-            BaseComponent[] messageComponents = messageWrapper.toComponents();
-            if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
         }
     }
 
