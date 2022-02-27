@@ -4,10 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.config.RoseSetting;
-import dev.rosewood.rosegarden.config.RoseSettingSection;
-import dev.rosewood.rosegarden.config.RoseSettingValue;
 import dev.rosewood.rosegarden.manager.AbstractConfigurationManager;
-import org.bukkit.Sound;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -130,7 +127,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         DISCORD_FORMAT_SPOILER("discord-formats.spoiler", "<spoiler>%message%</spoiler>"),
         DISCORD_FORMAT_CODE_BLOCK_ONE("discord-formats.code-block-one", ""),
         DISCORD_FORMAT_CODE_BLOCK_MULTIPLE("discord-formats.code-block-multiple", ""),
-        DISCORD_FORMAT_BLOCK_QUOTES("discord-formats.block-quotes", "&2> &o");
+        DISCORD_FORMAT_BLOCK_QUOTES("discord-formats.block-quotes", "&2> &o"),
+        DISCORD_FORMAT_CHANNEL("discord-formats.channel-link", "{discord-channel-link}");
 
         private final String key;
         private final Object defaultValue;

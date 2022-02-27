@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.bold.DiscordBoldTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.DiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
@@ -19,6 +20,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.italic.DiscordIta
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.strikethrough.DiscordStrikethroughTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.DiscordTagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.underline.DiscordUnderlineTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.papi.PAPIPlaceholderTokenizer;
@@ -32,8 +34,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +66,8 @@ public class MessageTokenizer {
     public static final DiscordMultiCodeTokenizer DISCORD_MULTI_CODE_TOKENIZER = new DiscordMultiCodeTokenizer();
     public static final DiscordQuoteTokenizer DISCORD_QUOTE_TOKENIZER = new DiscordQuoteTokenizer();
     public static final DiscordEmojiTokenizer DISCORD_EMOJI_TOKENIZER = new DiscordEmojiTokenizer();
+    public static final DiscordChannelTokenizer DISCORD_CHANNEL_TOKENIZER = new DiscordChannelTokenizer();
+    public static final DiscordTagTokenizer DISCORD_TAG_TOKENIZER = new DiscordTagTokenizer();
 
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
@@ -116,8 +118,16 @@ public class MessageTokenizer {
         }
     };
 
+    public static final List<Tokenizer<?>> FROM_DISCORD_COMPONENT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
+            add(DISCORD_CHANNEL_TOKENIZER);
+            addAll(DEFAULT_TOKENIZERS);
+        }
+    };
+
     public static final List<Tokenizer<?>> FROM_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
+            add(DISCORD_TAG_TOKENIZER);
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(DISCORD_EMOJI_TOKENIZER);
             add(DISCORD_BOLD_TOKENIZER);
@@ -128,9 +138,15 @@ public class MessageTokenizer {
             add(DISCORD_CODE_TOKENIZER);
             add(DISCORD_QUOTE_TOKENIZER);
             add(DISCORD_ITALIC_TOKENIZER);
-            add(DISCORD_FORMATTING_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
+        }
+    };
+
+    public static final List<Tokenizer<?>> FROM_DISCORD_FORMATTING_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
+            add(DISCORD_FORMATTING_TOKENIZER);
+            addAll(FROM_DISCORD_TOKENIZERS);
         }
     };
 

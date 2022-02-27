@@ -34,7 +34,10 @@ import java.util.regex.Pattern;
 public class MessageUtils {
 
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-    public static final Pattern CUSTOM_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z]+):[0-9]{18}>");
+    public static final Pattern DISCORD_CUSTOM_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z]+):[0-9]{18}>");
+    public static final Pattern DISCORD_CHANNEL_PATTERN = Pattern.compile("<#([0-9]{18})>");
+    public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@!([0-9]{18})>");
+    public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18})>");
 
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());
@@ -207,6 +210,7 @@ public class MessageUtils {
     }
 
     public static Player getPlayer(String name) {
+        if (name == null || name.isEmpty()) return null;
         Player player = Bukkit.getPlayer(name);
         if (player != null) return player;
 

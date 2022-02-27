@@ -341,9 +341,9 @@ public class MessageWrapper {
             String before = formatSplit[0];
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
-            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.FROM_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
-            if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).fromString(MessageTokenizer.DEFAULT_TOKENIZERS), ComponentBuilder.FormatRetention.FORMATTING);
-            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.FROM_DISCORD_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (before != null && !before.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, before, MessageTokenizer.FROM_DISCORD_FORMATTING_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            if (format.contains("{message}")) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, this.message, MessageTokenizer.FROM_DISCORD_TOKENIZERS).fromString(MessageTokenizer.FROM_DISCORD_COMPONENT_TOKENIZERS), ComponentBuilder.FormatRetention.FORMATTING);
+            if (after != null && !after.isEmpty()) componentBuilder.append(new MessageTokenizer(this, this.group, this.sender, viewer, this.location, after, MessageTokenizer.FROM_DISCORD_FORMATTING_TOKENIZERS).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
 
             this.tokenized = componentBuilder.create();
 

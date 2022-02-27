@@ -68,7 +68,7 @@ public class TagToken extends Token {
             for (int i = 0; i < colorlessContent.length(); i++) textBuilder.append(replacement).append("&f&r");
         } else {
             textBuilder.append(placeholder.getText().parse(this.getSender(), tagged, placeholders));
-            textBuilder.append(punctuation);
+            textBuilder.append(punctuation).append("&f&r");
         }
 
         component = TextComponent.fromLegacyText(placeholders.apply(textBuilder.toString()));

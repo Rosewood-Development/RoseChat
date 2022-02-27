@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.Group;
+import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -10,17 +11,22 @@ import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.GuildChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
 
-    private DiscordSRV discord;
-    private DiscordEmojiManager emojiManager;
+    private final DiscordSRV discord;
+    private final DiscordEmojiManager emojiManager;
 
     public DiscordSRVProvider() {
         this.discord = DiscordSRV.getPlugin();
@@ -108,5 +114,35 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         for (String channel : this.discord.getChannels().keySet()) {
             this.discord.getDestinationTextChannelForGameChannelName(channel).deleteMessageById(id).queue();
         }
+    }
+
+    @Override
+    public String getChannelName(String id) {
+        GuildChannel channel = this.discord.getJda().getGuildChannelById(id);
+        return channel == null ? null : channel.getName();
+    }
+
+    @Override
+    public String getServerId() {
+        return this.discord.getMainGuild().getId();
+    }
+
+    @Override
+    public String getUserFromId(String id) {
+        UUID uuid = this.discord.getAccountLinkManager().getUuid(id);
+        Member member = this.discord.getMainGuild().getMemberById(id);
+        if (member == null) return null;
+
+        String color = DiscordSRVListener.getColor(member);
+        return uuid == null ? "#" + color + member.getEffectiveName() : Bukkit.getOfflinePlayer(uuid).getName();
+    }
+
+    @Override
+    public String getRoleFromId(String id) {
+        Role role = this.discord.getMainGuild().getRoleById(id);
+        if (role == null) return null;
+
+        String color = Integer.toHexString(role.getColorRaw());
+        return "#" + color + role.getName();
     }
 }

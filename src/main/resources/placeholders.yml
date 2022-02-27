@@ -269,3 +269,14 @@ discord:
 from-discord:
   text:
     default: "&dDiscord &7| "
+
+discord-channel-link:
+  text:
+    default: "#856896#%channel_name%"
+  hover:
+    default:
+      - "&7Click to Open"
+  click:
+    default:
+      action: OPEN_URL
+      value: "https://discord.com/channels/%server_id%/%channel_id%"

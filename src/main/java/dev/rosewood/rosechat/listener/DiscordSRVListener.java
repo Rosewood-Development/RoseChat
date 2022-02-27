@@ -51,7 +51,7 @@ public class DiscordSRVListener implements Listener {
             StringPlaceholders.Builder placeholders = StringPlaceholders.builder()
                     .addPlaceholder("user_name", member.getUser().getName())
                     .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
-                    .addPlaceholder("user_color", "#" + this.getColor(member))
+                    .addPlaceholder("user_color", "#" + getColor(member))
                     .addPlaceholder("user_tag", member.getUser().getDiscriminator());
 
             // If not using the setting, or the player has never joined, use their discord name.
@@ -126,7 +126,7 @@ public class DiscordSRVListener implements Listener {
         }
     }
 
-    private String getColor(Member member) {
+    public static String getColor(Member member) {
         if (member.getColor() != null) return Integer.toHexString(member.getColorRaw());
         if (member.getRoles().isEmpty()) return "FFFFFF";
 

@@ -3,9 +3,7 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 
 public class DiscordEmojiToken extends Token {
 

@@ -279,6 +279,10 @@ public class ChatChannel implements Group {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
 
             return;
@@ -292,6 +296,10 @@ public class ChatChannel implements Group {
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
         }
 
@@ -310,6 +318,10 @@ public class ChatChannel implements Group {
             for (Player player : world.getPlayers()) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
 
             return;
@@ -321,6 +333,10 @@ public class ChatChannel implements Group {
             if (player != null) {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
                 player.spigot().sendMessage(message.parseFromDiscord(id, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player)));
+
+                if (message.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                }
             }
         }
     }

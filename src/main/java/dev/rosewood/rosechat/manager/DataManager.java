@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
 import org.bukkit.Bukkit;

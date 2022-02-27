@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
-import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,11 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Sound;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
