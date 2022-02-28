@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class DiscordItalicToken extends Token {
@@ -14,7 +15,12 @@ public class DiscordItalicToken extends Token {
 
     @Override
     public BaseComponent[] toComponents() {
-        return TextComponent.fromLegacyText(this.asString());
+        ComponentBuilder componentBuilder = new ComponentBuilder();
+        for (char c : this.asString().toCharArray()) {
+            componentBuilder.append(String.valueOf(c));
+        }
+
+        return componentBuilder.create();
     }
 
     @Override

@@ -67,6 +67,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The sound that will be sent to a player when they receive a message.",
                 "Players can individually disable this in-game with /togglesound.",
                 "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
+        USE_DISCORD_FORMATTING("chat-settings.use-discord-formatting-in-game", true,
+                "Should players be allowed to use Discord formatting in-game?",
+                "For example, using **text** to bold something."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,

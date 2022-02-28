@@ -161,7 +161,7 @@ public class MessageUtils {
     }
 
     public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
-        return parseCustomPlaceholder(sender, viewer, id, MessageTokenizer.DEFAULT_TOKENIZERS, placeholders);
+        return parseCustomPlaceholder(sender, viewer, id, Setting.USE_DISCORD_FORMATTING.getBoolean() ? MessageTokenizer.DEFAULT_WITH_DISCORD_TOKENIZERS : MessageTokenizer.DEFAULT_TOKENIZERS, placeholders);
     }
 
         public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {

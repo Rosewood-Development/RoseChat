@@ -11,7 +11,7 @@ public class DiscordItalicTokenizer implements Tokenizer<DiscordItalicToken> {
 
     @Override
     public DiscordItalicToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
+        if (group != null && !sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("*") || input.startsWith("_")) {
             int lastIndex = 0;
 

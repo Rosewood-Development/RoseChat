@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.Group;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -81,6 +82,19 @@ public class MessageTokenizer {
             add(REGEX_REPLACEMENT_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
+        }
+    };
+
+    public static final List<Tokenizer<?>> DEFAULT_WITH_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+        {
+            add(DISCORD_BOLD_TOKENIZER);
+            add(DISCORD_UNDERLINE_TOKENIZER);
+            add(DISCORD_STRIKETHROUGH_TOKENIZER);
+            add(DISCORD_MULTI_CODE_TOKENIZER);
+            add(DISCORD_CODE_TOKENIZER);
+            add(DISCORD_QUOTE_TOKENIZER);
+            add(DISCORD_ITALIC_TOKENIZER);
+            addAll(DEFAULT_TOKENIZERS);
         }
     };
 
@@ -179,28 +193,17 @@ public class MessageTokenizer {
         this.tokenize(this.parseReplacements(message));
     }
 
-    public MessageTokenizer(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message, Tokenizer<?>... tokenizers) {
-        this(messageWrapper, group, sender, viewer, location, message, Arrays.asList(tokenizers));
-    }
-
     public MessageTokenizer(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message) {
-        this(messageWrapper, group, sender, viewer, location, message, DEFAULT_TOKENIZERS);
+        this(messageWrapper, group, sender, viewer, location, message,
+                ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? DEFAULT_WITH_DISCORD_TOKENIZERS : DEFAULT_TOKENIZERS);
     }
 
     public MessageTokenizer(Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message, List<Tokenizer<?>> tokenizers) {
         this(null, group, sender, viewer, location, message, tokenizers);
     }
 
-    public MessageTokenizer(Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String message, Tokenizer<?>... tokenizers) {
-        this(null, group, sender, viewer, location, message, Arrays.asList(tokenizers));
-    }
-
     public MessageTokenizer(RoseSender sender, RoseSender viewer, MessageLocation location, String message, List<Tokenizer<?>> tokenizers) {
         this(null, null, sender, viewer, location, message, tokenizers);
-    }
-
-    public MessageTokenizer(RoseSender sender, RoseSender viewer, MessageLocation location, String message) {
-        this(null, null, sender, viewer, location, message, DEFAULT_TOKENIZERS);
     }
 
     private String parseReplacements(String message) {

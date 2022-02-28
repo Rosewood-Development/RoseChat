@@ -10,7 +10,7 @@ public class DiscordUnderlineTokenizer implements Tokenizer<DiscordUnderlineToke
 
     @Override
     public DiscordUnderlineToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
+        if (group != null && !sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("__")) {
             int lastIndex = 0;
 
