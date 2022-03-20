@@ -10,8 +10,8 @@ star:
 
 # This is an example of an emoji using a custom font.
 # A custom resource pack would need to be used for users to see the emoji.
-deer:
-  text: ':deer:'
+rosewood:
+  text: ':rosewood:'
   replacement: "\uE000"
-  hover: '&b&o:deer:'
-  font: "emoji"
+  hover: '&b&o:rosewood:'
+  font: "emojis"

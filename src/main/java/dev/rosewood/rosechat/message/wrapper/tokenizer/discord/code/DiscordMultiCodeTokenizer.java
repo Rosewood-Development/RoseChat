@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import org.bukkit.Bukkit;
 
 public class DiscordMultiCodeTokenizer implements Tokenizer<DiscordMultiCodeToken> {
 
@@ -24,7 +23,7 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<DiscordMultiCodeToke
             }
 
             if (lastIndex == 0) return null;
-            return new DiscordMultiCodeToken(sender, viewer, input.substring(0, lastIndex + 1));
+            return new DiscordMultiCodeToken(messageWrapper, group, sender, viewer, input, input.substring(3, lastIndex - 2));
         }
 
         return null;

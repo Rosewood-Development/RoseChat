@@ -72,6 +72,7 @@ permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
     children:
+      rosechat.basecommand: true
       rosechat.reload: true
       rosechat.color: true
       rosechat.hex: true
@@ -106,12 +107,15 @@ permissions:
       rosechat.nickname: true
       rosechat.ignore: true
       rosechat.deletemessages: true
+  rosechat.basecommand:
+    description: Allows using the rc command.
+    default: true
   rosechat.reload:
     description: Allows using the reload command.
     default: op
   rosechat.chat:
     description: Allows using chat.
-    default: not op
+    default: true
   rosechat.color:
     description: Allows using color codes.
     default: op
@@ -291,7 +295,7 @@ permissions:
     default: op
   rosechat.channel.global:
     description: Allows access to the global channel.
-    default: not op
+    default: true
   rosechat.admin.mute:
     description: Allows using the chat mute command.
     default: op

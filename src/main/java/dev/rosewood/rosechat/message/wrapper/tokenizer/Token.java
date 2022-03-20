@@ -9,11 +9,13 @@ public class Token {
     private final RoseSender sender;
     private final RoseSender viewer;
     private final String originalContent;
+    private String font;
 
     public Token(RoseSender sender, RoseSender viewer, String originalContent) {
         this.sender = sender;
         this.viewer = viewer;
         this.originalContent = originalContent;
+        this.font = "default";
     }
 
     public final String getOriginalContent() {
@@ -30,11 +32,14 @@ public class Token {
 
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder(this.originalContent);
-        componentBuilder.font("default");
         return componentBuilder.create();
     }
 
-    public String asString() {
-        return this.originalContent;
+    public String getFont() {
+        return this.font;
+    }
+
+    public void setFont(String font) {
+        this.font = font;
     }
 }

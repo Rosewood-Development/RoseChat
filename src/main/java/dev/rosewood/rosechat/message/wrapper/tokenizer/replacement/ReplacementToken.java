@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -18,14 +19,13 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 
 public class ReplacementToken extends Token {
 
     private final Group group;
     private final ChatReplacement replacement;
 
-    public ReplacementToken(RoseSender sender, RoseSender viewer, Group group, ChatReplacement replacement, String originalContent) {
+    public ReplacementToken(RoseSender sender, RoseSender viewer, Group group, String originalContent, ChatReplacement replacement) {
         super(sender, viewer, originalContent);
         this.group = group;
         this.replacement = replacement;
@@ -46,7 +46,11 @@ public class ReplacementToken extends Token {
                     .addPlaceholder("message", this.getOriginalContent()).build();
 
             String text = placeholder.getText().parse(this.getSender(), this.getViewer(), placeholders);
-            BaseComponent[] component = new MessageTokenizer(this.group, this.getSender(), this.getViewer(), MessageLocation.OTHER, HexUtils.colorify(placeholders.apply(text)), MessageTokenizer.REPLACEMENT_TOKENIZERS).toComponents();
+            text = placeholders.apply(text);
+            MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
+                    .group(this.group).sender(this.getSender()).viewer(this.getViewer())
+                    .location(MessageLocation.OTHER).tokenizers(Tokenizers.REPLACEMENT_TOKENIZERS).tokenize(text);
+            BaseComponent[] component = textTokenizer.toComponents();
             HoverEvent hoverEvent = null;
             ClickEvent clickEvent = null;
 
@@ -56,7 +60,10 @@ public class ReplacementToken extends Token {
             } else {
                 String hoverString = placeholders.apply(placeholder.getHover().parse(this.getSender(), this.getViewer(), placeholders));
                 if (hoverString != null) {
-                    BaseComponent[] hover = new MessageTokenizer(this.group, this.getSender(), this.getViewer(), MessageLocation.OTHER, hoverString, MessageTokenizer.REPLACEMENT_TOKENIZERS).toComponents();
+                    MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
+                            .group(this.group).sender(this.getSender()).viewer(this.getViewer()).location(MessageLocation.OTHER)
+                            .tokenizers(Tokenizers.REPLACEMENT_TOKENIZERS).tokenize(hoverString);
+                    BaseComponent[] hover = hoverTokenizer.toComponents();
                     hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
                 }
             }
@@ -72,7 +79,15 @@ public class ReplacementToken extends Token {
             }
 
             for (BaseComponent c : component) {
-                componentBuilder.append(c.toPlainText()).event(hoverEvent).event(clickEvent);
+                componentBuilder.append(c.toPlainText(), ComponentBuilder.FormatRetention.NONE)
+                        .bold(c.isBold())
+                        .italic(c.isItalic())
+                        .underlined(c.isUnderlined())
+                        .strikethrough(c.isStrikethrough())
+                        .obfuscated(c.isObfuscated())
+                        .color(c.getColorRaw())
+                        .event(hoverEvent)
+                        .event(clickEvent);
             }
         } else {
             for (char c : replacement.toCharArray()) {
@@ -86,6 +101,7 @@ public class ReplacementToken extends Token {
         return componentBuilder.create();
     }
 
+    @Override
     public String getFont() {
         return this.replacement.getFont();
     }

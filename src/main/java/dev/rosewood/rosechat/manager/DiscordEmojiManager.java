@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
+import net.md_5.bungee.api.chat.BaseComponent;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -60,6 +61,11 @@ public class DiscordEmojiManager extends Manager {
 
     }
 
+    /**
+     * Formats unicode emoji into a regular string emoji.
+     * @param message The message to format.
+     * @return The formatted message.
+     */
     public String formatUnicode(String message) {
         for (String unicode : this.discordEmojis.keySet()) {
             List<String> names = this.discordEmojis.get(unicode);
@@ -79,6 +85,16 @@ public class DiscordEmojiManager extends Manager {
         }
 
         return message;
+    }
+
+    /**
+     * Serializes the components into a string nicely formatted for Discord.
+     * @param components The components to serialize.
+     * @return The serialized string.
+     */
+    public String serializeComponents(BaseComponent[] components) {
+
+        return "";
     }
 
     public List<String> getNames(String unicode) {

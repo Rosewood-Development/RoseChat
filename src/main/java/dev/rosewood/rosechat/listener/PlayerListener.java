@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
-import dev.rosewood.rosegarden.utils.HexUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,7 +53,7 @@ public class PlayerListener implements Listener {
                 playerData.getCurrentChannel().add(player);
             }
 
-            if (playerData.getNickname() != null) player.setDisplayName(HexUtils.colorify(playerData.getNickname()));
+            if (playerData.getNickname() != null) player.setDisplayName(playerData.getNickname());
         });
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
     }
@@ -82,7 +81,7 @@ public class PlayerListener implements Listener {
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
 
         for (ChatChannel channel : api.getChannels()) {
-            if (channel.getWorld().equalsIgnoreCase(world.getName())) {
+            if (channel.getWorld().equalsIgnoreCase(world.getName()) && channel.isAutoJoin()) {
                 playerData.getCurrentChannel().remove(player);
                 playerData.setCurrentChannel(channel);
                 channel.add(player);

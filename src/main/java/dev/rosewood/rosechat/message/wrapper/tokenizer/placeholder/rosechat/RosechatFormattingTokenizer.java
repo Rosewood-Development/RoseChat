@@ -23,7 +23,7 @@ public class RosechatFormattingTokenizer implements Tokenizer<RosechatPlaceholde
             String placeholder = input.substring(matcher.start(), matcher.end());
             CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder.substring(1, placeholder.length() - 1));
             if (customPlaceholder == null) return null;
-            return new RosechatPlaceholderToken(wrapper, group, sender, viewer, customPlaceholder);
+            return new RosechatPlaceholderToken(wrapper, group, sender, viewer, placeholder, customPlaceholder);
         }
 
         return null;

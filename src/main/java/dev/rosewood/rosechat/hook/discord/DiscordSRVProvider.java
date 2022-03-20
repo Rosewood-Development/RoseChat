@@ -21,6 +21,8 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
@@ -36,6 +38,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     @Override
     public void sendMessage(MessageWrapper messageWrapper, Group group, String channel) {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
+        if (textChannel == null) return;
 
         BaseComponent[] message;
         boolean hasMessagePlaceholder = false;
@@ -47,6 +50,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
             text = ChatColor.stripColor(TextComponent.toPlainText(message));
+            this.emojiManager.serializeComponents(message);
         }
 
         CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
@@ -131,7 +135,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     public String getUserFromId(String id) {
         UUID uuid = this.discord.getAccountLinkManager().getUuid(id);
         Member member = this.discord.getMainGuild().getMemberById(id);
-        if (member == null) return null;
+        if (member == null) return this.getRoleFromId(id);
 
         String color = DiscordSRVListener.getColor(member);
         return uuid == null ? "#" + color + member.getEffectiveName() : Bukkit.getOfflinePlayer(uuid).getName();
@@ -144,5 +148,21 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         String color = Integer.toHexString(role.getColorRaw());
         return "#" + color + role.getName();
+    }
+
+    @Override
+    public List<UUID> getPlayersWithRole(String id) {
+        Role role = this.discord.getMainGuild().getRoleById(id);
+        if (role == null) return null;
+
+        List<UUID> players = new ArrayList<>();
+        for (Member member : this.discord.getMainGuild().getMembers()) {
+            if (member.getRoles().contains(role)) {
+                UUID uuid = this.discord.getAccountLinkManager().getUuid(member.getId());
+                if (uuid != null) players.add(uuid);
+            }
+        }
+
+        return players;
     }
 }

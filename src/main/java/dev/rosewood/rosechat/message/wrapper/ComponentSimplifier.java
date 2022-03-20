@@ -58,7 +58,7 @@ public class ComponentSimplifier {
                     String previousText = previous.get("text").getAsString();
                     previous.addProperty("text", previousText + text);
 
-                    if (textObject.has("extra")) {
+                    if (textObject.has("extra") && previous.has("extra")) {
                         JsonArray extra = textObject.getAsJsonArray("extra");
                         JsonArray previousExtra = previous.get("extra").getAsJsonArray();
                         previousExtra.addAll(extra);

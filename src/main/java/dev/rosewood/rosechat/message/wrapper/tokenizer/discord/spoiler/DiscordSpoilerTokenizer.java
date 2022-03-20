@@ -5,14 +5,12 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.bold.DiscordBoldToken;
-import org.bukkit.Bukkit;
 
 public class DiscordSpoilerTokenizer implements Tokenizer<DiscordSpoilerToken> {
 
     @Override
     public DiscordSpoilerToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        if (!sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
+        if (group != null && !sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("||")) {
             int lastIndex = 0;
 
@@ -25,7 +23,7 @@ public class DiscordSpoilerTokenizer implements Tokenizer<DiscordSpoilerToken> {
             }
 
             if (lastIndex == 0) return null;
-            return new DiscordSpoilerToken(sender, viewer, input.substring(0, lastIndex + 1));
+            return new DiscordSpoilerToken(messageWrapper, group, sender, viewer, input.substring(0, lastIndex + 1), input.substring(2, lastIndex - 1));
         }
 
         return null;

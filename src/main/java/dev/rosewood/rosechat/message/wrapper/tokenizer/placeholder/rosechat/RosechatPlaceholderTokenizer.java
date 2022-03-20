@@ -27,7 +27,7 @@ public class RosechatPlaceholderTokenizer implements Tokenizer<RosechatPlacehold
 
             CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder);
             if (customPlaceholder == null) return null;
-            return new RosechatPlaceholderToken(wrapper, group, sender, viewer, customPlaceholder);
+            return new RosechatPlaceholderToken(wrapper, group, sender, viewer, input.substring(matcher.start(), matcher.end()), customPlaceholder);
         }
 
         return null;

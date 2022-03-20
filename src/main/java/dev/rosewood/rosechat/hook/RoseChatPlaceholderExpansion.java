@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.hook;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
@@ -54,7 +55,8 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             case "is_group_leader":
                 return groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
             case "group":
-                return groupManager.getGroupChatByOwner(playerData.getUUID()).getId();
+                GroupChat group = groupManager.getGroupChatByOwner(playerData.getUUID());
+                return group != null ? group.getId() : null;
         }
 
         if (placeholder.startsWith("placeholder_")) {
@@ -71,7 +73,8 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
 
             if (placeholder.endsWith("_name")) {
                 String gc = placeholder.substring("group_".length(), placeholder.indexOf("_name"));
-                return groupManager.getGroupChatById(gc).getName();
+                GroupChat groupChat = groupManager.getGroupChatById(gc);
+                return groupChat == null ? null : groupChat.getName();
             }
         }
 

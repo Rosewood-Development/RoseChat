@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper;
 
 import com.google.gson.JsonParser;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -20,6 +21,10 @@ public class ComponentColorizer {
 
     public static final JsonParser JSON_PARSER = new JsonParser();
     private static final int CHARS_UNTIL_LOOP = 30;
+    public static final Pattern DISCORD_BOLD_MARKDOWN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
+    public static final Pattern DISCORD_UNDERLINE_MARKDOWN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
+    public static final Pattern DISCORD_ITALIC_MARKDOWN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
+    public static final Pattern DISCORD_STRIKETHROUGH_MARKDOWN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
@@ -50,6 +55,7 @@ public class ComponentColorizer {
         components = parseGradients(components);
         components = parseColors(components);
         components = parseLegacyColors(components);
+        if (ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean()) components = parseDiscordFormatting(components);
         return components;
     }
 
@@ -392,6 +398,146 @@ public class ComponentColorizer {
             }
 
             return parseLegacyFormatting(componentBuilder.create());
+        }
+
+        return components;
+    }
+
+    private static BaseComponent[] parseDiscordFormatting(BaseComponent[] components) {
+        ComponentBuilder componentBuilder = new ComponentBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (BaseComponent component : components)
+            stringBuilder.append(component.toPlainText());
+        String componentContent = stringBuilder.toString();
+
+        Matcher boldMatcher = DISCORD_BOLD_MARKDOWN.matcher(componentContent);
+        if (boldMatcher.find()) {
+            for (int i = 0; i < components.length; i++) {
+                if (i < boldMatcher.start() || i > boldMatcher.end() - 1) {
+                    BaseComponent component = components[i];
+                    componentBuilder.append(components[i], ComponentBuilder.FormatRetention.NONE)
+                            .font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                    continue;
+                }
+
+                if (i > boldMatcher.start() + 1 && i < boldMatcher.end() - 2) {
+                    BaseComponent component = components[i];
+                    String text = component.toPlainText();
+                    componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(true)
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                }
+
+            }
+
+            return parseDiscordFormatting(componentBuilder.create());
+        }
+
+        Matcher underlineMatcher = DISCORD_UNDERLINE_MARKDOWN.matcher(componentContent);
+        if (underlineMatcher.find()) {
+            for (int i = 0; i < components.length; i++) {
+                if (i < underlineMatcher.start() || i > underlineMatcher.end() - 1) {
+                    BaseComponent component = components[i];
+                    componentBuilder.append(components[i], ComponentBuilder.FormatRetention.NONE)
+                            .font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                    continue;
+                }
+
+                if (i > underlineMatcher.start() + 1 && i < underlineMatcher.end() - 2) {
+                    BaseComponent component = components[i];
+                    String text = component.toPlainText();
+                    componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(true)
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                }
+            }
+
+            return parseDiscordFormatting(componentBuilder.create());
+        }
+
+        Matcher italicMatcher = DISCORD_ITALIC_MARKDOWN.matcher(componentContent);
+        if (italicMatcher.find()) {
+            for (int i = 0; i < components.length; i++) {
+                if (i < italicMatcher.start() || i > italicMatcher.end() - 1) {
+                    BaseComponent component = components[i];
+                    componentBuilder.append(components[i], ComponentBuilder.FormatRetention.NONE)
+                            .font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                    continue;
+                }
+
+                if (i > italicMatcher.start() && i < italicMatcher.end() - 1) {
+                    BaseComponent component = components[i];
+                    String text = component.toPlainText();
+                    componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(true);
+                }
+            }
+
+            return parseDiscordFormatting(componentBuilder.create());
+        }
+
+        Matcher strikethroughMatcher = DISCORD_STRIKETHROUGH_MARKDOWN.matcher(componentContent);
+        if (strikethroughMatcher.find()) {
+            for (int i = 0; i < components.length; i++) {
+                if (i < strikethroughMatcher.start() || i > strikethroughMatcher.end() - 1) {
+                    BaseComponent component = components[i];
+                    componentBuilder.append(components[i], ComponentBuilder.FormatRetention.NONE)
+                            .font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(component.isStrikethrough())
+                            .italic(component.isItalic());
+                    continue;
+                }
+
+                if (i > strikethroughMatcher.start() + 1 && i < strikethroughMatcher.end() - 2) {
+                    BaseComponent component = components[i];
+                    String text = component.toPlainText();
+                    componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFont())
+                            .event(component.getHoverEvent()).event(component.getClickEvent()).color(component.getColorRaw())
+                            .bold(component.isBold())
+                            .obfuscated(component.isObfuscated())
+                            .underlined(component.isUnderlined())
+                            .strikethrough(true)
+                            .italic(component.isItalic());
+                }
+            }
+
+            return parseDiscordFormatting(componentBuilder.create());
         }
 
         return components;

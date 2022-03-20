@@ -15,7 +15,7 @@ public class RainbowToken extends Token {
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
         for (char c : this.getOriginalContent().toCharArray()) {
-            componentBuilder.append(String.valueOf(c));
+            componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
         }
 
         return componentBuilder.create();

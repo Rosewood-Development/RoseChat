@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 
 /**
- * Class for managing 'fake' players and console messages.
+ * Class for managing players and console messages.
  */
 public class RoseSender {
 
@@ -142,7 +142,7 @@ public class RoseSender {
     }
 
     /**
-     * @return A Player from the RoseSender.
+     * @return A player from the RoseSender.
      */
     public Player asPlayer() {
         if (this.isPlayer()) return this.player;

@@ -4,7 +4,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -17,37 +19,61 @@ import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class DiscordSRVListener implements Listener {
+public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     private final RoseChatAPI api;
+    private final DiscordSRV discord;
     private final Cache<UUID, String> cachedNicknames;
 
     public DiscordSRVListener() {
         this.api = RoseChatAPI.getInstance();
+        this.discord = DiscordSRV.getPlugin();
         this.cachedNicknames = CacheBuilder.newBuilder().expireAfterWrite(30L, TimeUnit.MINUTES).build();
+    }
+
+    @Override
+    public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        List<PlayerData> updatePlayers = new ArrayList<>();
+        api.getDataManager().getPlayerData().forEach(((uuid, playerData) -> {
+            for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
+                if (!deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
+                updatePlayers.add(playerData);
+                return;
+            }
+        }));
+
+        processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
     }
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
         event.setCancelled(true);
+        processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+    }
 
+    public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
         for (ChatChannel channel : this.api.getChannels()) {
             if (channel.getDiscordChannel() == null) continue;
-            if (!channel.getDiscordChannel().equalsIgnoreCase(DiscordSRV.getPlugin().getDestinationGameChannelNameForTextChannel(event.getChannel()))) continue;
+            if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel))) continue;
             if (channel.isMuted()) return;
 
-            Member member = event.getMember();
-            UUID uuid = DiscordSRV.getPlugin().getAccountLinkManager().getUuid(member.getId());
-
+            UUID uuid = this.discord.getAccountLinkManager().getUuid(member.getId());
             StringPlaceholders.Builder placeholders = StringPlaceholders.builder()
                     .addPlaceholder("user_name", member.getUser().getName())
                     .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
@@ -56,22 +82,22 @@ public class DiscordSRVListener implements Listener {
 
             // If not using the setting, or the player has never joined, use their discord name.
             if (!Setting.USE_IGN_WITH_DISCORD.getBoolean() || uuid == null) {
-                processMessage(null, event, member.getEffectiveName(), channel, placeholders);
+                createMessage(message, null, member.getEffectiveName(), channel, placeholders, update, updateFor);
                 return;
             }
 
             // Use the player's nickname if they're online.
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                processMessage(player, event, player.getDisplayName(), channel, placeholders);
+                createMessage(message, player, player.getDisplayName(), channel, placeholders, update, updateFor);
                 return;
             }
 
             // If the cache contains a name, use it.
             String cachedNickname = this.cachedNicknames.getIfPresent(uuid);
             if (cachedNickname != null) {
-                 processMessage(Bukkit.getOfflinePlayer(uuid), event, cachedNickname, channel, placeholders);
-                 return;
+                createMessage(message, Bukkit.getOfflinePlayer(uuid), cachedNickname, channel, placeholders, update, updateFor);
+                return;
             }
 
             // If the cache doesn't contain a nickname, get it from the PlayerData.
@@ -80,30 +106,29 @@ public class DiscordSRVListener implements Listener {
 
                 try {
                     name = this.cachedNicknames.get(uuid, () -> {
-                        if (data.getNickname() != null) return data.getNickname();
-                        return Bukkit.getOfflinePlayer(uuid).getName();
+                       if (data.getNickname() != null) return data.getNickname();
+                       return Bukkit.getOfflinePlayer(uuid).getName();
                     });
-                } catch (ExecutionException ignored) {
+                } catch (ExecutionException e) {
                     name = member.getEffectiveName();
                 }
 
-                processMessage(Bukkit.getOfflinePlayer(uuid), event, name, channel, placeholders);
+                createMessage(message, Bukkit.getOfflinePlayer(uuid), name, channel, placeholders, update, updateFor);
             });
 
             return;
         }
     }
 
-    private void processMessage(OfflinePlayer player, DiscordGuildMessagePostProcessEvent event, String name, ChatChannel channel, StringPlaceholders.Builder placeholders) {
-        StringBuilder message = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(event.getMessage().getContentRaw()));
-        RoseSender sender = player == null ? new RoseSender(name, "default") : new RoseSender(player);
+    private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, ChatChannel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
+        StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
+        RoseSender sender = (offlinePlayer == null ? new RoseSender(name, "default") : new RoseSender(offlinePlayer));
 
-        // Also send all attachments.
-        for (Message.Attachment attachment : event.getMessage().getAttachments())
-            message.append("\n").append(attachment.getUrl());
+        // Add all attachments.
+        for (Message.Attachment attachment : message.getAttachments())
+            messageBuilder.append("\n").append(attachment.getUrl());
 
-
-        String[] lines = message.toString().split("\n");
+        String[] lines = messageBuilder.toString().split("\n");
         int index = 0;
         for (String line : lines) {
             index++;
@@ -112,16 +137,35 @@ public class DiscordSRVListener implements Listener {
                 MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, line,
                         placeholders.addPlaceholder("user_nickname", name).build());
 
-                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) messageWrapper.validate().filter();
+                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) messageWrapper.validate().filter().applyDefaultColor();
 
                 if (!messageWrapper.canBeSent() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
-                    event.getMessage().delete().queue();
+                    message.delete().queue();
                     return;
                 }
 
-                channel.sendFromDiscord(event.getMessage().getId(), messageWrapper);
-                BaseComponent[] messageComponents = messageWrapper.toComponents();
-                if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+                if (update) {
+                    for (PlayerData playerData : updateFor) {
+                        Player player = Bukkit.getPlayer(playerData.getUUID());
+                        if (player == null) continue;
+                        messageWrapper.setShouldLogMessages(false);
+                        for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
+                            if (!deletableMessage.getDiscordId().equals(message.getId())) continue;
+                            messageWrapper.setId(deletableMessage.getUUID());
+                            BaseComponent[] components = messageWrapper.parseFromDiscord(message.getId(), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player));
+                            deletableMessage.setJson(ComponentSerializer.toString(components));
+                            break;
+                        }
+
+                        for (int i = 0; i < 100; i++) player.sendMessage("\n");
+                        for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
+                            player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+                    }
+                } else {
+                    channel.sendFromDiscord(message.getId(), messageWrapper);
+                    BaseComponent[] messageComponents = messageWrapper.toComponents();
+                    if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+                }
             }
         }
     }
@@ -136,5 +180,4 @@ public class DiscordSRVListener implements Listener {
 
         return "FFFFFF";
     }
-
 }

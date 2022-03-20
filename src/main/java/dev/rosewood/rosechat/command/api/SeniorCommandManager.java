@@ -46,6 +46,11 @@ public class SeniorCommandManager extends CommandManager {
         }
 
         if (args.length == 0) {
+            if (!sender.hasPermission("rosechat.basecommand")) {
+                this.localeManager.sendComponentMessage(sender, "no-permission");
+                return false;
+            }
+
             sendHelpMessage(sender);
             return true;
         }

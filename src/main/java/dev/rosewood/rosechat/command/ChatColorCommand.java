@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -30,7 +31,7 @@ public class ChatColorCommand extends AbstractCommand {
 
         String color = args[0];
 
-        if (!MessageUtils.canColor(sender, color, "chatcolor")) return;
+        if (!MessageUtils.canColor(sender, color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty()) {

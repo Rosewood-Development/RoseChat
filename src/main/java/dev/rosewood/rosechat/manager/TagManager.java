@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TagManager extends Manager {
 
-    private Map<String, Tag> tags;
+    private final Map<String, Tag> tags;
 
     public TagManager(RosePlugin rosePlugin) {
         super(rosePlugin);

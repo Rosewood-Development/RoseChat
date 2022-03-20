@@ -73,6 +73,7 @@ public class DeleteMessageCommand extends AbstractCommand {
 
             // Delete this message from Discord too, if enabled.
             if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
+            if (message == null) return;
             if (this.getAPI().getDiscord() != null && message.getDiscordId() != null) {
                 this.getAPI().getDiscord().deleteMessage(message.getDiscordId());
             }

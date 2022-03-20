@@ -17,12 +17,12 @@ public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (!replacement.isRegex()) continue;
             String groupPermission = group == null ? "" : "." + group.getLocationPermission();
-            if (location != MessageLocation.NONE && !sender.hasPermission("rosechat.replacements." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            if (group != null && location != MessageLocation.NONE && !sender.hasPermission("rosechat.replacements." + location.toString().toLowerCase() + groupPermission) || !sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
             Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
             if (matcher.find()) {
                 String found = input.substring(matcher.start(), matcher.end());
                 if (!input.startsWith(found)) return null;
-                return new ReplacementToken(sender, viewer, group, replacement, input.substring(matcher.start(), matcher.end()));
+                return new ReplacementToken(sender, viewer, group, input.substring(matcher.start(), matcher.end()), replacement);
             }
         }
 

@@ -5,13 +5,12 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import org.bukkit.Bukkit;
 
 public class DiscordCodeTokenizer implements Tokenizer<DiscordCodeToken> {
 
     @Override
     public DiscordCodeToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        if (group != null && sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
+        if (group != null && !sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (input.startsWith("`")) {
             int lastIndex = 0;
 
@@ -24,7 +23,7 @@ public class DiscordCodeTokenizer implements Tokenizer<DiscordCodeToken> {
             }
 
             if (lastIndex == 0) return null;
-            return new DiscordCodeToken(sender, viewer, input.substring(0, lastIndex + 1));
+            return new DiscordCodeToken(messageWrapper, group, sender, viewer, input, input.substring(1, lastIndex));
         }
 
         return null;

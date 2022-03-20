@@ -15,8 +15,8 @@ public class RosechatPlaceholderToken extends Token {
     private final Group group;
     private final CustomPlaceholder placeholder;
 
-    public RosechatPlaceholderToken(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, CustomPlaceholder placeholder) {
-        super(sender, viewer, "{" + placeholder.getId() + "}");
+    public RosechatPlaceholderToken(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, String originalContent, CustomPlaceholder placeholder) {
+        super(sender, viewer, originalContent);
         this.messageWrapper = messageWrapper;
         this.group = group;
         this.placeholder = placeholder;
@@ -28,7 +28,7 @@ public class RosechatPlaceholderToken extends Token {
         BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(),
                 MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build());
 
-        if (components != null) componentBuilder.append(components);
+        if (components != null) componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
 
         return componentBuilder.create();
     }

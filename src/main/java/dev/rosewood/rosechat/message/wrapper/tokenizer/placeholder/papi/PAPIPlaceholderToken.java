@@ -15,16 +15,13 @@ public class PAPIPlaceholderToken extends Token {
     @Override
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        String placeholder = this.asString();
+
+        String placeholder = PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), this.getOriginalContent());
         for (char c : placeholder.toCharArray()) {
-            componentBuilder.append(String.valueOf(c));
+            componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
         }
 
         return componentBuilder.create();
     }
 
-    @Override
-    public String asString() {
-        return PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), this.getOriginalContent() + "&f");
-    }
 }

@@ -13,7 +13,7 @@ public class DiscordQuoteTokenizer implements Tokenizer<DiscordQuoteToken> {
         if (group != null && !sender.hasPermission("rosechat.discord." + group.getLocationPermission())) return null;
         if (messageWrapper != null && !messageWrapper.getMessage().startsWith(">")) return null;
         if (input.startsWith("> ")) {
-            return new DiscordQuoteToken(sender, viewer, input);
+            return new DiscordQuoteToken(messageWrapper, group, sender, viewer, input, input.substring(2));
         }
 
         return null;

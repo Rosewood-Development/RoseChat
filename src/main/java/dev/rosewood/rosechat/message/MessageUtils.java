@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -20,6 +21,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -34,7 +36,7 @@ import java.util.regex.Pattern;
 public class MessageUtils {
 
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-    public static final Pattern DISCORD_CUSTOM_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z]+):[0-9]{18}>");
+    public static final Pattern DISCORD_CUSTOM_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z_]+):[0-9]{18}>");
     public static final Pattern DISCORD_CHANNEL_PATTERN = Pattern.compile("<#([0-9]{18})>");
     public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@!([0-9]{18})>");
     public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18})>");
@@ -61,7 +63,7 @@ public class MessageUtils {
 
     public static boolean isMessageEmpty(String message) {
         String colorified = HexUtils.colorify(message);
-        return ChatColor.stripColor(colorified).isEmpty();
+        return StringUtils.isBlank(ChatColor.stripColor(colorified));
     }
 
     public static boolean isAlphanumericSpace(final CharSequence cs) {
@@ -137,11 +139,16 @@ public class MessageUtils {
 
         String text = placeholder.getText().parse(sender, viewer, placeholders);
         if (text == null) return null;
-        component = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, placeholders.apply(text), tokenizers).toComponents();
+        text = placeholders.apply(text);
+        MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
+                .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).tokenize(text);
+        component = textTokenizer.toComponents();
 
         String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
         if (hoverString != null) {
-            BaseComponent[] hover = new MessageTokenizer(sender, viewer, MessageLocation.OTHER, hoverString, tokenizers).toComponents();
+            MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
+                    .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).tokenize(hoverString);
+            BaseComponent[] hover = hoverTokenizer.toComponents();
             hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
         }
 
@@ -161,10 +168,11 @@ public class MessageUtils {
     }
 
     public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
-        return parseCustomPlaceholder(sender, viewer, id, Setting.USE_DISCORD_FORMATTING.getBoolean() ? MessageTokenizer.DEFAULT_WITH_DISCORD_TOKENIZERS : MessageTokenizer.DEFAULT_TOKENIZERS, placeholders);
+        return parseCustomPlaceholder(sender, viewer, id,
+                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders);
     }
 
-        public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
+    public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 

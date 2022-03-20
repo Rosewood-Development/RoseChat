@@ -128,8 +128,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         DISCORD_FORMAT_STRIKETHROUGH("discord-formats.strikethrough", "&m"),
         DISCORD_FORMAT_ITALIC("discord-formats.italic", "&o"),
         DISCORD_FORMAT_SPOILER("discord-formats.spoiler", "<spoiler>%message%</spoiler>"),
-        DISCORD_FORMAT_CODE_BLOCK_ONE("discord-formats.code-block-one", ""),
-        DISCORD_FORMAT_CODE_BLOCK_MULTIPLE("discord-formats.code-block-multiple", ""),
+        DISCORD_FORMAT_CODE_BLOCK_ONE("discord-formats.code-block-one", "`%message%`"),
+        DISCORD_FORMAT_CODE_BLOCK_MULTIPLE("discord-formats.code-block-multiple", "```%message%```"),
         DISCORD_FORMAT_BLOCK_QUOTES("discord-formats.block-quotes", "&2> &o"),
         DISCORD_FORMAT_CHANNEL("discord-formats.channel-link", "{discord-channel-link}");
 

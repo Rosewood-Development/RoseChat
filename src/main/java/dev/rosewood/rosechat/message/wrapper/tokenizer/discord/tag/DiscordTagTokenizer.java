@@ -15,12 +15,12 @@ public class DiscordTagTokenizer implements Tokenizer<DiscordTagToken> {
         if (input.startsWith("<")) {
             Matcher matcher = MessageUtils.DISCORD_TAG_PATTERN.matcher(input);
             if (matcher.find()) {
-                return new DiscordTagToken(sender, viewer, input.substring(matcher.start(), matcher.end()), matcher.group(1));
+                return new DiscordTagToken(messageWrapper, group, sender, viewer, input.substring(matcher.start(), matcher.end()), matcher.group(1));
             }
 
             Matcher roleMatcher = MessageUtils.DISCORD_ROLE_TAG_PATTERN.matcher(input);
             if (roleMatcher.find()) {
-                return new DiscordTagToken(sender, viewer, input.substring(roleMatcher.start(), roleMatcher.end()), roleMatcher.group(1), true);
+                return new DiscordTagToken(messageWrapper, group, sender, viewer, input.substring(roleMatcher.start(), roleMatcher.end()), roleMatcher.group(1), true);
             }
         }
 

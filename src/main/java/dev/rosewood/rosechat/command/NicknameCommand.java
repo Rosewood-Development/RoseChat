@@ -11,8 +11,6 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -72,7 +70,7 @@ public class NicknameCommand extends AbstractCommand {
             }
 
             // Reset colour & formatting so uncoloured names don't take colour from previous words.
-            nickname = "&f&r" + message.parseToString() + "&f&r";
+            nickname = "&f&r" + nickname + "&f&r";
             player.setDisplayName(nickname);
             playerData.setNickname(nickname);
 

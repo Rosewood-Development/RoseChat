@@ -4,12 +4,11 @@ import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class DiscordFormattingToken extends Token {
 
@@ -27,22 +26,12 @@ public class DiscordFormattingToken extends Token {
     @Override
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(), MessageTokenizer.TO_DISCORD_TOKENIZERS,
+        BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(), Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS,
                 MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build());
 
-        if (components != null) componentBuilder.append(components);
+        if (components != null) componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
 
         return componentBuilder.create();
     }
 
-    @Override
-    public String asString() {
-        ComponentBuilder componentBuilder = new ComponentBuilder();
-        BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(), MessageTokenizer.TO_DISCORD_TOKENIZERS,
-                MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build());
-
-        if (components != null) componentBuilder.append(components);
-
-        return TextComponent.toPlainText(componentBuilder.create());
-    }
 }
