@@ -387,7 +387,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.FROM_DISCORD_FORMATTING_TOKENIZERS)
+                        .tokenizers(Tokenizers.DISCORD_FORMATTING_TOKENIZERS)
                         .tokenize(before);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
@@ -407,7 +407,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.FROM_DISCORD_FORMATTING_TOKENIZERS)
+                        .tokenizers(Tokenizers.DISCORD_FORMATTING_TOKENIZERS)
                         .tokenize(after);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);

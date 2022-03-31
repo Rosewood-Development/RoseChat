@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Emote;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.GuildChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
@@ -164,5 +165,11 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         }
 
         return players;
+    }
+
+    @Override
+    public String getCustomEmoji(String name) {
+        List<Emote> emotes = this.discord.getMainGuild().getEmotesByName(name, true);
+        return (emotes == null || emotes.isEmpty()) ? null : emotes.get(0).getAsMention();
     }
 }

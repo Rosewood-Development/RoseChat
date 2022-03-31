@@ -200,10 +200,12 @@ public class RoseChat extends RosePlugin {
         else new RoseChatPlaceholderExpansion().register();
 
         if (pluginManager.getPlugin("DiscordSRV") != null) {
-            this.discord = new DiscordSRVProvider();
-            DiscordSRVListener discordListener = new DiscordSRVListener();
-            DiscordSRV.api.subscribe(discordListener);
-            DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                this.discord = new DiscordSRVProvider();
+                DiscordSRVListener discordListener = new DiscordSRVListener();
+                DiscordSRV.api.subscribe(discordListener);
+                DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
+            }, 20L);
         }
 
         if (pluginManager.getPlugin("ProtocolLib") != null) {

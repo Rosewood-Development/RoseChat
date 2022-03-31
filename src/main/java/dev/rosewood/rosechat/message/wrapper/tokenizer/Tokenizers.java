@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.DiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.DiscordFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
@@ -46,6 +47,7 @@ public class Tokenizers {
     public static final DiscordEmojiTokenizer DISCORD_EMOJI_TOKENIZER = new DiscordEmojiTokenizer();
     public static final DiscordChannelTokenizer DISCORD_CHANNEL_TOKENIZER = new DiscordChannelTokenizer();
     public static final DiscordTagTokenizer DISCORD_TAG_TOKENIZER = new DiscordTagTokenizer();
+    public static final DiscordCustomEmojiTokenizer DISCORD_CUSTOM_EMOJI_TOKENIZER = new DiscordCustomEmojiTokenizer();
 
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
@@ -137,16 +139,19 @@ public class Tokenizers {
         }
     };
 
-    public static final List<Tokenizer<?>> FROM_DISCORD_FORMATTING_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
+    public static final List<Tokenizer<?>> DISCORD_FORMATTING_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
             add(DISCORD_FORMATTING_TOKENIZER);
             addAll(DEFAULT_WITH_DISCORD_TOKENIZERS);
         }
     };
-
+    
     public static final List<Tokenizer<?>> TO_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
             add(DISCORD_FORMATTING_TOKENIZER);
+            add(DISCORD_CUSTOM_EMOJI_TOKENIZER);
+            add(GRADIENT_TOKENIZER);
+            add(RAINBOW_TOKENIZER);
             add(ROSECHAT_PLACEHOLDER_TOKENIZER);
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);

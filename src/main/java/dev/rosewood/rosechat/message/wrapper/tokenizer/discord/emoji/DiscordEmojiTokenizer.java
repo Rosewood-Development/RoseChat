@@ -13,7 +13,7 @@ public class DiscordEmojiTokenizer implements Tokenizer<DiscordEmojiToken> {
     @Override
     public DiscordEmojiToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
         if (input.startsWith("<")) {
-            Matcher matcher = MessageUtils.DISCORD_CUSTOM_EMOJI_PATTERN.matcher(input);
+            Matcher matcher = MessageUtils.DISCORD_EMOJI_PATTERN.matcher(input);
             if (matcher.find()) {
                 return new DiscordEmojiToken(messageWrapper.getLocation(), group, sender, viewer, input.substring(matcher.start(), matcher.end()), matcher.group(1));
             }

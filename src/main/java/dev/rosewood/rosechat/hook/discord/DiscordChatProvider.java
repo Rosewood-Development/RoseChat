@@ -49,4 +49,10 @@ public interface DiscordChatProvider {
      * @return The UUIDs of the players who have this role.
      */
     List<UUID> getPlayersWithRole(String id);
+
+    /**
+     * @param name The name of the emoji to grab.
+     * @return The mention of the emoji.
+     */
+    String getCustomEmoji(String name);
 }
