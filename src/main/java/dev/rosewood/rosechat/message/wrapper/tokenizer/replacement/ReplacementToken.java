@@ -46,7 +46,7 @@ public class ReplacementToken extends Token {
                     .addPlaceholder("message", this.getOriginalContent()).build();
 
             String text = placeholder.getText().parse(this.getSender(), this.getViewer(), placeholders);
-            text = placeholders.apply(text);
+            text = placeholders.apply(text) + "&f&r";
             MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
                     .group(this.group).sender(this.getSender()).viewer(this.getViewer())
                     .location(MessageLocation.OTHER).tokenizers(Tokenizers.REPLACEMENT_TOKENIZERS).tokenize(text);

@@ -19,6 +19,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.whitespace.WhitespaceTokenizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class Tokenizers {
     public static final GradientTokenizer GRADIENT_TOKENIZER = new GradientTokenizer();
     public static final RainbowTokenizer RAINBOW_TOKENIZER = new RainbowTokenizer();
     public static final ColorTokenizer COLOR_TOKENIZER = new ColorTokenizer();
+    public static final URLTokenizer URL_TOKENIZER = new URLTokenizer();
     public static final PAPIPlaceholderTokenizer PAPI_PLACEHOLDER_TOKENIZER = new PAPIPlaceholderTokenizer();
     public static final RosechatPlaceholderTokenizer ROSECHAT_PLACEHOLDER_TOKENIZER = new RosechatPlaceholderTokenizer();
     public static final TagTokenizer TAG_TOKENIZER = new TagTokenizer();
@@ -54,6 +56,7 @@ public class Tokenizers {
             add(GRADIENT_TOKENIZER);
             add(RAINBOW_TOKENIZER);
             add(COLOR_TOKENIZER);
+            add(URL_TOKENIZER);
             add(ROSECHAT_PLACEHOLDER_TOKENIZER);
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(EMOJI_TOKENIZER);
@@ -126,16 +129,7 @@ public class Tokenizers {
     public static final List<Tokenizer<?>> DEFAULT_WITH_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
             addAll(FROM_DISCORD_TOKENIZERS);
-            add(GRADIENT_TOKENIZER);
-            add(RAINBOW_TOKENIZER);
-            add(COLOR_TOKENIZER);
-            add(ROSECHAT_PLACEHOLDER_TOKENIZER);
-            add(PAPI_PLACEHOLDER_TOKENIZER);
-            add(EMOJI_TOKENIZER);
-            add(TAG_TOKENIZER);
-            add(REGEX_REPLACEMENT_TOKENIZER);
-            add(WHITESPACE_TOKENIZER);
-            add(CHARACTER_TOKENIZER);
+            addAll(DEFAULT_TOKENIZERS);
         }
     };
 
