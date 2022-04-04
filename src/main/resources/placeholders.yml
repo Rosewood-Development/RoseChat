@@ -157,11 +157,13 @@ spy-players:
 # Placeholders used for deleting messages.
 # This placeholder does not need conditions, permissions are checked internally.
 # The %id% placeholder is used for the id of the message being deleted.
+# The %type% placeholder is used for the type of message, server or client.
+# The %message% placeholder is used to define where the X should be shown, before or after the message.
 delete-message:
   text:
     condition: "%type%"
-    client: " &c&l✖"
-    server: " &4&l✖"
+    client: "&c&l✖ %message%"
+    server: "&4&l✖ %message%"
   hover:
     default:
       - "&7&oClick to Delete"

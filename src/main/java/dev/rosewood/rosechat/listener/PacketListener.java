@@ -9,11 +9,13 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -62,26 +64,43 @@ public class PacketListener {
 
                 // Allow the client message to be deletable.
                 ComponentBuilder builder = new ComponentBuilder();
-                builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
 
                 RoseSender sender = new RoseSender(player);
                 String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
                 BaseComponent[] deleteClientButton = MessageUtils.parseCustomPlaceholder(sender, sender, placeholder.substring(1, placeholder.length() - 1),
                         MessageUtils.getSenderViewerPlaceholders(sender, sender)
                                 .addPlaceholder("id", messageId)
-                                .addPlaceholder("type", "client").build());
+                                .addPlaceholder("type", "client")
+                                .addPlaceholder("message", "").build());
 
                 if (deleteClientButton == null) {
                     playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
                     return;
                 }
 
-                builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+                if (shouldSuffixButton(sender, placeholder)) {
+                    builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+                    builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+                } else {
+                    builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+                    builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+                }
+
                 messageJson = ComponentSerializer.toString(builder.create());
                 if (!setMessageReflectively(packet, messageJson)) chatComponent.setJson(messageJson);
                 playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
             }
         });
+    }
+
+    private static boolean shouldSuffixButton(RoseSender sender, String placeholderId) {
+        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        if (placeholder == null) return false;
+
+        String text = placeholder.getText().parse(sender, sender,
+                MessageUtils.getSenderViewerPlaceholders(sender, sender)
+                        .addPlaceholder("type", "client").build());
+        return text.trim().startsWith("%message%");
     }
 
     // Thanks, Nicole!
