@@ -55,4 +55,10 @@ public interface DiscordChatProvider {
      * @return The mention of the emoji.
      */
     String getCustomEmoji(String name);
+
+    /**
+     * @param name The name of the user to tag.
+     * @return The tag.
+     */
+    String getUserTag(String name);
 }

@@ -91,6 +91,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Players can send messages with multiple lines when using DiscordSRV. This may spam the chat.",
                 "How many lines can a player send from discord? The rest will not be sent.",
                 "Requires DiscordSRV"),
+        CAN_TAG_MEMBERS("discord-settings.can-tag-members", true,
+                "Can players tag Discord members?", "Players can use @<username> in messages to tag a member.", "Requires DiscordSRV"),
 
         CHAT_FORMATS("chat-formats", null, "These are the the other chat formats in the plugin."),
         MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{message-sent-sender}{message-sent-arrow}{message-sent-receiver}{message}",

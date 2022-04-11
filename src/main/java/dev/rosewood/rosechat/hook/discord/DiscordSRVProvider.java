@@ -172,4 +172,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         List<Emote> emotes = this.discord.getMainGuild().getEmotesByName(name, true);
         return (emotes == null || emotes.isEmpty()) ? null : emotes.get(0).getAsMention();
     }
+
+    @Override
+    public String getUserTag(String name) {
+        String tag = "";
+        List<Member> members = this.discord.getMainGuild().getMembers();
+        for (Member member : members)
+            if (member.getEffectiveName().contains(name)) tag = member.getAsMention();
+
+        return tag;
+    }
 }

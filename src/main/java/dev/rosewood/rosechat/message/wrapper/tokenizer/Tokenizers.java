@@ -10,7 +10,9 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmoj
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.DiscordFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.DiscordTagTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.ToDiscordTagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.papi.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat.RosechatFormattingTokenizer;
@@ -50,6 +52,8 @@ public class Tokenizers {
     public static final DiscordChannelTokenizer DISCORD_CHANNEL_TOKENIZER = new DiscordChannelTokenizer();
     public static final DiscordTagTokenizer DISCORD_TAG_TOKENIZER = new DiscordTagTokenizer();
     public static final DiscordCustomEmojiTokenizer DISCORD_CUSTOM_EMOJI_TOKENIZER = new DiscordCustomEmojiTokenizer();
+    public static final ToDiscordSpoilerTokenizer TO_DISCORD_SPOILER_TOKENIZER = new ToDiscordSpoilerTokenizer();
+    public static final ToDiscordTagTokenizer TO_DISCORD_TAG_TOKENIZER = new ToDiscordTagTokenizer();
 
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
@@ -142,6 +146,8 @@ public class Tokenizers {
     
     public static final List<Tokenizer<?>> TO_DISCORD_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
+            add(TO_DISCORD_TAG_TOKENIZER);
+            add(TO_DISCORD_SPOILER_TOKENIZER);
             add(DISCORD_FORMATTING_TOKENIZER);
             add(DISCORD_CUSTOM_EMOJI_TOKENIZER);
             add(GRADIENT_TOKENIZER);
