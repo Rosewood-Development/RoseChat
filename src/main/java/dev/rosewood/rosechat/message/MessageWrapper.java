@@ -439,7 +439,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS)
+                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
                         .tokenize(this.message);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
@@ -454,7 +454,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS)
+                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
                         .tokenize(before);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
@@ -464,7 +464,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS)
+                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
                         .tokenize(this.message);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
@@ -474,7 +474,7 @@ public class MessageWrapper {
                 MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS)
+                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
                         .tokenize(after);
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);

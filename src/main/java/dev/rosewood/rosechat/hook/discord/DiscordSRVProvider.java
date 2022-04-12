@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
@@ -51,7 +52,6 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
             text = ChatColor.stripColor(TextComponent.toPlainText(message));
-            this.emojiManager.serializeComponents(message);
         }
 
         CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
@@ -178,7 +178,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String tag = "";
         List<Member> members = this.discord.getMainGuild().getMembers();
         for (Member member : members)
-            if (member.getEffectiveName().contains(name)) tag = member.getAsMention();
+            if (member.getEffectiveName().toLowerCase().contains(name.toLowerCase())) tag = member.getAsMention();
 
         return tag;
     }
