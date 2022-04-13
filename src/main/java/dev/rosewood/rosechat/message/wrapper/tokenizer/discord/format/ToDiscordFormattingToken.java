@@ -5,8 +5,6 @@ import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,9 +24,6 @@ public class ToDiscordFormattingToken extends Token {
     @Override
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-
-        // Remove all colour codes first
-        this.text = this.text.replaceAll(ComponentColorizer.VALID_LEGACY_REGEX.pattern(), "");
 
         int start = 0;
         for (int i = 0; i < this.text.length(); i++) {

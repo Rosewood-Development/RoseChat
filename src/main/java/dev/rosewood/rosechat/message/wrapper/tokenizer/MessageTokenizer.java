@@ -34,11 +34,11 @@ public class MessageTokenizer {
 
     private String parseReplacements(String message) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-            if (replacement.isRegex()) continue;
+            if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
             String groupPermission = this.group == null ? "" : "." + this.group.getLocationPermission();
             if (this.location != MessageLocation.NONE && !this.sender.hasPermission("rosechat.replacements." + this.location.toString().toLowerCase() + groupPermission)
                     || !this.sender.hasPermission("rosechat.replacement." + replacement.getId())) continue;
-            return message.replace(replacement.getText(), replacement.getReplacement());
+            message = message.replace(replacement.getText(), replacement.getReplacement());
         }
 
         return message;

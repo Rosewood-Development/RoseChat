@@ -260,4 +260,11 @@ public class MessageUtils {
 
         return true;
     }
+
+    public static String stripColors(String message) {
+        return message.replaceAll(ComponentColorizer.VALID_LEGACY_REGEX.pattern(), "")
+                .replaceAll(ComponentColorizer.HEX_REGEX.pattern(), "")
+                .replaceAll(ComponentColorizer.GRADIENT_PATTERN.pattern(), "")
+                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "");
+    }
 }

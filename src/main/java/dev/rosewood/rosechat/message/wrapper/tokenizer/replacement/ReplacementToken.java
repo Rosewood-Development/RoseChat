@@ -19,6 +19,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 
 public class ReplacementToken extends Token {
 
@@ -79,13 +80,12 @@ public class ReplacementToken extends Token {
             }
 
             for (BaseComponent c : component) {
-                componentBuilder.append(c.toPlainText(), ComponentBuilder.FormatRetention.NONE)
+                componentBuilder.append(c, ComponentBuilder.FormatRetention.NONE)
                         .bold(c.isBold())
                         .italic(c.isItalic())
                         .underlined(c.isUnderlined())
                         .strikethrough(c.isStrikethrough())
                         .obfuscated(c.isObfuscated())
-                        .color(c.getColorRaw())
                         .event(hoverEvent)
                         .event(clickEvent);
             }

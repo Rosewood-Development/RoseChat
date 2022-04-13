@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 
 public class ComponentSimplifier {
 
@@ -41,6 +42,7 @@ public class ComponentSimplifier {
         }
 
         String finalJson = jsonObject.toString();
+        if (finalJson.contains("?")) Bukkit.getConsoleSender().sendMessage(finalJson);
         return ComponentSerializer.parse(finalJson);
     }
 
@@ -52,15 +54,23 @@ public class ComponentSimplifier {
             JsonObject textObject = textElement.getAsJsonObject();
 
             if (previous != null && previous.has("text") && textObject.has("text")) {
+
                 if (isSimilar(previous, textObject)) {
                     String text = textObject.get("text").getAsString();
                     String previousText = previous.get("text").getAsString();
-                    previous.addProperty("text", previousText + text);
 
                     if (textObject.has("extra") && previous.has("extra")) {
                         JsonArray extra = textObject.getAsJsonArray("extra");
                         JsonArray previousExtra = previous.get("extra").getAsJsonArray();
                         previousExtra.addAll(extra);
+                    }
+
+                    if (!textObject.has("extra") && previous.has("extra")) {
+                        previous.getAsJsonArray("extra").add(textObject);
+                    } else if (textObject.has("extra") && !previous.has("extra")) {
+                        previous.add("extra", textObject.getAsJsonArray("extra"));
+                    } else {
+                        previous.addProperty("text", previousText + text);
                     }
                 } else {
                     compressedArray.add(previous);
