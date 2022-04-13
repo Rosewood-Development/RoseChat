@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
@@ -65,15 +66,28 @@ public class DeleteMessageCommand extends AbstractCommand {
                         if (TextComponent.toPlainText(deletedMessage).isEmpty()) {
                             toDelete.add(deletableMessage);
                         } else {
-                            deletableMessage.setJson(ComponentSerializer.toString(deletedMessage));
+                            String json = ComponentSerializer.toString(deletedMessage);
+
+                            BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, playerData, deletableMessage.getUUID().toString(), json);
+                            if (withDeleteButton == null) {
+                                deletableMessage.setJson(json);
+                            } else {
+                                deletableMessage.setJson(ComponentSerializer.toString(withDeleteButton));
+                                deletableMessage.setClient(true);
+                            }
                         }
                     }
 
                     message = deletableMessage;
                 }
 
+                boolean doRefresh = false;
                 if (message == null || !message.getUUID().equals(uuid)) continue;
-                for (DeletableMessage deletableMessage : toDelete) playerData.getMessageLog().getDeletableMessages().remove(deletableMessage);
+                for (DeletableMessage deletableMessage : toDelete) {
+                    if (!deletableMessage.isClient() || (playerData.getUUID() == ((Player) sender).getUniqueId())) {
+                        playerData.getMessageLog().getDeletableMessages().remove(deletableMessage);
+                    }
+                }
 
                 for (int i = 0; i < 100; i++) player.sendMessage("\n");
                 for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())

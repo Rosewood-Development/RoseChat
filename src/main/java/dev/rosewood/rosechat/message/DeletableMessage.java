@@ -36,6 +36,10 @@ public class DeletableMessage {
         return this.isClient;
     }
 
+    public void setClient(boolean client) {
+        this.isClient = client;
+    }
+
     public String getDiscordId() {
         return this.discordId;
     }

@@ -62,35 +62,42 @@ public class PacketListener {
                     return;
                 }
 
-                // Allow the client message to be deletable.
-                ComponentBuilder builder = new ComponentBuilder();
-
                 RoseSender sender = new RoseSender(player);
-                String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-                BaseComponent[] deleteClientButton = MessageUtils.parseCustomPlaceholder(sender, sender, placeholder.substring(1, placeholder.length() - 1),
-                        MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                                .addPlaceholder("id", messageId)
-                                .addPlaceholder("type", "client")
-                                .addPlaceholder("message", "").build());
+                BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
 
-                if (deleteClientButton == null) {
-                    playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
-                    return;
-                }
+                if (deleteClientButton == null) return;
 
-                if (shouldSuffixButton(sender, placeholder)) {
-                    builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
-                    builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
-                } else {
-                    builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
-                    builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
-                }
-
-                messageJson = ComponentSerializer.toString(builder.create());
+                messageJson = ComponentSerializer.toString(deleteClientButton);
                 if (!setMessageReflectively(packet, messageJson)) chatComponent.setJson(messageJson);
                 playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
             }
         });
+    }
+
+    // Allow the client message to be deletable.
+    public static BaseComponent[] appendButton(RoseSender sender, PlayerData playerData, String messageId, String messageJson) {
+        ComponentBuilder builder = new ComponentBuilder();
+        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
+        BaseComponent[] deleteClientButton = MessageUtils.parseCustomPlaceholder(sender, sender, placeholder.substring(1, placeholder.length() - 1),
+                MessageUtils.getSenderViewerPlaceholders(sender, sender)
+                        .addPlaceholder("id", messageId)
+                        .addPlaceholder("type", "client")
+                        .addPlaceholder("message", "").build());
+
+        if (deleteClientButton == null) {
+            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
+            return null;
+        }
+
+        if (shouldSuffixButton(sender, placeholder)) {
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+        } else {
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+        }
+
+        return builder.create();
     }
 
     private static boolean shouldSuffixButton(RoseSender sender, String placeholderId) {
