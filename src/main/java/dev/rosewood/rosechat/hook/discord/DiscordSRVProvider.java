@@ -24,7 +24,6 @@ import org.bukkit.Bukkit;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class DiscordSRVProvider implements DiscordChatProvider {

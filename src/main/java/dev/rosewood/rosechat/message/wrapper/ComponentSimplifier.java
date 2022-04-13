@@ -13,12 +13,12 @@ public class ComponentSimplifier {
     }
 
     public static BaseComponent[] simplify(BaseComponent[] components) {
-        components = removeUselessBits(components);
+        removeUselessBits(components);
         components = compress(components);
         return components;
     }
 
-    private static BaseComponent[] removeUselessBits(BaseComponent[] components) {
+    private static void removeUselessBits(BaseComponent[] components) {
         for (BaseComponent component : components) {
             if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
             if (!component.isBold()) component.setBold(null);
@@ -28,7 +28,6 @@ public class ComponentSimplifier {
             if (!component.isObfuscated()) component.setObfuscated(null);
         }
 
-        return components;
     }
 
     private static BaseComponent[] compress(BaseComponent[] components) {

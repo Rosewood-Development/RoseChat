@@ -29,7 +29,7 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.tokenizers = Tokenizers.DEFAULT_TOKENIZERS;
         this.colorize = true;
-        this.simplify = false;
+        this.simplify = true;
     }
 
     private String parseReplacements(String message) {
