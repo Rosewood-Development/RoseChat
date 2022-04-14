@@ -16,6 +16,7 @@ public class ComponentSimplifier {
     public static BaseComponent[] simplify(BaseComponent[] components) {
         removeUselessBits(components);
         components = compress(components);
+
         return components;
     }
 
@@ -42,7 +43,6 @@ public class ComponentSimplifier {
         }
 
         String finalJson = jsonObject.toString();
-        if (finalJson.contains("?")) Bukkit.getConsoleSender().sendMessage(finalJson);
         return ComponentSerializer.parse(finalJson);
     }
 
@@ -54,7 +54,6 @@ public class ComponentSimplifier {
             JsonObject textObject = textElement.getAsJsonObject();
 
             if (previous != null && previous.has("text") && textObject.has("text")) {
-
                 if (isSimilar(previous, textObject)) {
                     String text = textObject.get("text").getAsString();
                     String previousText = previous.get("text").getAsString();
@@ -63,9 +62,7 @@ public class ComponentSimplifier {
                         JsonArray extra = textObject.getAsJsonArray("extra");
                         JsonArray previousExtra = previous.get("extra").getAsJsonArray();
                         previousExtra.addAll(extra);
-                    }
-
-                    if (!textObject.has("extra") && previous.has("extra")) {
+                    } else if (!textObject.has("extra") && previous.has("extra")) {
                         previous.getAsJsonArray("extra").add(textObject);
                     } else if (textObject.has("extra") && !previous.has("extra")) {
                         previous.add("extra", textObject.getAsJsonArray("extra"));

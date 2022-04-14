@@ -163,12 +163,4 @@ public class Tokenizers {
             add(CHARACTER_TOKENIZER);
         }
     };
-
-    public static final List<Tokenizer<?>> TO_DISCORD_FORMATTING_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
-        {
-            add(TO_DISCORD_FORMATTING_TOKENIZER);
-            add(WHITESPACE_TOKENIZER);
-            add(CHARACTER_TOKENIZER);
-        }
-    };
 }
