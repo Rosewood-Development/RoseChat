@@ -15,7 +15,7 @@ public class ToDiscordSpoilerTokenizer implements Tokenizer<ToDiscordSpoilerToke
         String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
         String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
         if (input.startsWith(prefix)) {
-            return new ToDiscordSpoilerToken(sender, viewer, input.substring(0, input.indexOf(suffix) + suffix.length()), input.replace(prefix, "").replace(suffix, ""));
+            return new ToDiscordSpoilerToken(messageWrapper, sender, viewer, input.substring(0, input.indexOf(suffix) + suffix.length()), input.replace(prefix, "").replace(suffix, ""));
         }
 
         return null;

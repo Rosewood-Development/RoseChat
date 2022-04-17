@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMulti
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.DiscordFormattingTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.format.ToDiscordFormattingTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.DiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
@@ -55,7 +54,6 @@ public class Tokenizers {
     public static final DiscordCustomEmojiTokenizer DISCORD_CUSTOM_EMOJI_TOKENIZER = new DiscordCustomEmojiTokenizer();
     public static final ToDiscordSpoilerTokenizer TO_DISCORD_SPOILER_TOKENIZER = new ToDiscordSpoilerTokenizer();
     public static final ToDiscordTagTokenizer TO_DISCORD_TAG_TOKENIZER = new ToDiscordTagTokenizer();
-    public static final ToDiscordFormattingTokenizer TO_DISCORD_FORMATTING_TOKENIZER = new ToDiscordFormattingTokenizer();
 
     public static final List<Tokenizer<?>> DEFAULT_TOKENIZERS = new ArrayList<Tokenizer<?>>() {
         {
@@ -158,7 +156,6 @@ public class Tokenizers {
             add(PAPI_PLACEHOLDER_TOKENIZER);
             add(REGEX_REPLACEMENT_TOKENIZER);
             add(TAG_TOKENIZER);
-            add(TO_DISCORD_FORMATTING_TOKENIZER);
             add(WHITESPACE_TOKENIZER);
             add(CHARACTER_TOKENIZER);
         }

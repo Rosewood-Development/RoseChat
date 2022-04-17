@@ -465,7 +465,7 @@ public class MessageWrapper {
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
-                        .tokenize(MessageUtils.stripColors(this.message));
+                        .tokenize(MessageUtils.processForDiscord(MessageUtils.stripColors(this.message)));
 
                 componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }

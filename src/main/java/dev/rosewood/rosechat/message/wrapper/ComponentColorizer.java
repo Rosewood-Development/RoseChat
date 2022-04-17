@@ -6,6 +6,9 @@ import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -438,7 +441,6 @@ public class ComponentColorizer {
                             .strikethrough(component.isStrikethrough())
                             .italic(component.isItalic());
                 }
-
             }
 
             return parseDiscordFormatting(componentBuilder.create());

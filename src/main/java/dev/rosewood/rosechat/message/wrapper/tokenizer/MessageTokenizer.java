@@ -67,7 +67,7 @@ public class MessageTokenizer {
         }
 
         // Appends an empty string to always have something in the component.
-        componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
+        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
         BaseComponent[] components = componentBuilder.create();
 
         components = this.colorize ? ComponentColorizer.colorize(components) : components;

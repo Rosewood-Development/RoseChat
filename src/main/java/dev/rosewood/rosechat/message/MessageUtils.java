@@ -28,6 +28,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -42,6 +44,7 @@ public class MessageUtils {
     public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18})>");
     public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18})>");
     public static final Pattern URL_MARKDOWN_PATTERN = Pattern.compile("\\[(.+)\\]\\(((http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))\\)");
+    public static final List<Character> formattingCodes = new ArrayList<>(Arrays.asList('l', 'm', 'n', 'o'));
 
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());
@@ -265,6 +268,67 @@ public class MessageUtils {
         return message.replaceAll(ComponentColorizer.VALID_LEGACY_REGEX.pattern(), "")
                 .replaceAll(ComponentColorizer.HEX_REGEX.pattern(), "")
                 .replaceAll(ComponentColorizer.GRADIENT_PATTERN.pattern(), "")
-                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "");
+                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "")
+                .replaceAll("&r", "");
+    }
+
+    public static String processForDiscord(String text) {
+        int start = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (i == 0 || (text.charAt(i - 1) == '&' && formattingCodes.contains(c))) continue;
+            if (i != text.length() - 1 && (c == '&' && formattingCodes.contains(text.charAt(i + 1)))) continue;
+            start = i;
+            break;
+        }
+
+        boolean hasBold = false;
+        boolean hasStriketrough = false;
+        boolean hasUnderline = false;
+        boolean hasItalic = false;
+        Matcher matcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(text);
+        while (matcher.find()) {
+            switch (matcher.group().charAt(1)) {
+                case 'l':
+                    hasBold = true;
+                    break;
+                case 'm':
+                    hasStriketrough = true;
+                    break;
+                case 'n':
+                    hasUnderline = true;
+                    break;
+                case 'o':
+                    hasItalic = true;
+                    break;
+            }
+        }
+
+        if (!hasBold && !hasStriketrough && !hasUnderline && !hasItalic) return text;
+
+        text = text.substring(start);
+
+        // This order for formatting discord messages properly
+        if (hasUnderline) {
+            text = "__" + text;
+            text += "__";
+        }
+
+        if (hasStriketrough) {
+            text = "~~" + text;
+            text += "~~";
+        }
+
+        if (hasItalic) {
+            text = "*" + text;
+            text += "*";
+        }
+
+        if (hasBold) {
+            text = "**" + text;
+            text += "**";
+        }
+
+        return text;
     }
 }

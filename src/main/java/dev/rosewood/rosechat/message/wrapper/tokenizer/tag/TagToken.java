@@ -67,6 +67,7 @@ public class TagToken extends Token {
         if (hoverString != null) {
             MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
                     .group(this.group).sender(this.getSender()).viewer(this.getViewer()).location(MessageLocation.OTHER)
+                    .message(this.messageWrapper)
                     .tokenizers(Tokenizers.TAG_TOKENIZERS).tokenize(hoverString);
             BaseComponent[] hover = hoverTokenizer.toComponents();
             hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);

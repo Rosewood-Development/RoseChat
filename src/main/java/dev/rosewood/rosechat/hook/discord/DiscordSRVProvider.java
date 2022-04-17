@@ -50,7 +50,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String text = textPlaceholder != null ? textPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
-            text = ChatColor.stripColor(TextComponent.toPlainText(message));
+            text = TextComponent.toPlainText(message);
         }
 
         CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
