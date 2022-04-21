@@ -28,8 +28,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -268,67 +270,73 @@ public class MessageUtils {
         return message.replaceAll(ComponentColorizer.VALID_LEGACY_REGEX.pattern(), "")
                 .replaceAll(ComponentColorizer.HEX_REGEX.pattern(), "")
                 .replaceAll(ComponentColorizer.GRADIENT_PATTERN.pattern(), "")
-                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "")
-                .replaceAll("&r", "");
+                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "");
     }
 
     public static String processForDiscord(String text) {
-        int start = 0;
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (i == 0 || (text.charAt(i - 1) == '&' && formattingCodes.contains(c))) continue;
-            if (i != text.length() - 1 && (c == '&' && formattingCodes.contains(text.charAt(i + 1)))) continue;
-            start = i;
-            break;
-        }
+        StringBuilder  stringBuilder = new StringBuilder();
 
-        boolean hasBold = false;
-        boolean hasStriketrough = false;
-        boolean hasUnderline = false;
-        boolean hasItalic = false;
-        Matcher matcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(text);
-        while (matcher.find()) {
-            switch (matcher.group().charAt(1)) {
-                case 'l':
-                    hasBold = true;
-                    break;
-                case 'm':
-                    hasStriketrough = true;
-                    break;
-                case 'n':
-                    hasUnderline = true;
-                    break;
-                case 'o':
-                    hasItalic = true;
-                    break;
+        boolean isFormattingCode = false;
+        Deque<Character> deque = new ArrayDeque<>();
+        for (int i = 0; i < text.length(); i++) {
+            if (isFormattingCode) {
+                isFormattingCode = false;
+                continue;
+            }
+
+            char currentChar = text.charAt(i);
+            if (i < text.length() - 1) {
+                char nextChar = text.charAt(i + 1);
+                if (currentChar == '&') {
+                    if (Character.toLowerCase(nextChar) == 'r') {
+                        while (deque.descendingIterator().hasNext()) {
+                            Character c = deque.pollLast();
+                            if (c != null) {
+                                stringBuilder.append(getDiscordFormatting(c));
+                            }
+                        }
+
+                        isFormattingCode = true;
+                        continue;
+                    }
+
+                    deque.add(Character.toLowerCase(nextChar));
+                    stringBuilder.append(getDiscordFormatting(nextChar));
+
+                    isFormattingCode = true;
+                    continue;
+                }
+
+                stringBuilder.append(currentChar);
+                continue;
+            }
+
+            if (i == text.length() - 1) {
+                stringBuilder.append(currentChar);
+                while (deque.descendingIterator().hasNext()) {
+                    Character c = deque.pollLast();
+                    if (c != null) {
+                        stringBuilder.append(getDiscordFormatting(c));
+                    }
+                }
             }
         }
 
-        if (!hasBold && !hasStriketrough && !hasUnderline && !hasItalic) return text;
+        return stringBuilder.toString();
+    }
 
-        text = text.substring(start);
-
-        // This order for formatting discord messages properly
-        if (hasUnderline) {
-            text = "__" + text;
-            text += "__";
+    private static String getDiscordFormatting(char c) {
+        switch (Character.toLowerCase(c)) {
+            case 'o':
+                return "*";
+            case 'n':
+                return "__";
+            case 'm':
+                return "~~";
+            case 'l':
+                return "**";
+            default:
+                return "";
         }
-
-        if (hasStriketrough) {
-            text = "~~" + text;
-            text += "~~";
-        }
-
-        if (hasItalic) {
-            text = "*" + text;
-            text += "*";
-        }
-
-        if (hasBold) {
-            text = "**" + text;
-            text += "**";
-        }
-
-        return text;
     }
 }
