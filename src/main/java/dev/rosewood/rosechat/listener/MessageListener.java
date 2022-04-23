@@ -82,6 +82,6 @@ public class MessageListener implements Listener {
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("message", "").build());
+                        .addPlaceholder("message", "").build(), false);
     }
 }

@@ -27,7 +27,7 @@ public class DiscordFormattingToken extends Token {
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
         BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(), Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS,
-                MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build());
+                MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build(), true);
 
         if (components != null) componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
 

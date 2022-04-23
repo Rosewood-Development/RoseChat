@@ -136,7 +136,7 @@ public class MessageUtils {
         return builder;
     }
 
-    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, List<Tokenizer<?>> tokenizers, StringPlaceholders placeholders) {
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, List<Tokenizer<?>> tokenizers, StringPlaceholders placeholders, boolean discordify) {
         CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
         if (placeholder == null) return null;
 
@@ -148,7 +148,8 @@ public class MessageUtils {
         if (text == null) return null;
         text = placeholders.apply(text);
         MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
-                .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).simplify(false).tokenize(text);
+                .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).simplify(false).colorize(!discordify)
+                .tokenize(discordify ? MessageUtils.processForDiscord(MessageUtils.stripColors(text)) : text);
         component = textTokenizer.toComponents();
 
         String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
@@ -174,9 +175,9 @@ public class MessageUtils {
         return component;
     }
 
-    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders, boolean discordify) {
         return parseCustomPlaceholder(sender, viewer, id,
-                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders);
+                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders, discordify);
     }
 
     public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
