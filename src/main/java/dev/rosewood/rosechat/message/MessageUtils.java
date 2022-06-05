@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
@@ -149,7 +150,7 @@ public class MessageUtils {
         text = placeholders.apply(text);
         MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
                 .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).simplify(false).colorize(!discordify)
-                .tokenize(discordify ? MessageUtils.processForDiscord(MessageUtils.stripColors(text)) : text);
+                .tokenize(discordify ? MessageUtils.stripColors(text) : text);
         component = textTokenizer.toComponents();
 
         String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
@@ -275,7 +276,7 @@ public class MessageUtils {
     }
 
     public static String processForDiscord(String text) {
-        StringBuilder  stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         boolean isFormattingCode = false;
         Deque<Character> deque = new ArrayDeque<>();

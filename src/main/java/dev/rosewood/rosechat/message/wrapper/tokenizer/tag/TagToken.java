@@ -77,10 +77,11 @@ public class TagToken extends Token {
         if (this.tag.shouldMatchLength()) {
             String colorlessContent = TextComponent.toPlainText(hoverEvent.getValue());
             String replacement = placeholder.getText().parse(this.getSender(), this.getViewer(), placeholders);
-            for (int i = 0; i < colorlessContent.length(); i++) textBuilder.append(replacement).append("&f&r");
+            for (int i = 0; i < colorlessContent.length(); i++) textBuilder.append(replacement);
+            textBuilder.append("&f&r");
         } else {
             textBuilder.append(placeholder.getText().parse(this.getSender(), tagged, placeholders));
-            textBuilder.append(punctuation).append("&f&r");
+            textBuilder.append(punctuation);
         }
 
         components = TextComponent.fromLegacyText(placeholders.apply(textBuilder.toString()));
@@ -93,7 +94,6 @@ public class TagToken extends Token {
         }
 
         ComponentBuilder componentBuilder = new ComponentBuilder();
-
         for (BaseComponent component : components) {
             for (char c : component.toPlainText().toCharArray()) {
                 componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE)

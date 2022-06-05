@@ -50,7 +50,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String text = textPlaceholder != null ? textPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
-            text = TextComponent.toPlainText(message);
+            text = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
         }
 
         CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
@@ -60,7 +60,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String title = titlePlaceholder != null ? titlePlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (title != null && title.contains("{message}")) {
             message = messageWrapper.parseToDiscord(title, messageWrapper.getSender());
-            title = TextComponent.toPlainText(message);
+            title = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
             hasMessagePlaceholder = true;
         }
 
@@ -68,7 +68,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String description = descriptionPlaceholder != null ? descriptionPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (description != null && description.contains("{message}")) {
             message = messageWrapper.parseToDiscord(description, messageWrapper.getSender());
-            description = TextComponent.toPlainText(message);
+            description = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
             hasMessagePlaceholder = true;
         }
 

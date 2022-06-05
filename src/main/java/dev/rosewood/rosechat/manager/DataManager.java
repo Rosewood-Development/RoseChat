@@ -3,12 +3,15 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
 import org.bukkit.Bukkit;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,13 @@ public class DataManager extends AbstractDataManager {
         this.muteTasks = new HashMap<>();
         this.bungeePlayers = new HashMap<>();
         this.mutedChannels = new ArrayList<>();
+    }
+
+    @Override
+    public List<Class<? extends DataMigration>> getDataMigrations() {
+        return Collections.singletonList(
+                _1_Create_Tables_Data.class
+        );
     }
 
     public PlayerData getPlayerData(UUID uuid) {

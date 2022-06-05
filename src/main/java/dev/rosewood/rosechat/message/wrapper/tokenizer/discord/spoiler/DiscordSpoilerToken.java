@@ -28,7 +28,7 @@ public class DiscordSpoilerToken extends Token {
         String spoiler = format.contains("%message%") ? format.replace("%message%", this.replacement) : format + this.replacement;
         return new MessageTokenizer.Builder()
                 .message(this.messageWrapper).group(this.group).sender(this.getSender())
-                .viewer(getViewer()).location(this.messageWrapper.getLocation())
+                .viewer(this.getViewer()).location(this.messageWrapper.getLocation())
                 .tokenizers(Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS)
                 .tokenize(spoiler).toComponents();
     }

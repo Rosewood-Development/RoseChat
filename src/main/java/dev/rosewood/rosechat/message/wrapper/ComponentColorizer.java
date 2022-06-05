@@ -12,7 +12,9 @@ import org.bukkit.Bukkit;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ public class ComponentColorizer {
     public static final Pattern DISCORD_UNDERLINE_MARKDOWN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
     public static final Pattern DISCORD_ITALIC_MARKDOWN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
     public static final Pattern DISCORD_STRIKETHROUGH_MARKDOWN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
+    public static final Pattern DISCORD_SPOILER_MARKDOWN = Pattern.compile("\\|\\|(.*?)\\|\\|");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
@@ -543,6 +546,30 @@ public class ComponentColorizer {
         }
 
         return components;
+    }
+
+    public static String parseDiscordFormatting(String str) {
+        Matcher boldMatcher = DISCORD_BOLD_MARKDOWN.matcher(str);
+        if (boldMatcher.find()) {
+            str = str.replaceFirst("\\*\\*", "&l").replaceFirst("\\*\\*", "");
+        }
+
+        Matcher italicMatcher = DISCORD_ITALIC_MARKDOWN.matcher(str);
+        if (italicMatcher.find()) {
+            str = str.replaceFirst("\\*", "&o").replaceFirst("\\*", "");
+        }
+
+        Matcher underlineMatcher = DISCORD_UNDERLINE_MARKDOWN.matcher(str);
+        if (underlineMatcher.find()) {
+            str = str.replaceFirst("__", "&n").replaceFirst("__", "");
+        }
+
+        Matcher strikethroughMatcher = DISCORD_STRIKETHROUGH_MARKDOWN.matcher(str);
+        if (strikethroughMatcher.find()) {
+            str = str.replaceFirst("~~", "&m").replaceFirst("~~", "");
+        }
+
+        return str;
     }
 
     private static String parseHexColor(String color) {

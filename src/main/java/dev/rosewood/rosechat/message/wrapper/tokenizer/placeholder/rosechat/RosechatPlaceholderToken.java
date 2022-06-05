@@ -28,7 +28,7 @@ public class RosechatPlaceholderToken extends Token {
         BaseComponent[] components = MessageUtils.parseCustomPlaceholder(this.getSender(), this.getSender(), this.placeholder.getId(),
                 MessageUtils.getSenderViewerPlaceholders(this.getSender(), this.getViewer(), this.group, this.messageWrapper.getPlaceholders()).build(), false);
 
-        if (components != null) componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
+        if (components != null && components.length != 0) componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
 
         return componentBuilder.create();
     }

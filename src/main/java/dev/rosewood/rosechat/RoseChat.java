@@ -75,7 +75,7 @@ public class RoseChat extends RosePlugin {
     private DiscordChatProvider discord;
 
     public RoseChat() {
-        super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class);
+        super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
         instance = this;
     }
 
@@ -173,13 +173,6 @@ public class RoseChat extends RosePlugin {
                 DataManager.class,
                 GroupManager.class,
                 DiscordEmojiManager.class
-        );
-    }
-
-    @Override
-    public List<Class<? extends DataMigration>> getDataMigrations() {
-        return Collections.singletonList(
-                _1_Create_Tables_Data.class
         );
     }
 
