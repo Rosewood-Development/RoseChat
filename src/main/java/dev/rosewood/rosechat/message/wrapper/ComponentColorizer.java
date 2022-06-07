@@ -30,7 +30,6 @@ public class ComponentColorizer {
     public static final Pattern DISCORD_UNDERLINE_MARKDOWN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
     public static final Pattern DISCORD_ITALIC_MARKDOWN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
     public static final Pattern DISCORD_STRIKETHROUGH_MARKDOWN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
-    public static final Pattern DISCORD_SPOILER_MARKDOWN = Pattern.compile("\\|\\|(.*?)\\|\\|");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
@@ -106,7 +105,7 @@ public class ComponentColorizer {
             }
 
             int contentStart = matcher.end();
-            int contentStop = findStop(componentContent, matcher.end());
+            int contentStop = findStop(componentContent, matcher.end() - 1);
             String content = componentContent.substring(contentStart, contentStop);
             int contentLength = content.length();
             char[] chars = content.toCharArray();
@@ -187,7 +186,7 @@ public class ComponentColorizer {
             }
 
             int contentStart = matcher.end();
-            int contentStop = findStop(componentContent, matcher.end());
+            int contentStop = findStop(componentContent, matcher.end() - 1);
             String content = componentContent.substring(contentStart, contentStop);
             int contentLength = content.length();
             char[] chars = content.toCharArray();
@@ -254,7 +253,7 @@ public class ComponentColorizer {
         Matcher matcher = VALID_LEGACY_REGEX.matcher(componentContent);
         if (matcher.find()) {
             int contentStart = matcher.end();
-            int contentStop = findStop(componentContent, matcher.end());
+            int contentStop = findStop(componentContent, matcher.end() - 1);
 
             for (int i = 0; i < components.length; i++) {
                 if (i > matcher.start() - 1 && i < matcher.end()) continue;
@@ -295,7 +294,7 @@ public class ComponentColorizer {
         Matcher matcher = HEX_REGEX.matcher(componentContent);
         if (matcher.find()) {
             int contentStart = matcher.end();
-            int contentStop = findStop(componentContent, matcher.end());
+            int contentStop = findStop(componentContent, matcher.end() - 1);
 
             for (int i = 0; i < components.length; i++) {
                 if (i > matcher.start() - 1 && i < matcher.end()) continue;

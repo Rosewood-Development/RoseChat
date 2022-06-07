@@ -1,5 +1,5 @@
-# Tags can be used to tag specific players or add extra detail to messages.
-# Check the wiki for more information:
+# Tags can be used to tag specific players or add extra detail to a message.
+# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#tagsyml
 
 # This tag allows players to use @<player>, e.g. "Hey @Lilac!"
 # The ID of the tag.
