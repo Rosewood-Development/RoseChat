@@ -16,7 +16,9 @@ public class PAPIPlaceholderToken extends Token {
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
 
-        String placeholder = PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), this.getOriginalContent());
+        String placeholder = this.getOriginalContent().startsWith("%other_") ?
+                PlaceholderAPIHook.applyPlaceholders(this.getViewer().asPlayer(), this.getOriginalContent().replaceFirst("other_", "")) :
+                PlaceholderAPIHook.applyPlaceholders(this.getSender().asPlayer(), this.getOriginalContent());
         for (char c : placeholder.toCharArray()) {
             componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
         }
