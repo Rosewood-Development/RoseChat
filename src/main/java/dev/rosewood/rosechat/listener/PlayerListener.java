@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import org.bukkit.World;
@@ -53,7 +54,7 @@ public class PlayerListener implements Listener {
                 playerData.getCurrentChannel().add(player);
             }
 
-            if (playerData.getNickname() != null) player.setDisplayName(playerData.getNickname());
+            if (playerData.getNickname() != null) NicknameCommand.setDisplayName(player, playerData.getNickname());
         });
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
     }
