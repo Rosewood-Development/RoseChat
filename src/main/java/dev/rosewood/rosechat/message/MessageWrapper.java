@@ -9,7 +9,6 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -301,13 +300,9 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS)
-                        .tokenize(this.message);
+                       // .tokenizers(Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS)
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 return this.tokenized = componentBuilder.create();
             }
 
@@ -316,33 +311,33 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+               /* MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.FORMATTING_TOKENIZERS)
-                        .tokenize(before);
+                        .tokenize(before);*/
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, before).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.DEFAULT_TOKENIZERS)
-                        .tokenize(this.message);
+                        .tokenize(this.message);*/
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (after != null && !after.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.FORMATTING_TOKENIZERS)
-                        .tokenize(after);
+                        .tokenize(after);*/
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                //componentBuilder.append(new MessageTokenizer(this).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             this.tokenized = componentBuilder.create();
@@ -369,13 +364,13 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS)
                         .tokenize(this.message);
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);*/
                 return this.tokenized = componentBuilder.create();
             }
 
@@ -384,33 +379,33 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.DISCORD_FORMATTING_TOKENIZERS)
                         .tokenize(before);
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);*/
             }
 
             if (format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
                         .message(this).group(this.group).sender(this.sender)
                         .viewer(viewer).location(this.location)
                         .tokenizers(Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS)
                         .tokenize(this.message);
 
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);*/
             }
 
             if (after != null && !after.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.DISCORD_FORMATTING_TOKENIZERS)
-                        .tokenize(after);
-
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+//                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+//                        .message(this).group(this.group).sender(this.sender)
+//                        .viewer(viewer).location(this.location)
+//                        .tokenizers(Tokenizers.DISCORD_FORMATTING_TOKENIZERS)
+//                        .tokenize(after);
+//
+//                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             this.tokenized = componentBuilder.create();
@@ -436,13 +431,13 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
-                        .tokenize(this.message);
-
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+//                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+//                        .message(this).group(this.group).sender(this.sender)
+//                        .viewer(viewer).location(this.location)
+//                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
+//                        .tokenize(this.message);
+//
+//                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 return this.tokenized = componentBuilder.create();
             }
 
@@ -451,33 +446,33 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
-                        .tokenize(before);
-
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+//                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+//                        .message(this).group(this.group).sender(this.sender)
+//                        .viewer(viewer).location(this.location)
+//                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
+//                        .tokenize(before);
+//
+//                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
-                        .tokenize(MessageUtils.stripColors(this.message));
-
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+//                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+//                        .message(this).group(this.group).sender(this.sender)
+//                        .viewer(viewer).location(this.location)
+//                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
+//                        .tokenize(MessageUtils.stripColors(this.message));
+//
+//                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (after != null && !after.isEmpty()) {
-                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
-                        .tokenize(after);
-
-                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+//                MessageTokenizer tokenizer = new MessageTokenizer.Builder()
+//                        .message(this).group(this.group).sender(this.sender)
+//                        .viewer(viewer).location(this.location)
+//                        .tokenizers(Tokenizers.TO_DISCORD_TOKENIZERS).colorize(false)
+//                        .tokenize(after);
+//
+//                componentBuilder.append(tokenizer.toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             this.tokenized = componentBuilder.create();
@@ -536,6 +531,10 @@ public class MessageWrapper {
 
     public StringPlaceholders getPlaceholders() {
         return this.placeholders;
+    }
+
+    public Group getGroup() {
+        return this.group;
     }
 
     public UUID getId() {

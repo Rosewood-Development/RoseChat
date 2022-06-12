@@ -1,24 +1,39 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow;
 
-import dev.rosewood.rosechat.chat.Group;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
+import static dev.rosewood.rosechat.message.wrapper.ComponentColorizer.*;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import java.util.regex.Matcher;
 
 public class RainbowTokenizer implements Tokenizer<RainbowToken> {
 
     @Override
-    public RainbowToken tokenize(MessageWrapper wrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        if (input.startsWith("<r")) {
-            Matcher matcher = ComponentColorizer.RAINBOW_PATTERN.matcher(input);
-            if (matcher.find()) {
-                return new RainbowToken(sender, viewer, input.substring(matcher.start(), matcher.end()));
+    public RainbowToken tokenize(MessageWrapper messageWrapper, String input) {
+        // Check if the content contains the rainbow pattern.
+        Matcher matcher = RAINBOW_PATTERN.matcher(input);
+        if (matcher.find() && matcher.start() == 0) {
+            // Retrieve parameters from the rainbow pattern.
+            float saturation = 1.0F;
+            float brightness = 1.0F;
+
+            String saturationGroup = getCaptureGroup(matcher, "saturation");
+            if (saturationGroup != null) {
+                try {
+                    saturation = Float.parseFloat(saturationGroup);
+                } catch (NumberFormatException ignored) { }
             }
+
+            String brightnessGroup = getCaptureGroup(matcher, "brightness");
+            if (brightnessGroup != null) {
+                try {
+                    brightness = Float.parseFloat(brightnessGroup);
+                } catch (NumberFormatException ignored) { }
+            }
+
+            return new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness);
         }
 
         return null;
     }
+
 }

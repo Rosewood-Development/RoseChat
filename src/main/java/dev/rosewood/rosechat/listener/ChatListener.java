@@ -45,8 +45,8 @@ public class ChatListener implements Listener {
             }
 
             channel.send(message);
-            BaseComponent[] messageComponents = message.toComponents();
-            if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+            //BaseComponent[] messageComponents = message.toComponents();
+            //if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
         });
     }
 }

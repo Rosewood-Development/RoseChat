@@ -1,23 +1,41 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.gradient;
 
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import java.awt.Color;
+import java.util.List;
 
 public class GradientToken extends Token {
 
-    public GradientToken(RoseSender sender, RoseSender viewer, String originalContent) {
-        super(sender, viewer, originalContent);
+    private final List<Color> colors;
+
+    public GradientToken(String originalText, List<Color> colors) {
+        super(originalText);
+
+        this.colors = colors;
     }
 
     @Override
-    public BaseComponent[] toComponents() {
-        ComponentBuilder componentBuilder = new ComponentBuilder();
-        for (char c : this.getOriginalContent().toCharArray()) {
-            componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
+    public String getText(MessageWrapper wrapper) {
+        return "";
+    }
+
+    @Override
+    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+        int contentLength = 0;
+        for (Token token : futureTokens) {
+            if (!token.hasColorGenerator() || token == this) {
+                contentLength += token.getText(wrapper).length();
+            } else break;
         }
 
-        return componentBuilder.create();
+        return new ComponentColorizer.Gradient(this.colors, contentLength);
     }
+
+    @Override
+    public boolean hasColorGenerator() {
+        return true;
+    }
+
 }

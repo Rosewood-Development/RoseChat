@@ -112,7 +112,7 @@ public class ChatChannel implements Group {
 
         // Send the message to discord.
         if (api.getDiscord() != null) {
-            if (this.discordChannel != null) MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
+            //if (this.discordChannel != null) MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
         }
 
         // Send the message to other servers.

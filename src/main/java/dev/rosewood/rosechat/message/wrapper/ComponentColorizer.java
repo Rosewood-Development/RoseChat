@@ -142,7 +142,7 @@ public class ComponentColorizer {
                     int componentColor = component.getColor().getColor().getRGB();
                     componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFont())
                             .event(component.getHoverEvent()).event(component.getClickEvent())
-                            .color(componentColor == ChatColor.WHITE.getColor().getRGB() ? ChatColor.of(rainbow.next()) : component.getColorRaw())
+                            .color(componentColor == ChatColor.WHITE.getColor().getRGB() ? rainbow.next() : component.getColorRaw())
                             .obfuscated(component.isObfuscated())
                             .bold(component.isBold())
                             .underlined(component.isUnderlined())
@@ -224,7 +224,7 @@ public class ComponentColorizer {
                     int componentColor = component.getColor().getColor().getRGB();
                     componentBuilder.append(text, ComponentBuilder.FormatRetention.NONE).font(component.getFontRaw())
                             .event(component.getHoverEvent()).event(component.getClickEvent())
-                            .color(componentColor == ChatColor.WHITE.getColor().getRGB() ? ChatColor.of(gradient.next()) : component.getColorRaw())
+                            .color(componentColor == ChatColor.WHITE.getColor().getRGB() ? gradient.next() : component.getColorRaw())
                             .obfuscated(component.isObfuscated())
                             .bold(component.isBold())
                             .underlined(component.isUnderlined())
@@ -590,7 +590,7 @@ public class ComponentColorizer {
         return color;
     }
 
-    private static String getCaptureGroup(Matcher matcher, String group) {
+    public static String getCaptureGroup(Matcher matcher, String group) {
         try {
             return matcher.group(group);
         } catch (IllegalStateException | IllegalArgumentException e) {
@@ -607,8 +607,23 @@ public class ComponentColorizer {
         return content.length();
     }
 
-    private interface ColorGenerator {
-        Color next();
+    public interface ColorGenerator {
+        ChatColor next();
+    }
+
+    public static class SolidColor implements ColorGenerator {
+
+        private final ChatColor color;
+
+        public SolidColor(ChatColor color) {
+            this.color = color;
+        }
+
+        @Override
+        public ChatColor next() {
+            return color;
+        }
+
     }
 
     public static class Rainbow implements ColorGenerator {
@@ -627,10 +642,10 @@ public class ComponentColorizer {
         }
 
         @Override
-        public Color next() {
+        public ChatColor next() {
             Color color = Color.getHSBColor(this.hue, this.saturation, this.brightness);
             this.hue += this.hueStep;
-            return color;
+            return ChatColor.of(color);
         }
     }
 
@@ -654,9 +669,9 @@ public class ComponentColorizer {
         }
 
         @Override
-        public Color next() {
+        public ChatColor next() {
             if (NMSUtil.getVersionNumber() < 16 || this.steps <= 1)
-                return this.gradients.get(0).colorAt(0);
+                return ChatColor.of(this.gradients.get(0).colorAt(0));
 
             int adjustedStep = (int) Math.round(Math.abs(((2 * Math.asin(Math.sin(this.step * (Math.PI / (2 * this.steps))))) / Math.PI) * this.steps));
 
@@ -670,7 +685,7 @@ public class ComponentColorizer {
             }
 
             this.step++;
-            return color;
+            return ChatColor.of(color);
         }
     }
 

@@ -1,19 +1,21 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 
-public class Token {
+import java.util.List;
 
-    private final RoseSender sender;
-    private final RoseSender viewer;
-    private final String originalContent;
-    private String font;
+public abstract class Token {
 
-    public Token(RoseSender sender, RoseSender viewer, String originalContent) {
-        this.sender = sender;
-        this.viewer = viewer;
+    protected final String originalContent;
+    protected String font;
+
+    public Token(String originalContent) {
         this.originalContent = originalContent;
         this.font = "default";
     }
@@ -22,17 +24,35 @@ public class Token {
         return this.originalContent;
     }
 
-    public RoseSender getSender() {
-        return this.sender;
-    }
-
-    public RoseSender getViewer() {
-        return this.viewer;
-    }
-
-    public BaseComponent[] toComponents() {
+    public BaseComponent[] toComponents(MessageWrapper wrapper) {
         ComponentBuilder componentBuilder = new ComponentBuilder(this.originalContent);
         return componentBuilder.create();
+    }
+
+    public abstract String getText(MessageWrapper wrapper);
+
+    public String getHover(MessageWrapper wrapper) {
+        return null;
+    }
+
+    public HoverEvent.Action getHoverAction() {
+        return HoverEvent.Action.SHOW_TEXT;
+    }
+
+    public String getClick(MessageWrapper wrapper) {
+        return null;
+    }
+
+    public ClickEvent.Action getClickAction() {
+        return ClickEvent.Action.RUN_COMMAND;
+    }
+
+    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+        return null;
+    }
+
+    public boolean hasColorGenerator() {
+        return false;
     }
 
     public String getFont() {

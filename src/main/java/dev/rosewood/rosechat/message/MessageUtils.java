@@ -5,13 +5,11 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -138,47 +136,49 @@ public class MessageUtils {
     }
 
     public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, List<Tokenizer<?>> tokenizers, StringPlaceholders placeholders, boolean discordify) {
-        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
-        if (placeholder == null) return null;
-
-        BaseComponent[] component;
-        HoverEvent hoverEvent = null;
-        ClickEvent clickEvent = null;
-
-        String text = placeholder.getText().parse(sender, viewer, placeholders);
-        if (text == null) return null;
-        text = placeholders.apply(text);
-        MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
-                .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).simplify(false).colorize(!discordify)
-                .tokenize(discordify ? MessageUtils.stripColors(text) : text);
-        component = textTokenizer.toComponents();
-
-        String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
-        if (hoverString != null) {
-            MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
-                    .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).tokenize(hoverString);
-            BaseComponent[] hover = hoverTokenizer.toComponents();
-            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
-        }
-
-        String clickString = placeholder.getClick() != null ? placeholders.apply(placeholder.getClick().parse(sender, viewer, placeholders)) : null;
-        ClickEvent.Action action = placeholder.getClick() != null ? placeholder.getClick().parseToAction(sender, viewer, placeholders) : null;
-        if (clickString != null && action != null) {
-            String click = sender.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(sender.asPlayer(), clickString) : clickString;
-            clickEvent = new ClickEvent(action, ChatColor.stripColor(click));
-        }
-
-        for (BaseComponent c : component) {
-            c.setHoverEvent(hoverEvent);
-            c.setClickEvent(clickEvent);
-        }
-
-        return component;
+//        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
+//        if (placeholder == null) return null;
+//
+//        BaseComponent[] component;
+//        HoverEvent hoverEvent = null;
+//        ClickEvent clickEvent = null;
+//
+//        String text = placeholder.getText().parse(sender, viewer, placeholders);
+//        if (text == null) return null;
+//        text = placeholders.apply(text);
+//        MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
+//                .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).simplify(false).colorize(!discordify)
+//                .tokenize(discordify ? MessageUtils.stripColors(text) : text);
+//        component = textTokenizer.toComponents();
+//
+//        String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
+//        if (hoverString != null) {
+//            MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
+//                    .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).tokenize(hoverString);
+//            BaseComponent[] hover = hoverTokenizer.toComponents();
+//            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
+//        }
+//
+//        String clickString = placeholder.getClick() != null ? placeholders.apply(placeholder.getClick().parse(sender, viewer, placeholders)) : null;
+//        ClickEvent.Action action = placeholder.getClick() != null ? placeholder.getClick().parseToAction(sender, viewer, placeholders) : null;
+//        if (clickString != null && action != null) {
+//            String click = sender.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(sender.asPlayer(), clickString) : clickString;
+//            clickEvent = new ClickEvent(action, ChatColor.stripColor(click));
+//        }
+//
+//        for (BaseComponent c : component) {
+//            c.setHoverEvent(hoverEvent);
+//            c.setClickEvent(clickEvent);
+//        }
+//
+//        return component;
+        return null;
     }
 
     public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders, boolean discordify) {
-        return parseCustomPlaceholder(sender, viewer, id,
-                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders, discordify);
+//        return parseCustomPlaceholder(sender, viewer, id,
+//                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders, discordify);
+        return null;
     }
 
     public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {

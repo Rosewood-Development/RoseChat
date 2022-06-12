@@ -1,41 +1,44 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
-import dev.rosewood.rosechat.chat.Group;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import net.md_5.bungee.api.ChatColor;
+
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ColorTokenizer implements Tokenizer<ColorToken> {
 
     @Override
-    public ColorToken tokenize(MessageWrapper messageWrapper, Group group, RoseSender sender, RoseSender viewer, MessageLocation location, String input) {
-        Matcher legacyMatcher = ComponentColorizer.VALID_LEGACY_REGEX.matcher(input);
-        Matcher legacyFormattingMatcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(input);
-        Matcher hexMatcher = ComponentColorizer.HEX_REGEX.matcher(input);
-        if (legacyMatcher.find()) {
-            String match = input.substring(legacyMatcher.start(), legacyMatcher.end());
-            if (input.startsWith(match)) {
-                return new ColorToken(sender, viewer, input.substring(legacyMatcher.start(), legacyMatcher.end()));
-            }
-        }
+    public ColorToken tokenize(MessageWrapper messageWrapper, String input) {
+        ColorToken legacyToken = this.parseMatcher(ComponentColorizer.VALID_LEGACY_REGEX, input);
+        if (legacyToken != null) return legacyToken;
 
-        if (legacyFormattingMatcher.find()) {
-            String match = input.substring(legacyFormattingMatcher.start(), legacyFormattingMatcher.end());
-            if (input.startsWith(match)) {
-                return new ColorToken(sender, viewer, input.substring(legacyFormattingMatcher.start(), legacyFormattingMatcher.end()));
-            }
-        }
+        ColorToken legacyFormattingToken = this.parseMatcher(ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING, input);
+        if (legacyFormattingToken != null) return legacyFormattingToken;
 
-        if (hexMatcher.find()) {
-            String match = input.substring(hexMatcher.start(), hexMatcher.end());
+        return this.parseMatcher(ComponentColorizer.HEX_REGEX, input);
+    }
+    
+    private ColorToken parseMatcher(Pattern pattern, String input) {
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            String match = input.substring(matcher.start(), matcher.end());
             if (input.startsWith(match)) {
-                return new ColorToken(sender, viewer, input.substring(hexMatcher.start(), hexMatcher.end()));
+                String content = input.substring(matcher.start(), matcher.end());
+                return new ColorToken(content, fromString(content));
             }
         }
 
         return null;
     }
+
+    private ChatColor fromString(String string) {
+        int hashIndex = string.indexOf('#');
+        if (hashIndex == -1)
+            return ChatColor.getByChar(string.charAt(1));
+        return ChatColor.of(string.substring(hashIndex, hashIndex + 7));
+    }
+
 }
