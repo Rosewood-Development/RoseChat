@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.gradient;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import java.awt.Color;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class GradientToken extends Token {
     }
 
     @Override
-    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
         int contentLength = 0;
         for (Token token : futureTokens) {
             if (!token.hasColorGenerator() || token == this) {
@@ -30,7 +30,7 @@ public class GradientToken extends Token {
             } else break;
         }
 
-        return new ComponentColorizer.Gradient(this.colors, contentLength);
+        return new HexUtils.Gradient(this.colors, contentLength);
     }
 
     @Override

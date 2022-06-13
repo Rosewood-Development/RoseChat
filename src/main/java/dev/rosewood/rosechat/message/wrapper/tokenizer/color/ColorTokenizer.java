@@ -3,8 +3,8 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +38,7 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
         int hashIndex = string.indexOf('#');
         if (hashIndex == -1)
             return ChatColor.getByChar(string.charAt(1));
-        return ChatColor.of(string.substring(hashIndex, hashIndex + 7));
+        return HexUtils.translateHex(string.substring(hashIndex, hashIndex + 7));
     }
 
 }

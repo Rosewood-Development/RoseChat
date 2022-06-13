@@ -1,10 +1,10 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
-
+import java.awt.Color;
 import java.util.List;
 
 public class ColorToken extends Token {
@@ -23,8 +23,8 @@ public class ColorToken extends Token {
     }
 
     @Override
-    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
-        return new ComponentColorizer.SolidColor(this.color);
+    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+        return new SolidColor(this.color);
     }
 
     @Override
@@ -32,4 +32,22 @@ public class ColorToken extends Token {
         return true;
     }
 
+    public static class SolidColor implements HexUtils.ColorGenerator {
+
+        private final ChatColor color;
+
+        public SolidColor(ChatColor color) {
+            this.color = color;
+        }
+
+        @Override
+        public ChatColor nextChatColor() {
+            return this.color;
+        }
+
+        @Override
+        public Color nextColor() {
+            return this.color.getColor();
+        }
+    }
 }

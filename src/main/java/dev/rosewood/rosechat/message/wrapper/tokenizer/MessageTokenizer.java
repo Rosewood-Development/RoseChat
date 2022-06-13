@@ -5,16 +5,13 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.test.TestTokenizer;
-import net.md_5.bungee.api.ChatColor;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -22,10 +19,8 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class MessageTokenizer {
@@ -82,7 +77,7 @@ public class MessageTokenizer {
 
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        ComponentColorizer.ColorGenerator colorGenerator = null;
+        HexUtils.ColorGenerator colorGenerator = null;
         for (int i = 0; i < this.tokens.size(); i++) {
             Token token = this.tokens.get(i);
             if (token.hasColorGenerator())
@@ -101,7 +96,7 @@ public class MessageTokenizer {
             } else {
                 for (char c : token.getText(this.messageWrapper).toCharArray()) {
                     componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
-                    componentBuilder.color(colorGenerator.next());
+                    componentBuilder.color(colorGenerator.nextChatColor());
 
                     String hover = token.getHover(this.messageWrapper);
                     if (hover != null)

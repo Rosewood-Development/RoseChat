@@ -1,13 +1,11 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
-import net.md_5.bungee.api.ChatColor;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-
 import java.util.List;
 
 public abstract class Token {
@@ -47,7 +45,7 @@ public abstract class Token {
         return ClickEvent.Action.RUN_COMMAND;
     }
 
-    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
         return null;
     }
 

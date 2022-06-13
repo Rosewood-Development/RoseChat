@@ -1,9 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
-
+import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.List;
 
 public class RainbowToken extends Token {
@@ -23,7 +22,7 @@ public class RainbowToken extends Token {
     }
 
     @Override
-    public ComponentColorizer.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
         int contentLength = 0;
         for (Token token : futureTokens) {
             if (!token.hasColorGenerator() || token == this) {
@@ -31,7 +30,7 @@ public class RainbowToken extends Token {
             } else break;
         }
 
-        return new ComponentColorizer.Rainbow(contentLength, this.saturation, this.brightness);
+        return new HexUtils.Rainbow(contentLength, this.saturation, this.brightness);
     }
 
     @Override
