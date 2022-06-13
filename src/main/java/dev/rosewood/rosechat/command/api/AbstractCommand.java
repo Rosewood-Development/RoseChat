@@ -15,7 +15,7 @@ public abstract class AbstractCommand {
     /**
      * The labels for the command.
      */
-    private List<String> labels;
+    private final List<String> labels;
 
     /**
      * Is the command player only, or can the console use it?
@@ -152,4 +152,5 @@ public abstract class AbstractCommand {
     public RoseChatAPI getAPI() {
         return this.api;
     }
+
 }

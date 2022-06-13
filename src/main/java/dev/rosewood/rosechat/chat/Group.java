@@ -37,4 +37,5 @@ public interface Group {
      * @return A string used in the permissions for this group.
      */
     String getLocationPermission();
+
 }

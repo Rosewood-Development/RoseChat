@@ -14,9 +14,8 @@ public class TestToken extends Token {
     @Override
     public String getText(MessageWrapper wrapper) {
         // Whatever this is
-        return this.getOriginalContent().substring(1, this.getOriginalContent().length());
+        return this.getOriginalContent().substring(1, this.getOriginalContent().length() - 1);
     }
-
 
     @Override
     public String getHover(MessageWrapper wrapper) {

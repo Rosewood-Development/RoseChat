@@ -57,4 +57,5 @@ public class MuteChatCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-chat-mute-usage");
     }
+
 }

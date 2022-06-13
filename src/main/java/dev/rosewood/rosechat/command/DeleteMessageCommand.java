@@ -162,4 +162,5 @@ public class DeleteMessageCommand extends AbstractCommand {
     public String getSyntax() {
         return null;
     }
+
 }

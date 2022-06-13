@@ -66,4 +66,5 @@ public class InfoGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-info-usage");
     }
+
 }

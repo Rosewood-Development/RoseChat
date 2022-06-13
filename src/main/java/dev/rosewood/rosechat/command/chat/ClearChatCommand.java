@@ -63,4 +63,5 @@ public class ClearChatCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-chat-clear-usage");
     }
+
 }

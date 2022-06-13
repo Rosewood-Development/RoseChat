@@ -209,4 +209,5 @@ public class GroupManager extends Manager {
     public Map<String, GroupChat> getGroupChats() {
         return this.groupChats;
     }
+
 }

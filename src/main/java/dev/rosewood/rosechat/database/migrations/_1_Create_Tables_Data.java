@@ -53,4 +53,5 @@ public class _1_Create_Tables_Data extends DataMigration {
                     ")");
         }
     }
+
 }

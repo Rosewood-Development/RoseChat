@@ -269,4 +269,5 @@ public class EnglishLocale implements Locale {
             this.put("command-ignore-unignored", "&eYou are no longer ignoring &b%player%&e.");
         }};
     }
+
 }

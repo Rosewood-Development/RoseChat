@@ -42,4 +42,5 @@ public class ToggleMessageCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-togglemessage-usage");
     }
+
 }

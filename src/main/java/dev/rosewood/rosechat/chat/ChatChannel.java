@@ -622,4 +622,5 @@ public class ChatChannel implements Group {
     public void setJoinable(boolean joinable) {
         this.joinable = joinable;
     }
+
 }

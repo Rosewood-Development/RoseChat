@@ -64,4 +64,5 @@ public class CustomCommand extends Command {
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
         return Collections.emptyList();
     }
+
 }

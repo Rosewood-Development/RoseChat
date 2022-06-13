@@ -20,8 +20,8 @@ import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
 
-    private RoseChat plugin;
-    private DataManager dataManager;
+    private final RoseChat plugin;
+    private final DataManager dataManager;
 
     public BungeeListener(RoseChat plugin) {
         this.plugin = plugin;
@@ -157,4 +157,5 @@ public class BungeeListener implements PluginMessageListener {
             e.printStackTrace();
         }
     }
+
 }

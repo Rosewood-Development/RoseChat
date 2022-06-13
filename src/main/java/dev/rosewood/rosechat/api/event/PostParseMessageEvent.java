@@ -30,4 +30,5 @@ public class PostParseMessageEvent extends MessageEvent {
     public boolean isToDiscord() {
         return this.isToDiscord;
     }
+
 }

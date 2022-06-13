@@ -85,4 +85,5 @@ public class SocialSpyCommand extends AbstractCommand {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-socialspy-disabled", StringPlaceholders.single("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-socialspy-" + args[0].toLowerCase())));
     }
+
 }

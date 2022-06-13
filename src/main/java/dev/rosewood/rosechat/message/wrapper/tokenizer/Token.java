@@ -60,4 +60,5 @@ public abstract class Token {
     public void setFont(String font) {
         this.font = font;
     }
+
 }

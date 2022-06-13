@@ -58,4 +58,5 @@ public class ChatInfoCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-usage");
     }
+
 }

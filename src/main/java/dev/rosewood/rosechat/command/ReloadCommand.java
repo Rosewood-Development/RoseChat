@@ -39,4 +39,5 @@ public class ReloadCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-reload-usage");
     }
+
 }

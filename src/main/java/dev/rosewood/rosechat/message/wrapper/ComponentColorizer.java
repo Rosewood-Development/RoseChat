@@ -718,4 +718,5 @@ public class ComponentColorizer {
         }
 
     }
+
 }

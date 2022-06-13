@@ -208,5 +208,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     public LocaleManager getLocaleManager() {
         return this.localeManager;
     }
+
 }
 

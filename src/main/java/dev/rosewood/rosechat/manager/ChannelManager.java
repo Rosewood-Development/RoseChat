@@ -111,4 +111,5 @@ public class ChannelManager extends Manager {
     public ChatChannel getDefaultChannel() {
         return this.defaultChannel;
     }
+
 }

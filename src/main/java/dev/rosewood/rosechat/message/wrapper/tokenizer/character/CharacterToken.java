@@ -13,4 +13,5 @@ public class CharacterToken extends Token {
     public String getText(MessageWrapper wrapper) {
         return this.getOriginalContent();
     }
+
 }

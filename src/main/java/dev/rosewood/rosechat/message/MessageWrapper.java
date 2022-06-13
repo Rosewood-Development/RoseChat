@@ -556,4 +556,5 @@ public class MessageWrapper {
     public void setShouldLogMessages(boolean logMessages) {
         this.logMessages = logMessages;
     }
+
 }

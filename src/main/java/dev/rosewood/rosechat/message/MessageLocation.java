@@ -9,4 +9,5 @@ public enum MessageLocation {
     CHATCOLOR,
     OTHER,
     NONE // Removes all need for permissions
+
 }

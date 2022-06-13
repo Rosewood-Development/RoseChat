@@ -81,4 +81,5 @@ public class RenameGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-rename-usage");
     }
+
 }

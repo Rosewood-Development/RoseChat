@@ -113,4 +113,5 @@ public class ChatReplacement {
     public void setRegex(boolean regex) {
         this.regex = regex;
     }
+
 }

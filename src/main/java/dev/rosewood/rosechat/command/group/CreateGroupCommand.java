@@ -68,4 +68,5 @@ public class CreateGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-create-usage");
     }
+
 }

@@ -43,4 +43,5 @@ public class ToggleEmojiCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-toggleemoji-usage");
     }
+
 }

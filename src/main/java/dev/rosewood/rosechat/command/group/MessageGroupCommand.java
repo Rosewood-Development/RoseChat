@@ -73,4 +73,5 @@ public class MessageGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gcm-usage");
     }
+
 }

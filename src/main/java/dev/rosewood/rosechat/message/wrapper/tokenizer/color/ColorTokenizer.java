@@ -27,7 +27,7 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
             String match = input.substring(matcher.start(), matcher.end());
             if (input.startsWith(match)) {
                 String content = input.substring(matcher.start(), matcher.end());
-                return new ColorToken(content, fromString(content));
+                return new ColorToken(content, this.fromString(content));
             }
         }
 

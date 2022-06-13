@@ -24,4 +24,5 @@ public class DiscordPlaceholder {
     public CustomPlaceholder getPlaceholder(String id) {
         return this.placeholders.get(id);
     }
+
 }

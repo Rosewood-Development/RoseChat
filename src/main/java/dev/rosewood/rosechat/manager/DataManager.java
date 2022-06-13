@@ -299,4 +299,5 @@ public class DataManager extends AbstractDataManager {
     public List<String> getPlayersOnServer(String server) {
         return this.bungeePlayers.get(server);
     }
+
 }

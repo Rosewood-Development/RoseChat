@@ -74,4 +74,5 @@ public class MembersGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-members-usage");
     }
+
 }

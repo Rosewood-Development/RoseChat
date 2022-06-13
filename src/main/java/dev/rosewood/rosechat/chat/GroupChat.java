@@ -151,4 +151,5 @@ public class GroupChat implements Group {
     public void setOwner(UUID owner) {
         this.owner = owner;
     }
+
 }

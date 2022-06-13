@@ -13,4 +13,5 @@ public class PreParseMessageEvent extends MessageEvent {
     public PreParseMessageEvent(MessageWrapper message, RoseSender viewer) {
         super(message, viewer);
     }
+
 }

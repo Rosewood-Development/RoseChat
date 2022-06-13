@@ -269,4 +269,5 @@ public class JapaneseLocale implements Locale {
             this.put("command-ignore-unignored", "&b%player%&eを無視していません。");
         }};
     }
+
 }

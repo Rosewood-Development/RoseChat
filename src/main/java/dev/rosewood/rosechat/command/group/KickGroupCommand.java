@@ -93,4 +93,5 @@ public class KickGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-kick-usage");
     }
+
 }

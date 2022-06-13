@@ -54,4 +54,5 @@ public class EmojiManager extends Manager {
     public Map<String, ChatReplacement> getEmojis() {
         return this.emojis;
     }
+
 }

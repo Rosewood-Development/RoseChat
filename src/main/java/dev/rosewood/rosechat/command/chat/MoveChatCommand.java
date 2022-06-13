@@ -82,4 +82,5 @@ public class MoveChatCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-chat-move-usage");
     }
+
 }

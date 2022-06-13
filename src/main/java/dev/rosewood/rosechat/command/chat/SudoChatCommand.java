@@ -67,4 +67,5 @@ public class SudoChatCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-chat-sudo-usage");
     }
+
 }

@@ -182,4 +182,5 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
         return "FFFFFF";
     }
+
 }

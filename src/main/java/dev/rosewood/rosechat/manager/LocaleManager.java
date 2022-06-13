@@ -68,4 +68,5 @@ public class LocaleManager extends AbstractLocaleManager {
         String message = this.locale.getString(messageKey);
         return message == null ? ChatColor.RED + "Missing message in locale file: " + messageKey : stringPlaceholders.apply(message);
     }
+
 }

@@ -99,4 +99,5 @@ public class DiscordEmojiManager extends Manager {
     public Map<String, List<String>> getDiscordEmojis() {
         return this.discordEmojis;
     }
+
 }

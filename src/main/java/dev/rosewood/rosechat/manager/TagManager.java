@@ -65,4 +65,5 @@ public class TagManager extends Manager {
     public Map<String, Tag> getTags() {
         return this.tags;
     }
+
 }

@@ -75,4 +75,5 @@ public class ToggleSoundCommand extends AbstractCommand {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglesound-off", StringPlaceholders.single("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-togglesound-" + args[0].toLowerCase())));
     }
+
 }

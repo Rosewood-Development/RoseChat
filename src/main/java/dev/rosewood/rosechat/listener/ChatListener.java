@@ -49,4 +49,5 @@ public class ChatListener implements Listener {
             //if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
         });
     }
+
 }

@@ -100,4 +100,5 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
     public String getVersion() {
         return RoseChat.getInstance().getDescription().getVersion();
     }
+
 }

@@ -32,4 +32,5 @@ public enum FilterType {
         RoseSender sender = new RoseSender(player);
         this.sendWarning(sender);
     }
+
 }

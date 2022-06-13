@@ -61,4 +61,5 @@ public interface DiscordChatProvider {
      * @return The tag.
      */
     String getUserTag(String name);
+
 }

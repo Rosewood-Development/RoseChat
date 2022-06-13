@@ -83,4 +83,5 @@ public class DisbandGroupCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-disband-usage");
     }
+
 }

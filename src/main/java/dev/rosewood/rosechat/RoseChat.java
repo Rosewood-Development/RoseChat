@@ -219,4 +219,5 @@ public class RoseChat extends RosePlugin {
     public static RoseChat getInstance() {
         return instance;
     }
+
 }

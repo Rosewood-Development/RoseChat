@@ -63,4 +63,5 @@ public class IgnoreCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-ignore-usage");
     }
+
 }

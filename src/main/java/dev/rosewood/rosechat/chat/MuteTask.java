@@ -8,8 +8,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class MuteTask extends BukkitRunnable {
 
-    private RoseChatAPI api;
-    private PlayerData data;
+    private final RoseChatAPI api;
+    private final PlayerData data;
 
     public MuteTask(PlayerData data) {
         this.api = RoseChatAPI.getInstance();
@@ -30,4 +30,5 @@ public class MuteTask extends BukkitRunnable {
             this.cancel();
         }
     }
+
 }

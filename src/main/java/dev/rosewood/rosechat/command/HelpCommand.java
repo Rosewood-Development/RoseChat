@@ -78,4 +78,5 @@ public class HelpCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-help-usage");
     }
+
 }

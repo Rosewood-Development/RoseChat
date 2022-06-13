@@ -243,4 +243,5 @@ public class ConditionalPlaceholder {
     public Map<String, ClickEvent.Action> getClickActions() {
         return this.clickActions;
     }
+
 }

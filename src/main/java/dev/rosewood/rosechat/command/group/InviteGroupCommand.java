@@ -96,4 +96,5 @@ public class InviteGroupCommand extends AbstractCommand {
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-hover"))));
         player.spigot().sendMessage(componentBuilder.create());
     }
+
 }

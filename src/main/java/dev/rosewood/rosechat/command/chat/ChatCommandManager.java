@@ -18,4 +18,5 @@ public class ChatCommandManager extends CommandManager {
             this.getLocaleManager().sendComponentMessage(sender, "command-chat-" + subcommand.getLabels().get(0) + "-description", false);
         }
     }
+
 }

@@ -283,4 +283,5 @@ public class PlayerData {
         this.ignoringPlayers.remove(target);
         api.getDataManager().removeIgnore(this.getUUID(), target);
     }
+
 }

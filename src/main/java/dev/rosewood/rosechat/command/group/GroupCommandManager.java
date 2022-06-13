@@ -18,4 +18,5 @@ public class GroupCommandManager extends CommandManager {
             this.getLocaleManager().sendComponentMessage(sender, "command-gc-" + subcommand.getLabels().get(0) + "-description", false);
         }
     }
+
 }

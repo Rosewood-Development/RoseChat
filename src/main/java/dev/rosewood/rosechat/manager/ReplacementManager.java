@@ -57,4 +57,5 @@ public class ReplacementManager extends Manager {
     public Map<String, ChatReplacement> getReplacements() {
         return this.replacements;
     }
+
 }

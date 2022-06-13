@@ -141,4 +141,5 @@ public class NicknameCommand extends AbstractCommand {
 
         return true;
     }
+
 }

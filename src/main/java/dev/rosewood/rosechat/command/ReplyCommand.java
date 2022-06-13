@@ -109,4 +109,5 @@ public class ReplyCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-reply-usage");
     }
+
 }

@@ -103,4 +103,5 @@ public class MessageLog {
     public void setCleanupAmount(int cleanupAmount) {
         this.cleanupAmount = cleanupAmount;
     }
+
 }

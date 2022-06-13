@@ -105,4 +105,5 @@ public class AcceptGroupCommand extends AbstractCommand {
 
         this.getAPI().addGroupChatMember(groupChat, player);
     }
+
 }

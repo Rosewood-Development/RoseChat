@@ -188,4 +188,5 @@ public class PlaceholderManager extends Manager {
     public DiscordPlaceholder getDiscordPlaceholder() {
         return this.discordPlaceholder;
     }
+
 }

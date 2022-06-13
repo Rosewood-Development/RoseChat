@@ -448,4 +448,5 @@ public class RoseChatAPI {
 
         return false;
     }
+
 }

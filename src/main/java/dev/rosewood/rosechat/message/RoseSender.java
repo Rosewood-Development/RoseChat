@@ -199,4 +199,5 @@ public class RoseSender {
     public String getName() {
         return this.isConsole() ? this.getDisplayName() : this.asPlayer().getName();
     }
+
 }

@@ -132,4 +132,5 @@ public class MuteCommand extends AbstractCommand {
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-mute-usage");
     }
+
 }

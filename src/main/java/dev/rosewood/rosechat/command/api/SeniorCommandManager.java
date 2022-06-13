@@ -90,4 +90,5 @@ public class SeniorCommandManager extends CommandManager {
     public List<CommandManager> getCommandManagers() {
         return this.commandManagers;
     }
+
 }

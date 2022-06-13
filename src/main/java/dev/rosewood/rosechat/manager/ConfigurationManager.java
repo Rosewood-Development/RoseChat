@@ -192,4 +192,5 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 " |_|  \\_\\___/|___/\\___|\\_____|_| |_|\\__,_|\\__|"
         };
     }
+
 }

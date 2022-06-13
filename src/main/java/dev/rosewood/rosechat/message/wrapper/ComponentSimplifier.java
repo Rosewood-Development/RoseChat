@@ -102,4 +102,5 @@ public class ComponentSimplifier {
         boolean shareObfuscated = (one.has("obfuscated") && one.get("obfuscated").getAsBoolean()) == (two.has("obfuscated") && two.get("obfuscated").getAsBoolean());
         return shareColor && shareHover && shareClick && shareBold && shareItalic && shareUnderlined && shareStrikethrough && shareObfuscated;
     }
+
 }

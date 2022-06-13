@@ -84,4 +84,5 @@ public class MessageListener implements Listener {
                         .addPlaceholder("type", "server")
                         .addPlaceholder("message", "").build(), false);
     }
+
 }
