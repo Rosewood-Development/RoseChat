@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -18,12 +19,12 @@ public class ColorToken extends Token {
     }
 
     @Override
-    public String getText(MessageWrapper wrapper) {
+    public String getContent(MessageWrapper wrapper, RoseSender viewer) {
         return "";
     }
 
     @Override
-    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, RoseSender viewer, List<Token> futureTokens) {
         return new SolidColor(this.color);
     }
 
@@ -49,5 +50,7 @@ public class ColorToken extends Token {
         public Color nextColor() {
             return this.color.getColor();
         }
+
     }
+    
 }

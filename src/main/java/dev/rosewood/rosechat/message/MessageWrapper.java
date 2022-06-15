@@ -54,6 +54,7 @@ public class MessageWrapper {
         this.taggedPlayers = new ArrayList<>();
         this.id = UUID.randomUUID();
         this.logMessages = true;
+        this.placeholders = StringPlaceholders.empty();
     }
 
     public MessageWrapper(RoseSender sender, MessageLocation location, Group group, String message, StringPlaceholders placeholders) {
@@ -302,7 +303,7 @@ public class MessageWrapper {
             if (format == null || !format.contains("{message}")) {
                        // .tokenizers(Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS)
 
-                componentBuilder.append(new MessageTokenizer(this, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, viewer, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 return this.tokenized = componentBuilder.create();
             }
 
@@ -317,7 +318,7 @@ public class MessageWrapper {
                         .tokenizers(Tokenizers.FORMATTING_TOKENIZERS)
                         .tokenize(before);*/
 
-                componentBuilder.append(new MessageTokenizer(this, before).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, viewer, before).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
@@ -327,7 +328,7 @@ public class MessageWrapper {
                         .tokenizers(Tokenizers.DEFAULT_TOKENIZERS)
                         .tokenize(this.message);*/
 
-                componentBuilder.append(new MessageTokenizer(this, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, viewer, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (after != null && !after.isEmpty()) {
