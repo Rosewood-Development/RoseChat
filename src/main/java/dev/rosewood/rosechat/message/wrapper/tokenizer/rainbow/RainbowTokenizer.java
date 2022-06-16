@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import java.util.regex.Matcher;
@@ -8,7 +9,7 @@ import java.util.regex.Matcher;
 public class RainbowTokenizer implements Tokenizer<RainbowToken> {
 
     @Override
-    public RainbowToken tokenize(MessageWrapper messageWrapper, String input) {
+    public RainbowToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         // Check if the content contains the rainbow pattern.
         Matcher matcher = ComponentColorizer.RAINBOW_PATTERN.matcher(input);
         if (matcher.find() && matcher.start() == 0) {

@@ -1,23 +1,33 @@
-package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat;
+package dev.rosewood.rosechat.message.wrapper.tokenizer.replacement;
 
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
-public class RoseChatPlaceholderToken extends Token {
+public class ReplacementToken extends Token {
 
     private final String content;
     private final String hover;
     private final String click;
     private final ClickEvent.Action clickAction;
+    private final String font;
 
-    public RoseChatPlaceholderToken(String originalContent, String content, String hover, String click, ClickEvent.Action clickAction) {
+    public ReplacementToken(String originalContent, String content, String hover, String click, ClickEvent.Action clickAction, String font) {
         super(originalContent);
 
         this.content = content;
         this.hover = hover;
         this.click = click;
         this.clickAction = clickAction;
+        this.font = font;
+    }
+
+    public ReplacementToken(String originalContent, String content, String hover, String font) {
+        this(originalContent, content, hover, null, null, font);
+    }
+
+    public ReplacementToken(String originalContent, String content) {
+        this(originalContent, content, null, null, null, "default");
     }
 
     @Override
@@ -50,4 +60,8 @@ public class RoseChatPlaceholderToken extends Token {
         return this.clickAction;
     }
 
+    @Override
+    public String getFont() {
+        return this.font;
+    }
 }

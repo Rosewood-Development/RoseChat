@@ -12,6 +12,10 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenize
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.papi.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -30,8 +34,12 @@ public class MessageTokenizer {
                 new GradientTokenizer(),
                 new RainbowTokenizer(),
                 new ColorTokenizer(),
+                new URLTokenizer(),
                 new RoseChatPlaceholderTokenizer(),
                 new PAPIPlaceholderTokenizer(),
+                new EmojiTokenizer(),
+                new TagTokenizer(),
+                new RegexReplacementTokenizer(),
                 new CharacterTokenizer()
         ));
     }
@@ -70,12 +78,12 @@ public class MessageTokenizer {
         for (int i = 0; i < content.length(); i++) {
             String substring = content.substring(i);
             for (Tokenizer<?> tokenizer : tokenizers) {
-                Token token = tokenizer.tokenize(this.messageWrapper, substring);
+                Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
                     if (token.requiresTokenizing() && depth < 10) {
                         added.add(token);
-                        List<Token> generated = this.tokenizeContent(token.getContent(this.messageWrapper, this.viewer), depth + 1);
+                        List<Token> generated = this.tokenizeContent(token.getContent(), depth + 1);
                         token.addChildren(generated);
                     } else {
                         added.add(token);
@@ -106,30 +114,30 @@ public class MessageTokenizer {
                 this.toComponents(componentBuilder, colorGenerator, token.getChildren());
             } else {
                 if (token.hasColorGenerator())
-                    colorGenerator = token.getColorGenerator(this.messageWrapper, this.viewer, tokens.subList(i, tokens.size()));
+                    colorGenerator = token.getColorGenerator(tokens.subList(i, tokens.size()));
 
                 if (colorGenerator == null) {
-                    componentBuilder.append(token.getContent(this.messageWrapper, this.viewer), ComponentBuilder.FormatRetention.NONE);
+                    componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE).font(token.getFont());
 
-                    String hover = token.getHover(this.messageWrapper, this.viewer);
+                    String hover = token.getHover();
                     if (hover != null)
-                        componentBuilder.event(new HoverEvent(token.getHoverAction(this.messageWrapper, this.viewer), TextComponent.fromLegacyText(hover)));
+                        componentBuilder.event(new HoverEvent(token.getHoverAction(), TextComponent.fromLegacyText(hover)));
 
-                    String click = token.getClick(this.messageWrapper, this.viewer);
+                    String click = token.getClick();
                     if (click != null)
-                        componentBuilder.event(new ClickEvent(token.getClickAction(this.messageWrapper, this.viewer), click));
+                        componentBuilder.event(new ClickEvent(token.getClickAction(), click));
                 } else {
-                    for (char c : token.getContent(this.messageWrapper, this.viewer).toCharArray()) {
-                        componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
+                    for (char c : token.getContent().toCharArray()) {
+                        componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE).font(token.getFont());
                         componentBuilder.color(colorGenerator.nextChatColor());
 
-                        String hover = token.getHover(this.messageWrapper, this.viewer);
+                        String hover = token.getHover();
                         if (hover != null)
-                            componentBuilder.event(new HoverEvent(token.getHoverAction(this.messageWrapper, this.viewer), TextComponent.fromLegacyText(hover)));
+                            componentBuilder.event(new HoverEvent(token.getHoverAction(), TextComponent.fromLegacyText(hover)));
 
-                        String click = token.getClick(this.messageWrapper, this.viewer);
+                        String click = token.getClick();
                         if (click != null)
-                            componentBuilder.event(new ClickEvent(token.getClickAction(this.messageWrapper, this.viewer), click));
+                            componentBuilder.event(new ClickEvent(token.getClickAction(), click));
                     }
                 }
             }

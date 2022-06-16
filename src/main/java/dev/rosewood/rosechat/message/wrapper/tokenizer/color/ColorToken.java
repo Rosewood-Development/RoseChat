@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -19,12 +17,12 @@ public class ColorToken extends Token {
     }
 
     @Override
-    public String getContent(MessageWrapper wrapper, RoseSender viewer) {
+    public String getContent() {
         return "";
     }
 
     @Override
-    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, RoseSender viewer, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(List<Token> futureTokens) {
         return new SolidColor(this.color);
     }
 

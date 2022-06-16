@@ -1,21 +1,25 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.papi;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 
 public class PAPIPlaceholderToken extends Token {
 
-    public PAPIPlaceholderToken(String originalContent) {
+    private final String content;
+
+    public PAPIPlaceholderToken(String originalContent, String content) {
         super(originalContent);
+
+        this.content = content;
     }
 
     @Override
-    public String getContent(MessageWrapper wrapper, RoseSender viewer) {
-        return this.getOriginalContent().startsWith("%other_") ?
-                               PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), this.getOriginalContent().replaceFirst("other_", "")) :
-                               PlaceholderAPIHook.applyPlaceholders(wrapper.getSender().asPlayer(), this.getOriginalContent());
+    public String getContent() {
+        return this.content;
+    }
+
+    @Override
+    public boolean requiresTokenizing() {
+        return true;
     }
 
 }

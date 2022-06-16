@@ -1,28 +1,26 @@
-package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat;
+package dev.rosewood.rosechat.message.wrapper.tokenizer.url;
 
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
-public class RoseChatPlaceholderToken extends Token {
+public class URLToken extends Token {
 
     private final String content;
+    private final String url;
     private final String hover;
-    private final String click;
-    private final ClickEvent.Action clickAction;
 
-    public RoseChatPlaceholderToken(String originalContent, String content, String hover, String click, ClickEvent.Action clickAction) {
+    public URLToken(String originalContent, String content, String url, String hover) {
         super(originalContent);
 
         this.content = content;
+        this.url = url;
         this.hover = hover;
-        this.click = click;
-        this.clickAction = clickAction;
     }
 
     @Override
     public String getContent() {
-        return this.content;
+        return content;
     }
 
     @Override
@@ -32,22 +30,22 @@ public class RoseChatPlaceholderToken extends Token {
 
     @Override
     public String getHover() {
-        return this.hover;
+        return hover;
     }
 
     @Override
     public HoverEvent.Action getHoverAction() {
-        return HoverEvent.Action.SHOW_TEXT;
+        return super.getHoverAction();
     }
 
     @Override
     public String getClick() {
-        return this.click;
+        return this.url;
     }
 
     @Override
     public ClickEvent.Action getClickAction() {
-        return this.clickAction;
+        return ClickEvent.Action.OPEN_URL;
     }
 
 }

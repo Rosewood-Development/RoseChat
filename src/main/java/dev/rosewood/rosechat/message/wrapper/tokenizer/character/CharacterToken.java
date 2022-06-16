@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.character;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 
 public class CharacterToken extends Token {
@@ -11,7 +9,7 @@ public class CharacterToken extends Token {
     }
     
     @Override
-    public String getContent(MessageWrapper wrapper, RoseSender viewer) {
+    public String getContent() {
         return this.getOriginalContent();
     }
 

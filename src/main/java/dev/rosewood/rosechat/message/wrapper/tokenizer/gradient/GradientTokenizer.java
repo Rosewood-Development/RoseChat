@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.gradient;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import java.awt.Color;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 public class GradientTokenizer implements Tokenizer<GradientToken> {
 
     @Override
-    public GradientToken tokenize(MessageWrapper messageWrapper, String input) {
+    public GradientToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         Matcher matcher = ComponentColorizer.GRADIENT_PATTERN.matcher(input);
         if (matcher.find() && matcher.start() == 0) {
             List<Color> hexSteps = Arrays.stream(ComponentColorizer.getCaptureGroup(matcher, "hex").substring(1).split(":"))

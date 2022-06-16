@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +8,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 public abstract class Token {
 
-    // TODO: Add MessageWrapper and RoseSender (viewer) here and remove from methods
     protected final String originalContent;
     protected String font;
     protected List<Token> children;
@@ -25,7 +22,7 @@ public abstract class Token {
         return this.originalContent;
     }
 
-    public abstract String getContent(MessageWrapper wrapper, RoseSender viewer);
+    public abstract String getContent();
 
     public boolean requiresTokenizing() {
         return false;
@@ -39,34 +36,34 @@ public abstract class Token {
         return this.children;
     }
 
-    public String getHover(MessageWrapper wrapper, RoseSender viewer) {
+    public String getHover() {
         return null;
     }
 
-    public HoverEvent.Action getHoverAction(MessageWrapper wrapper, RoseSender viewer) {
+    public HoverEvent.Action getHoverAction() {
         return HoverEvent.Action.SHOW_TEXT;
     }
 
-    public String getClick(MessageWrapper wrapper, RoseSender viewer) {
+    public String getClick() {
         return null;
     }
 
-    public ClickEvent.Action getClickAction(MessageWrapper wrapper, RoseSender viewer) {
-        return ClickEvent.Action.RUN_COMMAND;
-    }
-
-    public HexUtils.ColorGenerator getColorGenerator(MessageWrapper wrapper, RoseSender viewer, List<Token> futureTokens) {
+    public ClickEvent.Action getClickAction() {
         return null;
     }
 
-    protected int getColorGeneratorContentLength(MessageWrapper wrapper, RoseSender viewer, List<Token> futureTokens) {
+    public HexUtils.ColorGenerator getColorGenerator(List<Token> futureTokens) {
+        return null;
+    }
+
+    protected int getColorGeneratorContentLength(List<Token> futureTokens) {
         int contentLength = 0;
         for (Token token : futureTokens) {
             if (!token.hasColorGenerator() || token == this) {
                 if (token.getChildren().isEmpty()) {
-                    contentLength += token.getContent(wrapper, viewer).length();
-                } else if (token.getChildren().stream().noneMatch(x -> x.getColorGenerator(wrapper, viewer, futureTokens) != null)) {
-                    contentLength += token.getChildren().stream().mapToInt(x -> x.getContent(wrapper, viewer).length()).sum();
+                    contentLength += token.getContent().length();
+                } else if (token.getChildren().stream().noneMatch(x -> x.getColorGenerator(futureTokens) != null)) {
+                    contentLength += token.getChildren().stream().mapToInt(x -> x.getContent().length()).sum();
                 }
             } else break;
         }
