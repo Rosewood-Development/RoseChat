@@ -1,23 +1,26 @@
-package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.rosechat;
+package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RoseChatPlaceholderTokenizer implements Tokenizer<RoseChatPlaceholderToken> {
+public class RoseChatPlaceholderTokenizer implements Tokenizer<GenericToken> {
 
     private static final Pattern RC_PATTERN = Pattern.compile("\\{(.*?)\\}");
 
     @Override
-    public RoseChatPlaceholderToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         if (!input.startsWith("{")) return null;
 
         Matcher matcher = RC_PATTERN.matcher(input);
@@ -37,7 +40,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<RoseChatPlacehold
             String hover = customPlaceholder.getHover() == null ? null : placeholders.apply(customPlaceholder.getHover().parse(messageWrapper.getSender(), viewer, placeholders));
             String click = customPlaceholder.getClick() == null ? null : placeholders.apply(customPlaceholder.getClick().parse(messageWrapper.getSender(), viewer, placeholders));
             ClickEvent.Action clickAction = customPlaceholder.getClick() == null ? null : customPlaceholder.getClick().parseToAction(messageWrapper.getSender(), viewer, placeholders);
-            return new RoseChatPlaceholderToken(originalContent, content, hover, click, clickAction);
+            return new GenericToken(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, click, clickAction);
         }
         return null;
     }

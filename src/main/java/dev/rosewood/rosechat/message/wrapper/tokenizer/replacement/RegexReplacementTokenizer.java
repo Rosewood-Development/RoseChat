@@ -5,15 +5,15 @@ import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
+public class RegexReplacementTokenizer implements Tokenizer<GenericToken> {
 
     @Override
-    public ReplacementToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (!replacement.isRegex()) continue;
 
@@ -28,7 +28,7 @@ public class RegexReplacementTokenizer implements Tokenizer<ReplacementToken> {
                 if (!input.startsWith(originalContent)) return null;
 
                 String content = replacement.getReplacement();
-                return new ReplacementToken(originalContent, content);
+                return new GenericToken(originalContent, content);
             }
         }
 

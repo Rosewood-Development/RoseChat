@@ -6,22 +6,22 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TagTokenizer implements Tokenizer<TagToken> {
+public class TagTokenizer implements Tokenizer<GenericToken> {
 
     @Override
-    public TagToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
             if (input.startsWith(tag.getPrefix())) {
                 String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
@@ -47,7 +47,7 @@ public class TagTokenizer implements Tokenizer<TagToken> {
         return null;
     }
 
-    private TagToken createTagToken(MessageWrapper wrapper, RoseSender viewer, String originalContent, String content, Tag tag) {
+    private GenericToken createTagToken(MessageWrapper wrapper, RoseSender viewer, String originalContent, String content, Tag tag) {
         CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(tag.getFormat());
         if (placeholder == null) return null;
 
@@ -85,7 +85,7 @@ public class TagTokenizer implements Tokenizer<TagToken> {
         String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parse(wrapper.getSender(), viewer, placeholders));
         ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(wrapper.getSender(), viewer, placeholders);
 
-        return new TagToken(originalContent, content, hover, click, clickAction);
+        return new GenericToken(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, click, clickAction);
     }
 
 }
