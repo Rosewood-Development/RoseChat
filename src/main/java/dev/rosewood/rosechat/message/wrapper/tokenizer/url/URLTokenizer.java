@@ -4,19 +4,18 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-
 import java.util.regex.Matcher;
 
-public class URLTokenizer implements Tokenizer<GenericToken> {
+public class URLTokenizer implements Tokenizer<Token> {
 
     @Override
-    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         if (input.startsWith("[")) {
             Matcher matcher = MessageUtils.URL_MARKDOWN_PATTERN.matcher(input);
             if (matcher.find()) {
@@ -34,7 +33,7 @@ public class URLTokenizer implements Tokenizer<GenericToken> {
                 content = placeholders.apply(placeholder.getText().parse(messageWrapper.getSender(), viewer, placeholders));
                 String hover = placeholders.apply(placeholder.getHover().parse(messageWrapper.getSender(), viewer, placeholders));
 
-                return new GenericToken(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, url, ClickEvent.Action.OPEN_URL);
+                return new Token(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, url, ClickEvent.Action.OPEN_URL);
             }
         }
 

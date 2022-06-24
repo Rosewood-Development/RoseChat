@@ -3,18 +3,18 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PAPIPlaceholderTokenizer implements Tokenizer<GenericToken> {
+public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
     private static final Pattern PAPI_PATTERN = Pattern.compile("\\%(.*?)\\%");
 
     @Override
-    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         if (!input.startsWith("%")) return null;
 
         Matcher matcher = PAPI_PATTERN.matcher(input);
@@ -28,7 +28,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<GenericToken> {
             String content = originalContent.startsWith("%other_") ?
                     PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", "")) :
                     PlaceholderAPIHook.applyPlaceholders(messageWrapper.getSender().asPlayer(), originalContent);
-            return new GenericToken(originalContent, content);
+            return new Token(originalContent, content);
         }
         return null;
     }

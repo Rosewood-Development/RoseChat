@@ -33,7 +33,7 @@ public class ChatReplacement {
      * @param replacement The replacement to be used.
      */
     public ChatReplacement(String id, String text, String replacement, boolean regex) {
-        this(id, text, replacement, null, "default", regex);
+        this(id, text, replacement, null, null, regex);
     }
 
     /**

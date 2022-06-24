@@ -22,6 +22,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,14 +100,16 @@ public class MessageTokenizer {
 
     public BaseComponent[] toComponents() {
         ComponentBuilder componentBuilder = new ComponentBuilder();
-        HexUtils.ColorGenerator colorGenerator = null;
-        this.toComponents(componentBuilder, colorGenerator, this.tokens);
+        this.toComponents(componentBuilder, null, this.tokens);
 
         // Appends an empty string to always have something in the component.
         if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
         BaseComponent[] components = componentBuilder.create();
 
-        return ComponentSimplifier.simplify(components);
+        Bukkit.getLogger().info(ComponentSerializer.toString(componentBuilder.create()));
+
+        return components;
+        //return ComponentSimplifier.simplify(components);
     }
 
     public void toComponents(ComponentBuilder componentBuilder, HexUtils.ColorGenerator colorGenerator, List<Token> tokens) {
@@ -117,7 +122,8 @@ public class MessageTokenizer {
                     colorGenerator = token.getColorGenerator(tokens.subList(i, tokens.size()));
 
                 if (colorGenerator == null) {
-                    componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE).font(token.getFont());
+                    componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE)
+                            .font(token.font);
 
                     String hover = token.getHover();
                     if (hover != null)
@@ -128,8 +134,9 @@ public class MessageTokenizer {
                         componentBuilder.event(new ClickEvent(token.getClickAction(), click));
                 } else {
                     for (char c : token.getContent().toCharArray()) {
-                        componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE).font(token.getFont());
-                        componentBuilder.color(colorGenerator.nextChatColor());
+                        componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE)
+                            .font(token.font)
+                            .color(colorGenerator.nextChatColor());
 
                         String hover = token.getHover();
                         if (hover != null)

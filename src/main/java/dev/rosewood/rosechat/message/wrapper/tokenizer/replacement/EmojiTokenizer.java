@@ -6,13 +6,13 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 
-public class EmojiTokenizer implements Tokenizer<GenericToken> {
+public class EmojiTokenizer implements Tokenizer<Token> {
 
     @Override
-    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
             if (input.startsWith(emoji.getText())) {
                 String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
@@ -25,7 +25,7 @@ public class EmojiTokenizer implements Tokenizer<GenericToken> {
 
                 String originalContent = input.substring(0, emoji.getText().length());
                 String content = emoji.getReplacement();
-                return new GenericToken(originalContent, content, emoji.getHoverText(), emoji.getFont());
+                return new Token(originalContent, content, emoji.getHoverText(), emoji.getFont());
             }
         }
 

@@ -1,27 +1,29 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.tag;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.GenericToken;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class TagTokenizer implements Tokenizer<GenericToken> {
+public class TagTokenizer implements Tokenizer<Token> {
+
+    // Issue with tokenizing itself: If the tag is @Vekhove, it tokenizes the content which ends up being... "@Lilac", then tokenizing the @ again and etc
 
     @Override
-    public GenericToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
             if (input.startsWith(tag.getPrefix())) {
                 String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
@@ -47,18 +49,11 @@ public class TagTokenizer implements Tokenizer<GenericToken> {
         return null;
     }
 
-    private GenericToken createTagToken(MessageWrapper wrapper, RoseSender viewer, String originalContent, String content, Tag tag) {
+    private Token createTagToken(MessageWrapper wrapper, RoseSender viewer, String originalContent, String content, Tag tag) {
         CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(tag.getFormat());
         if (placeholder == null) return null;
 
-        String punctuation = "";
-        if (tag.getSuffix() == null) {
-            Matcher matcher = Pattern.compile("[\\p{Punct}\\p{IsPunctuation}]").matcher(content);
-            punctuation = matcher.find() ? content.substring(matcher.start() + 1) : "";
-            content = content.replace(punctuation, "");
-        }
-
-        Player taggedPlayer = MessageUtils.getPlayer(content);
+        Player taggedPlayer = this.findPlayer(content);
         if (taggedPlayer != null) wrapper.getTaggedPlayers().add(taggedPlayer.getUniqueId());
         if (tag.getSound() != null) wrapper.setTagSound(tag.getSound());
 
@@ -69,7 +64,7 @@ public class TagTokenizer implements Tokenizer<GenericToken> {
         String hover = placeholder.getHover() == null ? null : placeholders.apply(placeholder.getHover().parse(wrapper.getSender(), viewer, placeholders));
 
         StringBuilder contentBuilder = new StringBuilder();
-        content = placeholder.getText().parse(wrapper.getSender(), tagged, placeholders);
+        content = placeholders.apply(placeholder.getText().parse(wrapper.getSender(), tagged, placeholders));
         if (tag.shouldMatchLength()) {
             if (hover != null) {
                 String colorlessHover = ChatColor.stripColor(HexUtils.colorify(hover));
@@ -77,7 +72,6 @@ public class TagTokenizer implements Tokenizer<GenericToken> {
             }
         } else {
             contentBuilder.append(content);
-            contentBuilder.append(punctuation);
         }
 
         content = contentBuilder.toString();
@@ -85,7 +79,37 @@ public class TagTokenizer implements Tokenizer<GenericToken> {
         String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parse(wrapper.getSender(), viewer, placeholders));
         ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(wrapper.getSender(), viewer, placeholders);
 
-        return new GenericToken(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, click, clickAction);
+        return new Token(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, click, clickAction);
+    }
+
+    public Player findPlayer(String input) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        Bukkit.broadcastMessage("Looking For: " + input);
+        // Important to prioritise nicknames first
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerData playerData = api.getPlayerData(player.getUniqueId());
+            String nickname = playerData.getNickname();
+            if (nickname != null && input.contains(nickname)) {
+                return player;
+            }
+        }
+
+        // Then display names!
+        for (Player player : Bukkit.getOnlinePlayers()) {
+             if (input.contains(player.getDisplayName())) {
+                 return player;
+             }
+        }
+
+        // Finally, usernames
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (input.contains(player.getName())) {
+                return player;
+            }
+        }
+
+        return null;
     }
 
 }
