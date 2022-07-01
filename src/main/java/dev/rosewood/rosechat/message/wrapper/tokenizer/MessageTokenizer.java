@@ -110,11 +110,7 @@ public class MessageTokenizer {
 
         // Appends an empty string to always have something in the component.
         if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
-        BaseComponent[] components = componentBuilder.create();
-
-        Bukkit.getLogger().info(ComponentSerializer.toString(componentBuilder.create()));
-
-        return components;
+        return componentBuilder.create();
         //return ComponentSimplifier.simplify(components);
     }
 

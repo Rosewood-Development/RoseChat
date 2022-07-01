@@ -11,6 +11,7 @@ import java.util.Collections;
 public class ConfigurationManager extends AbstractConfigurationManager {
 
     public enum Setting implements RoseSetting {
+        CHAT_PREVIEW("chat-preview", true, "Should chat preview be enabled for 1.19 servers?", "You will also need to set previews-chat=true in the server.properties file", "Enabling this setting will disable message signing from clients due to technical limitations"),
         MODERATION_SETTINGS("moderation-settings", null, "Moderation Settings"),
         CAPS_CHECKING_ENABLED("moderation-settings.caps-checking-enabled", true,
                 "Should the plugin check for messages that contain too many capital letters?"),

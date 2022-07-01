@@ -42,7 +42,7 @@ dependencies {
     compileOnly 'com.discordsrv:discordsrv:1.25.1'
     compileOnly 'net.dv8tion:JDA:4.3.0_349'
     compileOnly 'net.kyori:adventure-platform-bukkit:4.1.0'
-    compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'
 }
 
 processResources {
