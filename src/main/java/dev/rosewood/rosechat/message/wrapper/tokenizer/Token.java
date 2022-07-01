@@ -61,7 +61,7 @@ public class Token {
     }
 
     public Token(String originalContent) {
-        this(originalContent, originalContent, null, null, null, null, null, true);
+        this(originalContent, originalContent, null, null, null, null, null, false);
     }
 
     public final String getOriginalContent() {
@@ -77,7 +77,6 @@ public class Token {
     }
 
     public void addChildren(List<Token> children) {
-        Bukkit.broadcastMessage(this.font + " / " + this.hover + " / " + this.click + " / " + children.size());
         if (this.font != null) children.stream().filter(x -> x.font == null).forEach(child -> child.font = this.font);
         if (this.hover != null) children.stream().filter(x -> x.hover == null).forEach(child -> {
             child.hover = this.hover;

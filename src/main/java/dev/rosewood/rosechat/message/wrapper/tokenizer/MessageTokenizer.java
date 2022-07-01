@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageLocation;
@@ -84,7 +85,12 @@ public class MessageTokenizer {
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
-                    if (token.requiresTokenizing() && depth < 10) {
+                    if (depth > 10) {
+                        RoseChat.getInstance().getLogger().warning("Exceeded a depth of 10 when tokenizing message: " + this.messageWrapper.getMessage());
+                        continue;
+                    }
+
+                    if (token.requiresTokenizing()) {
                         added.add(token);
                         List<Token> generated = this.tokenizeContent(token.getContent(), depth + 1);
                         token.addChildren(generated);
