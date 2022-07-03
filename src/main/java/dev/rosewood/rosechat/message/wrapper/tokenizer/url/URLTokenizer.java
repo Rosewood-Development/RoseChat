@@ -33,7 +33,7 @@ public class URLTokenizer implements Tokenizer<Token> {
                 content = placeholders.apply(placeholder.getText().parse(messageWrapper.getSender(), viewer, placeholders));
                 String hover = placeholders.apply(placeholder.getHover().parse(messageWrapper.getSender(), viewer, placeholders));
 
-                return new Token(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, url, ClickEvent.Action.OPEN_URL);
+                return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(url).clickAction(ClickEvent.Action.OPEN_URL));
             }
         }
 

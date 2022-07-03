@@ -28,7 +28,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             String content = originalContent.startsWith("%other_") ?
                     PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", "")) :
                     PlaceholderAPIHook.applyPlaceholders(messageWrapper.getSender().asPlayer(), originalContent);
-            return new Token(originalContent, content);
+            return new Token(new Token.TokenSettings(originalContent).content(content));
         }
         return null;
     }

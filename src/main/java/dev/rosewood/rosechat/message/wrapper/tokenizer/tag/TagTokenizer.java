@@ -79,13 +79,12 @@ public class TagTokenizer implements Tokenizer<Token> {
         String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parse(wrapper.getSender(), viewer, placeholders));
         ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(wrapper.getSender(), viewer, placeholders);
 
-        return new Token(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, click, clickAction);
+        return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction).ignoreTokenizer(this));
     }
 
     public Player findPlayer(String input) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        Bukkit.broadcastMessage("Looking For: " + input);
         // Important to prioritise nicknames first
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = api.getPlayerData(player.getUniqueId());

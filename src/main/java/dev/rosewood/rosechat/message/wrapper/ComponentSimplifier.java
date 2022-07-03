@@ -3,10 +3,14 @@ package dev.rosewood.rosechat.message.wrapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ComponentSimplifier {
+
+    @SuppressWarnings("deprecation")
+    private static final JsonParser JSON_PARSER = new JsonParser();
 
     private ComponentSimplifier() {
 
@@ -33,7 +37,7 @@ public class ComponentSimplifier {
 
     private static BaseComponent[] compress(BaseComponent[] components) {
         String json = ComponentSerializer.toString(components);
-        JsonObject jsonObject = ComponentColorizer.JSON_PARSER.parse(json).getAsJsonObject();
+        JsonObject jsonObject = JSON_PARSER.parse(json).getAsJsonObject();
 
         if (jsonObject.has("extra")) {
             JsonArray extraArray = jsonObject.getAsJsonArray("extra");

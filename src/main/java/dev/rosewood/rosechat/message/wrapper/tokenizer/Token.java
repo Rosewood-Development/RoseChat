@@ -1,11 +1,13 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
+import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.bukkit.Bukkit;
 
 public class Token {
 
@@ -17,51 +19,21 @@ public class Token {
     protected HoverEvent.Action hoverAction;
     protected ClickEvent.Action clickAction;
     protected boolean requiresTokenizing;
-    protected List<Token> children;
+    protected Set<Tokenizer<?>> ignoredTokenizers;
+    protected List<Token> children, hoverChildren;
 
-    public Token(String originalContent, String content, String hover, HoverEvent.Action hoverAction, String click, ClickEvent.Action clickAction, String font, boolean tokenizeRecursively) {
-        this.originalContent = originalContent;
-        this.font = font;
-        this.content = content;
-        this.hover = hover;
-        this.hoverAction = hoverAction;
-        this.click = click;
-        this.clickAction = clickAction;
-        this.requiresTokenizing = tokenizeRecursively;
+    public Token(TokenSettings settings) {
+        this.originalContent = settings.originalContent;
+        this.content = settings.content;
+        this.hover = settings.hover;
+        this.click = settings.click;
+        this.font = settings.font;
+        this.hoverAction = settings.hoverAction;
+        this.clickAction = settings.clickAction;
+        this.requiresTokenizing = settings.requiresTokenizing;
+        this.ignoredTokenizers = settings.ignoredTokenizers;
         this.children = new ArrayList<>();
-    }
-
-    public Token(String originalContent, String content, String hover, HoverEvent.Action hoverAction, String click, ClickEvent.Action clickAction, String font) {
-        this(originalContent, content, hover, hoverAction, click, clickAction, font, true);
-    }
-
-    public Token(String originalContent, String content, String hover, HoverEvent.Action hoverAction, String click, ClickEvent.Action clickAction) {
-        this(originalContent, content, hover, hoverAction, click, clickAction, null, true);
-    }
-
-    public Token(String originalContent, String content, String hover, HoverEvent.Action hoverAction, String font) {
-        this(originalContent, content, hover, hoverAction, null, null, font, true);
-    }
-
-    public Token(String originalContent, String content, String hover, HoverEvent.Action hoverAction) {
-        this(originalContent, content, hover, hoverAction, null, null, null, true);
-    }
-
-    public Token(String originalContent, String content, String hover, String font) {
-        this(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, null, null, font, true);
-    }
-
-    public Token(String originalContent, String content, String hover) {
-        this(originalContent, content, hover, HoverEvent.Action.SHOW_TEXT, null, null, null, true);
-    }
-
-    public Token(String originalContent, String content) {
-        this(originalContent, content, null, null, null, null, null, true);
-        this.content = content;
-    }
-
-    public Token(String originalContent) {
-        this(originalContent, originalContent, null, null, null, null, null, false);
+        this.hoverChildren = new ArrayList<>();
     }
 
     public final String getOriginalContent() {
@@ -80,6 +52,7 @@ public class Token {
         if (this.font != null) children.stream().filter(x -> x.font == null).forEach(child -> child.font = this.font);
         if (this.hover != null) children.stream().filter(x -> x.hover == null).forEach(child -> {
             child.hover = this.hover;
+            child.hoverChildren = this.hoverChildren;
             child.hoverAction = this.hoverAction;
         });
         if (this.click != null) children.stream().filter(x -> x.click == null).forEach(child -> {
@@ -93,12 +66,20 @@ public class Token {
         return this.children;
     }
 
+    public void addHoverChildren(List<Token> children) {
+        this.hoverChildren.addAll(children);
+    }
+
     public String getHover() {
         return this.hover;
     }
 
     public HoverEvent.Action getHoverAction() {
         return this.hover == null ? null : (this.hoverAction == null ? HoverEvent.Action.SHOW_TEXT : this.hoverAction);
+    }
+
+    public List<Token> getHoverChildren() {
+        return this.hoverChildren;
     }
 
     public String getClick() {
@@ -129,6 +110,85 @@ public class Token {
 
     public boolean hasColorGenerator() {
         return false;
+    }
+
+    public FormattedColorGenerator applyFormatCodes(FormattedColorGenerator colorGenerator, String baseColor, List<Token> futureTokens) {
+        return null;
+    }
+
+    public boolean hasFormatCodes() {
+        return false;
+    }
+
+    public String getEffectiveFont() {
+        return this.font == null ? "default" : this.font;
+    }
+
+    public Set<Tokenizer<?>> getIgnoredTokenizers() {
+        return this.ignoredTokenizers;
+    }
+
+    public static class TokenSettings {
+
+        private final String originalContent;
+        private String content, hover, click, font;
+        private HoverEvent.Action hoverAction;
+        private ClickEvent.Action clickAction;
+        private boolean requiresTokenizing;
+        private final Set<Tokenizer<?>> ignoredTokenizers;
+
+        public TokenSettings(String originalContent) {
+            this.originalContent = originalContent;
+            this.content = originalContent;
+            this.hover = null;
+            this.click = null;
+            this.font = null;
+            this.hoverAction = null;
+            this.clickAction = null;
+            this.requiresTokenizing = true;
+            this.ignoredTokenizers = new HashSet<>();
+        }
+
+        public TokenSettings content(String text) {
+            this.content = text;
+            return this;
+        }
+
+        public TokenSettings hover(String text) {
+            this.hover = text;
+            return this;
+        }
+
+        public TokenSettings click(String text) {
+            this.click = text;
+            return this;
+        }
+
+        public TokenSettings font(String font) {
+            this.font = font;
+            return this;
+        }
+
+        public TokenSettings hoverAction(HoverEvent.Action action) {
+            this.hoverAction = action;
+            return this;
+        }
+
+        public TokenSettings clickAction(ClickEvent.Action action) {
+            this.clickAction = action;
+            return this;
+        }
+
+        public TokenSettings requiresTokenizing(boolean tokenizeRecursively) {
+            this.requiresTokenizing = tokenizeRecursively;
+            return this;
+        }
+
+        public TokenSettings ignoreTokenizer(Tokenizer<?> tokenizer) {
+            this.ignoredTokenizers.add(tokenizer);
+            return this;
+        }
+
     }
 
 }

@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 
 public class EmojiTokenizer implements Tokenizer<Token> {
 
@@ -25,7 +26,7 @@ public class EmojiTokenizer implements Tokenizer<Token> {
 
                 String originalContent = input.substring(0, emoji.getText().length());
                 String content = emoji.getReplacement();
-                return new Token(originalContent, content, emoji.getHoverText(), emoji.getFont());
+                return new Token(new Token.TokenSettings(originalContent).content(content).hover(emoji.getHoverText()).font(emoji.getFont()).ignoreTokenizer(this));
             }
         }
 

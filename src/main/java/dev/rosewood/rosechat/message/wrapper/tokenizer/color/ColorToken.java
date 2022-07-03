@@ -11,14 +11,9 @@ public class ColorToken extends Token {
     private final ChatColor color;
 
     public ColorToken(String originalText, ChatColor color) {
-        super(originalText);
+        super(new TokenSettings(originalText).content(""));
 
         this.color = color;
-    }
-
-    @Override
-    public String getContent() {
-        return "";
     }
 
     @Override

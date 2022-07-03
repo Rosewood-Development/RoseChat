@@ -4,6 +4,9 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorToken;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ public class PlayerData {
         this.tagSounds = true;
         this.messageSounds = true;
         this.emojis = true;
-        this.color = "";
+        this.color = "&f";
         this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();

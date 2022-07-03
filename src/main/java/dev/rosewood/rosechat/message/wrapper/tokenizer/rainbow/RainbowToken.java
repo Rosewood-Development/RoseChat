@@ -9,15 +9,10 @@ public class RainbowToken extends Token {
     private final float saturation, brightness;
 
     public RainbowToken(String originalText, float saturation, float brightness) {
-        super(originalText);
+        super(new TokenSettings(originalText).content(""));
 
         this.saturation = saturation;
         this.brightness = brightness;
-    }
-
-    @Override
-    public String getContent() {
-        return "";
     }
 
     @Override

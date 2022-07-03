@@ -34,7 +34,7 @@ public class ChatColorCommand extends AbstractCommand {
         if (!MessageUtils.canColor(sender, color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
 
         String colorified = HexUtils.colorify(color);
-        if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty()) {
+        if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-invalid");
             return;
         }

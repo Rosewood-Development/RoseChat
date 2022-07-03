@@ -7,17 +7,18 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.text.Normalizer;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.StringUtils;
@@ -26,15 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import java.text.Normalizer;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MessageUtils {
 
@@ -45,7 +37,25 @@ public class MessageUtils {
     public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18})>");
     public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18})>");
     public static final Pattern URL_MARKDOWN_PATTERN = Pattern.compile("\\[(.+)\\]\\(((http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))\\)");
-    public static final List<Character> formattingCodes = new ArrayList<>(Arrays.asList('l', 'm', 'n', 'o'));
+
+    public static final Pattern DISCORD_BOLD_MARKDOWN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
+    public static final Pattern DISCORD_UNDERLINE_MARKDOWN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
+    public static final Pattern DISCORD_ITALIC_MARKDOWN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
+    public static final Pattern DISCORD_STRIKETHROUGH_MARKDOWN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
+    public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
+    public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
+    public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
+    public static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
+    public static final Pattern GRADIENT_PATTERN = Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>");
+    public static final Pattern STOP = Pattern.compile(
+            "<(rainbow|r)(#(\\d+))?(:(\\d*\\.?\\d+))?(:(\\d*\\.?\\d+))?(:(l|L|loop))?>|" +
+                    "<(gradient|g)(#(\\d+))?((:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(l|L|loop))?>|" +
+                    "(&[a-f0-9r])|" +
+                    "<#([A-Fa-f0-9]){6}>|" +
+                    "\\{#([A-Fa-f0-9]){6}}|" +
+                    "&#([A-Fa-f0-9]){6}|" +
+                    "#([A-Fa-f0-9]){6}"
+    );
 
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());
@@ -247,11 +257,11 @@ public class MessageUtils {
     }
 
     public static boolean canColor(CommandSender sender, String str, String permissionArea) {
-        Matcher colorMatcher = ComponentColorizer.VALID_LEGACY_REGEX.matcher(str);
-        Matcher formatMatcher = ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING.matcher(str);
-        Matcher hexMatcher = ComponentColorizer.HEX_REGEX.matcher(str);
-        Matcher gradientMatcher = ComponentColorizer.GRADIENT_PATTERN.matcher(str);
-        Matcher rainbowMatcher = ComponentColorizer.RAINBOW_PATTERN.matcher(str);
+        Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
+        Matcher formatMatcher = VALID_LEGACY_REGEX_FORMATTING.matcher(str);
+        Matcher hexMatcher = HEX_REGEX.matcher(str);
+        Matcher gradientMatcher = GRADIENT_PATTERN.matcher(str);
+        Matcher rainbowMatcher = RAINBOW_PATTERN.matcher(str);
 
         boolean canColor = !colorMatcher.find() || sender.hasPermission("rosechat.color." + permissionArea);
         boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + permissionArea);
@@ -269,10 +279,10 @@ public class MessageUtils {
     }
 
     public static String stripColors(String message) {
-        return message.replaceAll(ComponentColorizer.VALID_LEGACY_REGEX.pattern(), "")
-                .replaceAll(ComponentColorizer.HEX_REGEX.pattern(), "")
-                .replaceAll(ComponentColorizer.GRADIENT_PATTERN.pattern(), "")
-                .replaceAll(ComponentColorizer.RAINBOW_PATTERN.pattern(), "");
+        return message.replaceAll(VALID_LEGACY_REGEX.pattern(), "")
+                .replaceAll(HEX_REGEX.pattern(), "")
+                .replaceAll(GRADIENT_PATTERN.pattern(), "")
+                .replaceAll(RAINBOW_PATTERN.pattern(), "");
     }
 
     public static String processForDiscord(String text) {
@@ -339,6 +349,14 @@ public class MessageUtils {
                 return "**";
             default:
                 return "";
+        }
+    }
+
+    public static String getCaptureGroup(Matcher matcher, String group) {
+        try {
+            return matcher.group(group);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return null;
         }
     }
 

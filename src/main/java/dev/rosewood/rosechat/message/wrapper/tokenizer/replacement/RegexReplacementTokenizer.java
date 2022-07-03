@@ -28,7 +28,7 @@ public class RegexReplacementTokenizer implements Tokenizer<Token> {
                 if (!input.startsWith(originalContent)) return null;
 
                 String content = replacement.getReplacement();
-                return new Token(originalContent, content);
+                return new Token(new Token.TokenSettings(originalContent).content(content));
             }
         }
 

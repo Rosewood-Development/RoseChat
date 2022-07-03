@@ -10,14 +10,9 @@ public class GradientToken extends Token {
     private final List<Color> colors;
 
     public GradientToken(String originalText, List<Color> colors) {
-        super(originalText);
+        super(new TokenSettings(originalText).content(""));
 
         this.colors = colors;
-    }
-
-    @Override
-    public String getContent() {
-        return "";
     }
 
     @Override

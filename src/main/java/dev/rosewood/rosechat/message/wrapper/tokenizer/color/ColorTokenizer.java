@@ -1,25 +1,22 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.ComponentColorizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.ChatColor;
 
 public class ColorTokenizer implements Tokenizer<ColorToken> {
 
     @Override
     public ColorToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
-        ColorToken legacyToken = this.parseMatcher(ComponentColorizer.VALID_LEGACY_REGEX, input);
+        ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) return legacyToken;
 
-        ColorToken legacyFormattingToken = this.parseMatcher(ComponentColorizer.VALID_LEGACY_REGEX_FORMATTING, input);
-        if (legacyFormattingToken != null) return legacyFormattingToken;
-
-        return this.parseMatcher(ComponentColorizer.HEX_REGEX, input);
+        return this.parseMatcher(MessageUtils.HEX_REGEX, input);
     }
     
     private ColorToken parseMatcher(Pattern pattern, String input) {
