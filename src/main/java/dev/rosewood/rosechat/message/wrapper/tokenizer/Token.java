@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +20,7 @@ public class Token {
     protected ClickEvent.Action clickAction;
     protected boolean requiresTokenizing;
     protected Set<Tokenizer<?>> ignoredTokenizers;
+    protected StringPlaceholders.Builder placeholders;
     protected List<Token> children, hoverChildren;
 
     public Token(TokenSettings settings) {
@@ -32,6 +33,7 @@ public class Token {
         this.clickAction = settings.clickAction;
         this.requiresTokenizing = settings.requiresTokenizing;
         this.ignoredTokenizers = settings.ignoredTokenizers;
+        this.placeholders = settings.placeholders;
         this.children = new ArrayList<>();
         this.hoverChildren = new ArrayList<>();
     }
@@ -41,7 +43,7 @@ public class Token {
     }
 
     public String getContent() {
-        return this.content;
+        return this.placeholders.build().apply(this.content);
     }
 
     public boolean requiresTokenizing() {
@@ -49,16 +51,22 @@ public class Token {
     }
 
     public void addChildren(List<Token> children) {
-        if (this.font != null) children.stream().filter(x -> x.font == null).forEach(child -> child.font = this.font);
-        if (this.hover != null) children.stream().filter(x -> x.hover == null).forEach(child -> {
-            child.hover = this.hover;
-            child.hoverChildren = this.hoverChildren;
-            child.hoverAction = this.hoverAction;
-        });
-        if (this.click != null) children.stream().filter(x -> x.click == null).forEach(child -> {
-            child.click = this.click;
-            child.clickAction = this.clickAction;
-        });
+        for (Token child : children) {
+            if (this.font != null) {
+                child.font = this.font;
+            }
+
+            if (this.hover != null) {
+                child.hover = this.getHover();
+                child.hoverChildren = this.hoverChildren;
+                child.hoverAction = this.hoverAction;
+            }
+
+            if (this.click != null) {
+                child.click = this.getClick();
+                child.clickAction = this.clickAction;
+            }
+        }
         this.children.addAll(children);
     }
 
@@ -71,7 +79,7 @@ public class Token {
     }
 
     public String getHover() {
-        return this.hover;
+        return this.hover == null ? null : this.placeholders.build().apply(this.hover);
     }
 
     public HoverEvent.Action getHoverAction() {
@@ -83,7 +91,14 @@ public class Token {
     }
 
     public String getClick() {
-        return this.click;
+        if (this.click == null)
+            return null;
+
+        if (this.getClickAction() == ClickEvent.Action.OPEN_URL && !this.click.startsWith("http://") && !this.click.startsWith("https://")) {
+            return this.placeholders.build().apply("https://" + this.click);
+        } else {
+            return this.placeholders.build().apply(this.click);
+        }
     }
 
     public ClickEvent.Action getClickAction() {
@@ -128,6 +143,10 @@ public class Token {
         return this.ignoredTokenizers;
     }
 
+    public StringPlaceholders getPlaceholders() {
+        return this.placeholders.build();
+    }
+
     public static class TokenSettings {
 
         private final String originalContent;
@@ -136,6 +155,7 @@ public class Token {
         private ClickEvent.Action clickAction;
         private boolean requiresTokenizing;
         private final Set<Tokenizer<?>> ignoredTokenizers;
+        private final StringPlaceholders.Builder placeholders;
 
         public TokenSettings(String originalContent) {
             this.originalContent = originalContent;
@@ -147,6 +167,7 @@ public class Token {
             this.clickAction = null;
             this.requiresTokenizing = true;
             this.ignoredTokenizers = new HashSet<>();
+            this.placeholders = StringPlaceholders.builder();
         }
 
         public TokenSettings content(String text) {
@@ -186,6 +207,11 @@ public class Token {
 
         public TokenSettings ignoreTokenizer(Tokenizer<?> tokenizer) {
             this.ignoredTokenizers.add(tokenizer);
+            return this;
+        }
+
+        public TokenSettings placeholder(String placeholder, Object value) {
+            this.placeholders.addPlaceholder(placeholder, value);
             return this;
         }
 

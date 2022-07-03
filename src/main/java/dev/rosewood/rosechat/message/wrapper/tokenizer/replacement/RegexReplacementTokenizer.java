@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
@@ -28,7 +29,8 @@ public class RegexReplacementTokenizer implements Tokenizer<Token> {
                 if (!input.startsWith(originalContent)) return null;
 
                 String content = replacement.getReplacement();
-                return new Token(new Token.TokenSettings(originalContent).content(content));
+
+                return new Token(new Token.TokenSettings(originalContent).content(content).placeholder("message", originalContent).ignoreTokenizer(this));
             }
         }
 

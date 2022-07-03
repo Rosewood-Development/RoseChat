@@ -20,8 +20,6 @@ import org.bukkit.entity.Player;
 
 public class TagTokenizer implements Tokenizer<Token> {
 
-    // Issue with tokenizing itself: If the tag is @Vekhove, it tokenizes the content which ends up being... "@Lilac", then tokenizing the @ again and etc
-
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
@@ -41,7 +39,7 @@ public class TagTokenizer implements Tokenizer<Token> {
 
                 int endIndex = input.contains(" ") ? input.indexOf(" ") : input.length();
                 String originalContent = input.substring(0, endIndex);
-                String content = input.substring(tag.getPrefix().length() - 1, endIndex);
+                String content = input.substring(tag.getPrefix().length(), endIndex);
                 return this.createTagToken(messageWrapper, viewer, originalContent, content, tag);
             }
         }

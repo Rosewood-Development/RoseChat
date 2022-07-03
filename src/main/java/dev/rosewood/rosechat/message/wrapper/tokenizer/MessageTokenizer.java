@@ -11,15 +11,18 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.RoseGardenUtils;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
 
@@ -50,15 +53,15 @@ public class MessageTokenizer {
 
     private void tokenize(String message) {
         this.tokens.clear();
-        this.tokens.addAll(this.tokenizeContent(message, true, 0, Collections.emptySet()));
+        this.tokens.addAll(this.tokenizeContent(message, true, 0, null));
     }
 
-    private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Set<Tokenizer<?>> ignoredTokenizers) {
+    private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
             String substring = content.substring(i);
             for (Tokenizer<?> tokenizer : tokenizers) {
-                if (ignoredTokenizers.contains(tokenizer))
+                if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring);
@@ -70,15 +73,21 @@ public class MessageTokenizer {
                     }
 
                     if (token.requiresTokenizing()) {
+                        // Inherit things from parent
+                        if (parent != null) {
+                            token.ignoredTokenizers.addAll(parent.getIgnoredTokenizers());
+                            token.placeholders.addAll(parent.getPlaceholders());
+                        }
+
                         added.add(token);
-                        List<Token> generatedContent = this.tokenizeContent(token.getContent(), true, depth + 1, Sets.union(ignoredTokenizers, token.getIgnoredTokenizers()));
+                        List<Token> generatedContent = this.tokenizeContent(token.getContent(), true, depth + 1, token);
                         token.addChildren(generatedContent);
                     } else {
                         added.add(token);
                     }
 
                     if (tokenizeHover && token.getHover() != null && !token.getHover().isEmpty())
-                        token.addHoverChildren(this.tokenizeContent(token.getHover(), false, depth + 1, Sets.union(ignoredTokenizers, token.getIgnoredTokenizers())));
+                        token.addHoverChildren(this.tokenizeContent(token.getHover(), false, depth + 1, token));
 
                     break;
                 }

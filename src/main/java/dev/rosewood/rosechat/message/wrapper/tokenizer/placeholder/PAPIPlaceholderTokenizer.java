@@ -8,6 +8,8 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
@@ -28,7 +30,13 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             String content = originalContent.startsWith("%other_") ?
                     PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", "")) :
                     PlaceholderAPIHook.applyPlaceholders(messageWrapper.getSender().asPlayer(), originalContent);
-            return new Token(new Token.TokenSettings(originalContent).content(content));
+            content = content.replace(ChatColor.COLOR_CHAR, '&');
+
+            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content);
+            if (originalContent.equals(content))
+                tokenSettings.ignoreTokenizer(this);
+            Bukkit.broadcastMessage(content);
+            return new Token(tokenSettings);
         }
         return null;
     }
