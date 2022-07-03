@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Bukkit;
 
 public class Token {
 
@@ -94,10 +95,11 @@ public class Token {
         if (this.click == null)
             return null;
 
-        if (this.getClickAction() == ClickEvent.Action.OPEN_URL && !this.click.startsWith("http://") && !this.click.startsWith("https://")) {
-            return this.placeholders.build().apply("https://" + this.click);
+        String effectiveClick = this.placeholders.build().apply(this.click);
+        if (this.getClickAction() == ClickEvent.Action.OPEN_URL && !effectiveClick.startsWith("http")) {
+            return "https://" + effectiveClick;
         } else {
-            return this.placeholders.build().apply(this.click);
+            return effectiveClick;
         }
     }
 
@@ -145,6 +147,11 @@ public class Token {
 
     public StringPlaceholders getPlaceholders() {
         return this.placeholders.build();
+    }
+
+    public void applyInheritance(Token child) {
+        child.ignoredTokenizers.addAll(this.ignoredTokenizers);
+        child.placeholders.addAll(this.getPlaceholders());
     }
 
     public static class TokenSettings {

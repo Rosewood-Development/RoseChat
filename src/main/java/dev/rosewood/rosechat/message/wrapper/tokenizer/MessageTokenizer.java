@@ -74,10 +74,8 @@ public class MessageTokenizer {
 
                     if (token.requiresTokenizing()) {
                         // Inherit things from parent
-                        if (parent != null) {
-                            token.ignoredTokenizers.addAll(parent.getIgnoredTokenizers());
-                            token.placeholders.addAll(parent.getPlaceholders());
-                        }
+                        if (parent != null)
+                            parent.applyInheritance(token);
 
                         added.add(token);
                         List<Token> generatedContent = this.tokenizeContent(token.getContent(), true, depth + 1, token);
