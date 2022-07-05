@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 
 public class FormatToken extends Token {
 
-    private static final List<Tokenizer<?>> CHAT_COLOR_TOKENIZERS = Arrays.asList(Tokenizers.GRADIENT, Tokenizers.RAINBOW, Tokenizers.COLOR, Tokenizers.FORMAT);
     private final ChatColor format;
 
     public FormatToken(String originalText, ChatColor format) {
@@ -49,7 +48,7 @@ public class FormatToken extends Token {
         List<Token> chatColorTokens = new ArrayList<>();
         for (int i = 0; i < baseColor.length(); i++) {
             String substring = baseColor.substring(i);
-            for (Tokenizer<?> tokenizer : CHAT_COLOR_TOKENIZERS) {
+            for (Tokenizer<?> tokenizer : Tokenizers.getBundleValues(Tokenizers.COLORS_BUNDLE)) {
                 Token token = tokenizer.tokenize(null, null, substring);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;

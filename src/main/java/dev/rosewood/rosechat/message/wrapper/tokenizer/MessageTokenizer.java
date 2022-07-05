@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
+import com.google.common.collect.Lists;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
@@ -10,9 +11,9 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -21,21 +22,20 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessageTokenizer {
 
-    private static final List<Tokenizer<?>> tokenizers = Tokenizers.values();
+    private final List<Tokenizer<?>> tokenizers;
     private final MessageWrapper messageWrapper;
     private final RoseSender viewer;
     private final List<Token> tokens;
-    private final Set<Tokenizer<?>> ignoredTokenizers;
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message) {
-        this(messageWrapper, viewer, message, Collections.emptySet());
+        this(messageWrapper, viewer, message, Tokenizers.DEFAULT_BUNDLE);
     }
 
-    public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, Set<Tokenizer<?>> ignoredTokenizers) {
+    public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, String... tokenizerBundles) {
         this.messageWrapper = messageWrapper;
         this.viewer = viewer;
         this.tokens = new ArrayList<>();
-        this.ignoredTokenizers = ignoredTokenizers;
+        this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
         this.tokenize(this.parseReplacements(message));
     }
 
@@ -61,8 +61,8 @@ public class MessageTokenizer {
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
             String substring = content.substring(i);
-            for (Tokenizer<?> tokenizer : tokenizers) {
-                if (this.ignoredTokenizers.contains(tokenizer) || (parent != null && parent.getIgnoredTokenizers().contains(tokenizer)))
+            for (Tokenizer<?> tokenizer : this.tokenizers) {
+                if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring);
