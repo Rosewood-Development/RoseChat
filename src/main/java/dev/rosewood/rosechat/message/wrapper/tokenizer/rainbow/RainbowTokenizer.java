@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 public class RainbowTokenizer implements Tokenizer<RainbowToken> {
 
     @Override
-    public RainbowToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public RainbowToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         // Check if the content contains the rainbow pattern.
         Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(input);
         if (matcher.find() && matcher.start() == 0) {

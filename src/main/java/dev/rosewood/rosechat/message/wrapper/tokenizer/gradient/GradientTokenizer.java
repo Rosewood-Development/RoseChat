@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class GradientTokenizer implements Tokenizer<GradientToken> {
 
     @Override
-    public GradientToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public GradientToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         Matcher matcher = MessageUtils.GRADIENT_PATTERN.matcher(input);
         if (matcher.find() && matcher.start() == 0) {
             List<Color> hexSteps = Arrays.stream(MessageUtils.getCaptureGroup(matcher, "hex").substring(1).split(":"))

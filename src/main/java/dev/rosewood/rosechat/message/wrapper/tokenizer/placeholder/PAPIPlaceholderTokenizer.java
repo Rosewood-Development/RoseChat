@@ -9,14 +9,13 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 
 public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
     private static final Pattern PAPI_PATTERN = Pattern.compile("\\%(.*?)\\%");
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         if (!input.startsWith("%")) return null;
 
         Matcher matcher = PAPI_PATTERN.matcher(input);
@@ -24,7 +23,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
             String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-            if ((messageWrapper.getLocation() != MessageLocation.NONE && !messageWrapper.getSender().hasPermission("rosechat.placeholders." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)) || !messageWrapper.getSender().hasPermission("rosechat.placeholder." + placeholderPermission)) return null;
+            if (!ignorePermissions && ((messageWrapper.getLocation() != MessageLocation.NONE && !messageWrapper.getSender().hasPermission("rosechat.placeholders." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)) || !messageWrapper.getSender().hasPermission("rosechat.placeholder." + placeholderPermission))) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             String content = originalContent.startsWith("%other_") ?
@@ -35,7 +34,6 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content);
             if (originalContent.equals(content))
                 tokenSettings.ignoreTokenizer(this);
-            Bukkit.broadcastMessage(content);
             return new Token(tokenSettings);
         }
         return null;

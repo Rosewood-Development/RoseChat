@@ -13,13 +13,13 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 public class EmojiTokenizer implements Tokenizer<Token> {
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
             if (input.startsWith(emoji.getText())) {
                 String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-                if (messageWrapper.getLocation() != MessageLocation.NONE
+                if (!ignorePermissions && (messageWrapper.getLocation() != MessageLocation.NONE
                         && !messageWrapper.getSender().hasPermission("rosechat.emojis." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
-                        || !messageWrapper.getSender().hasPermission("rosechat.emoji." + emoji.getId())) continue;
+                        || !messageWrapper.getSender().hasPermission("rosechat.emoji." + emoji.getId()))) continue;
 
                 PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(messageWrapper.getSender().getUUID());
                 if (playerData == null || !playerData.hasEmojis()) continue;

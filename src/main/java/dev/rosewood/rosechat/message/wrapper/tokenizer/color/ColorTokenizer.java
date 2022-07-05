@@ -12,7 +12,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ColorTokenizer implements Tokenizer<ColorToken> {
 
     @Override
-    public ColorToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public ColorToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) return legacyToken;
 

@@ -21,13 +21,13 @@ import org.bukkit.entity.Player;
 public class TagTokenizer implements Tokenizer<Token> {
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
             if (input.startsWith(tag.getPrefix())) {
                 String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-                if (messageWrapper.getLocation() != MessageLocation.NONE
+                if (!ignorePermissions && (messageWrapper.getLocation() != MessageLocation.NONE
                         && !messageWrapper.getSender().hasPermission("rosechat.tags." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
-                        || !messageWrapper.getSender().hasPermission("rosechat.tag." + tag.getId())) continue;
+                        || !messageWrapper.getSender().hasPermission("rosechat.tag." + tag.getId()))) continue;
 
                 if (tag.getSuffix() != null) {
                     if (!input.contains(tag.getSuffix())) continue;

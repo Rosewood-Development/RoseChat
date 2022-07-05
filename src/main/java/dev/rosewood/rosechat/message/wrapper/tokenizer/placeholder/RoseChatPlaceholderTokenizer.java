@@ -19,16 +19,16 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
     private static final Pattern RC_PATTERN = Pattern.compile("\\{(.*?)\\}");
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         if (!input.startsWith("{")) return null;
 
         Matcher matcher = RC_PATTERN.matcher(input);
         if (matcher.find()) {
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-            if (messageWrapper.getLocation() != MessageLocation.NONE
+            if (!ignorePermissions && (messageWrapper.getLocation() != MessageLocation.NONE
                     && !messageWrapper.getSender().hasPermission("rosechat.placeholders." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
-                    || !messageWrapper.getSender().hasPermission("rosechat.placeholder.rosechat." + placeholder)) return null;
+                    || !messageWrapper.getSender().hasPermission("rosechat.placeholder.rosechat." + placeholder))) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(originalContent.substring(1, originalContent.length() - 1));

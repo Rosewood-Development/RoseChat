@@ -10,7 +10,7 @@ import net.md_5.bungee.api.ChatColor;
 public class FormatTokenizer implements Tokenizer<FormatToken> {
 
     @Override
-    public FormatToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public FormatToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(input);
         if (matcher.find()) {
             String match = input.substring(matcher.start(), matcher.end());

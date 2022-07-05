@@ -49,7 +49,7 @@ public class FormatToken extends Token {
         for (int i = 0; i < baseColor.length(); i++) {
             String substring = baseColor.substring(i);
             for (Tokenizer<?> tokenizer : Tokenizers.getBundleValues(Tokenizers.COLORS_BUNDLE)) {
-                Token token = tokenizer.tokenize(null, null, substring);
+                Token token = tokenizer.tokenize(null, null, substring, false);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
                     chatColorTokens.add(token);

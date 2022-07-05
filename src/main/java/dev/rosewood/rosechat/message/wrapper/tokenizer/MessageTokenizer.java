@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
-import com.google.common.collect.Lists;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
@@ -26,15 +25,26 @@ public class MessageTokenizer {
     private final MessageWrapper messageWrapper;
     private final RoseSender viewer;
     private final List<Token> tokens;
+    private final boolean ignorePermissions;
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message) {
-        this(messageWrapper, viewer, message, Tokenizers.DEFAULT_BUNDLE);
+        this(messageWrapper, viewer, message, false, Tokenizers.DEFAULT_BUNDLE);
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, String... tokenizerBundles) {
         this.messageWrapper = messageWrapper;
         this.viewer = viewer;
         this.tokens = new ArrayList<>();
+        this.ignorePermissions = false;
+        this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
+        this.tokenize(this.parseReplacements(message));
+    }
+
+    public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
+        this.messageWrapper = messageWrapper;
+        this.viewer = viewer;
+        this.tokens = new ArrayList<>();
+        this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
         this.tokenize(this.parseReplacements(message));
     }
@@ -65,7 +75,7 @@ public class MessageTokenizer {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
-                Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring);
+                Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, this.ignorePermissions);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {

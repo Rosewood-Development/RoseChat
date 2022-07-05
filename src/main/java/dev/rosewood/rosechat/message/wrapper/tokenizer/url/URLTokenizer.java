@@ -15,13 +15,12 @@ import java.util.regex.Matcher;
 public class URLTokenizer implements Tokenizer<Token> {
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         if (input.startsWith("[")) {
             Matcher matcher = MessageUtils.URL_MARKDOWN_PATTERN.matcher(input);
             if (matcher.find()) {
                 String originalContent = input.substring(matcher.start(), matcher.end());
                 String content = matcher.group(1);
-
 
                 String url = matcher.group(2);
                 url = url.startsWith("http") ? url : "https://" + url;

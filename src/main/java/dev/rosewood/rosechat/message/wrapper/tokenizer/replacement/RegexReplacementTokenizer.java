@@ -14,14 +14,14 @@ import java.util.regex.Pattern;
 public class RegexReplacementTokenizer implements Tokenizer<Token> {
 
     @Override
-    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input) {
+    public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (!replacement.isRegex()) continue;
 
             String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-            if (messageWrapper.getLocation() != MessageLocation.NONE
+            if (!ignorePermissions && (messageWrapper.getLocation() != MessageLocation.NONE
                     && !messageWrapper.getSender().hasPermission("rosechat.replacements." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
-                    || !messageWrapper.getSender().hasPermission("rosechat.replacement." + replacement.getId())) continue;
+                    || !messageWrapper.getSender().hasPermission("rosechat.replacement." + replacement.getId()))) continue;
 
             Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
             if (matcher.find()) {
