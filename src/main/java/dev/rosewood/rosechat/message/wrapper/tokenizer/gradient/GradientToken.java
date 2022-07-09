@@ -22,7 +22,7 @@ public class GradientToken extends Token {
 
     @Override
     public boolean hasColorGenerator() {
-        return true;
+        return colors != null;
     }
 
 }

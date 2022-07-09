@@ -63,7 +63,7 @@ public class NicknameCommand extends AbstractCommand {
         if (this.isNicknameAllowed(player, nickname)) {
             RoseSender roseSender = new RoseSender(player);
 
-            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).validate().filterCaps().filterLanguage().filterURLs();
+            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
             if (!message.canBeSent()) {
                 if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
                 return;

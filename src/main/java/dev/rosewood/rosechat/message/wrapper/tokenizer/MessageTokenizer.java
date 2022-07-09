@@ -75,7 +75,7 @@ public class MessageTokenizer {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
-                Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, this.ignorePermissions);
+                Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, parent != null || this.ignorePermissions);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {

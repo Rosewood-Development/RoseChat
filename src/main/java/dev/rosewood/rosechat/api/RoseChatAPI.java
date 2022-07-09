@@ -84,7 +84,19 @@ public class RoseChatAPI {
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message) {
-        return new MessageWrapper(sender, MessageLocation.OTHER, null, message).parse(null, viewer);
+        return new MessageWrapper(sender, MessageLocation.NONE, null, message).parse(null, viewer);
+    }
+
+    /**
+     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * @param location The location that the chat message is in.
+     * @param sender The person sending the message.
+     * @param viewer The person receiving the message.
+     * @param message The string to parse.
+     * @return A {@link BaseComponent} consisting of the parsed message.
+     */
+    public BaseComponent[] parse(MessageLocation location, RoseSender sender, RoseSender viewer, String message) {
+        return new MessageWrapper(sender, location, null, message).parse(null, viewer);
     }
 
     /**

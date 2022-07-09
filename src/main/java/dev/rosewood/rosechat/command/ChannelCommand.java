@@ -43,7 +43,7 @@ public class ChannelCommand extends AbstractCommand {
 
             if (!channel.canSendMessage(roseSender, data, message)) return;
 
-            MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
+            MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
             if (!messageWrapper.canBeSent()) {
                 if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
                 return;

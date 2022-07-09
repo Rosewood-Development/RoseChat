@@ -66,102 +66,6 @@ public class MessageWrapper {
         this(new RoseSender(sender), messageLocation, group, message);
     }
 
-    /**
-     * Removes color codes instead of showing '&c' if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validateColors() {
-        if (this.sender.hasPermission("rosechat.color." + this.locationPermission)) return this;
-        Matcher matcher = MessageUtils.VALID_LEGACY_REGEX.matcher(this.message);
-        List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) toRemove.add(this.message.substring(matcher.start(), matcher.end()));
-        for (String s : toRemove) this.message = this.message.replace(s, "");
-
-        return this;
-    }
-
-    /**
-     * Removes formatting codes instead of showing '&l' if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validateFormatting() {
-        Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(this.message);
-        List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) {
-            if (!this.sender.hasPermission("rosechat.format." + this.locationPermission)) {
-                String code = this.message.substring(matcher.start(), matcher.end());
-                if (!code.endsWith("k")) toRemove.add(code);
-            }
-
-            if (!this.sender.hasPermission("rosechat.magic." + this.locationPermission)) {
-                String code = this.message.substring(matcher.start(), matcher.end());
-                if (code.endsWith("k")) toRemove.add(code);
-            }
-        }
-        for (String s : toRemove) this.message = this.message.replace(s, "");
-
-        return this;
-    }
-
-    /**
-     * Removes codes instead of showing them if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validateHex() {
-        Matcher matcher = MessageUtils.HEX_REGEX.matcher(this.message);
-        List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) {
-            String color = this.message.substring(matcher.start(), matcher.end());
-            if (this.sender.hasPermission("rosechat.hex." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
-            else toRemove.add(color);
-        }
-        for (String s : toRemove) this.message = this.message.replace(s, "");
-
-        return this;
-    }
-
-    /**
-     * Removes codes instead of showing them if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validateRainbow() {
-        Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(this.message);
-        List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) {
-            String color = this.message.substring(matcher.start(), matcher.end());
-            if (this.sender.hasPermission("rosechat.rainbow." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
-            else toRemove.add(color);
-        }
-        for (String s : toRemove) this.message = this.message.replace(s, "");
-
-        return this;
-    }
-
-    /**
-     * Removes codes instead of showing them if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validateGradient() {
-        Matcher matcher = MessageUtils.GRADIENT_PATTERN.matcher(this.message);
-        List<String> toRemove = new ArrayList<>();
-        while (matcher.find()) {
-            String color = this.message.substring(matcher.start(), matcher.end());
-            if (this.sender.hasPermission("rosechat.gradient." + this.locationPermission)) this.message = this.message.replace(color, color.toLowerCase());
-            else toRemove.add(color);
-        }
-        for (String s : toRemove) this.message = this.message.replace(s, "");
-
-        return this;
-    }
-
-    /**
-     * Removes codes instead of showing them if the player doesn't have permission.
-     * @return The MessageWrapper.
-     */
-    public MessageWrapper validate() {
-        return this.validateRainbow().validateGradient().validateColors().validateFormatting().validateHex();
-    }
-
     private boolean isCaps() {
         if (this.sender.hasPermission("rosechat.caps." + this.locationPermission)) return false;
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return false;
@@ -301,8 +205,14 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                String tokenizers = Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DISCORD_FORMATTING_BUNDLE : Tokenizers.DEFAULT_BUNDLE;
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, tokenizers).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                } else {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                }
+
                 return this.tokenized = componentBuilder.create();
             }
 
@@ -315,7 +225,13 @@ public class MessageWrapper {
             }
 
             if (format.contains("{message}")) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                } else {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                }
             }
 
             if (after != null && !after.isEmpty()) {
@@ -346,13 +262,14 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                /*MessageTokenizer tokenizer = new MessageTokenizer.Builder()
-                        .message(this).group(this.group).sender(this.sender)
-                        .viewer(viewer).location(this.location)
-                        .tokenizers(Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS)
-                        .tokenize(this.message);*/
+                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                } else {
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DEFAULT_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                }
 
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 return this.tokenized = componentBuilder.create();
             }
 

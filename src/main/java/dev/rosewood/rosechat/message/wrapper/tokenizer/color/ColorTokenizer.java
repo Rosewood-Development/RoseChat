@@ -14,9 +14,14 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
     @Override
     public ColorToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
-        if (legacyToken != null) return legacyToken;
+        if (legacyToken != null) return hasPermission(messageWrapper, ignorePermissions, "rosechat.color") ?
+                legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
 
-        return this.parseMatcher(MessageUtils.HEX_REGEX, input);
+        ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
+        if (hexToken != null) return hasPermission(messageWrapper, ignorePermissions, "rosechat.hex") ?
+                hexToken : new ColorToken(hexToken.getOriginalContent(), null);
+
+        return null;
     }
     
     private ColorToken parseMatcher(Pattern pattern, String input) {

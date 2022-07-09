@@ -78,7 +78,7 @@ public class MessageCommand extends AbstractCommand {
         if (!canBeMessaged.get()) return;
 
         RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.MESSAGE, null, message).validate().filter().applyDefaultColor();
+        MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
         if (!messageWrapper.canBeSent()) {
             if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
             return;

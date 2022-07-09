@@ -23,7 +23,7 @@ public class ColorToken extends Token {
 
     @Override
     public boolean hasColorGenerator() {
-        return true;
+        return this.color != null;
     }
 
     public static class SolidColor implements HexUtils.ColorGenerator {

@@ -208,7 +208,7 @@ public class ChatChannel implements Group {
     public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         BaseComponent[] components = ComponentSerializer.parse(jsonMessage);
-        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).validate().filter().applyDefaultColor();
+        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
 
         // Send the message to the channel spies.
         for (UUID uuid : api.getDataManager().getChannelSpies()) {

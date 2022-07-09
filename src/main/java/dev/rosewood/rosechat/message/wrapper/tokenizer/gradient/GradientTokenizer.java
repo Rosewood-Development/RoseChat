@@ -20,7 +20,9 @@ public class GradientTokenizer implements Tokenizer<GradientToken> {
                     .map(x -> x.length() != 4 ? x : String.format("#%s%s%s%s%s%s", x.charAt(1), x.charAt(1), x.charAt(2), x.charAt(2), x.charAt(3), x.charAt(3)))
                     .map(Color::decode)
                     .collect(Collectors.toList());
-            return new GradientToken(input.substring(matcher.start(), matcher.end()), hexSteps);
+            String content = input.substring(matcher.start(), matcher.end());
+            return hasPermission(messageWrapper, ignorePermissions, "rosechat.gradient") ?
+                    new GradientToken(content, hexSteps) : new GradientToken(content, null);
         }
 
         return null;

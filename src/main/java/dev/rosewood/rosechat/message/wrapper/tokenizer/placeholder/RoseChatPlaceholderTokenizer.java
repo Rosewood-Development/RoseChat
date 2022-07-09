@@ -11,6 +11,8 @@ import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Bukkit;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +27,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
         Matcher matcher = RC_PATTERN.matcher(input);
         if (matcher.find()) {
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
-            String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-            if (!ignorePermissions && (messageWrapper.getLocation() != MessageLocation.NONE
-                    && !messageWrapper.getSender().hasPermission("rosechat.placeholders." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
-                    || !messageWrapper.getSender().hasPermission("rosechat.placeholder.rosechat." + placeholder))) return null;
+            if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             CustomPlaceholder customPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(originalContent.substring(1, originalContent.length() - 1));

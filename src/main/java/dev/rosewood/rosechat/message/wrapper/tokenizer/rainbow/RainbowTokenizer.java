@@ -4,6 +4,8 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
+
 import java.util.regex.Matcher;
 
 public class RainbowTokenizer implements Tokenizer<RainbowToken> {
@@ -31,7 +33,8 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
                 } catch (NumberFormatException ignored) { }
             }
 
-            return new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness);
+            return hasPermission(messageWrapper, ignorePermissions, "rosechat.rainbow") ?
+                    new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f);
         }
 
         return null;

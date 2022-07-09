@@ -36,7 +36,7 @@ public class RenameGroupCommand extends AbstractCommand {
         if (!MessageUtils.canColor(sender, name, "group")) return;
 
         RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).validate().filterLanguage().filterCaps().filterURLs();
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();
 
         if (!message.canBeSent()) {
             if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);

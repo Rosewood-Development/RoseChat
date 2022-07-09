@@ -22,7 +22,7 @@ public class RainbowToken extends Token {
 
     @Override
     public boolean hasColorGenerator() {
-        return true;
+        return this.saturation != 0.0f && this.brightness != 0.0f;
     }
 
 }

@@ -43,7 +43,7 @@ public class CustomCommand extends Command {
                     if (roseSender.isPlayer() && roseSender.getUUID() != null) data = RoseChatAPI.getInstance().getPlayerData(roseSender.getUUID());
                     if (!channel.canSendMessage(roseSender, data, message)) return false;
 
-                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).validate().filter().applyDefaultColor();
+                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
                     if (!messageWrapper.canBeSent()) {
                         if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
                         return true;

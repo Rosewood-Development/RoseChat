@@ -22,8 +22,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
         if (matcher.find()) {
             String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
-            String groupPermission = messageWrapper.getGroup() == null ? "" : "." + messageWrapper.getGroup().getLocationPermission();
-            if (!ignorePermissions && ((messageWrapper.getLocation() != MessageLocation.NONE && !messageWrapper.getSender().hasPermission("rosechat.placeholders." + messageWrapper.getLocation().toString().toLowerCase() + groupPermission)) || !messageWrapper.getSender().hasPermission("rosechat.placeholder." + placeholderPermission))) return null;
+            if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission)) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             String content = originalContent.startsWith("%other_") ?

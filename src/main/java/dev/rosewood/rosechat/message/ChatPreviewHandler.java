@@ -66,7 +66,7 @@ public class ChatPreviewHandler {
                         ChatChannel channel = data.getCurrentChannel();
                         RoseSender sender = new RoseSender(player);
 
-                        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message).applyDefaultColor();
+                        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
                         chatPreviewPacket.getChatComponents().write(0, WrappedChatComponent.fromJson(ComponentSerializer.toString(messageWrapper.parse(channel.getFormat(), sender))));
                         protocolManager.sendServerPacket(player, chatPreviewPacket);
                     });

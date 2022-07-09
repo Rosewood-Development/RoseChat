@@ -38,7 +38,7 @@ public class ChatListener implements Listener {
 
             if (!channel.canSendMessage(sender, data, event.getMessage())) return;
 
-            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).validate().filter().applyDefaultColor();
+            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
             if (!message.canBeSent()) {
                 if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
                 return;

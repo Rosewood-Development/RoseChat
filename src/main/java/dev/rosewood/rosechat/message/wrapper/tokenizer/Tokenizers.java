@@ -26,6 +26,7 @@ public class Tokenizers {
 
     public static final String DEFAULT_BUNDLE = "default";
     public static final String COLORS_BUNDLE = "colors";
+    public static final String DISCORD_FORMATTING_BUNDLE = "discord";
 
     private static final Multimap<String, TokenizerEntry<?>> TOKENIZERS = MultimapBuilder.hashKeys().arrayListValues().build();
 
