@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -11,8 +10,6 @@ import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.bukkit.Bukkit;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

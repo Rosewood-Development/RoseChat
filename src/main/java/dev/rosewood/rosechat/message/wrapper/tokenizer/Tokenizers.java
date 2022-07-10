@@ -6,6 +6,8 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterTokeni
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.DiscordChannelTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
@@ -30,6 +32,9 @@ public class Tokenizers {
 
     private static final Multimap<String, TokenizerEntry<?>> TOKENIZERS = MultimapBuilder.hashKeys().arrayListValues().build();
 
+    public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_MULTICODE = register("discord_multicode", new DiscordMultiCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_CODE = register("discord_code", new DiscordCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<RainbowToken> RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
