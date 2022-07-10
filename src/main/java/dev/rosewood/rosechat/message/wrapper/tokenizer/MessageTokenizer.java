@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,8 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
 
@@ -111,8 +114,9 @@ public class MessageTokenizer {
 
         // Appends an empty string to always have something in the component.
         if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
-        return componentBuilder.create();
-        //return ComponentSimplifier.simplify(components);
+        BaseComponent[] components = ComponentSimplifier.simplify(componentBuilder.create());
+        Bukkit.getLogger().info(ComponentSerializer.toString(components));
+        return components;
     }
 
     public void toComponents(ComponentBuilder componentBuilder, FormattedColorGenerator colorGenerator, List<Token> tokens) {
@@ -168,7 +172,7 @@ public class MessageTokenizer {
                 // Make sure to apply the color even if there's no content
                 if (token.getContent().isEmpty()) {
                     componentBuilder.append("");
-                    colorGenerator.apply(componentBuilder);
+                    colorGenerator.apply(componentBuilder, false);
                     continue;
                 }
 
@@ -176,7 +180,7 @@ public class MessageTokenizer {
                     componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE)
                             .font(token.getEffectiveFont());
 
-                    colorGenerator.apply(componentBuilder);
+                    colorGenerator.apply(componentBuilder, Character.isSpaceChar(c));
 
                     if (token.getHover() != null) {
                         if (token.getHoverChildren().isEmpty()) {

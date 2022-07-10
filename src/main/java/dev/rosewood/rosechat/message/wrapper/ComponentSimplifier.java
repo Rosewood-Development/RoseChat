@@ -4,7 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.Collection;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Content;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ComponentSimplifier {
@@ -25,6 +28,15 @@ public class ComponentSimplifier {
 
     private static void removeUselessBits(BaseComponent[] components) {
         for (BaseComponent component : components) {
+            if (component.getExtra() != null)
+                removeUselessBits(component.getExtra());
+
+            if (component.getHoverEvent() != null) {
+                BaseComponent[] hoverContent = component.getHoverEvent().getValue();
+                removeUselessBits(hoverContent);
+                component.setHoverEvent(new HoverEvent(component.getHoverEvent().getAction(), hoverContent));
+            }
+
             if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
             if (!component.isBold()) component.setBold(null);
             if (!component.isItalic()) component.setItalic(null);
@@ -32,7 +44,26 @@ public class ComponentSimplifier {
             if (!component.isStrikethrough()) component.setStrikethrough(null);
             if (!component.isObfuscated()) component.setObfuscated(null);
         }
+    }
 
+    private static void removeUselessBits(Collection<BaseComponent> components) {
+        for (BaseComponent component : components) {
+            if (component.getExtra() != null)
+                removeUselessBits(component.getExtra());
+
+            if (component.getHoverEvent() != null) {
+                BaseComponent[] hoverContent = component.getHoverEvent().getValue();
+                removeUselessBits(hoverContent);
+                component.setHoverEvent(new HoverEvent(component.getHoverEvent().getAction(), hoverContent));
+            }
+
+            if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
+            if (!component.isBold()) component.setBold(null);
+            if (!component.isItalic()) component.setItalic(null);
+            if (!component.isUnderlined()) component.setUnderlined(null);
+            if (!component.isStrikethrough()) component.setStrikethrough(null);
+            if (!component.isObfuscated()) component.setObfuscated(null);
+        }
     }
 
     private static BaseComponent[] compress(BaseComponent[] components) {
@@ -55,6 +86,17 @@ public class ComponentSimplifier {
         int index = 0;
         for (JsonElement textElement : textArray) {
             JsonObject textObject = textElement.getAsJsonObject();
+
+            // Compress hoverEvent
+            if (textObject.has("hoverEvent")) {
+                JsonObject hoverEventObject = textObject.getAsJsonObject("hoverEvent");
+                String action = hoverEventObject.get("action").getAsString();
+                if (action.equals("show_text")) {
+                    JsonArray hoverTextArray = hoverEventObject.getAsJsonArray("value");
+                    hoverTextArray = compressText(hoverTextArray);
+                    hoverEventObject.add("value", hoverTextArray);
+                }
+            }
 
             if (previous != null && previous.has("text") && textObject.has("text")) {
                 if (isSimilar(previous, textObject)) {

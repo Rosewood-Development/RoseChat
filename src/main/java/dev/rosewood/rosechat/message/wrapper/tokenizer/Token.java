@@ -116,9 +116,9 @@ public class Token {
         for (Token token : futureTokens) {
             if (!token.hasColorGenerator() || token == this) {
                 if (token.getChildren().isEmpty()) {
-                    contentLength += token.getContent().length();
+                    contentLength += token.getContent().replaceAll("\\s+", "").length();
                 } else if (token.getChildren().stream().noneMatch(x -> x.getColorGenerator(futureTokens) != null)) {
-                    contentLength += token.getChildren().stream().mapToInt(x -> x.getContent().length()).sum();
+                    contentLength += token.getChildren().stream().mapToInt(x -> x.getContent().replaceAll("\\s+", "").length()).sum();
                 }
             } else break;
         }

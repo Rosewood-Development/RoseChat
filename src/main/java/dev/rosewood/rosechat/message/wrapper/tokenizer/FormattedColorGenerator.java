@@ -1,12 +1,14 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer;
 
 import dev.rosewood.rosegarden.utils.HexUtils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class FormattedColorGenerator {
 
     private final HexUtils.ColorGenerator colorGenerator;
     private boolean obfuscated, bold, strikethrough, underline, italic;
+    private ChatColor previousColor;
 
     public FormattedColorGenerator(HexUtils.ColorGenerator colorGenerator) {
         this.colorGenerator = colorGenerator;
@@ -45,9 +47,13 @@ public class FormattedColorGenerator {
         this.italic = true;
     }
 
-    public void apply(ComponentBuilder componentBuilder) {
-        if (this.colorGenerator != null)
-            componentBuilder.color(this.colorGenerator.nextChatColor());
+    public void apply(ComponentBuilder componentBuilder, boolean copyPrevious) {
+        if (this.colorGenerator != null) {
+            ChatColor chatColor = copyPrevious ? this.previousColor : this.colorGenerator.nextChatColor();
+            componentBuilder.color(chatColor);
+            if (!copyPrevious)
+                this.previousColor = chatColor;
+        }
         componentBuilder.obfuscated(this.obfuscated);
         componentBuilder.bold(this.bold);
         componentBuilder.strikethrough(this.strikethrough);
