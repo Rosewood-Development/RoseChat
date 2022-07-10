@@ -114,9 +114,7 @@ public class MessageTokenizer {
 
         // Appends an empty string to always have something in the component.
         if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
-        BaseComponent[] components = ComponentSimplifier.simplify(componentBuilder.create());
-        Bukkit.getLogger().info(ComponentSerializer.toString(components));
-        return components;
+        return ComponentSimplifier.simplify(componentBuilder.create());
     }
 
     public void toComponents(ComponentBuilder componentBuilder, FormattedColorGenerator colorGenerator, List<Token> tokens) {

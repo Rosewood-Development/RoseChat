@@ -31,11 +31,11 @@ import org.bukkit.entity.Player;
 public class MessageUtils {
 
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-    public static final Pattern DISCORD_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z0-9_\\-~]+):[0-9]{18}>");
+    public static final Pattern DISCORD_EMOJI_PATTERN = Pattern.compile("<a?:([a-zA-Z0-9_\\-~]+):[0-9]{18,19}>");
     public static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z_]+):");
-    public static final Pattern DISCORD_CHANNEL_PATTERN = Pattern.compile("<#([0-9]{18})>");
-    public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18})>");
-    public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18})>");
+    public static final Pattern DISCORD_CHANNEL_PATTERN = Pattern.compile("<#([0-9]{18,19})>");
+    public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18,19})>");
+    public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18,19})>");
     public static final Pattern URL_MARKDOWN_PATTERN = Pattern.compile("\\[(.+)\\]\\(((http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))\\)");
 
     public static final Pattern DISCORD_BOLD_MARKDOWN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");

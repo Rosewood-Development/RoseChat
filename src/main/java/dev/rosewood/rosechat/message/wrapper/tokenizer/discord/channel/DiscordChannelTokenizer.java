@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
@@ -29,7 +30,7 @@ public class DiscordChannelTokenizer implements Tokenizer<Token> {
             String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();
 
             return new Token(new Token.TokenSettings(originalContent).content(content).hover("HOVER").click("CLICK").hoverAction(HoverEvent.Action.SHOW_TEXT).clickAction(ClickEvent.Action.OPEN_URL)
-                    .placeholder("server_id", serverId).placeholder("channel_id", matcher.group(1)).placeholder("channel_name", channelName).ignoreTokenizer(this));
+                    .placeholder("server_id", serverId).placeholder("channel_id", matcher.group(1)).placeholder("channel_name", channelName).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG));
         }
 
         return null;
