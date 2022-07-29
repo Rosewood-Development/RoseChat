@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.command;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
@@ -7,10 +9,14 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -61,19 +67,9 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         if (this.isNicknameAllowed(player, nickname)) {
-            RoseSender roseSender = new RoseSender(player);
+            setDisplayName(player, nickname);
 
-            MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
-            if (!message.canBeSent()) {
-                if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
-                return;
-            }
-
-            // Reset colour & formatting so uncoloured names don't take colour from previous words.
-            nickname = "&f&r" + nickname + "&f&r";
-            player.setDisplayName(nickname);
             playerData.setNickname(nickname);
-
             playerData.save();
 
             if (target == null) {
@@ -84,6 +80,31 @@ public class NicknameCommand extends AbstractCommand {
                         StringPlaceholders.builder("name", nickname).addPlaceholder("player", player.getName()).build());
             }
         }
+    }
+
+    public static void setDisplayName(Player player, String nickname) {
+        RoseSender roseSender = new RoseSender(player);
+
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).validate().filterCaps().filterLanguage().filterURLs();
+        if (!message.canBeSent()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
+            return;
+        }
+
+        // Remove emojis from the display name.
+        String displayName = nickname;
+        for (ChatReplacement replacement : RoseChatAPI.getInstance().getEmojis()) {
+            if (!displayName.contains(replacement.getText()) || replacement.getFont() == null || replacement.getFont().equals("default")) continue;
+            displayName = displayName.replace(replacement.getText(), "").trim();
+        }
+
+        BaseComponent[] nicknameComponent = new MessageTokenizer.Builder()
+                .message(message).group(null).sender(roseSender)
+                .viewer(roseSender).location(MessageLocation.NICKNAME)
+                .tokenizers(ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS)
+                .tokenize(displayName).toComponents();
+
+        player.setDisplayName(TextComponent.toLegacyText(nicknameComponent));
     }
 
     @Override

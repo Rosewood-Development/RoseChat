@@ -30,6 +30,11 @@ public class ChatColorCommand extends AbstractCommand {
         }
 
         String color = args[0];
+        if (color.equalsIgnoreCase("remove")) {
+            playerData.setColor("");
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-removed");
+            return;
+        }
 
         if (!MessageUtils.canColor(sender, color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
 
@@ -41,14 +46,24 @@ public class ChatColorCommand extends AbstractCommand {
 
         String colorStr = color;
         colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : colorStr;
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-color-success", StringPlaceholders.single("color", ChatColor.stripColor(color + colorStr)));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.single("color", ChatColor.stripColor(color + colorStr)));
         playerData.setColor(color);
         playerData.save();
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        List<String> tab = new ArrayList<>();
+        if (args.length == 1) {
+            tab.add("remove");
+            if (sender.hasPermission("rosechat.color.chatcolor")) tab.add("&a");
+            if (sender.hasPermission("rosechat.format.chatcolor")) tab.add("&l");
+            if (sender.hasPermission("rosechat.hex.chatcolor")) tab.add("#FFFFFF");
+            if (sender.hasPermission("rosechat.rainbow.chatcolor")) tab.add("<r:0.5>");
+            if (sender.hasPermission("rosechat.gradient.chatcolor")) tab.add("<g:#FFFFFF:#000000>");
+        }
+
+        return tab;
     }
 
     @Override
