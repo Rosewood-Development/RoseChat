@@ -85,7 +85,7 @@ public class NicknameCommand extends AbstractCommand {
     public static void setDisplayName(Player player, String nickname) {
         RoseSender roseSender = new RoseSender(player);
 
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).validate().filterCaps().filterLanguage().filterURLs();
+        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
         if (!message.canBeSent()) {
             if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
             return;
@@ -98,11 +98,8 @@ public class NicknameCommand extends AbstractCommand {
             displayName = displayName.replace(replacement.getText(), "").trim();
         }
 
-        BaseComponent[] nicknameComponent = new MessageTokenizer.Builder()
-                .message(message).group(null).sender(roseSender)
-                .viewer(roseSender).location(MessageLocation.NICKNAME)
-                .tokenizers(ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS)
-                .tokenize(displayName).toComponents();
+        String[] bundles = ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? new String[] { Tokenizers.DEFAULT_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE } : new String[] { Tokenizers.DEFAULT_BUNDLE };
+        BaseComponent[] nicknameComponent = new MessageTokenizer(message, roseSender, displayName, bundles).toComponents();
 
         player.setDisplayName(TextComponent.toLegacyText(nicknameComponent));
     }
