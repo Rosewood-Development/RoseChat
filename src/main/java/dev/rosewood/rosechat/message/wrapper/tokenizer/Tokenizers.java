@@ -8,6 +8,8 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.DiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
@@ -29,12 +31,16 @@ public class Tokenizers {
     public static final String DEFAULT_BUNDLE = "default";
     public static final String COLORS_BUNDLE = "colors";
     public static final String DISCORD_FORMATTING_BUNDLE = "discord";
+    public static final String TO_DISCORD_BUNDLE = "to_discord";
+    public static final String FROM_DISCORD_BUNDLE = "from_discord";
 
     private static final Multimap<String, TokenizerEntry<?>> TOKENIZERS = MultimapBuilder.hashKeys().arrayListValues().build();
 
-    public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_MULTICODE = register("discord_multicode", new DiscordMultiCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CODE = register("discord_code", new DiscordCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_CUSTOM_EMOJI = register("discord_custom_emoji", new DiscordCustomEmojiTokenizer(), TO_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<RainbowToken> RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);

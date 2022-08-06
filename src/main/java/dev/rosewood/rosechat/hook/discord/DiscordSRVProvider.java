@@ -168,7 +168,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     @Override
     public String getCustomEmoji(String name) {
         List<Emote> emotes = this.discord.getMainGuild().getEmotesByName(name, true);
-        return (emotes == null || emotes.isEmpty()) ? null : emotes.get(0).getAsMention();
+        return (emotes == null || emotes.isEmpty()) ? ":" + name + ":" : emotes.get(0).getAsMention();
     }
 
     @Override
