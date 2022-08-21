@@ -90,7 +90,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 PlayerData data = this.api.getPlayerData(player.getUniqueId());
-                createMessage(message, player, data.getNickname(), channel, placeholders, update, updateFor);
+                createMessage(message, player, data.getNickname() == null ? player.getDisplayName() : data.getNickname(), channel, placeholders, update, updateFor);
                 return;
             }
 

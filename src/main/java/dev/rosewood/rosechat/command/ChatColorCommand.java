@@ -32,6 +32,7 @@ public class ChatColorCommand extends AbstractCommand {
         String color = args[0];
         if (color.equalsIgnoreCase("remove")) {
             playerData.setColor("");
+            playerData.save();
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-removed");
             return;
         }
@@ -45,7 +46,9 @@ public class ChatColorCommand extends AbstractCommand {
         }
 
         String colorStr = color;
-        colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : colorStr;
+        colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : (colorStr.startsWith("<g") ?
+                this.getAPI().getLocaleManager().getMessage("command-color-gradient") : colorStr.startsWith("<r:") ?
+                this.getAPI().getLocaleManager().getMessage("command-color-rainbow") : colorStr);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.single("color", ChatColor.stripColor(color + colorStr)));
         playerData.setColor(color);
         playerData.save();

@@ -19,8 +19,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
 
@@ -40,7 +38,7 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = false;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.tokenize(this.parseReplacements(message));
+        this.tokenize(message);
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
@@ -49,7 +47,7 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.tokenize(this.parseReplacements(message));
+        this.tokenize(message);
     }
 
     private String parseReplacements(String message) {

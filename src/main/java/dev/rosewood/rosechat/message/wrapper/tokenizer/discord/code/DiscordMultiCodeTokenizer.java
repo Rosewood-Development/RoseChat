@@ -11,7 +11,7 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions,"rosechat.discord")) return null;
+        if (!hasPermission(messageWrapper, ignorePermissions,"rosechat.discordmulticode")) return null;
         if (!input.startsWith("```")) return null;
         int lastIndex = 0;
 

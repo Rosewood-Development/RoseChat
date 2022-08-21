@@ -10,16 +10,25 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeT
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.FromDiscordSpoilerTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.FromDiscordTagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.markdown.MarkdownBoldTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.markdown.MarkdownItalicTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.markdown.MarkdownStrikethroughTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.markdown.MarkdownUnderlineTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.ReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import java.util.Collections;
@@ -36,9 +45,13 @@ public class Tokenizers {
 
     private static final Multimap<String, TokenizerEntry<?>> TOKENIZERS = MultimapBuilder.hashKeys().arrayListValues().build();
 
+    public static final Tokenizer<Token> TO_DISCORD_SPOILER = register("to_discord_spoiler", new ToDiscordSpoilerTokenizer(), TO_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> FROM_DISCORD_SPOILER = register("from_discord_spoiler", new FromDiscordSpoilerTokenizer(), FROM_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> FROM_DISCORD_TAG = register("from_discord_tag", new FromDiscordTagTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_MULTICODE = register("discord_multicode", new DiscordMultiCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CODE = register("discord_code", new DiscordCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_QUOTE = register("discord_quote", new DiscordQuoteTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CUSTOM_EMOJI = register("discord_custom_emoji", new DiscordCustomEmojiTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
@@ -51,6 +64,7 @@ public class Tokenizers {
     public static final Tokenizer<Token> EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE);
+    public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE);
 
     public static List<Tokenizer<?>> getBundleValues(String bundle) {

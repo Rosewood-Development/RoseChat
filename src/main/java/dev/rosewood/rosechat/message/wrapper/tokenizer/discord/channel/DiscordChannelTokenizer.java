@@ -11,14 +11,15 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-
 import java.util.regex.Matcher;
 
 public class DiscordChannelTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
+        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.discordchannel")) return null;
         if (!input.startsWith("<")) return null;
+
         Matcher matcher = MessageUtils.DISCORD_CHANNEL_PATTERN.matcher(input);
         if (matcher.find()) {
             String originalContent = input.substring(matcher.start(), matcher.end());
@@ -29,7 +30,7 @@ public class DiscordChannelTokenizer implements Tokenizer<Token> {
             String serverId = discord.getServerId();
             String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();
 
-            return new Token(new Token.TokenSettings(originalContent).content(content).hover("HOVER").click("CLICK").hoverAction(HoverEvent.Action.SHOW_TEXT).clickAction(ClickEvent.Action.OPEN_URL)
+            return new Token(new Token.TokenSettings(originalContent).content(content).hoverAction(HoverEvent.Action.SHOW_TEXT).clickAction(ClickEvent.Action.OPEN_URL)
                     .placeholder("server_id", serverId).placeholder("channel_id", matcher.group(1)).placeholder("channel_name", channelName).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG));
         }
 

@@ -1,7 +1,7 @@
 ﻿# When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
-# These can be used for custom colour codes, general replacements or regular expressions.
+# These can be used for custom color codes, general replacements or regular expressions.
 # These replacements can be used with placeholders in placeholder.yml.
-# Emoji's can be defined in the emojis.yml, as they are parsed separately from replacements.
+# Emojis can be defined in the emojis.yml, as they are parsed separately from replacements.
 # Check the wiki for more information:
 rainbow:
   text: "&h"

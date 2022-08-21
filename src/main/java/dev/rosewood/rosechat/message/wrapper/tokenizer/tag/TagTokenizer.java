@@ -13,6 +13,8 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -84,7 +86,7 @@ public class TagTokenizer implements Tokenizer<Token> {
         content = placeholders.apply(placeholder.getText().parse(wrapper.getSender(), placeholderViewer, placeholders));
         if (tag.shouldMatchLength()) {
             if (hover != null) {
-                String colorlessHover = ChatColor.stripColor(HexUtils.colorify(hover));
+                String colorlessHover = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(wrapper.getSender(), viewer, hover));
                 for (int i = 0; i < colorlessHover.length(); i++) contentBuilder.append(content);
             }
         } else {

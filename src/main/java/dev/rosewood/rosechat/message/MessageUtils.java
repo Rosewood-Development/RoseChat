@@ -37,11 +37,10 @@ public class MessageUtils {
     public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18,19})>");
     public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18,19})>");
     public static final Pattern URL_MARKDOWN_PATTERN = Pattern.compile("\\[(.+)\\]\\(((http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))\\)");
-
-    public static final Pattern DISCORD_BOLD_MARKDOWN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
-    public static final Pattern DISCORD_UNDERLINE_MARKDOWN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
-    public static final Pattern DISCORD_ITALIC_MARKDOWN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
-    public static final Pattern DISCORD_STRIKETHROUGH_MARKDOWN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
+    public static final Pattern BOLD_MARKDOWN_PATTERN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
+    public static final Pattern UNDERLINE_MARKDOWN_PATTERN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
+    public static final Pattern ITALIC_MARKDOWN_PATTERN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
+    public static final Pattern STRIKETHROUGH_MARKDOWN_PATTERN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");

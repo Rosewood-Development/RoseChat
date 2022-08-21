@@ -7,14 +7,13 @@ import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
-import org.bukkit.Bukkit;
-
 import java.util.regex.Matcher;
 
 public class DiscordCustomEmojiTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
+        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.discordemoji")) return null;
         if (!input.startsWith(":")) return null;
         Matcher matcher = MessageUtils.EMOJI_PATTERN.matcher(input);
         if (matcher.find()) {
