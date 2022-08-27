@@ -10,7 +10,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
 import java.util.regex.Matcher;
 
 public class FromDiscordTagTokenizer implements Tokenizer<Token> {

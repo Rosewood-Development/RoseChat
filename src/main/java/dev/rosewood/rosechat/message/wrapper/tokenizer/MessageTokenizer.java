@@ -38,7 +38,7 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = false;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.tokenize(message);
+        this.tokenize(parseReplacements(message));
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
@@ -47,12 +47,13 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.tokenize(message);
+        this.tokenize(parseReplacements(message));
     }
 
     private String parseReplacements(String message) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
+            if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
             String groupPermission = this.messageWrapper.getGroup() == null ? "" : "." + this.messageWrapper.getGroup().getLocationPermission();
             if (this.messageWrapper.getLocation() != MessageLocation.NONE
                     && !this.messageWrapper.getSender().hasPermission("rosechat.replacements." + this.messageWrapper.getLocation().toString().toLowerCase() + groupPermission)
