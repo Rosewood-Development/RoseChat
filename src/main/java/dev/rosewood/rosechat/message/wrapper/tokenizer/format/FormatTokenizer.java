@@ -16,9 +16,10 @@ public class FormatTokenizer implements Tokenizer<FormatToken> {
             String match = input.substring(matcher.start(), matcher.end());
             if (input.startsWith(match)) {
                 String content = input.substring(matcher.start(), matcher.end());
-                return (content.contains("k") ?
-                        hasPermission(messageWrapper, ignorePermissions, "rosechat.magic") : hasPermission(messageWrapper, ignorePermissions, "rosechat.format")) ?
-                        new FormatToken(content, ChatColor.getByChar(content.charAt(1))) : new FormatToken(content, null);
+                char formatCharacter = content.charAt(1);
+                char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
+                boolean hasPermission = hasPermission(messageWrapper, ignorePermissions, formatCharacterLowercase == 'k' ? "rosechat.magic" : "rosechat.format");
+                return hasPermission ? new FormatToken(content, ChatColor.getByChar(formatCharacterLowercase), Character.isLowerCase(formatCharacter)) : new FormatToken(content, null);
             }
         }
         return null;

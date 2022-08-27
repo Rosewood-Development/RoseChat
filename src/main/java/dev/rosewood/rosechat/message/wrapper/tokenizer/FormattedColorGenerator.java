@@ -15,36 +15,31 @@ public class FormattedColorGenerator {
     }
 
     public void copyFormatsTo(FormattedColorGenerator colorGenerator) {
-        if (this.obfuscated)
-            colorGenerator.obfuscated();
-        if (this.bold)
-            colorGenerator.bold();
-        if (this.strikethrough)
-            colorGenerator.strikethrough();
-        if (this.underline)
-            colorGenerator.underline();
-        if (this.italic)
-            colorGenerator.italic();
+        colorGenerator.obfuscated(this.obfuscated);
+        colorGenerator.bold(this.bold);
+        colorGenerator.strikethrough(this.strikethrough);
+        colorGenerator.underline(this.underline);
+        colorGenerator.italic(this.italic);
     }
 
-    public void obfuscated() {
-        this.obfuscated = true;
+    public void obfuscated(boolean value) {
+        this.obfuscated = value;
     }
 
-    public void bold() {
-        this.bold = true;
+    public void bold(boolean value) {
+        this.bold = value;
     }
 
-    public void strikethrough() {
-        this.strikethrough = true;
+    public void strikethrough(boolean value) {
+        this.strikethrough = value;
     }
 
-    public void underline() {
-        this.underline = true;
+    public void underline(boolean value) {
+        this.underline = value;
     }
 
-    public void italic() {
-        this.italic = true;
+    public void italic(boolean value) {
+        this.italic = value;
     }
 
     public void apply(ComponentBuilder componentBuilder, boolean copyPrevious) {

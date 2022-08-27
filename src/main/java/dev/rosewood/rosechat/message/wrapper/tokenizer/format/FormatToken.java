@@ -7,29 +7,36 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import java.util.ArrayList;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 public class FormatToken extends Token {
 
     private final ChatColor format;
+    private final boolean value;
 
-    public FormatToken(String originalText, ChatColor format) {
+    public FormatToken(String originalText, ChatColor format, boolean value) {
         super(new TokenSettings(originalText).content(""));
 
         this.format = format;
+        this.value = value;
+    }
+
+    public FormatToken(String originalText, ChatColor format) {
+        this(originalText, format, true);
     }
 
     @Override
     public FormattedColorGenerator applyFormatCodes(FormattedColorGenerator colorGenerator, String baseColor, List<Token> futureTokens) {
         if (this.format == ChatColor.MAGIC) {
-            colorGenerator.obfuscated();
+            colorGenerator.obfuscated(this.value);
         } else if (this.format == ChatColor.BOLD) {
-            colorGenerator.bold();
+            colorGenerator.bold(this.value);
         } else if (this.format == ChatColor.STRIKETHROUGH) {
-            colorGenerator.strikethrough();
+            colorGenerator.strikethrough(this.value);
         } else if (this.format == ChatColor.UNDERLINE) {
-            colorGenerator.underline();
+            colorGenerator.underline(this.value);
         } else if (this.format == ChatColor.ITALIC) {
-            colorGenerator.italic();
+            colorGenerator.italic(this.value);
         } else if (this.format == ChatColor.RESET) {
             return this.getPlayerChatColor(baseColor, futureTokens);
         }
@@ -64,15 +71,15 @@ public class FormatToken extends Token {
             } else if (token.hasFormatCodes() && token instanceof FormatToken) {
                 FormatToken formatToken = (FormatToken) token;
                 if (formatToken.format == ChatColor.MAGIC) {
-                    colorGenerator.obfuscated();
+                    colorGenerator.obfuscated(formatToken.value);
                 } else if (formatToken.format == ChatColor.BOLD) {
-                    colorGenerator.bold();
+                    colorGenerator.bold(formatToken.value);
                 } else if (formatToken.format == ChatColor.STRIKETHROUGH) {
-                    colorGenerator.strikethrough();
+                    colorGenerator.strikethrough(formatToken.value);
                 } else if (formatToken.format == ChatColor.UNDERLINE) {
-                    colorGenerator.underline();
+                    colorGenerator.underline(formatToken.value);
                 } else if (formatToken.format == ChatColor.ITALIC) {
-                    colorGenerator.italic();
+                    colorGenerator.italic(formatToken.value);
                 } else if (formatToken.format == ChatColor.RESET) {
                     colorGenerator = new FormattedColorGenerator(null);
                 }

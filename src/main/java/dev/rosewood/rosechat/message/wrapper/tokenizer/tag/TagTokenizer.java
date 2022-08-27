@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 
 public class TagTokenizer implements Tokenizer<Token> {
 
+    private final static String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
+
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
@@ -134,7 +136,7 @@ public class TagTokenizer implements Tokenizer<Token> {
             int playerChar = Character.toUpperCase(playerName.codePointAt(j));
             if (inputChar == playerChar) {
                 matchLength++;
-            } else if (i > 0 && (Character.isSpaceChar(inputChar) || Pattern.matches("[\\p{P}\\p{S}]", String.valueOf(Character.toChars(inputChar))))) {
+            } else if (i > 0 && (Character.isSpaceChar(inputChar) || Pattern.matches(PUNCTUATION_REGEX, String.valueOf(Character.toChars(inputChar))))) {
                 return matchLength;
             } else {
                 return -1;
