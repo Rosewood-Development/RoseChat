@@ -8,20 +8,16 @@ import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class TagTokenizer implements Tokenizer<Token> {
-
-    private final static String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
@@ -103,7 +99,7 @@ public class TagTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction).ignoreTokenizer(this));
     }
 
-    public DetectedPlayer matchPartialPlayer(String input) {
+    private DetectedPlayer matchPartialPlayer(String input) {
         // Check displaynames first
         for (Player player : Bukkit.getOnlinePlayers()) {
             int matchLength = this.getMatchLength(input, ChatColor.stripColor(player.getDisplayName()));
@@ -136,7 +132,7 @@ public class TagTokenizer implements Tokenizer<Token> {
             int playerChar = Character.toUpperCase(playerName.codePointAt(j));
             if (inputChar == playerChar) {
                 matchLength++;
-            } else if (i > 0 && (Character.isSpaceChar(inputChar) || Pattern.matches(PUNCTUATION_REGEX, String.valueOf(Character.toChars(inputChar))))) {
+            } else if (i > 0 && (Character.isSpaceChar(inputChar) || Pattern.matches(MessageUtils.PUNCTUATION_REGEX, String.valueOf(Character.toChars(inputChar))))) {
                 return matchLength;
             } else {
                 return -1;

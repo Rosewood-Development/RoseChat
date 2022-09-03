@@ -10,7 +10,7 @@ public class DiscordCodeTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions,"rosechat.discordcode")) return null;
+        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.code")) return null;
         if (!input.startsWith("`")) return null;
         int lastIndex = 0;
 

@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuot
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.FromDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.FromDiscordTagTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.tag.ToDiscordTagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.format.FormatTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
@@ -47,6 +48,7 @@ public class Tokenizers {
 
     public static final Tokenizer<Token> TO_DISCORD_SPOILER = register("to_discord_spoiler", new ToDiscordSpoilerTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_SPOILER = register("from_discord_spoiler", new FromDiscordSpoilerTokenizer(), FROM_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> TO_DISCORD_TAG = register("to_discord_tag", new ToDiscordTagTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_TAG = register("from_discord_tag", new FromDiscordTagTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_MULTICODE = register("discord_multicode", new DiscordMultiCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);

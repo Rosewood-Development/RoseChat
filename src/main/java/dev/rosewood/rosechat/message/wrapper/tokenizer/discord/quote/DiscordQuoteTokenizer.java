@@ -12,7 +12,7 @@ public class DiscordQuoteTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.discordquote")) return null;
+        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.quote")) return null;
         if (!ChatColor.stripColor(HexUtils.colorify(messageWrapper.getMessage())).startsWith("> ")) return null;
         if (!input.startsWith("> ")) return null;
         String content = input.substring(2);

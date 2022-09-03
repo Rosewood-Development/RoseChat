@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 
 public class MessageUtils {
 
+    public final static String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
     public static final Pattern DISCORD_EMOJI_PATTERN = Pattern.compile("<a?(:[a-zA-Z0-9_\\-~]+:)[0-9]{18,19}>");
     public static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z_]+):");

@@ -62,4 +62,34 @@ public interface DiscordChatProvider {
      */
     String getUserTag(String name);
 
+    /**
+     * @param input The string to match from.
+     * @return The name of the member.
+     */
+    DetectedMember matchPartialMember(String input);
+
+    class DetectedMember {
+
+        private final String name;
+        private final String mention;
+        private final int consumedTextLength;
+
+        public DetectedMember(String name, String mention, int consumedTextLength) {
+            this.name = name;
+            this.mention = mention;
+            this.consumedTextLength = consumedTextLength;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getMention() {
+            return this.mention;
+        }
+
+        public int getConsumedTextLength() {
+            return this.consumedTextLength;
+        }
+    }
 }

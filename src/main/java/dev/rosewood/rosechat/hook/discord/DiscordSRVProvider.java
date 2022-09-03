@@ -24,6 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class DiscordSRVProvider implements DiscordChatProvider {
 
@@ -179,6 +180,34 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             if (member.getEffectiveName().toLowerCase().contains(name.toLowerCase())) tag = member.getAsMention();
 
         return tag;
+    }
+
+    @Override
+    public DetectedMember matchPartialMember(String input) {
+        for (Member member : this.discord.getMainGuild().getMembers()) {
+            int matchLength = this.getMatchLength(input, member.getEffectiveName());
+            if (matchLength != -1)
+                return new DetectedMember(this.getUserFromId(member.getId()), member.getAsMention(), matchLength);
+        }
+
+        return null;
+    }
+
+    private int getMatchLength(String input, String memberName) {
+        int matchLength = 0;
+        for (int i = 0, j = 0; i < input.length() && j < memberName.length(); i++, j++) {
+            int inputChar = Character.toUpperCase(input.codePointAt(i));
+            int memberChar = Character.toUpperCase(memberName.codePointAt(j));
+            if (inputChar == memberChar) {
+                matchLength++;
+            } else if (i > 0 && (Character.isSpaceChar(inputChar) || Pattern.matches(MessageUtils.PUNCTUATION_REGEX, String.valueOf(Character.toChars(inputChar))))) {
+                return matchLength;
+            } else {
+                return -1;
+            }
+        }
+
+        return matchLength;
     }
 
 }
