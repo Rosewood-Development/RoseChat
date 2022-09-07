@@ -28,6 +28,12 @@ public interface DiscordChatProvider {
     String getChannelName(String id);
 
     /**
+     * @param name The name of the channel.
+     * @return The channel as a mention.
+     */
+    String getChannelFromName(String name);
+
+    /**
      * @return The ID of the Discord server.
      */
     String getServerId();
@@ -66,15 +72,21 @@ public interface DiscordChatProvider {
      * @param input The string to match from.
      * @return The name of the member.
      */
-    DetectedMember matchPartialMember(String input);
+    DetectedMention matchPartialMember(String input);
 
-    class DetectedMember {
+    /**
+     * @param input The string to match from.
+     * @return The name of the channel.
+     */
+    DetectedMention matchPartialChannel(String input);
+
+    class DetectedMention {
 
         private final String name;
         private final String mention;
         private final int consumedTextLength;
 
-        public DetectedMember(String name, String mention, int consumedTextLength) {
+        public DetectedMention(String name, String mention, int consumedTextLength) {
             this.name = name;
             this.mention = mention;
             this.consumedTextLength = consumedTextLength;

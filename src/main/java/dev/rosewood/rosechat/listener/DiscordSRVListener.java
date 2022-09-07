@@ -74,10 +74,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             if (channel.isMuted()) return;
 
             UUID uuid = this.discord.getAccountLinkManager().getUuid(member.getId());
+            String color = getColor(member);
             StringPlaceholders.Builder placeholders = StringPlaceholders.builder()
                     .addPlaceholder("user_name", member.getUser().getName())
                     .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
-                    .addPlaceholder("user_color", "#" + getColor(member))
+                    .addPlaceholder("user_color", "#" + (color.length() == 5 ? "0" + color : color))
                     .addPlaceholder("user_tag", member.getUser().getDiscriminator());
 
             // If not using the setting, or the player has never joined, use their discord name.

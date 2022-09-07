@@ -13,7 +13,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.regex.Matcher;
 
-public class DiscordChannelTokenizer implements Tokenizer<Token> {
+public class FromDiscordChannelTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {

@@ -98,7 +98,7 @@ public class NicknameCommand extends AbstractCommand {
             displayName = displayName.replace(replacement.getText(), "").trim();
         }
 
-        String[] bundles = ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? new String[] { Tokenizers.DEFAULT_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE } : new String[] { Tokenizers.DEFAULT_BUNDLE };
+        String[] bundles = ConfigurationManager.Setting.USE_DISCORD_FORMATTING.getBoolean() ? new String[] { Tokenizers.DEFAULT_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.MARKDOWN_BUNDLE } : new String[] { Tokenizers.DEFAULT_BUNDLE };
         BaseComponent[] nicknameComponent = new MessageTokenizer(message, roseSender, displayName, bundles).toComponents();
 
         player.setDisplayName(TextComponent.toLegacyText(nicknameComponent));

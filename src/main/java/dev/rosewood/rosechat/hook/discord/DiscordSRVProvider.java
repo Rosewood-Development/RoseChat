@@ -127,6 +127,12 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     }
 
     @Override
+    public String getChannelFromName(String name) {
+        GuildChannel channel = this.discord.getJda().getTextChannelsByName(name, true).get(0);
+        return channel == null ? null : channel.getAsMention();
+    }
+
+    @Override
     public String getServerId() {
         return this.discord.getMainGuild().getId();
     }
@@ -138,7 +144,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (member == null) return this.getRoleFromId(id);
 
         String color = DiscordSRVListener.getColor(member);
-        return uuid == null ? "#" + color + member.getEffectiveName() : Bukkit.getOfflinePlayer(uuid).getName();
+        return uuid == null ? "#" + (color.length() == 5 ? "0" + color : color) + member.getEffectiveName() : Bukkit.getOfflinePlayer(uuid).getName();
     }
 
     @Override
@@ -183,11 +189,22 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     }
 
     @Override
-    public DetectedMember matchPartialMember(String input) {
+    public DetectedMention matchPartialMember(String input) {
         for (Member member : this.discord.getMainGuild().getMembers()) {
             int matchLength = this.getMatchLength(input, member.getEffectiveName());
             if (matchLength != -1)
-                return new DetectedMember(this.getUserFromId(member.getId()), member.getAsMention(), matchLength);
+                return new DetectedMention(this.getUserFromId(member.getId()), member.getAsMention(), matchLength);
+        }
+
+        return null;
+    }
+
+    @Override
+    public DetectedMention matchPartialChannel(String input) {
+        for (GuildChannel channel : this.discord.getMainGuild().getChannels()) {
+            int matchLength = this.getMatchLength(input, channel.getName());
+            if (matchLength != -1)
+                return new DetectedMention(this.getChannelFromName(channel.getName()), channel.getAsMention(), matchLength);
         }
 
         return null;

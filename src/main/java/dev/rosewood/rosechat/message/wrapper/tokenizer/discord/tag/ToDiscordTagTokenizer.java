@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 
 public class ToDiscordTagTokenizer implements Tokenizer<Token> {
 
@@ -17,10 +18,11 @@ public class ToDiscordTagTokenizer implements Tokenizer<Token> {
         if (!input.startsWith("@")) return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
-        DiscordChatProvider.DetectedMember member = discord.matchPartialMember(input.substring(1));
+        DiscordChatProvider.DetectedMention member = discord.matchPartialMember(input.substring(1));
         if (member == null) return null;
 
-        return new Token(new Token.TokenSettings(input.substring(0, member.getConsumedTextLength() + 1)).content(member.getMention()).ignoreTokenizer(this));
+        return new Token(new Token.TokenSettings(input.substring(0, member.getConsumedTextLength() + 1)).content(member.getMention()).ignoreTokenizer(this)
+                .ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT));
     }
 
 }

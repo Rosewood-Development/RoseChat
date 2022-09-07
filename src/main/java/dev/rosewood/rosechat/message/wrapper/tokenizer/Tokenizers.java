@@ -5,7 +5,8 @@ import com.google.common.collect.MultimapBuilder;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.character.CharacterTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorToken;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.DiscordChannelTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.FromDiscordChannelTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.channel.ToDiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
@@ -40,6 +41,7 @@ public class Tokenizers {
 
     public static final String DEFAULT_BUNDLE = "default";
     public static final String COLORS_BUNDLE = "colors";
+    public static final String MARKDOWN_BUNDLE = "markdown";
     public static final String DISCORD_FORMATTING_BUNDLE = "discord";
     public static final String TO_DISCORD_BUNDLE = "to_discord";
     public static final String FROM_DISCORD_BUNDLE = "from_discord";
@@ -50,16 +52,16 @@ public class Tokenizers {
     public static final Tokenizer<Token> FROM_DISCORD_SPOILER = register("from_discord_spoiler", new FromDiscordSpoilerTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> TO_DISCORD_TAG = register("to_discord_tag", new ToDiscordTagTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_TAG = register("from_discord_tag", new FromDiscordTagTokenizer(), FROM_DISCORD_BUNDLE);
-    public static final Tokenizer<Token> DISCORD_CHANNEL = register("discord_channel", new DiscordChannelTokenizer(), FROM_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> TO_DISCORD_CHANNEL = register("to_discord_channel", new ToDiscordChannelTokenizer(), TO_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> FROM_DISCORD_CHANNEL = register("from_discord_channel", new FromDiscordChannelTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_MULTICODE = register("discord_multicode", new DiscordMultiCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CODE = register("discord_code", new DiscordCodeTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_QUOTE = register("discord_quote", new DiscordQuoteTokenizer(), DISCORD_FORMATTING_BUNDLE);
     public static final Tokenizer<Token> DISCORD_CUSTOM_EMOJI = register("discord_custom_emoji", new DiscordCustomEmojiTokenizer(), TO_DISCORD_BUNDLE);
-    public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
-    public static final Tokenizer<Token> MARKDOWN_BOLD = register("markdown_bold", new MarkdownBoldTokenizer(), DISCORD_FORMATTING_BUNDLE);
-    public static final Tokenizer<Token> MARKDOWN_ITALIC = register("markdown_italic", new MarkdownItalicTokenizer(), DISCORD_FORMATTING_BUNDLE);
-    public static final Tokenizer<Token> MARKDOWN_UNDERLINE = register("markdown_underline", new MarkdownUnderlineTokenizer(), DISCORD_FORMATTING_BUNDLE);
-    public static final Tokenizer<Token> MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), DISCORD_FORMATTING_BUNDLE);
+    public static final Tokenizer<Token> MARKDOWN_BOLD = register("markdown_bold", new MarkdownBoldTokenizer(), MARKDOWN_BUNDLE);
+    public static final Tokenizer<Token> MARKDOWN_ITALIC = register("markdown_italic", new MarkdownItalicTokenizer(), MARKDOWN_BUNDLE);
+    public static final Tokenizer<Token> MARKDOWN_UNDERLINE = register("markdown_underline", new MarkdownUnderlineTokenizer(), MARKDOWN_BUNDLE);
+    public static final Tokenizer<Token> MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), MARKDOWN_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<RainbowToken> RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
@@ -68,6 +70,7 @@ public class Tokenizers {
     public static final Tokenizer<Token> ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE);
