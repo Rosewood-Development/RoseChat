@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeT
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.ToDiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.FromDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
@@ -45,11 +46,14 @@ public class Tokenizers {
     public static final String DISCORD_FORMATTING_BUNDLE = "discord";
     public static final String TO_DISCORD_BUNDLE = "to_discord";
     public static final String FROM_DISCORD_BUNDLE = "from_discord";
+    public static final String DISCORD_EMOJI_BUNDLE = "discord_emoji";
 
     private static final Multimap<String, TokenizerEntry<?>> TOKENIZERS = MultimapBuilder.hashKeys().arrayListValues().build();
 
     public static final Tokenizer<Token> TO_DISCORD_SPOILER = register("to_discord_spoiler", new ToDiscordSpoilerTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_SPOILER = register("from_discord_spoiler", new FromDiscordSpoilerTokenizer(), FROM_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> TO_DISCORD_EMOJI = register("to_discord_emoji", new ToDiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), DISCORD_EMOJI_BUNDLE);
     public static final Tokenizer<Token> TO_DISCORD_TAG = register("to_discord_tag", new ToDiscordTagTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_TAG = register("from_discord_tag", new FromDiscordTagTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> TO_DISCORD_CHANNEL = register("to_discord_channel", new ToDiscordChannelTokenizer(), TO_DISCORD_BUNDLE);
@@ -70,7 +74,6 @@ public class Tokenizers {
     public static final Tokenizer<Token> ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE);
     public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE);

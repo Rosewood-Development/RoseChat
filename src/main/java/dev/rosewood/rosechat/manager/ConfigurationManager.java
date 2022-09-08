@@ -125,16 +125,17 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         DISCORD_TO_MINECRAFT_FORMAT("chat-formats.discord-to-minecraft", "{from-discord}{discord-player}{separator}{message}",
                 "The format of a message that was sent from discord.", "Requires DiscordSRV"),
 
-        DISCORD_FORMATS("discord-formats", null, "Discord Format Settings", "Requires DiscordSRV"),
-        DISCORD_FORMAT_BOLD("discord-formats.bold", "&l"),
-        DISCORD_FORMAT_UNDERLINE("discord-formats.underline", "&n"),
-        DISCORD_FORMAT_STRIKETHROUGH("discord-formats.strikethrough", "&m"),
-        DISCORD_FORMAT_ITALIC("discord-formats.italic", "&o"),
-        DISCORD_FORMAT_SPOILER("discord-formats.spoiler", "<spoiler>%message%</spoiler>"),
-        DISCORD_FORMAT_CODE_BLOCK_ONE("discord-formats.code-block-one", "`%message%`"),
-        DISCORD_FORMAT_CODE_BLOCK_MULTIPLE("discord-formats.code-block-multiple", "```%message%```"),
-        DISCORD_FORMAT_BLOCK_QUOTES("discord-formats.block-quotes", "&2> &o"),
-        DISCORD_FORMAT_CHANNEL("discord-formats.channel-link", "{discord-channel-link}");
+        MARKDOWN_FORMATS("markdown-formats", null, "Discord Format Settings"),
+        MARKDOWN_FORMAT_BOLD("markdown-formats.bold", "&l"),
+        MARKDOWN_FORMAT_UNDERLINE("markdown-formats.underline", "&n"),
+        MARKDOWN_FORMAT_STRIKETHROUGH("markdown-formats.strikethrough", "&m"),
+        MARKDOWN_FORMAT_ITALIC("markdown-formats.italic", "&o"),
+        MARKDOWN_FORMAT_SPOILER("markdown-formats.spoiler", "<spoiler>%message%</spoiler>"),
+        MARKDOWN_FORMAT_CODE_BLOCK_ONE("markdown-formats.code-block-one", "`%message%`"),
+        MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE("markdown-formats.code-block-multiple", "```%message%```"),
+        MARKDOWN_FORMAT_BLOCK_QUOTES("markdown-formats.block-quotes", "&2> &o"),
+        MARKDOWN_FORMAT_URL("markdown-formats.url", "{url}"),
+        DISCORD_FORMAT_CHANNEL("markdown-formats.channel-link", "{discord-channel-link}", "Requires DiscordSRV");
 
         private final String key;
         private final Object defaultValue;

@@ -17,7 +17,7 @@ public class DiscordQuoteTokenizer implements Tokenizer<Token> {
         if (!input.startsWith("> ")) return null;
         String content = input.substring(2);
 
-        String format = Setting.DISCORD_FORMAT_BLOCK_QUOTES.getString();
+        String format = Setting.MARKDOWN_FORMAT_BLOCK_QUOTES.getString();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new Token(new Token.TokenSettings(input).content(content).ignoreTokenizer(this));

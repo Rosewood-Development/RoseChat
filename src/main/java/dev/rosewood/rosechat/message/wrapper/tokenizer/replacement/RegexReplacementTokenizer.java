@@ -26,7 +26,8 @@ public class RegexReplacementTokenizer implements Tokenizer<Token> {
 
                 String content = replacement.getReplacement();
 
-                return new Token(new Token.TokenSettings(originalContent).content(content).placeholder("message", originalContent).ignoreTokenizer(this));
+                return new Token(new Token.TokenSettings(originalContent).content(content).placeholder("message", originalContent)
+                        .placeholder("extra", originalContent).ignoreTokenizer(this));
             }
         }
 

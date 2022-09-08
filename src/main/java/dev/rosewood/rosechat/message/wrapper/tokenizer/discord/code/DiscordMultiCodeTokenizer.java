@@ -27,7 +27,7 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
         String originalContent = input.substring(0, lastIndex);
         String content = input.substring(3, lastIndex - 3);
 
-        String format = Setting.DISCORD_FORMAT_CODE_BLOCK_MULTIPLE.getString();
+        String format = Setting.MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE.getString();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));

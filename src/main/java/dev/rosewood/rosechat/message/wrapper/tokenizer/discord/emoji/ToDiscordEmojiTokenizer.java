@@ -7,11 +7,11 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import net.md_5.bungee.api.chat.HoverEvent;
-
 import java.util.regex.Matcher;
 
-public class DiscordEmojiTokenizer implements Tokenizer<Token> {
+public class ToDiscordEmojiTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {

@@ -247,7 +247,7 @@ url:
   click:
     default:
       action: OPEN_URL
-      value: "%message%"
+      value: "%extra%"
 
 # Discord Placeholders:
 # %user_nickname% - The user's nickname.

@@ -26,7 +26,7 @@ public class FromDiscordSpoilerTokenizer implements Tokenizer<Token> {
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(2, lastIndex - 1);
 
-        String format = Setting.DISCORD_FORMAT_SPOILER.getString();
+        String format = Setting.MARKDOWN_FORMAT_SPOILER.getString();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));

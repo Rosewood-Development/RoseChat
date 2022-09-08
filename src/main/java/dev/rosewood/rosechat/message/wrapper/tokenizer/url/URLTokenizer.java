@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.url;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -27,14 +28,9 @@ public class URLTokenizer implements Tokenizer<Token> {
                 String url = matcher.group(2);
                 url = url.startsWith("http") ? url : "https://" + url;
 
-                CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder("url");
-                StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(messageWrapper.getSender(), viewer, messageWrapper.getGroup())
-                        .addPlaceholder("message", content).build();
-
-                content = placeholders.apply(placeholder.getText().parse(messageWrapper.getSender(), viewer, placeholders));
-                String hover = placeholders.apply(placeholder.getHover().parse(messageWrapper.getSender(), viewer, placeholders));
-
-                return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(url).clickAction(ClickEvent.Action.OPEN_URL));
+                return new Token(new Token.TokenSettings(originalContent).content(ConfigurationManager.Setting.MARKDOWN_FORMAT_URL.getKey())
+                        .hoverAction(HoverEvent.Action.SHOW_TEXT).clickAction(ClickEvent.Action.OPEN_URL)
+                        .placeholder("message", content).placeholder("extra", url).ignoreTokenizer(this));
             }
         }
 

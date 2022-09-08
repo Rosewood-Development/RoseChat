@@ -26,7 +26,7 @@ public class DiscordCodeTokenizer implements Tokenizer<Token> {
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(1, lastIndex);
 
-        String format = Setting.DISCORD_FORMAT_CODE_BLOCK_ONE.getString();
+        String format = Setting.MARKDOWN_FORMAT_CODE_BLOCK_ONE.getString();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));
