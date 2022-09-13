@@ -7,7 +7,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -51,7 +51,7 @@ public class TagTokenizer implements Tokenizer<Token> {
     }
 
     private Token createTagToken(MessageWrapper wrapper, RoseSender viewer, String originalContent, String content, Tag tag) {
-        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(tag.getFormat());
+        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(tag.getFormat());
         if (placeholder == null) return null;
 
         RoseSender placeholderViewer = null;
@@ -78,10 +78,10 @@ public class TagTokenizer implements Tokenizer<Token> {
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(wrapper.getSender(), placeholderViewer, wrapper.getGroup())
                 .addPlaceholder("tagged", content).build();
 
-        String hover = placeholder.getHover() == null ? null : placeholders.apply(placeholder.getHover().parse(wrapper.getSender(), viewer, placeholders));
+        String hover = placeholder.getHover() == null ? null : placeholders.apply(placeholder.getHover().parseToString(wrapper.getSender(), viewer, placeholders));
 
         StringBuilder contentBuilder = new StringBuilder();
-        content = placeholders.apply(placeholder.getText().parse(wrapper.getSender(), placeholderViewer, placeholders));
+        content = placeholders.apply(placeholder.getText().parseToString(wrapper.getSender(), placeholderViewer, placeholders));
         if (tag.shouldMatchLength()) {
             if (hover != null) {
                 String colorlessHover = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(wrapper.getSender(), viewer, hover));
@@ -93,10 +93,10 @@ public class TagTokenizer implements Tokenizer<Token> {
 
         content = contentBuilder.toString();
 
-        String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parse(wrapper.getSender(), viewer, placeholders));
+        String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parseToString(wrapper.getSender(), viewer, placeholders));
         ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(wrapper.getSender(), viewer, placeholders);
 
-        return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction).ignoreTokenizer(this));
+        return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).ignoreTokenizer(this));
     }
 
     private DetectedPlayer matchPartialPlayer(String input) {

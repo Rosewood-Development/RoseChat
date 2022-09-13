@@ -4,8 +4,6 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.gradient.GradientToken;
-
 import java.util.regex.Matcher;
 
 public class RainbowTokenizer implements Tokenizer<RainbowToken> {

@@ -5,11 +5,9 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -66,10 +64,10 @@ public class MessageListener implements Listener {
     }
 
     private boolean shouldSuffixButton(PostParseMessageEvent event, String placeholderId) {
-        CustomPlaceholder placeholder = this.api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        RoseChatPlaceholder placeholder = this.api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return false;
 
-        String text = placeholder.getText().parse(event.getMessage().getSender(), event.getViewer(),
+        String text = placeholder.getText().parseToString(event.getMessage().getSender(), event.getViewer(),
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
                         .addPlaceholder("type", "server").build());

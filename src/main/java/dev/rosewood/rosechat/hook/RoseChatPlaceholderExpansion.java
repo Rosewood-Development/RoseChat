@@ -62,7 +62,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         if (placeholder.startsWith("placeholder_")) {
             String rcPlaceholder = placeholder.substring("placeholder_".length());
             RoseSender sender = new RoseSender(player);
-            return HexUtils.colorify(placeholderSettingManager.getPlaceholder(rcPlaceholder).getText().parse(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
+            return HexUtils.colorify(placeholderSettingManager.getPlaceholder(rcPlaceholder).getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
         }
 
         if (placeholder.startsWith("group_")) {

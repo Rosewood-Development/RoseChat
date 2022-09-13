@@ -33,6 +33,12 @@ public class MessageGroupCommand extends AbstractCommand {
         GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
 
         if (groupChat == null) {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
+            return;
+        }
+
+        Player player = (Player) sender;
+        if (!groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
         }

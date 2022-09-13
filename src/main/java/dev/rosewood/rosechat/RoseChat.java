@@ -53,9 +53,11 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
+import dev.rosewood.rosechat.message.ChatPreviewHandler;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
@@ -70,6 +72,7 @@ public class RoseChat extends RosePlugin {
     private SeniorCommandManager commandManager;
     private Permission vault;
     private DiscordChatProvider discord;
+    private ChatPreviewHandler chatPreviewHandler;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
@@ -149,13 +152,23 @@ public class RoseChat extends RosePlugin {
             groupManager.loadMemberGroupChats(player.getUniqueId());
         });
 
+        groupManager.loadNames();
+
         dataManager.getMutedChannels((channels) -> {});
+
+        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean()) {
+            //this.chatPreviewHandler = new ChatPreviewHandler(this);
+            //this.chatPreviewHandler.enable();
+        }
     }
 
     @Override
     public void disable() {
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this);
+
+        if (this.chatPreviewHandler != null)
+            this.chatPreviewHandler.disable();
     }
 
     @Override

@@ -6,8 +6,9 @@ import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
@@ -46,46 +47,46 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(messageWrapper.getSender(), messageWrapper.getSender(), group).build();
         DiscordPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordPlaceholder();
 
-        CustomPlaceholder textPlaceholder = placeholder.getPlaceholder("text");
-        String text = textPlaceholder != null ? textPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        PlaceholderCondition textPlaceholder = placeholder.getPlaceholder("text");
+        String text = textPlaceholder != null ? textPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
             text = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
         }
 
-        CustomPlaceholder urlPlaceholder = placeholder.getPlaceholder("url");
-        String url = urlPlaceholder != null ? urlPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
+        String url = urlPlaceholder != null ? urlPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
 
-        CustomPlaceholder titlePlaceholder = placeholder.getPlaceholder("title");
-        String title = titlePlaceholder != null ? titlePlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
+        String title = titlePlaceholder != null ? titlePlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (title != null && title.contains("{message}")) {
             message = messageWrapper.parseToDiscord(title, messageWrapper.getSender());
             title = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
             hasMessagePlaceholder = true;
         }
 
-        CustomPlaceholder descriptionPlaceholder = placeholder.getPlaceholder("description");
-        String description = descriptionPlaceholder != null ? descriptionPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
+        String description = descriptionPlaceholder != null ? descriptionPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (description != null && description.contains("{message}")) {
             message = messageWrapper.parseToDiscord(description, messageWrapper.getSender());
             description = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
             hasMessagePlaceholder = true;
         }
 
-        CustomPlaceholder timestampPlaceholder = placeholder.getPlaceholder("timestamp");
-        boolean timestamp = timestampPlaceholder != null && Boolean.parseBoolean(timestampPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders));
+        PlaceholderCondition timestampPlaceholder = placeholder.getPlaceholder("timestamp");
+        boolean timestamp = timestampPlaceholder != null && Boolean.parseBoolean(timestampPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders));
 
-        CustomPlaceholder colorPlaceholder = placeholder.getPlaceholder("color");
-        int color = colorPlaceholder != null ? Integer.parseInt(colorPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 0;
+        PlaceholderCondition colorPlaceholder = placeholder.getPlaceholder("color");
+        int color = colorPlaceholder != null ? Integer.parseInt(colorPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 0;
 
-        CustomPlaceholder thumbnailPlaceholder = placeholder.getPlaceholder("thumbnail");
-        String thumbnail = thumbnailPlaceholder != null? placeholders.apply(thumbnailPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : null;
+        PlaceholderCondition thumbnailPlaceholder = placeholder.getPlaceholder("thumbnail");
+        String thumbnail = thumbnailPlaceholder != null? placeholders.apply(thumbnailPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : null;
 
-        CustomPlaceholder thumbnailWidthPlaceholder = placeholder.getPlaceholder("thumbnail-width");
-        int thumbnailWidth = thumbnailWidthPlaceholder != null? Integer.parseInt(thumbnailWidthPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 128;
+        PlaceholderCondition thumbnailWidthPlaceholder = placeholder.getPlaceholder("thumbnail-width");
+        int thumbnailWidth = thumbnailWidthPlaceholder != null? Integer.parseInt(thumbnailWidthPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 128;
 
-        CustomPlaceholder thumbnailHeightPlaceholder = placeholder.getPlaceholder("thumbnail-height");
-        int thumbnailHeight = thumbnailHeightPlaceholder != null? Integer.parseInt(thumbnailHeightPlaceholder.getText().parse(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 128;
+        PlaceholderCondition thumbnailHeightPlaceholder = placeholder.getPlaceholder("thumbnail-height");
+        int thumbnailHeight = thumbnailHeightPlaceholder != null? Integer.parseInt(thumbnailHeightPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : 128;
 
         if (hasMessagePlaceholder) {
             MessageEmbed messageEmbed = new MessageEmbed(url,

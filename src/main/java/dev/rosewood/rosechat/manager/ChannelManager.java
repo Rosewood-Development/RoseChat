@@ -2,11 +2,9 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.CustomCommand;
-import dev.rosewood.rosechat.message.ChatPreviewHandler;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import java.io.File;
@@ -21,7 +19,6 @@ public class ChannelManager extends Manager {
     private final LocaleManager localeManager;
     private final Map<String, ChatChannel> channels;
     private ChatChannel defaultChannel;
-    private ChatPreviewHandler chatPreviewHandler;
 
     public ChannelManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -76,17 +73,10 @@ public class ChannelManager extends Manager {
             this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                     "&eNo default chat channel was found. Using &b" + this.defaultChannel.getId() + " &eas default.");
         }
-
-        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean()) {
-            this.chatPreviewHandler = new ChatPreviewHandler(this.rosePlugin);
-            this.chatPreviewHandler.enable();
-        }
     }
 
     @Override
     public void disable() {
-        if (this.chatPreviewHandler != null)
-            this.chatPreviewHandler.disable();
     }
 
     private void registerCommand(String command) {

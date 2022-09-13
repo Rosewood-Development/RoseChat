@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
-import org.bukkit.Bukkit;
 
 public class ToDiscordSpoilerTokenizer implements Tokenizer<Token> {
 
@@ -25,4 +24,5 @@ public class ToDiscordSpoilerTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(originalContent).content("||" + content + "||").ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG)
                 .ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT));
     }
+
 }

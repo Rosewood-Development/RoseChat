@@ -1,14 +1,13 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.placeholder;
 
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.ChatColor;
 
 public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 

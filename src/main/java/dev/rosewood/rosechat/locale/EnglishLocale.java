@@ -156,6 +156,7 @@ public class EnglishLocale implements Locale {
             this.put("command-gc-create-usage", "&e/gc create <id> <display name>");
             this.put("command-gc-create-success", "&eYou have created a new group chat called &b%name%&e. Use &b/gc invite &eto invite a player.");
             this.put("command-gc-create-fail", "&cYou already own a group chat!");
+            this.put("command-gc-already-exists", "&cA group chat with this name already exists!");
 
             this.put("#23", "Group Chat Invite Command");
             this.put("command-gc-invite-description", "&8 - &b/gc invite &7- Invites a player to the group chat.");

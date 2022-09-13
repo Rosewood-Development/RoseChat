@@ -59,4 +59,5 @@ public class FromDiscordTagTokenizer implements Tokenizer<Token> {
 
         return new Token(new Token.TokenSettings(originalContent).content(finalTag));
     }
+
 }

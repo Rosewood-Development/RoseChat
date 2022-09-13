@@ -4,8 +4,8 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import java.util.regex.Matcher;
 import net.md_5.bungee.api.ChatColor;
+import java.util.regex.Matcher;
 
 public class FormatTokenizer implements Tokenizer<FormatToken> {
 

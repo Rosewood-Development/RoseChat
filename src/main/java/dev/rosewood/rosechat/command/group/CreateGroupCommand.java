@@ -32,6 +32,11 @@ public class CreateGroupCommand extends AbstractCommand {
         }
 
         String id = args[0];
+        if (this.getAPI().getGroupChatById(id) != null) {
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-already-exists");
+            return;
+        }
+
         String name = getAllArgs(1, args);
 
         if (!MessageUtils.canColor(sender, name, "group")) return;

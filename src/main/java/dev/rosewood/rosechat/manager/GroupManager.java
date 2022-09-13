@@ -15,13 +15,15 @@ import java.util.function.Consumer;
 
 public class GroupManager extends Manager {
 
-    private DataManager dataManager;
+    private final DataManager dataManager;
     private final Map<String, GroupChat> groupChats;
+    private final List<String> groupChatNames;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
+        this.groupChatNames = new ArrayList<>();
     }
 
     @Override
@@ -90,6 +92,21 @@ public class GroupManager extends Manager {
         });
     }
 
+    public void loadNames() {
+        this.async(() -> {
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                String getQuery = "SELECT id FROM " + this.dataManager.getTablePrefix() + "group_chat";
+                try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
+                    ResultSet result = statement.executeQuery();
+
+                    if (result.next()) {
+                        this.groupChatNames.add(result.getString("id"));
+                    }
+                }
+            });
+        });
+    }
+
     public void addMember(GroupChat groupChat, UUID member) {
         this.async(() -> {
             this.dataManager.getDatabaseConnector().connect(connection -> {
@@ -98,7 +115,7 @@ public class GroupManager extends Manager {
                 try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                     statement.setString(1, groupChat.getId());
                     statement.setString(2, member.toString());
-                    statement.executeUpdate();
+                    statement.executeQuery();
                 }
             });
         });
@@ -189,6 +206,28 @@ public class GroupManager extends Manager {
         });
     }
 
+    public void getGroupInfo(String groupId, Consumer<GroupInfo> callback) {
+        this.async(() -> {
+            this.dataManager.getDatabaseConnector().connect(connection -> {
+                String getQuery = "SELECT COUNT(gcm.group_chat) as members, gc.id, gc.name, gc.owner FROM " +
+                        this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
+                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE id = ?";
+                try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
+                    statement.setString(1, groupId);
+                    ResultSet result = statement.executeQuery();
+
+                    if (result.next()) {
+                        String id = result.getString("id");
+                        String name = result.getString("name");
+                        String owner = result.getString("owner");
+                        int members = result.getInt("members");
+                        callback.accept(new GroupInfo(id, name, owner, members));
+                    }
+                }
+            });
+        });
+    }
+
     private void async(Runnable asyncCallback) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
     }
@@ -208,6 +247,41 @@ public class GroupManager extends Manager {
 
     public Map<String, GroupChat> getGroupChats() {
         return this.groupChats;
+    }
+
+    public List<String> getGroupChatNames() {
+        return this.groupChatNames;
+    }
+
+    public static class GroupInfo {
+
+        private final String id;
+        private final String name;
+        private final String owner;
+        private final int members;
+
+        public GroupInfo(String id, String name, String owner, int members) {
+            this.id = id;
+            this.name = name;
+            this.owner = owner;
+            this.members = members;
+        }
+
+        public String getId() {
+            return this.id;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getOwner() {
+            return this.owner;
+        }
+
+        public int getMembers() {
+            return this.members;
+        }
     }
 
 }

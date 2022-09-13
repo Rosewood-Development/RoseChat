@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 
 public class FromDiscordSpoilerTokenizer implements Tokenizer<Token> {
 
@@ -31,4 +30,5 @@ public class FromDiscordSpoilerTokenizer implements Tokenizer<Token> {
 
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));
     }
+
 }

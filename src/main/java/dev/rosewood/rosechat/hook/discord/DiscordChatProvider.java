@@ -104,4 +104,5 @@ public interface DiscordChatProvider {
             return this.consumedTextLength;
         }
     }
+
 }

@@ -4,10 +4,9 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.FormattedColorGenerator;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
+import net.md_5.bungee.api.ChatColor;
 import java.util.ArrayList;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 
 public class FormatToken extends Token {
 

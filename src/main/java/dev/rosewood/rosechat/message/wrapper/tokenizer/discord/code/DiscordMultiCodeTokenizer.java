@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import org.bukkit.Bukkit;
 
 public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
 
