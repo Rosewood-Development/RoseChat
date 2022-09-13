@@ -42,6 +42,7 @@ commands:
   channel:
     aliases: [c]
     description: Accesses a chat channel.
+    permission: rosechat.channel
   chat:
     aliases: [cc, chatchannel]
     description: Displays admin commands for chat channels.
@@ -56,9 +57,11 @@ commands:
   gc:
     aliases: [group, groupchat]
     description: Displays group chat commands.
+    permission: rosechat.group
   gcm:
     aliases: [gcm, gcmsg, gmsg]
     description: Send a message in a group chat.
+    permission: rosechat.group.message
   nickname:
     aliases: [nick]
     description: Set a nickname.
@@ -68,6 +71,8 @@ commands:
     permission: rosechat.ignore
   delmsg:
     description: Delete a message.
+    permission: rosechat.deletemessage
+
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
