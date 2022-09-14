@@ -43,7 +43,7 @@ public class ChannelManager extends Manager {
             boolean joinable = !channelsConfig.contains(id + ".joinable") || channelsConfig.getBoolean(id + ".joinable");
             int radius = channelsConfig.contains(id + ".radius") ? channelsConfig.getInt(id + ".radius") : -1;
             String world = channelsConfig.contains(id + ".world") ? channelsConfig.getString(id + ".world") : null;
-            boolean autoJoin = channelsConfig.contains(id + ".auto-join") && channelsConfig.getBoolean("auto-join");
+            boolean autoJoin = channelsConfig.contains(id + ".auto-join") && channelsConfig.getBoolean(id + ".auto-join");
             List<String> servers = channelsConfig.contains(id + ".servers") ? channelsConfig.getStringList(id + ".servers") : new ArrayList<>();
             String discord = channelsConfig.contains(id + ".discord") ? channelsConfig.getString(id + ".discord") : null;
 

@@ -26,7 +26,7 @@ public class ChannelCommand extends AbstractCommand {
         if (args.length == 0) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
         } else if (args.length == 1) {
-            if (!switchChannel(sender, args[0])) {
+            if (!processChannelSwitch(sender, args[0])) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             }
         } else {
@@ -42,6 +42,10 @@ public class ChannelCommand extends AbstractCommand {
             if (roseSender.isPlayer() && roseSender.getUUID() != null) data = this.getAPI().getPlayerData(roseSender.getUUID());
 
             if (!channel.canSendMessage(roseSender, data, message)) return;
+            if (!channel.isJoinable()) {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
+                return;
+            }
 
             MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
             if (!messageWrapper.canBeSent()) {
@@ -78,7 +82,7 @@ public class ChannelCommand extends AbstractCommand {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-channel-usage");
     }
 
-    public static boolean switchChannel(CommandSender sender, String channel) {
+    public static boolean processChannelSwitch(CommandSender sender, String channel) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         if (sender instanceof Player) {
@@ -93,6 +97,11 @@ public class ChannelCommand extends AbstractCommand {
 
             if (!sender.hasPermission("rosechat.channel." + newChannel.getId())) {
                 api.getLocaleManager().sendMessage(sender, "no-permission");
+                return true;
+            }
+
+            if (!newChannel.isJoinable()) {
+                api.getLocaleManager().sendComponentMessage(sender, "command-channel-not-joinable");
                 return true;
             }
 

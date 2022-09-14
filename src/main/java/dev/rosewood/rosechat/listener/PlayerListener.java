@@ -39,6 +39,7 @@ public class PlayerListener implements Listener {
                 for (ChatChannel channel : this.channelManager.getChannels().values()) {
                     if (channel.isAutoJoin() && (channel.getWorld() != null && channel.getWorld().equalsIgnoreCase(world.getName()))) {
                         playerData.setCurrentChannel(channel);
+                        channel.add(playerData.getUUID());
                         foundChannel = true;
                         break;
                     }
@@ -47,6 +48,7 @@ public class PlayerListener implements Listener {
                 // If no channel was found, place them in the default channel.
                 if (!foundChannel) {
                     playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
+                    this.channelManager.getDefaultChannel().add(playerData.getUUID());
                 }
 
                 playerData.save();
@@ -76,9 +78,9 @@ public class PlayerListener implements Listener {
         for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
             if (channel.getCommand() != null) {
                 String command = channel.getCommand();
-
-                event.getCommands().remove(command);
                 event.getCommands().remove(command + ":" + command);
+
+                if (!event.getPlayer().hasPermission("rosechat.channel." + channel.getId())) event.getCommands().remove(command);
             }
         }
     }
@@ -91,10 +93,23 @@ public class PlayerListener implements Listener {
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
 
         for (ChatChannel channel : api.getChannels()) {
+            if (channel.getWorld() == null) continue;
+
+            // Remove the player from the channel when leaving the world.
+            if (channel.getWorld().equals(event.getFrom().getName())) {
+                ChatChannel defaultChannel = api.getChannelManager().getDefaultChannel();
+                playerData.getCurrentChannel().remove(player);
+                playerData.setCurrentChannel(defaultChannel);
+                defaultChannel.add(playerData.getUUID());
+                playerData.save();
+            }
+
             if (channel.getWorld().equalsIgnoreCase(world.getName()) && channel.isAutoJoin()) {
                 playerData.getCurrentChannel().remove(player);
                 playerData.setCurrentChannel(channel);
                 channel.add(player);
+                playerData.save();
+                return;
             }
         }
     }

@@ -99,6 +99,7 @@ public class EnglishLocale implements Locale {
             this.put("command-channel-joined", "&eYou are now using the &b%id% &echannel.");
             this.put("command-channel-custom-usage", "&e/%channel% &e<message>");
             this.put("command-channel-not-joinable", "&cThis channel cannot be joined.");
+            this.put("command-channel-cannot-message", "&cYou cannot send a message in this channel!");
 
             this.put("#13", "Chat Command");
             this.put("command-chat-description", "&8 - &d/chat &7- Displays the admin help menu.");

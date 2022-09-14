@@ -31,7 +31,7 @@ public class CustomCommand extends Command {
                 }
 
                 if (args.length == 0) {
-                    if (!ChannelCommand.switchChannel(sender, cmd)) {
+                    if (!ChannelCommand.processChannelSwitch(sender, cmd)) {
                         RoseChatAPI.getInstance().getLocaleManager()
                                 .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getCommand()));
                     }
@@ -42,6 +42,10 @@ public class CustomCommand extends Command {
                     RoseSender roseSender = new RoseSender(sender);
                     if (roseSender.isPlayer() && roseSender.getUUID() != null) data = RoseChatAPI.getInstance().getPlayerData(roseSender.getUUID());
                     if (!channel.canSendMessage(roseSender, data, message)) return false;
+                    if (!channel.isJoinable()) {
+                        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
+                        return false;
+                    }
 
                     MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
                     if (!messageWrapper.canBeSent()) {

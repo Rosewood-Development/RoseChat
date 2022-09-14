@@ -65,11 +65,6 @@ public class ChatChannel implements Group {
             return false;
         }
 
-        if (!this.joinable) {
-            sender.sendLocaleMessage("command-channel-not-joinable");
-            return false;
-        }
-
         if (data != null) {
             // Check Mute Expiry
             if (data.getMuteTime() > 0 && data.getMuteTime() < System.currentTimeMillis()) {
