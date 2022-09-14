@@ -72,6 +72,15 @@ public class PlayerListener implements Listener {
         // Don't send the delete message command, as it shouldn't be used by players.
         event.getCommands().remove("delmsg");
         event.getCommands().remove("rosechat:delmsg");
+
+        for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
+            if (channel.getCommand() != null) {
+                String command = channel.getCommand();
+
+                event.getCommands().remove(command);
+                event.getCommands().remove(command + ":" + command);
+            }
+        }
     }
 
     @EventHandler

@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import java.io.File;
 import java.util.ArrayList;
@@ -44,9 +45,8 @@ public class PlaceholderManager extends Manager {
 
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
-            // TODO: Adjust this
             if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)) {
-                parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
+                if (placeholderConfiguration.contains(id)) parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
                 continue;
             }
 

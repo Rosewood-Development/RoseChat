@@ -77,6 +77,7 @@ public class ChannelManager extends Manager {
 
     @Override
     public void disable() {
+
     }
 
     private void registerCommand(String command) {
