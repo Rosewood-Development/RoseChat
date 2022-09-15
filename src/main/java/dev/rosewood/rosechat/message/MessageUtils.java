@@ -278,6 +278,17 @@ public class MessageUtils {
         return true;
     }
 
+    public static boolean hasDefaultColor(String input, MessageWrapper messageWrapper) {
+        if (messageWrapper == null || messageWrapper.getSenderData() == null || messageWrapper.getSenderData().getColor() == null) return false;
+
+        String message = messageWrapper.getMessage();
+        String color = messageWrapper.getSenderData().getColor();
+        if (color.isEmpty()) return false;
+
+        String start = message.substring(0, color.length());
+        return input.startsWith(start);
+    }
+
     public static String stripColors(String message) {
         return message.replaceAll(VALID_LEGACY_REGEX.pattern(), "")
                 .replaceAll(HEX_REGEX.pattern(), "")

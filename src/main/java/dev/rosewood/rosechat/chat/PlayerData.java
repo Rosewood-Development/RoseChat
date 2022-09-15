@@ -42,7 +42,7 @@ public class PlayerData {
         this.tagSounds = true;
         this.messageSounds = true;
         this.emojis = true;
-        this.color = "&f";
+        this.color = "";
         this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();

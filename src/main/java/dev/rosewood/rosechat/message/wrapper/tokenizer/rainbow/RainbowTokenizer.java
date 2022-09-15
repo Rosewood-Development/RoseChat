@@ -31,7 +31,7 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
                 } catch (NumberFormatException ignored) { }
             }
 
-            return hasPermission(messageWrapper, ignorePermissions, "rosechat.rainbow") ?
+            return hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.rainbow") ?
                     new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f);
         }
 

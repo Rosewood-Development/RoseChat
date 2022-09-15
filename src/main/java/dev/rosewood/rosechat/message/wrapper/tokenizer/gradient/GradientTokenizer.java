@@ -21,7 +21,7 @@ public class GradientTokenizer implements Tokenizer<GradientToken> {
                     .map(Color::decode)
                     .collect(Collectors.toList());
             String content = input.substring(matcher.start(), matcher.end());
-            return hasPermission(messageWrapper, ignorePermissions, "rosechat.gradient") ?
+            return hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.gradient") ?
                     new GradientToken(content, hexSteps) : new GradientToken(content, null);
         }
 
