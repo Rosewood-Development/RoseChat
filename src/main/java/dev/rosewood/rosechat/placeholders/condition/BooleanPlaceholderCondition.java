@@ -15,10 +15,15 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
         super(section, condition);
     }
 
-
     @Override
     public String parse(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
-        String result = this.combineConditionValues(String.valueOf(this.parseToBoolean(sender, viewer, placeholders)));
+        return String.valueOf(this.parseToBoolean(sender, viewer, placeholders));
+    }
+
+    @Override
+    public String parseToString(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+        String parsed = this.parse(sender, viewer, placeholders);
+        String result = this.combineConditionValues(parsed);
         return result == null || result.isEmpty() ? this.combineConditionValues("default") : result;
     }
 

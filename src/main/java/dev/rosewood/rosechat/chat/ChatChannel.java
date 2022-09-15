@@ -60,7 +60,7 @@ public class ChatChannel implements Group {
 
     public boolean canSendMessage(RoseSender sender, PlayerData data, String message) {
         // Don't send the message if the player doesn't have permission.
-        if (!sender.hasPermission("rosechat.chat") && !sender.hasPermission("rosechat.channel." + this.id)) {
+        if (!sender.hasPermission("rosechat.chat") || !sender.hasPermission("rosechat.channel." + this.id)) {
             sender.sendLocaleMessage("no-permission");
             return false;
         }

@@ -115,7 +115,7 @@ public class GroupManager extends Manager {
                 try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                     statement.setString(1, groupChat.getId());
                     statement.setString(2, member.toString());
-                    statement.executeQuery();
+                    statement.executeUpdate();
                 }
             });
         });
