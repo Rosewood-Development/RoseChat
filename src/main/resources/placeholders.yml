@@ -56,13 +56,9 @@ separator:
     default: " &e» &f"
 
 # Placeholders used in the message format.
-message-sent-sender:
+message-sent:
   text:
-    default: "&8[&eYou"
-
-message-sent-arrow:
-  text:
-    default: " &6-> "
+    default: "&8[&eYou &6-> &f%other_player_nickname%&8] "
   hover:
     default:
       - "&6From: &f%player_name%"
@@ -73,17 +69,9 @@ message-sent-arrow:
       action: SUGGEST_COMMAND
       value: "/r "
 
-message-sent-receiver:
+message-received:
   text:
-    default: "&f%other_player_nickname%&8] "
-
-message-received-sender:
-  text:
-    default: "&8[&f%player_nickname%"
-
-message-received-arrow:
-  text:
-    default: " &6-> "
+    default: "&8[&f%player_nickname% &6-> &eYou&8] "
   hover:
     default:
       - "&6From: &f%player_name%"
@@ -93,10 +81,6 @@ message-received-arrow:
     default:
       action: SUGGEST_COMMAND
       value: "/r "
-
-message-received-receiver:
-  text:
-    default: "&eYou&8] "
 
 # Placeholders used in the group format.
 group-prefix:

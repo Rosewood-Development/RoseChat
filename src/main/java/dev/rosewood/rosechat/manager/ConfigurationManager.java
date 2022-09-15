@@ -96,9 +96,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Can players tag Discord members?", "Players can use @<username> in messages to tag a member.", "Requires DiscordSRV"),
 
         CHAT_FORMATS("chat-formats", null, "These are the the other chat formats in the plugin."),
-        MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{message-sent-sender}{message-sent-arrow}{message-sent-receiver}{message}",
+        MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{message-sent}{message}",
                 "The format of a /message sent to another player."),
-        MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{message-received-sender}{message-received-arrow}{message-received-receiver}{message}",
+        MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{message-received}{message}",
                 "The format of a /message received from another player."),
         MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-players}{message}",
                 "The format of a spied /message."),
