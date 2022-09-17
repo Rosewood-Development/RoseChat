@@ -8,6 +8,8 @@ import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -60,9 +62,12 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         if (placeholder.startsWith("placeholder_")) {
-            String rcPlaceholder = placeholder.substring("placeholder_".length());
+            String rcPlaceholderId = placeholder.substring("placeholder_".length());
             RoseSender sender = new RoseSender(player);
-            return HexUtils.colorify(placeholderSettingManager.getPlaceholder(rcPlaceholder).getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
+            RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
+            if (rcPlaceholder == null) return null;
+
+            return HexUtils.colorify(rcPlaceholder.getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
         }
 
         if (placeholder.startsWith("group_")) {
