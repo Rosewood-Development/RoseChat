@@ -65,15 +65,17 @@ public class MessageCommand extends AbstractCommand {
 
         Player targetPlayer = Bukkit.getPlayer(target);
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
-        this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
-            if (targetPlayer != null && data != null) {
-                if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
-                    canBeMessaged.set(false);
-                    return;
+        if (targetPlayer != null) {
+            this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
+                if (targetPlayer != null && data != null) {
+                    if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
+                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
+                        canBeMessaged.set(false);
+                        return;
+                    }
                 }
-            }
-        });
+            });
+        }
 
         if (!canBeMessaged.get()) return;
 
@@ -92,6 +94,8 @@ public class MessageCommand extends AbstractCommand {
             playerData.setReplyTo(target);
             playerData.save();
         }
+
+        if (targetPlayer == null) return;
 
         if (this.getAPI().isBungee()) {
             BungeeListener.updateReply(sender.getName(), target);

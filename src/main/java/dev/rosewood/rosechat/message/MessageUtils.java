@@ -283,7 +283,7 @@ public class MessageUtils {
 
         String message = messageWrapper.getMessage();
         String color = messageWrapper.getSenderData().getColor();
-        if (color.isEmpty()) return false;
+        if (color.isEmpty() || color.length() >= message.length()) return false;
 
         String start = message.substring(0, color.length());
         return input.startsWith(start);

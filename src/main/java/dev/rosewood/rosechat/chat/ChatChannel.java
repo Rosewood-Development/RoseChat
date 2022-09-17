@@ -99,10 +99,13 @@ public class ChatChannel implements Group {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to the channel spies.
-        for (UUID uuid : api.getDataManager().getChannelSpies()) {
-            if (uuid == message.getSender().getUUID()) continue;
-            Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        if (!this.visibleAnywhere) {
+            for (UUID uuid : api.getDataManager().getChannelSpies()) {
+                if (this.getMembers().contains(uuid)) continue;
+                if (uuid == message.getSender().getUUID()) continue;
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+            }
         }
 
         // Send the message to discord.
@@ -127,7 +130,7 @@ public class ChatChannel implements Group {
                 player.spigot().sendMessage(message.parse(this.getFormat(), new RoseSender(player)));
 
                 if (message.getTaggedPlayers().contains(player.getUniqueId())) {
-                    if (message.getTagSound() != null) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
+                    if (message.getTagSound() != null && data.hasTagSounds()) player.playSound(player.getLocation(), message.getTagSound(), 1, 1);
                 }
             }
 
