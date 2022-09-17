@@ -371,4 +371,15 @@ public class MessageUtils {
         }
     }
 
+    public static void sendMessageWrapper(RoseSender sender, ChatChannel channel, MessageWrapper message) {
+        if (!message.canBeSent()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
+            return;
+        }
+
+        channel.send(message);
+        BaseComponent[] messageComponents = message.toComponents();
+        if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+    }
+
 }

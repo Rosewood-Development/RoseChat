@@ -5,11 +5,10 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -48,14 +47,7 @@ public class ChannelCommand extends AbstractCommand {
             }
 
             MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
-            if (!messageWrapper.canBeSent()) {
-                if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
-                return;
-            }
-
-            channel.send(messageWrapper);
-            BaseComponent[] messageComponents = messageWrapper.toComponents();
-            if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+            MessageUtils.sendMessageWrapper(roseSender, channel, messageWrapper);
         }
     }
 

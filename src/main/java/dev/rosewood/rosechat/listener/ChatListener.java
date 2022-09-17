@@ -5,9 +5,9 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,14 +39,7 @@ public class ChatListener implements Listener {
             if (!channel.canSendMessage(sender, data, event.getMessage())) return;
 
             MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
-            if (!message.canBeSent()) {
-                if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
-                return;
-            }
-
-            channel.send(message);
-            BaseComponent[] messageComponents = message.toComponents();
-            if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+            MessageUtils.sendMessageWrapper(sender, channel, message);
         });
     }
 
