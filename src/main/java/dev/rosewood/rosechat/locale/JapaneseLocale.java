@@ -23,10 +23,10 @@ public class JapaneseLocale implements Locale {
             this.put("prefix", "&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] ");
 
             this.put("#1", "コマンド・メッセージ");
-            this.put("no-permission", "&c許可がありません！");
+            this.put("no-permission", "&cこれをするのは許可がありません！");
             this.put("player-not-found", "&cこのプレイヤーはオンラインではありません！");
             this.put("player-only", "&cコンソールはこのコマンドを使うことができません！");
-            this.put("invalid-arguments", "&c使用方法： &b%syntax%&c.");
+            this.put("invalid-arguments", "&c使用方法： &b%syntax%&c。");
             this.put("not-a-number", "&cこれはナンバーではありません。");
             this.put("message-blank", "&cメッセージを入力してください！");
 
@@ -44,13 +44,13 @@ public class JapaneseLocale implements Locale {
             this.put("command-reload-reloaded", "&eプラグインのデータとコンフィグファイルとロケールファイルはリロードしました。");
 
             this.put("#5", "モデレーション・コマンド");
-            this.put("blocked-caps", "&c大文字をすぎますからあなたのメッセージをセンドすることができません！");
+            this.put("blocked-caps", "&c大文字をすぎるのは入りますからあなたのメッセージをセンドすることができませんでした！");
             this.put("blocked-spam", "&cスパムしないでください！");
             this.put("blocked-language", "&c醜語を使いました (;_;)");
             this.put("blocked-url", "&cURLかIPをセンドしないでください！");
 
             this.put("#6", "メッセージ・コマンド");
-            this.put("command-message-description", "&8 - &d/msg &7- プレイヤーをメッセージします。");
+            this.put("command-message-description", "&8 - &d/msg &7- プレイヤーにメッセージします。");
             this.put("command-message-usage", "&e/msg <プレイヤー> <メッセージ>");
             this.put("command-message-enter-message", "&cメッセージを入力してください！");
 
@@ -58,7 +58,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-reply-description", "&8 - &d/reply &7- プレイヤーのメッセージに答えます。");
             this.put("command-reply-usage", "&e/reply");
             this.put("command-reply-enter-message", "&cメッセージを入力してください！");
-            this.put("command-reply-no-one", "&cここで誰もはありません…");
+            this.put("command-reply-no-one", "&cここでは誰もいません…");
 
             this.put("#8", "ソーシャルスパイ・コマンド");
             this.put("command-socialspy-description", "&8 - &d/socialspy &7- プライベートメッセージを見せるのをトグルします。");
@@ -74,14 +74,14 @@ public class JapaneseLocale implements Locale {
             this.put("command-togglemessage-description", "&8 - &d/togglemessage &7- メッセージを受けるのをトグルします。");
             this.put("command-togglemessage-usage", "&e/togglemessage");
             this.put("command-togglemessage-on", "&eメッセージを受けるのを&aエネーブルしました&e。");
-            this.put("command-togglemessage-off", "&eメッセージを受けるのを&cエネーブルしました&e。");
-            this.put("command-togglemessage-cannot-message", "&cこのプレイヤーをメッセージすることができません！");
+            this.put("command-togglemessage-off", "&eメッセージを受けるのを&cディセーブルしました&e。");
+            this.put("command-togglemessage-cannot-message", "&cこのプレイヤーにメッセージすることができません！");
 
             this.put("#10", "トグルサウンド ・コマンド");
             this.put("command-togglesound-description", "&8 - &d/togglesound &7- メッセージ音とタッグ音をトグルします。");
             this.put("command-togglesound-usage", "&e/togglesound <messages/tags/all>");
             this.put("command-togglesound-on", "&b%type%&e音を&aエネーブルしました&e。");
-            this.put("command-togglesound-off", "&b%type%&e音を&cエネーブルしました&e。");
+            this.put("command-togglesound-off", "&b%type%&e音を&cディセーブルしました&e。");
             this.put("command-togglesound-messages", "メッセージ");
             this.put("command-togglesound-tags", "タッグ");
             this.put("command-togglesound-all", "オール");
@@ -99,6 +99,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-channel-joined", "&e今、&b%id%&eチャンネルを使っています。");
             this.put("command-channel-custom-usage", "&e/%channel% &e<メッセージ>");
             this.put("command-channel-not-joinable", "&cこのチャンネルを参加することができません。");
+            this.put("command-channel-cannot-message", "&cこのチャンネルにメッセージをセンドすることができません！");
 
             this.put("#13", "チャット・コマンド");
             this.put("command-chat-description", "&8 - &d/chat &7- アドミンのヘルプメニューを見せます。");
@@ -125,7 +126,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-chat-mute-usage", "&e/chat mute <チャンネル>");
             this.put("command-chat-mute-muted", "&b%channel%&eチャンネルをミュートしました。");
             this.put("command-chat-mute-unmuted", "&b%channel%&eチャンネルはミュートを解除しました。");
-            this.put("channel-muted", "&cこのチャンネルはミュートですからメッセージをセンドすることができません。");
+            this.put("channel-muted", "&cこのチャンネルはミュートだからこのチャンネルにメッセージをセンドすることができません。");
 
             this.put("#18", "チャットSudo・コマンド");
             this.put("command-chat-sudo-description", "&8 - &c/chat sudo &7- あなたは他のプレイヤーからメッセージをセンドします。");
@@ -156,21 +157,22 @@ public class JapaneseLocale implements Locale {
             this.put("command-gc-create-usage", "&e/gc create <id> <名前>");
             this.put("command-gc-create-success", "&e新しいグループチャットを作りました、名前は&b%name%&eです。 プレイヤーを招待に&b/gc invite&eを使います。");
             this.put("command-gc-create-fail", "&cグループチャットをもう持っています！");
+            this.put("command-gc-already-exists", "&cこの名前のグループ チャットはもうあります！");
 
             this.put("#23", "グループチャット・インバイト・コマンド");
             this.put("command-gc-invite-description", "&8 - &b/gc invite &7- プレイヤーをグループチャットに招待します。");
             this.put("command-gc-invite-usage", "&e/gc invite <プレイヤー>");
-            this.put("command-gc-invite-full", "&bグループチャットがもう１２８メンバーいます！");
+            this.put("command-gc-invite-full", "&bあなたのグループチャットは１２８人のメンバーがもういます！");
             this.put("command-gc-invite-success", "&b%player%&eを&b%name%&eグループチャットに招待しました。");
             this.put("command-gc-invite-invited", "&b%player%&eは&b%name%&eグループチャットに招待しました。");
-            this.put("command-gc-invite-member", "&cこのプレイヤーはもうグループチャットにいます！");
+            this.put("command-gc-invite-member", "&cこのプレイヤーはあなたのグループチャットにもういます！");
 
             this.put("#24", "グループチャット・キック・コマンド");
             this.put("command-gc-kick-description", "&8 - &b/gc kick &7- プレイヤーをグループチャットから取り除きます。");
             this.put("command-gc-kick-usage", "&e/gc kick <プレイヤー>");
             this.put("command-gc-kick-success", "&b%player%&eを&b%name%&eグループチャットから取り除きました。");
             this.put("command-gc-kick-kicked", "&eあなたを&b%name%&eグループチャットから取り除きました。");
-            this.put("command-gc-kick-invalid-player", "&cこのプレイヤーがグループチャットにいません！");
+            this.put("command-gc-kick-invalid-player", "&cこのプレイヤーがあなたのグループチャットにいません！");
             this.put("command-gc-kick-self", "&c自分を取り除くことができません！");
 
             this.put("#25", "グループチャット・アクセプト・コマンド");
@@ -180,15 +182,15 @@ public class JapaneseLocale implements Locale {
             this.put("command-gc-accept-accepted", "&b%player%&eは&b%name%&eグループチャットを参加しました。");
             this.put("command-gc-accept-no-invites", "&cグループチャットの招待がありません (;_;)");
             this.put("command-gc-accept-not-invited", "&cあなたをこのグループチャットは招待しませんでした。");
-            this.put("command-gc-accept-hover", "&a招待を応じますにクリックします");
+            this.put("command-gc-accept-hover", "&a招待を応するにクリックします");
             this.put("command-gc-accept-accept", "&a&l応じます");
 
             this.put("#26", "グループチャット・デナイ・コマンド");
-            this.put("command-gc-deny-description", "&8 - &b/gc deny &7- グループチャット招待を却下します");
+            this.put("command-gc-deny-description", "&8 - &b/gc deny &7- グループチャット招待を却下します。");
             this.put("command-gc-deny-usage", "&e/gc deny [プレイヤー]");
             this.put("command-gc-deny-success", "&b%name%&eの招待を却下しました。");
             this.put("command-gc-deny-denied", "&b%player%&eはあなたの招待を却下しました。");
-            this.put("command-gc-deny-hover", "&c招待を却下しますにクリックします");
+            this.put("command-gc-deny-hover", "&c招待を却下するにクリックします");
             this.put("command-gc-deny-deny", "&c&l却下します");
 
             this.put("#27", "グループチャット・リーブ・コマンド");
@@ -202,7 +204,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-gc-disband-description", "&8 - &b/gc disband &7- グループチャットを解散します。");
             this.put("command-gc-disband-usage", "&e/gc disband [グループチャット]");
             this.put("command-gc-disband-success", "&b%name%&eグループチャットを解散しました…");
-            this.put("command-gc-disband-admin", "&eあなたは&b%name%&eグループチャットを解散しました");
+            this.put("command-gc-disband-admin", "&eあなたは&b%name%&eグループチャットを解散しました。");
 
             this.put("#29", "グループチャット・メンバー・コマンド");
             this.put("command-gc-members-description", "&8 - &b/gc members &7- グループチャットのメンバーを見せます。");
@@ -232,6 +234,9 @@ public class JapaneseLocale implements Locale {
             this.put("command-color-usage", "&e/color <装飾コード>");
             this.put("command-color-success", "&e新しいチャット色は&f%color%&e&r。");
             this.put("command-color-invalid", "&eこれは有効な装飾コードではありません。");
+            this.put("command-color-removed", "&eあなたのチャットカラーは外しました。");
+            this.put("command-color-gradient", "グラディエント");
+            this.put("command-color-rainbow", "レインボー");
 
             this.put("#34", "ミュート・コマンド");
             this.put("command-mute-description", "&8 - &d/mute &7- プレイヤーをミュートします。");
@@ -256,8 +261,8 @@ public class JapaneseLocale implements Locale {
             this.put("#35", "ニックネーム・コマンド");
             this.put("command-nickname-description", "&8 - &d/nickname &7- ニックネームを変更します。");
             this.put("command-nickname-usage", "&e/nickname <ニックネーム/プレイヤー> [ニックネーム/off]");
-            this.put("command-nickname-success", "&e新しいニックネームは&f%name%&e。");
-            this.put("command-nickname-other", "&b%player%&eの新しいニックネームは&f%name%&e。");
+            this.put("command-nickname-success", "&e新しいニックネームは&f%name%&eです。");
+            this.put("command-nickname-other", "&b%player%&eの新しいニックネームは&f%name%&eです。");
             this.put("command-nickname-too-short", "&cこのニックネームは短すぎます！");
             this.put("command-nickname-too-long", "&cこのニックネームは長すぎます！");
             this.put("command-nickname-not-allowed", "&cこのニックネームを使うことができません！");
