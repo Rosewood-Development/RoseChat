@@ -209,9 +209,13 @@ public class ChatChannel implements Group {
         MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
 
         // Send the message to the channel spies.
-        for (UUID uuid : api.getDataManager().getChannelSpies()) {
-            Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(localMessage.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        if (!this.visibleAnywhere) {
+            for (UUID uuid : api.getDataManager().getChannelSpies()) {
+                if (this.getMembers().contains(uuid)) continue;
+                if (uuid == localMessage.getSender().getUUID()) continue;
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(localMessage.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+            }
         }
 
         // Send the message to discord.
@@ -267,9 +271,13 @@ public class ChatChannel implements Group {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to the channel spies.
-        for (UUID uuid : api.getDataManager().getChannelSpies()) {
-            Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null) spy.spigot().sendMessage(message.parseFromDiscord(id, Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        if (!this.visibleAnywhere) {
+            for (UUID uuid : api.getDataManager().getChannelSpies()) {
+                if (this.getMembers().contains(uuid)) continue;
+                if (uuid == message.getSender().getUUID()) continue;
+                Player spy = Bukkit.getPlayer(uuid);
+                if (spy != null) spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+            }
         }
 
         // Send to everyone who can view it.

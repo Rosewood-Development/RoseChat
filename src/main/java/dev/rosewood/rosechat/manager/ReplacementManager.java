@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ReplacementManager extends Manager {
 
-    private Map<String, ChatReplacement> replacements;
+    private final Map<String, ChatReplacement> replacements;
 
     public ReplacementManager(RosePlugin rosePlugin) {
         super(rosePlugin);

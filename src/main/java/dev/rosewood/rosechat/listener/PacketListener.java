@@ -81,7 +81,7 @@ public class PacketListener {
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
                         .addPlaceholder("id", messageId)
                         .addPlaceholder("type", "client")
-                        .addPlaceholder("message", "").build(), false);
+                        .addPlaceholder("message", "").build());
 
         if (deleteClientButton == null) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class EmojiManager extends Manager {
 
-    private Map<String, ChatReplacement> emojis;
+    private final Map<String, ChatReplacement> emojis;
 
     public EmojiManager(RosePlugin rosePlugin) {
         super(rosePlugin);

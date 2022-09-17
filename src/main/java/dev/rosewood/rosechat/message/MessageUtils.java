@@ -145,7 +145,7 @@ public class MessageUtils {
         return builder;
     }
 
-    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, List<Tokenizer<?>> tokenizers, StringPlaceholders placeholders, boolean discordify) {
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders, String... tokenizerBundle) {
 //        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(id);
 //        if (placeholder == null) return null;
 //
@@ -185,9 +185,9 @@ public class MessageUtils {
         return null;
     }
 
-    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders, boolean discordify) {
-//        return parseCustomPlaceholder(sender, viewer, id,
-//                Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders, discordify);
+    public static BaseComponent[] parseCustomPlaceholder(RoseSender sender, RoseSender viewer, String id, StringPlaceholders placeholders) {
+        // return parseCustomPlaceholder(sender, viewer, id,
+        //        Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS, placeholders);
         return null;
     }
 

@@ -96,7 +96,7 @@ public class TagTokenizer implements Tokenizer<Token> {
         String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parseToString(wrapper.getSender(), viewer, placeholders));
         ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(wrapper.getSender(), viewer, placeholders);
 
-        return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).ignoreTokenizer(this));
+        return new Token(new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction).ignoreTokenizer(this));
     }
 
     private DetectedPlayer matchPartialPlayer(String input) {

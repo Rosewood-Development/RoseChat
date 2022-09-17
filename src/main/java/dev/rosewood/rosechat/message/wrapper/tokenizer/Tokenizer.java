@@ -12,7 +12,6 @@ public interface Tokenizer<T extends Token> {
         String groupPermission = wrapper == null ? "" : (wrapper.getGroup() == null ? "" : "." + wrapper.getGroup().getLocationPermission());
         return ignorePermissions
                 || wrapper == null
-                || !wrapper.getSender().isPlayer()
                 || wrapper.getLocation() == MessageLocation.NONE
                 || (wrapper.getSender().hasPermission(permission + "." + wrapper.getLocation().toString() + groupPermission));
     }

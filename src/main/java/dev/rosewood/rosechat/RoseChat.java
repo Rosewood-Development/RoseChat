@@ -208,7 +208,7 @@ public class RoseChat extends RosePlugin {
                 DiscordSRVListener discordListener = new DiscordSRVListener();
                 DiscordSRV.api.subscribe(discordListener);
                 DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
-            }, 20L);
+            }, 60L);
         }
 
         if (pluginManager.getPlugin("ProtocolLib") != null) {

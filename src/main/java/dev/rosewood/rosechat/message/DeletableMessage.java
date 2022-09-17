@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class DeletableMessage {
 
-    private UUID uuid;
+    private final UUID uuid;
     private String json;
     private String discordId;
     private boolean isClient;

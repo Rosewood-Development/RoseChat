@@ -16,7 +16,7 @@ public class MessageListener implements Listener {
     private final RoseChatAPI api;
 
     public MessageListener(RoseChat plugin) {
-        this.api = RoseChatAPI.getInstance();;
+        this.api = RoseChatAPI.getInstance();
     }
 
     @EventHandler
@@ -80,7 +80,7 @@ public class MessageListener implements Listener {
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("message", "").build(), false);
+                        .addPlaceholder("message", "").build());
     }
 
 }

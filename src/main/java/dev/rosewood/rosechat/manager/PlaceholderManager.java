@@ -10,7 +10,6 @@ import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import java.io.File;
 import java.util.ArrayList;
@@ -20,11 +19,11 @@ import java.util.Map;
 
 public class PlaceholderManager extends Manager {
 
-    private Map<String, RoseChatPlaceholder> placeholders;
-    private Map<String, String> chatFormats;
-    private Map<String, List<String>> parsedFormats;
-    private Map<String, Tag> tags;
-    private Map<String, ChatReplacement> emojis;
+    private final Map<String, RoseChatPlaceholder> placeholders;
+    private final Map<String, String> chatFormats;
+    private final Map<String, List<String>> parsedFormats;
+    private final Map<String, Tag> tags;
+    private final Map<String, ChatReplacement> emojis;
     private DiscordPlaceholder discordPlaceholder;
 
     public PlaceholderManager(RosePlugin rosePlugin) {

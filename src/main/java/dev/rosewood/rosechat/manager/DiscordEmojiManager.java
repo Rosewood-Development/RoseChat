@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class DiscordEmojiManager extends Manager {
 
-    private Map<String, List<String>> discordEmojis;
+    private final Map<String, List<String>> discordEmojis;
 
     public DiscordEmojiManager(RosePlugin rosePlugin) {
         super(rosePlugin);

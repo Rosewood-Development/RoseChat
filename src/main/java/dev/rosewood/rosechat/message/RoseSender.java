@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -74,7 +75,7 @@ public class RoseSender {
         RoseChatAPI api = RoseChatAPI.getInstance();
         if (api.getVault() != null) {
             if (this.offlinePlayer != null) {
-                return api.getVault().playerHas(null, this.offlinePlayer, permission);
+                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || api.getVault().playerHas(null, this.offlinePlayer, permission);
             }
 
             if (this.group != null && this.player == null) {

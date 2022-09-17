@@ -123,8 +123,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     }
 
     private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, ChatChannel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
-        // TODO: Parse Discord Formatting
-        //String parsedMessage = ComponentColorizer.parseDiscordFormatting(message.getContentRaw());
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
         RoseSender sender = (offlinePlayer == null ? new RoseSender(name, "default") : new RoseSender(offlinePlayer));
 
