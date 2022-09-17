@@ -205,7 +205,7 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                     componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
@@ -225,7 +225,7 @@ public class MessageWrapper {
             }
 
             if (format.contains("{message}")) {
-                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                     componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
@@ -262,7 +262,7 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                     componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
@@ -315,7 +315,7 @@ public class MessageWrapper {
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
-                if (Setting.USE_DISCORD_FORMATTING.getBoolean()) {
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                     componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {

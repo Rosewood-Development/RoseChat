@@ -11,7 +11,6 @@ import java.util.Collections;
 public class ConfigurationManager extends AbstractConfigurationManager {
 
     public enum Setting implements RoseSetting {
-        CHAT_PREVIEW("chat-preview", true, "Should chat preview be enabled for 1.19 servers?", "You will also need to set previews-chat=true in the server.properties file", "Enabling this setting will disable message signing from clients due to technical limitations"),
         MODERATION_SETTINGS("moderation-settings", null, "Moderation Settings"),
         CAPS_CHECKING_ENABLED("moderation-settings.caps-checking-enabled", true,
                 "Should the plugin check for messages that contain too many capital letters?"),
@@ -31,7 +30,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         WARN_ON_SPAM_SENT("moderation-settings.warn-on-spam-sent", true,
                 "Should the plugin send a warning message (defined in the locale file) when a player spams?"),
         URL_CHECKING_ENABLED("moderation-settings.url-checking-enabled", true,
-                "Should the plugin check for messages that contain URLs and IP addresseS?"),
+                "Should the plugin check for messages that contain URLs and IP addresses?",
+                "If false, a player will still need permission to send URLs that can be clicked on."),
         URL_CENSORING_ENABLED("moderation-settings.url-censoring-enabled", true,
                 "Should the plugin censor URLs and IP addresses?",
                 "If true, messages will be censored; periods and click functionality will be removed.",
@@ -40,12 +40,12 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Should the plugin send a warning message (defined in the locale file) when a player sends a message contain a URL or IP address?"),
         SWEAR_CHECKING_ENABLED("moderation-settings.swear-checking-enabled", true,
                 "Should the plugin check for swear words?"),
-        SWEAR_FILTER_SENSITIVITY("moderation-settings.swear-filter-sensitivity", 80.0,
+        SWEAR_FILTER_SENSITIVITY("moderation-settings.swear-filter-sensitivity", 85.0,
                 "How similar are the messages that count as swears?", "For example, words that are more than 80% similar will not be sent."),
         BLOCKED_SWEARS("moderation-settings.blocked-swears", Collections.singletonList("bitch"),
                 "If a player sends a message that contains one of these words, then the message will not be sent."),
         WARN_ON_BLOCKED_SWEAR_SENT("moderation-settings.warn-on-blocked-swear-sent", true,
-                "Should the plugin send a warning message (defined in the locale file) when a player sends a message with  a blocked swear word."),
+                "Should the plugin send a warning message (defined in the locale file) when a player sends a message with a blocked swear word?"),
         SWEAR_REPLACEMENTS("moderation-settings.swear-replacements", Arrays.asList("fuck:f***", "ass:butt"),
                 "If a player sends a message that contains one of these words, then the word will be replaced.",
                 "Note: This does not affect words like 'assassin'.", "Format: 'contains:replaced'"),
@@ -62,14 +62,17 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Should non-alphanumeric characters, such as brackets, be allowed in nicknames?"),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
+        CHAT_PREVIEW("chat-settings.chat-preview", true, "Should chat preview be enabled for 1.19 servers?",
+                "You will also need to set previews-chat=true in the server.properties file",
+                "Enabling this setting will disable message signing from clients due to technical limitations."),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true,
                 "Should players be allowed to message other players on connected servers?", "Requires BungeeCord"),
         MESSAGE_SOUND("chat-settings.message-sound", "BLOCK_NOTE_BLOCK_PLING",
                 "The sound that will be sent to a player when they receive a message.",
                 "Players can individually disable this in-game with /togglesound.",
                 "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html", "Set to 'none' for no sound."),
-        USE_DISCORD_FORMATTING("chat-settings.use-discord-formatting-in-game", true,
-                "Should players be allowed to use Discord formatting in-game?",
+        USE_MARKDOWN_FORMATTING("chat-settings.use-markdown-formatting-in-game", true,
+                "Should players be allowed to use markdown formatting in-game?",
                 "For example, using **text** to bold something."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
@@ -191,7 +194,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 " | |__) |___  ___  ___| |    | |__   __ _| |_",
                 " |  _  // _ \\/ __|/ _ \\ |    | '_ \\ / _` | __|",
                 " | | \\ \\ (_) \\__ \\  __/ |____| | | | (_| | |_",
-                " |_|  \\_\\___/|___/\\___|\\_____|_| |_|\\__,_|\\__|"
+                " |_|  \\_\\___/|___/\\___|\\_____|_| |_|\\__,_|\\__|",
+                ""
         };
     }
 

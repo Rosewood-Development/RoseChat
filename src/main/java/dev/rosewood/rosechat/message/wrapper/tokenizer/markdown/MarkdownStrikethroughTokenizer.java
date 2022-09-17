@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.markdown;
 
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -19,7 +20,9 @@ public class MarkdownStrikethroughTokenizer implements Tokenizer<Token> {
             String originalContent = input.substring(matcher.start(), matcher.end());
             String content = originalContent.substring(2, originalContent.length() - 2);
 
-            return new Token(new Token.TokenSettings(originalContent).content("&m" + content + "&M").ignoreTokenizer(this));
+            String format = ConfigurationManager.Setting.MARKDOWN_FORMAT_STRIKETHROUGH.getString();
+            content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
+            return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));
         }
 
         return null;
