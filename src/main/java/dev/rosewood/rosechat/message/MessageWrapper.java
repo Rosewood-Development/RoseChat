@@ -263,10 +263,10 @@ public class MessageWrapper {
 
             if (format == null || !format.contains("{message}")) {
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
 
@@ -283,7 +283,7 @@ public class MessageWrapper {
             }
 
             if (format.contains("{message}")) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 

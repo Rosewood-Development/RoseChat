@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.regex.Matcher;
 
@@ -26,7 +27,7 @@ public class DiscordEmojiTokenizer implements Tokenizer<Token> {
                 content = emoji.getReplacement();
 
                 return new Token(new Token.TokenSettings(originalContent).content(content).font(emoji.getFont())
-                        .hoverAction(HoverEvent.Action.SHOW_TEXT).hover(emoji.getHoverText()).ignoreTokenizer(this));
+                        .hoverAction(HoverEvent.Action.SHOW_TEXT).hover(emoji.getHoverText()).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.EMOJI));
             }
 
             return new Token(new Token.TokenSettings(originalContent).content(matcher.group(1)));

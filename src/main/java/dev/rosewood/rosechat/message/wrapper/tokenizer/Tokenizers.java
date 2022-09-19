@@ -11,7 +11,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordCodeT
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.code.DiscordMultiCodeTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.DiscordEmojiTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.emoji.ToDiscordEmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.quote.DiscordQuoteTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.FromDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
@@ -52,7 +51,6 @@ public class Tokenizers {
 
     public static final Tokenizer<Token> TO_DISCORD_SPOILER = register("to_discord_spoiler", new ToDiscordSpoilerTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_SPOILER = register("from_discord_spoiler", new FromDiscordSpoilerTokenizer(), FROM_DISCORD_BUNDLE);
-    public static final Tokenizer<Token> TO_DISCORD_EMOJI = register("to_discord_emoji", new ToDiscordEmojiTokenizer(), FROM_DISCORD_BUNDLE);
     public static final Tokenizer<Token> DISCORD_EMOJI = register("discord_emoji", new DiscordEmojiTokenizer(), DISCORD_EMOJI_BUNDLE);
     public static final Tokenizer<Token> TO_DISCORD_TAG = register("to_discord_tag", new ToDiscordTagTokenizer(), TO_DISCORD_BUNDLE);
     public static final Tokenizer<Token> FROM_DISCORD_TAG = register("from_discord_tag", new FromDiscordTagTokenizer(), FROM_DISCORD_BUNDLE);

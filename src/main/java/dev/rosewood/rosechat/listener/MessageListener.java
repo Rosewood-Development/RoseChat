@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -76,10 +77,11 @@ public class MessageListener implements Listener {
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {
         placeholder = placeholder.replace("%message%", "");
-        return MessageUtils.parseCustomPlaceholder(event.getMessage().getSender(), event.getViewer(), placeholder.substring(1, placeholder.length() - 1),
+
+        return RoseChatAPI.getInstance().parse(event.getMessage().getSender(), event.getViewer(), placeholder,
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
-                        .addPlaceholder("type", "server")
+                        .addPlaceholder("type", "client")
                         .addPlaceholder("message", "").build());
     }
 

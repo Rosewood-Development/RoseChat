@@ -20,6 +20,7 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
@@ -85,6 +86,18 @@ public class RoseChatAPI {
      */
     public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message) {
         return new MessageWrapper(sender, MessageLocation.NONE, null, message).parse(null, viewer);
+    }
+
+    /**
+     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * @param sender The person sending the message.
+     * @param viewer The person receiving the message.
+     * @param message The string to parse.
+     * @param placeholders A set of placeholders to use.
+     * @return A {@link BaseComponent} consisting of the parsed message.
+     */
+    public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message, StringPlaceholders placeholders) {
+        return new MessageWrapper(sender, MessageLocation.NONE, null, message, placeholders).parse(null, viewer);
     }
 
     /**

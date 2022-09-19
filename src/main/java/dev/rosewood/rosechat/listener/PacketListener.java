@@ -20,6 +20,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -77,7 +78,7 @@ public class PacketListener {
     public static BaseComponent[] appendButton(RoseSender sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-        BaseComponent[] deleteClientButton = MessageUtils.parseCustomPlaceholder(sender, sender, placeholder.substring(1, placeholder.length() - 1),
+        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
                         .addPlaceholder("id", messageId)
                         .addPlaceholder("type", "client")
