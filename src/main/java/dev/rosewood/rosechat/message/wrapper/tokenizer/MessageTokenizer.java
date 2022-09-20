@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -150,8 +151,8 @@ public class MessageTokenizer {
             }
 
             if (!colorGenerator.isApplicable()) {
-                componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE)
-                        .font(token.getEffectiveFont());
+                componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE);
+                if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                 if (token.getHover() != null) {
                     if (token.getHoverChildren().isEmpty()) {
@@ -174,8 +175,8 @@ public class MessageTokenizer {
                 }
 
                 for (char c : token.getContent().toCharArray()) {
-                    componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE)
-                            .font(token.getEffectiveFont());
+                    componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
+                    if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                     colorGenerator.apply(componentBuilder, Character.isSpaceChar(c));
 

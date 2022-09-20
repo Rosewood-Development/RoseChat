@@ -1,9 +1,13 @@
 package dev.rosewood.rosechat.placeholders.condition;
 
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.Collections;
@@ -50,7 +54,14 @@ public class PlaceholderCondition {
     public PlaceholderCondition parseValues() {
         for (String sub : this.section.getKeys(false)) {
             if (sub.equals("condition")) continue;
-            if (this.section.contains(sub + ".action")) this.clickActions.put(sub + ".action", ClickEvent.Action.valueOf(this.section.getString(sub + ".action")));
+            try {
+                if (this.section.contains(sub + ".action")) this.clickActions.put(sub + ".action", ClickEvent.Action.valueOf(this.section.getString(sub + ".action")));
+            } catch (IllegalArgumentException e) {
+                LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+                localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                        "&eThe " + this.section.getString(sub + ".action") + " action is not a valid ClickEvent!");
+            }
+
             if (this.section.contains(sub + ".value")) this.conditionValues.put(sub + ".value", Collections.singletonList(this.section.getString(sub + ".value")));
             this.conditionValues.put(sub, this.section.isList(sub) ? this.section.getStringList(sub) : Collections.singletonList(this.section.getString(sub)));
         }

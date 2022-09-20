@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -36,7 +37,7 @@ public class ComponentSimplifier {
                 component.setHoverEvent(new HoverEvent(component.getHoverEvent().getAction(), hoverContent));
             }
 
-            if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
+            if (NMSUtil.getVersionNumber() >= 16) if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
             if (!component.isBold()) component.setBold(null);
             if (!component.isItalic()) component.setItalic(null);
             if (!component.isUnderlined()) component.setUnderlined(null);
@@ -56,7 +57,7 @@ public class ComponentSimplifier {
                 component.setHoverEvent(new HoverEvent(component.getHoverEvent().getAction(), hoverContent));
             }
 
-            if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
+            if (NMSUtil.getVersionNumber() >= 16) if (component.getFont() != null && component.getFont().equalsIgnoreCase("default")) component.setFont(null);
             if (!component.isBold()) component.setBold(null);
             if (!component.isItalic()) component.setItalic(null);
             if (!component.isUnderlined()) component.setUnderlined(null);
