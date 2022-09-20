@@ -18,9 +18,8 @@ public interface Group {
      * @param senderUUID The UUID of the player who sent the message.
      * @param senderGroup The group of the player who sent the message.
      * @param rawMessage The message that was originally sent.
-     * @param jsonMessage The messaged, parsed on the sending server.
      */
-    void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage);
+    void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage);
 
     /**
      * Sends a message from discord.

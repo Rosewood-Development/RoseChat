@@ -95,7 +95,7 @@ public class MessageCommand extends AbstractCommand {
             playerData.save();
         }
 
-        if (targetPlayer == null) return;
+        if (target.equalsIgnoreCase("Console")) return;
 
         if (this.getAPI().isBungee()) {
             BungeeListener.updateReply(sender.getName(), target);

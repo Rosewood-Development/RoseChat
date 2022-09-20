@@ -6,6 +6,8 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RoseSender;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -58,7 +60,7 @@ public class BungeeListener implements PluginMessageListener {
             if (command.equalsIgnoreCase("message_player")) {
                 PlayerData playerData = this.dataManager.getPlayerData(player.getUniqueId());
                 if (additional == null || !playerData.getIgnoringPlayers().contains(UUID.fromString(additional))) {
-                    player.spigot().sendMessage(ComponentSerializer.parse(received));
+                    MessageUtils.sendPrivateMessage(new RoseSender(commandInfoSplit[3], commandInfoSplit[4]), player.getName(), received);
                 }
             } else if (command.equalsIgnoreCase("update_reply")) {
                 PlayerData playerData = this.plugin.getManager(DataManager.class).getPlayerData(player.getUniqueId());
@@ -67,9 +69,12 @@ public class BungeeListener implements PluginMessageListener {
                     playerData.save();
                 }
             } else {
-                ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(command);
-                // TODO: This
-                //chatChannel.sendJson(received, null);
+                String channelTo = commandInfoSplit[1];
+                String sender = commandInfoSplit[2];
+                String senderUUID = commandInfoSplit[3];
+                String senderGroup = commandInfoSplit[4];
+                ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(channelTo);
+                chatChannel.sendJson(sender, UUID.fromString(senderUUID), senderGroup, received);
             }
 
         } catch (IOException e) {
@@ -77,18 +82,18 @@ public class BungeeListener implements PluginMessageListener {
         }
     }
 
-    public static void sendChannelMessage(String channel, String server, String message) {
+    public static void sendChannelMessage(String serverTo, String channelTo, String sender, UUID senderUUID, String senderGroup, String rawMessage) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF("Forward");
-            out.writeUTF(server);
-            out.writeUTF("rosechat:" + channel);
+            out.writeUTF(serverTo);
+            out.writeUTF("rosechat:" + channelTo + ":" + sender + ":" + senderUUID + ":" + senderGroup);
 
             ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
             DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            msgOut.writeUTF(message);
+            msgOut.writeUTF(rawMessage);
 
             out.writeShort(msgBytes.toByteArray().length);
             out.write(msgBytes.toByteArray());
@@ -99,18 +104,18 @@ public class BungeeListener implements PluginMessageListener {
         }
     }
 
-    public static void sendDirectMessage(UUID sender, String playerName, String message) {
+    public static void sendDirectMessage(String sender, UUID senderUUID, String senderGroup, String playerName, String rawMessage) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF("ForwardToPlayer");
             out.writeUTF(playerName);
-            out.writeUTF("rosechat:message_player:" + sender.toString());
+            out.writeUTF("rosechat:message_player:" + senderUUID.toString() + ":" + sender + ":" + senderGroup);
 
             ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
             DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            msgOut.writeUTF(message);
+            msgOut.writeUTF(rawMessage);
 
             out.writeShort(msgBytes.toByteArray().length);
             out.write(msgBytes.toByteArray());

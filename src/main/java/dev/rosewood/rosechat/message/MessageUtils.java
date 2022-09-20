@@ -149,9 +149,14 @@ public class MessageUtils {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 
+    public static void sendPrivateMessage(RoseSender sender, String targetName, String message) {
+        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
+        sendPrivateMessage(sender, targetName, messageWrapper);
+    }
+
     public static void sendPrivateMessage(RoseSender sender, String targetName, MessageWrapper message) {
         Player target = Bukkit.getPlayer(targetName);
-        RoseSender messageTarget = target == null ? new RoseSender(Bukkit.getConsoleSender()) : new RoseSender(target);
+        RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
 
         BaseComponent[] sentMessage = message.parse(Setting.MESSAGE_SENT_FORMAT.getString(), messageTarget);
         BaseComponent[] receivedMessage = message.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
@@ -173,7 +178,7 @@ public class MessageUtils {
             if (targetName.equalsIgnoreCase("Console")) {
                 Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
             } else {
-                BungeeListener.sendDirectMessage(sender.getUUID(), targetName, ComponentSerializer.toString(receivedMessage));
+                BungeeListener.sendDirectMessage(message.getSender().getNickname(), sender.getUUID(), sender.getGroup(), targetName, message.getMessage());
             }
         } else {
             target.spigot().sendMessage(receivedMessage);

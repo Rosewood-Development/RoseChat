@@ -116,7 +116,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.parse(this.getFormat(), null)));
+                BungeeListener.sendChannelMessage(server, this.getId(), message.getSender().getName(), message.getSender().getUUID(), message.getSender().getGroup(), message.getMessage());
             }
         }
 
@@ -203,9 +203,8 @@ public class ChatChannel implements Group {
     }
 
     @Override
-    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage, String jsonMessage) {
+    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
-        BaseComponent[] components = ComponentSerializer.parse(jsonMessage);
         MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
 
         // Send the message to the channel spies.
@@ -226,17 +225,21 @@ public class ChatChannel implements Group {
         // Send to everyone who can view it.
         if (this.isVisibleAnywhere()) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-
                 PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+                if (data.getIgnoringPlayers().contains(localMessage.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(components);
+                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
+                player.spigot().sendMessage(localMessage.parse(this.getFormat(), new RoseSender(player)));
+
+                if (localMessage.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (localMessage.getTagSound() != null && data.hasTagSounds()) player.playSound(player.getLocation(), localMessage.getTagSound(), 1, 1);
+                }
             }
 
             return;
         }
 
+        // Send to players in the same world.
         // Send to players in the same world.
         if (this.world != null) {
             World world = Bukkit.getWorld(this.world);
@@ -246,10 +249,16 @@ public class ChatChannel implements Group {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
 
                 PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+                if (data.getIgnoringPlayers().contains(localMessage.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(components);
+                player.spigot().sendMessage(localMessage.parse(this.getFormat(), new RoseSender(player)));
+
+                if (localMessage.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (localMessage.getTagSound() != null) player.playSound(player.getLocation(), localMessage.getTagSound(), 1, 1);
+                }
             }
+
+            return;
         }
 
         // Send to players in the channel.
@@ -259,9 +268,13 @@ public class ChatChannel implements Group {
                 if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
 
                 PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data.getIgnoringPlayers().contains(senderUUID)) continue;
+                if (data.getIgnoringPlayers().contains(localMessage.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(components);
+                player.spigot().sendMessage(localMessage.parse(this.getFormat(), new RoseSender(player)));
+
+                if (localMessage.getTaggedPlayers().contains(player.getUniqueId())) {
+                    if (localMessage.getTagSound() != null) player.playSound(player.getLocation(), localMessage.getTagSound(), 1, 1);
+                }
             }
         }
     }
@@ -312,7 +325,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(this.getId(), server, ComponentSerializer.toString(message.toComponents()));
+                BungeeListener.sendChannelMessage(server, this.getId(), message.getSender().getName(), message.getSender().getUUID(), message.getSender().getGroup(), message.getMessage());
             }
         }
 
@@ -366,7 +379,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(this.getId(), server, message);
+                BungeeListener.sendChannelMessage(server, this.getId(), null, null, null, message);
             }
         }
 

@@ -190,6 +190,7 @@ public class RoseSender {
      */
     public String getNickname() {
         if (!this.isPlayer()) return this.getDisplayName();
+        if (RoseChatAPI.getInstance().getPlayerData(this.getUUID()) == null) return this.getDisplayName();
         String nickname = RoseChatAPI.getInstance().getPlayerData(this.getUUID()).getNickname();
         return nickname == null ? this.getDisplayName() : nickname;
     }
