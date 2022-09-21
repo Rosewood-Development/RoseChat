@@ -68,7 +68,8 @@ public class TagTokenizer implements Tokenizer<Token> {
                 // No player was found, use the tag string up until the first space instead
                 int endIndex = content.indexOf(" ");
                 if (endIndex == -1) endIndex = content.length();
-                originalContent = tag.getPrefix() + content.substring(0, endIndex);
+                content = content.substring(0, endIndex);
+                originalContent = tag.getPrefix() + content;
             }
         }
 
