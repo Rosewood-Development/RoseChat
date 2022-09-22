@@ -118,7 +118,7 @@ public class BungeeListener implements PluginMessageListener {
                 stringBuilder.append(permission);
             }
 
-            out.writeUTF("rosechat:" + channelTo + ":" + sender.getNickname() + ":" + sender.getUUID() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
+            out.writeUTF("rosechat:" + channelTo + ":" + sender.getName() + ":" + sender.getUUID() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
 
             sendPluginMessage(outputStream, out, rawMessage);
         } catch (IOException e) {
@@ -140,7 +140,7 @@ public class BungeeListener implements PluginMessageListener {
                 stringBuilder.append(permission);
             }
 
-            out.writeUTF("rosechat:message_player:" + sender.getUUID() + ":" + sender.getNickname() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
+            out.writeUTF("rosechat:message_player:" + sender.getUUID() + ":" + sender.getName() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
 
             sendPluginMessage(outputStream, out, rawMessage);
         } catch (IOException e) {

@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.message.wrapper.tokenizer;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-import org.bukkit.Bukkit;
 
 public interface Tokenizer<T extends Token> {
 
@@ -20,4 +19,5 @@ public interface Tokenizer<T extends Token> {
     default boolean hasExtendedPermission(MessageWrapper wrapper, boolean ignorePermissions, String permission, String extendedPermission) {
         return ignorePermissions || hasPermission(wrapper, ignorePermissions, permission) && (wrapper != null && wrapper.getSender() != null && wrapper.getSender().hasPermission(extendedPermission));
     }
+
 }

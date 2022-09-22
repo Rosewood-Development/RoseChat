@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.GroupManager;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.Bukkit;
@@ -28,8 +29,7 @@ public class GroupChat implements Group {
     }
 
 
-    @Override
-    public void send(MessageWrapper message) {
+    private void sendGeneric(MessageWrapper message) {
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
@@ -49,13 +49,19 @@ public class GroupChat implements Group {
     }
 
     @Override
-    public void sendJson(RoseSender sender, String rawMessage) {
+    public void send(MessageWrapper message) {
+        this.sendGeneric(message);
+    }
 
+    @Override
+    public void sendJson(RoseSender sender, String rawMessage) {
+        MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+        this.sendGeneric(message);
     }
 
     @Override
     public void sendFromDiscord(String id, MessageWrapper message) {
-
+        this.sendGeneric(message);
     }
 
     @Override

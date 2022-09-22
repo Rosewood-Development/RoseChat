@@ -80,7 +80,7 @@ public class AcceptGroupCommand extends AbstractCommand {
             if (target.startsWith("rosechat.groups.") && info.getValue()) {
                 try {
                     amount = Math.max(amount, Integer.parseInt(target.substring(target.lastIndexOf(".") + 1)));
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException ignored) {}
             }
         }
 

@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
-
 import java.util.List;
 import java.util.UUID;
 

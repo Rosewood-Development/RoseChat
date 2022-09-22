@@ -29,8 +29,7 @@ public enum FilterType {
      * @param player The person to receive the message.
      */
     public void sendWarning(Player player) {
-        RoseSender sender = new RoseSender(player);
-        this.sendWarning(sender);
+        this.sendWarning(new RoseSender(player));
     }
 
 }

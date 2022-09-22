@@ -7,8 +7,11 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
@@ -70,7 +73,6 @@ public class DeleteMessageCommand extends AbstractCommand {
                     message = deletableMessage;
                 }
 
-                boolean doRefresh = false;
                 if (message == null || !message.getUUID().equals(uuid)) continue;
                 for (DeletableMessage deletableMessage : toDelete) {
                     if (!deletableMessage.isClient() || (playerData.getUUID() == ((Player) sender).getUniqueId())) {
@@ -93,51 +95,44 @@ public class DeleteMessageCommand extends AbstractCommand {
     }
 
     private BaseComponent[] parseDeletedMessagePlaceholder(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
-//        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
-//        CustomPlaceholder placeholder = this.getAPI().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-//        if (placeholder == null) return null;
-//
-//        BaseComponent[] component;
-//        HoverEvent hoverEvent = null;
-//        ClickEvent clickEvent = null;
-//
-//        String text = placeholder.getText().parse(sender, viewer, placeholders);
-//        if (text == null) return null;
-//        List<Tokenizer<?>> tokenizers = Setting.USE_DISCORD_FORMATTING.getBoolean() ? Tokenizers.DEFAULT_WITH_DISCORD_TOKENIZERS : Tokenizers.DEFAULT_TOKENIZERS;
-//
-//        text = placeholders.apply(text);
-//        MessageTokenizer textTokenizer = new MessageTokenizer.Builder()
-//                .sender(sender).viewer(viewer).location(MessageLocation.OTHER)
-//                .tokenizers(tokenizers)
-//                .tokenize(text);
-//        component = textTokenizer.toComponents();
-//
-//        String hoverString = placeholder.getHover() != null ? placeholders.apply(placeholder.getHover().parse(sender, viewer, placeholders)) : null;
-//        if (hoverString != null) {
-//            if (hoverString.contains("%original%")) {
-//               hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
-//            } else {
-//                MessageTokenizer hoverTokenizer = new MessageTokenizer.Builder()
-//                        .sender(sender).viewer(viewer).location(MessageLocation.OTHER).tokenizers(tokenizers).tokenize(hoverString);
-//                BaseComponent[] hover = hoverTokenizer.toComponents();
-//                hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover);
-//            }
-//        }
-//
-//        String clickString = placeholder.getClick() != null ? placeholders.apply(placeholder.getClick().parse(sender, viewer, placeholders)) : null;
-//        ClickEvent.Action action = placeholder.getClick() != null ? placeholder.getClick().parseToAction(sender, viewer, placeholders) : null;
-//        if (clickString != null && action != null) {
-//            String click = sender.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(sender.asPlayer(), clickString) : clickString;
-//            clickEvent = new ClickEvent(action, ChatColor.stripColor(click));
-//        }
-//
-//        for (BaseComponent c : component) {
-//            c.setHoverEvent(hoverEvent);
-//            c.setClickEvent(clickEvent);
-//        }
-//
-//        return component;
-        return null;
+        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
+        RoseChatPlaceholder placeholder = this.getAPI().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        if (placeholder == null) return null;
+
+        BaseComponent[] components;
+        HoverEvent hoverEvent = null;
+        ClickEvent clickEvent = null;
+
+        if (placeholder.getText() == null) return null;
+        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
+        if (text == null) return null;
+        components = this.getAPI().parse(sender, viewer, text, placeholders);
+
+        if (placeholder.getHover() != null) {
+            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
+            if (hover != null) {
+                if (hover.equalsIgnoreCase("%original%")) {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
+                } else {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, this.getAPI().parse(sender, viewer, hover, placeholders));
+                }
+            }
+        }
+
+        if (placeholder.getClick() != null) {
+            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
+            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
+            if (click != null && action != null) {
+                clickEvent = new ClickEvent(action, TextComponent.toPlainText(this.getAPI().parse(sender, viewer, click, placeholders)));
+            }
+        }
+
+        for (BaseComponent component : components) {
+            component.setHoverEvent(hoverEvent);
+            component.setClickEvent(clickEvent);
+        }
+
+        return components;
     }
 
     @Override

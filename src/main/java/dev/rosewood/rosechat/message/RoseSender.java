@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
@@ -9,7 +9,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +18,7 @@ import java.util.UUID;
  */
 public class RoseSender {
 
-    private RoseChat plugin;
+    private final RoseChatAPI api;
     private Player player;
     private String displayName;
     private String group;
@@ -28,6 +27,7 @@ public class RoseSender {
     private List<String> ignoredPermissions;
 
     private RoseSender() {
+        this.api = RoseChatAPI.getInstance();
         this.ignoredPermissions = new ArrayList<>();
     }
 
@@ -37,10 +37,9 @@ public class RoseSender {
      */
     public RoseSender(Player player) {
         this();
-        this.plugin = RoseChat.getInstance();
         this.player = player;
         this.displayName = player.getDisplayName();
-        this.group = this.plugin.getVault() == null ? "default" : this.plugin.getVault().getPrimaryGroup(player);
+        this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
     }
 
     /**
@@ -51,10 +50,9 @@ public class RoseSender {
         this();
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            this.plugin = RoseChat.getInstance();
             this.player = player;
             this.displayName = player.getDisplayName();
-            this.group = this.plugin.getVault() == null ? "default" : this.plugin.getVault().getPrimaryGroup(player);
+            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.displayName = "&cConsole";
             this.group = "default";
@@ -88,18 +86,17 @@ public class RoseSender {
     public boolean hasPermission(String permission) {
         if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length()))) return true;
 
-        RoseChatAPI api = RoseChatAPI.getInstance();
-        if (api.getVault() != null) {
+        if (this.api.getVault() != null) {
             if (this.offlinePlayer != null) {
                 return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || api.getVault().playerHas(null, this.offlinePlayer, permission);
             }
 
             if (this.group != null && this.player == null) {
-                return api.getVault().groupHas((String) null, this.group, permission);
+                return this.api.getVault().groupHas((String) null, this.group, permission);
             }
         }
 
-        return this.player == null || this.player.hasPermission(permission) || this.ignoredPermissions.contains(permission.substring("rosechat.".length()));
+        return this.player == null || this.player.hasPermission(permission);
     }
 
     public List<String> getPermissions() {
@@ -140,7 +137,7 @@ public class RoseSender {
      * @param key The key of the message to send.
      */
     public void sendLocaleMessage(String key) {
-        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(this, key);
+        this.api.getLocaleManager().sendComponentMessage(this, key);
     }
 
     /**
@@ -226,8 +223,8 @@ public class RoseSender {
      */
     public String getNickname() {
         if (!this.isPlayer()) return this.getDisplayName();
-        if (RoseChatAPI.getInstance().getPlayerData(this.getUUID()) == null) return this.getDisplayName();
-        String nickname = RoseChatAPI.getInstance().getPlayerData(this.getUUID()).getNickname();
+        if (this.api.getPlayerData(this.getUUID()) == null) return this.getDisplayName();
+        String nickname = this.api.getPlayerData(this.getUUID()).getNickname();
         return nickname == null ? this.getDisplayName() : nickname;
     }
 
@@ -236,6 +233,10 @@ public class RoseSender {
      */
     public String getName() {
         return this.isConsole() ? this.getDisplayName() : this.asPlayer().getName();
+    }
+
+    public PlayerData getPlayerData() {
+        return this.uuid != null ? this.api.getPlayerData(this.uuid) : null;
     }
 
     public void setUuid(UUID uuid) {

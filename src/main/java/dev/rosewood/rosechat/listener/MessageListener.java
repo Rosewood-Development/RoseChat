@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

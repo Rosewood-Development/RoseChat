@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -38,10 +37,8 @@ public class CustomCommand extends Command {
                 } else {
                     String message = AbstractCommand.getAllArgs(0, args);
 
-                    PlayerData data = null;
                     RoseSender roseSender = new RoseSender(sender);
-                    if (roseSender.isPlayer() && roseSender.getUUID() != null) data = RoseChatAPI.getInstance().getPlayerData(roseSender.getUUID());
-                    if (!channel.canSendMessage(roseSender, data, message)) return false;
+                    if (!channel.canSendMessage(roseSender, message)) return false;
                     if (!channel.isJoinable()) {
                         RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
                         return false;

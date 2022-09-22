@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.placeholders.condition;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RoseSender;

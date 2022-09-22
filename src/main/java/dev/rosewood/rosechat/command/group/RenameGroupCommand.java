@@ -44,7 +44,7 @@ public class RenameGroupCommand extends AbstractCommand {
         }
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + message.parseToString() + "&f&r";
+        name = message.parseToString();
         groupChat.setName(name);
         groupChat.save();
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));

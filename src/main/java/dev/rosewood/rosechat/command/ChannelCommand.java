@@ -36,11 +36,9 @@ public class ChannelCommand extends AbstractCommand {
             }
 
             String message = getAllArgs(1, args);
-            PlayerData data = null;
             RoseSender roseSender = new RoseSender(sender);
-            if (roseSender.isPlayer() && roseSender.getUUID() != null) data = this.getAPI().getPlayerData(roseSender.getUUID());
 
-            if (!channel.canSendMessage(roseSender, data, message)) return;
+            if (!channel.canSendMessage(roseSender, message)) return;
             if (!channel.isJoinable()) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
                 return;

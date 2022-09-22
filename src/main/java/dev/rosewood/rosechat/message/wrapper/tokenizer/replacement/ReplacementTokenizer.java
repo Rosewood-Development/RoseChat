@@ -21,4 +21,5 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
         }
         return null;
     }
+
 }

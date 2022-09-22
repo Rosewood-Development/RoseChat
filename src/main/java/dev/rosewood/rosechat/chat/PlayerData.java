@@ -4,9 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.color.ColorToken;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +11,8 @@ import java.util.UUID;
 
 public class PlayerData {
 
-    private UUID uuid;
-    private MessageLog messageLog;
+    private final UUID uuid;
+    private final MessageLog messageLog;
     private String replyTo;
     private boolean messageSpy;
     private boolean channelSpy;
@@ -28,8 +25,8 @@ public class PlayerData {
     private ChatChannel currentChannel;
     private String color;
     private String nickname;
-    private List<GroupChat> groupInvites;
-    private List<UUID> ignoringPlayers;
+    private final List<GroupChat> groupInvites;
+    private final List<UUID> ignoringPlayers;
 
     /**
      * Creates a new PlayerData for a specific player.

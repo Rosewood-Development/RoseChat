@@ -36,7 +36,7 @@ public class ChatListener implements Listener {
             ChatChannel channel = data.getCurrentChannel();
             RoseSender sender = new RoseSender(player);
 
-            if (!channel.canSendMessage(sender, data, event.getMessage())) return;
+            if (!channel.canSendMessage(sender, event.getMessage())) return;
 
             MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
             MessageUtils.sendMessageWrapper(sender, channel, message);
