@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -17,7 +16,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
@@ -60,7 +61,10 @@ public class BungeeListener implements PluginMessageListener {
             if (command.equalsIgnoreCase("message_player")) {
                 PlayerData playerData = this.dataManager.getPlayerData(player.getUniqueId());
                 if (additional == null || !playerData.getIgnoringPlayers().contains(UUID.fromString(additional))) {
-                    MessageUtils.sendPrivateMessage(new RoseSender(commandInfoSplit[3], commandInfoSplit[4]), player.getName(), received);
+                    RoseSender roseSender = new RoseSender(commandInfoSplit[3], commandInfoSplit[4]);
+                    List<String> permissions = new ArrayList<>(Arrays.asList(commandInfoSplit[5].split(",")));
+                    roseSender.setIgnoredPermissions(permissions);
+                    MessageUtils.sendPrivateMessage(roseSender, player.getName(), received);
                 }
             } else if (command.equalsIgnoreCase("update_reply")) {
                 PlayerData playerData = this.plugin.getManager(DataManager.class).getPlayerData(player.getUniqueId());
@@ -73,8 +77,13 @@ public class BungeeListener implements PluginMessageListener {
                 String sender = commandInfoSplit[2];
                 String senderUUID = commandInfoSplit[3];
                 String senderGroup = commandInfoSplit[4];
+                String senderPermissions = commandInfoSplit[5];
+                List<String> permissions = new ArrayList<>(Arrays.asList(senderPermissions.split(",")));
                 ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(channelTo);
-                chatChannel.sendJson(sender, UUID.fromString(senderUUID), senderGroup, received);
+                RoseSender roseSender = new RoseSender(sender, senderGroup);
+                roseSender.setIgnoredPermissions(permissions);
+                roseSender.setUuid(UUID.fromString(senderUUID));
+                chatChannel.sendJson(roseSender, received);
             }
 
         } catch (IOException e) {
@@ -82,45 +91,58 @@ public class BungeeListener implements PluginMessageListener {
         }
     }
 
-    public static void sendChannelMessage(String serverTo, String channelTo, String sender, UUID senderUUID, String senderGroup, String rawMessage) {
+    /**
+     * Sends a BungeeCord message to the specified channel on the specified server.
+     * The sending and receiving server may have different format. Therefore, the raw message is sent so the
+     * receiving server can parse it correctly.
+     * A sender should contain a list of RoseChat permissions, which get sent to the specified server.
+     * This is because if the receiving server has never seen that player, their message will not be seen as intended.
+     * Due to this, any custom Tokenizers should start their permission with 'rosechat.', to avoid sending every single permission over the network.
+     *
+     * @param sender The RoseSender who sent the message.
+     * @param serverTo The server that should receive the message.
+     * @param channelTo The channel that should receive the message.
+     * @param rawMessage The unformatted message that is being sent.
+     */
+    public static void sendChannelMessage(RoseSender sender, String serverTo, String channelTo, String rawMessage) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF("Forward");
             out.writeUTF(serverTo);
-            out.writeUTF("rosechat:" + channelTo + ":" + sender + ":" + senderUUID + ":" + senderGroup);
 
-            ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-            DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            msgOut.writeUTF(rawMessage);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String permission : sender.getPermissions()) {
+                if (stringBuilder.length() != 0) stringBuilder.append(",");
+                stringBuilder.append(permission);
+            }
 
-            out.writeShort(msgBytes.toByteArray().length);
-            out.write(msgBytes.toByteArray());
-            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-            if (player != null) player.sendPluginMessage(RoseChat.getInstance(), "BungeeCord", outputStream.toByteArray());
+            out.writeUTF("rosechat:" + channelTo + ":" + sender.getNickname() + ":" + sender.getUUID() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
+
+            sendPluginMessage(outputStream, out, rawMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void sendDirectMessage(String sender, UUID senderUUID, String senderGroup, String playerName, String rawMessage) {
+    public static void sendDirectMessage(RoseSender sender, String playerTo, String rawMessage) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF("ForwardToPlayer");
-            out.writeUTF(playerName);
-            out.writeUTF("rosechat:message_player:" + senderUUID.toString() + ":" + sender + ":" + senderGroup);
+            out.writeUTF(playerTo);
 
-            ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-            DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            msgOut.writeUTF(rawMessage);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String permission : sender.getPermissions()) {
+                if (stringBuilder.length() != 0) stringBuilder.append(",");
+                stringBuilder.append(permission);
+            }
 
-            out.writeShort(msgBytes.toByteArray().length);
-            out.write(msgBytes.toByteArray());
-            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-            if (player != null) player.sendPluginMessage(RoseChat.getInstance(), "BungeeCord", outputStream.toByteArray());
+            out.writeUTF("rosechat:message_player:" + sender.getUUID() + ":" + sender.getNickname() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
+
+            sendPluginMessage(outputStream, out, rawMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -150,9 +172,17 @@ public class BungeeListener implements PluginMessageListener {
             out.writeUTF(receiver);
             out.writeUTF("rosechat:update_reply");
 
+            sendPluginMessage(outputStream, out, sender);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void sendPluginMessage(ByteArrayOutputStream outputStream, DataOutputStream out, String message) {
+        try {
             ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
             DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            msgOut.writeUTF(sender);
+            msgOut.writeUTF(message);
 
             out.writeShort(msgBytes.toByteArray().length);
             out.write(msgBytes.toByteArray());

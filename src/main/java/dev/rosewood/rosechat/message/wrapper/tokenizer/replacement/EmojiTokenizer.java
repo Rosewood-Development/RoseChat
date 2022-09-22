@@ -17,7 +17,7 @@ public class EmojiTokenizer implements Tokenizer<Token> {
                 if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) return null;
 
                 PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(messageWrapper.getSender().getUUID());
-                if (playerData == null || !playerData.hasEmojis()) continue;
+                if (playerData != null && !playerData.hasEmojis()) continue;
 
                 String originalContent = input.substring(0, emoji.getText().length());
                 String content = emoji.getReplacement();

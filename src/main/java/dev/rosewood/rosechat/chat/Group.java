@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.message.MessageWrapper;
+import dev.rosewood.rosechat.message.RoseSender;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -15,11 +17,9 @@ public interface Group {
     /**
      * Sends a json message to the group.
      * @param sender The name of the player who sent the message.
-     * @param senderUUID The UUID of the player who sent the message.
-     * @param senderGroup The group of the player who sent the message.
      * @param rawMessage The message that was originally sent.
      */
-    void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage);
+    void sendJson(RoseSender sender, String rawMessage);
 
     /**
      * Sends a message from discord.

@@ -116,7 +116,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(server, this.getId(), message.getSender().getName(), message.getSender().getUUID(), message.getSender().getGroup(), message.getMessage());
+                BungeeListener.sendChannelMessage(message.getSender(), server, this.getId(), message.getMessage());
             }
         }
 
@@ -203,9 +203,9 @@ public class ChatChannel implements Group {
     }
 
     @Override
-    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage) {
+    public void sendJson(RoseSender sender, String rawMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
-        MessageWrapper localMessage = new MessageWrapper(new RoseSender(sender, senderGroup), MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+        MessageWrapper localMessage = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
 
         // Send the message to the channel spies.
         if (!this.visibleAnywhere) {
@@ -239,7 +239,6 @@ public class ChatChannel implements Group {
             return;
         }
 
-        // Send to players in the same world.
         // Send to players in the same world.
         if (this.world != null) {
             World world = Bukkit.getWorld(this.world);
@@ -325,7 +324,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(server, this.getId(), message.getSender().getName(), message.getSender().getUUID(), message.getSender().getGroup(), message.getMessage());
+                //BungeeListener.sendChannelMessage(server, this.getId(), message.getSender().getName(), message.getSender().getUUID(), message.getSender().getGroup(), message.getMessage());
             }
         }
 
@@ -379,7 +378,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers.
         if (api.isBungee()) {
             for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(server, this.getId(), null, null, null, message);
+                //BungeeListener.sendChannelMessage(server, this.getId(), null, null, null, message);
             }
         }
 

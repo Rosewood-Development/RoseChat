@@ -49,7 +49,7 @@ public class GroupChat implements Group {
     }
 
     @Override
-    public void sendJson(String sender, UUID senderUUID, String senderGroup, String rawMessage) {
+    public void sendJson(RoseSender sender, String rawMessage) {
 
     }
 

@@ -178,7 +178,7 @@ public class MessageUtils {
             if (targetName.equalsIgnoreCase("Console")) {
                 Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
             } else {
-                BungeeListener.sendDirectMessage(message.getSender().getNickname(), sender.getUUID(), sender.getGroup(), targetName, message.getMessage());
+                BungeeListener.sendDirectMessage(message.getSender(), targetName, message.getMessage());
             }
         } else {
             target.spigot().sendMessage(receivedMessage);

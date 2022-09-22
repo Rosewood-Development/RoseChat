@@ -8,6 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,12 +24,19 @@ public class RoseSender {
     private String displayName;
     private String group;
     private OfflinePlayer offlinePlayer;
+    private UUID uuid;
+    private List<String> ignoredPermissions;
+
+    private RoseSender() {
+        this.ignoredPermissions = new ArrayList<>();
+    }
 
     /**
      * Creates a new RoseSender.
      * @param player The player to use.
      */
     public RoseSender(Player player) {
+        this();
         this.plugin = RoseChat.getInstance();
         this.player = player;
         this.displayName = player.getDisplayName();
@@ -37,6 +48,7 @@ public class RoseSender {
      * @param sender The CommandSender to use.
      */
     public RoseSender(CommandSender sender) {
+        this();
         if (sender instanceof Player) {
             Player player = (Player) sender;
             this.plugin = RoseChat.getInstance();
@@ -55,6 +67,7 @@ public class RoseSender {
      * @param group The group to use.
      */
     public RoseSender(String name, String group) {
+        this();
         this.displayName = name;
         this.group = group;
     }
@@ -64,6 +77,7 @@ public class RoseSender {
      * @param offlinePlayer The offline player to use.
      */
     public RoseSender(OfflinePlayer offlinePlayer) {
+        this();
         this.offlinePlayer = offlinePlayer;
     }
 
@@ -72,6 +86,8 @@ public class RoseSender {
      * @return True if the RoseSender has the permission.
      */
     public boolean hasPermission(String permission) {
+        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length()))) return true;
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         if (api.getVault() != null) {
             if (this.offlinePlayer != null) {
@@ -83,7 +99,26 @@ public class RoseSender {
             }
         }
 
-        return this.player == null || this.player.hasPermission(permission);
+        return this.player == null || this.player.hasPermission(permission) || this.ignoredPermissions.contains(permission.substring("rosechat.".length()));
+    }
+
+    public List<String> getPermissions() {
+        List<String> permissions = new ArrayList<>();
+        if (this.isPlayer()) {
+            for (PermissionAttachmentInfo permission : this.player.getEffectivePermissions()) {
+                if (permission.getPermission().startsWith("rosechat.")) permissions.add(permission.getPermission().substring("rosechat.".length()));
+            }
+        }
+
+        return permissions;
+    }
+
+    public void setIgnoredPermissions(List<String> permissions) {
+        this.ignoredPermissions = permissions;
+    }
+
+    public List<String> getIgnoredPermissions() {
+        return this.ignoredPermissions;
     }
 
     /**
@@ -154,7 +189,8 @@ public class RoseSender {
      * @return The UUID of the player.
      */
     public UUID getUUID() {
-        if (this.isPlayer()) return this.player.getUniqueId();
+        if (this.uuid != null) return this.uuid;
+        else if (this.isPlayer()) return this.player.getUniqueId();
         else if (this.offlinePlayer != null) return this.offlinePlayer.getUniqueId();
         else return null;
     }
@@ -202,4 +238,7 @@ public class RoseSender {
         return this.isConsole() ? this.getDisplayName() : this.asPlayer().getName();
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
 }
