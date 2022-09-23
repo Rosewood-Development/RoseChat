@@ -20,6 +20,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +55,10 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         }
 
         PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
-        String url = urlPlaceholder != null ? urlPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        String url = urlPlaceholder != null ? ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
 
         PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
-        String title = titlePlaceholder != null ? titlePlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        String title = titlePlaceholder != null ? ChatColor.stripColor(placeholders.apply(titlePlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
         if (title != null && title.contains("{message}")) {
             message = messageWrapper.parseToDiscord(title, messageWrapper.getSender());
             title = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
@@ -65,7 +66,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         }
 
         PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
-        String description = descriptionPlaceholder != null ? descriptionPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
+        String description = descriptionPlaceholder != null ? ChatColor.stripColor(placeholders.apply(descriptionPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
         if (description != null && description.contains("{message}")) {
             message = messageWrapper.parseToDiscord(description, messageWrapper.getSender());
             description = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
