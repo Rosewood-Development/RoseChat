@@ -327,7 +327,7 @@ public class MessageWrapper {
             }
 
             String[] formatSplit = format.split("\\{message\\}");
-            String before = formatSplit.length > 1 ? formatSplit[0] : null;
+            String before = formatSplit.length > 0 ? formatSplit[0] : null;
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
