@@ -252,7 +252,14 @@ public class MessageUtils {
                 .replaceAll(RAINBOW_PATTERN.pattern(), "");
     }
 
+    public static String stripNonLegacyColors(String message) {
+        return message.replaceAll(HEX_REGEX.pattern(), "")
+                .replaceAll(GRADIENT_PATTERN.pattern(), "")
+                .replaceAll(RAINBOW_PATTERN.pattern(), "");
+    }
+
     public static String processForDiscord(String text) {
+        text = stripNonLegacyColors(text);
         StringBuilder stringBuilder = new StringBuilder();
 
         boolean isFormattingCode = false;
@@ -301,7 +308,7 @@ public class MessageUtils {
             }
         }
 
-        return stringBuilder.toString();
+        return ChatColor.stripColor(stringBuilder.toString());
     }
 
     private static String getDiscordFormatting(char c) {

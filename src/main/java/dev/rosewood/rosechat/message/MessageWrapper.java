@@ -316,10 +316,10 @@ public class MessageWrapper {
 
             if (format == null || !format.contains("{message}")) {
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_DISCORD_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DEFAULT_DISCORD_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
 
@@ -331,17 +331,17 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, before, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, viewer, before, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_DISCORD_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_DISCORD_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (after != null && !after.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, after, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, viewer, after, true, Tokenizers.TO_DISCORD_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_DISCORD_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 

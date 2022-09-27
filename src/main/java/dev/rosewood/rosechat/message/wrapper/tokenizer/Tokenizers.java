@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 public class Tokenizers {
 
     public static final String DEFAULT_BUNDLE = "default";
+    public static final String DEFAULT_DISCORD_BUNDLE = "default_discord";
     public static final String COLORS_BUNDLE = "colors";
     public static final String MARKDOWN_BUNDLE = "markdown";
     public static final String DISCORD_FORMATTING_BUNDLE = "discord";
@@ -66,16 +67,16 @@ public class Tokenizers {
     public static final Tokenizer<Token> MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), MARKDOWN_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<RainbowToken> RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
-    public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
+    public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE);
     public static final Tokenizer<FormatToken> FORMAT = register("format", new FormatTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
-    public static final Tokenizer<Token> URL = register("url", new URLTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE);
-    public static final Tokenizer<Token> CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE);
+    public static final Tokenizer<Token> URL = register("url", new URLTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer<Token> CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
 
     public static List<Tokenizer<?>> getBundleValues(String bundle) {
         return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::getTokenizer).collect(Collectors.toList()));

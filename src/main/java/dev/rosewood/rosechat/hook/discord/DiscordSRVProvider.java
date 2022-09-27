@@ -51,25 +51,25 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String text = textPlaceholder != null ? textPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders) : null;
         if (text != null && text.contains("{message}")) {
             message = messageWrapper.parseToDiscord(text, messageWrapper.getSender());
-            text = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
+            text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
         }
 
         PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
         String url = urlPlaceholder != null ? ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
 
         PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
-        String title = titlePlaceholder != null ? ChatColor.stripColor(placeholders.apply(titlePlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
+        String title = titlePlaceholder != null ? placeholders.apply(titlePlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : null;
         if (title != null && title.contains("{message}")) {
             message = messageWrapper.parseToDiscord(title, messageWrapper.getSender());
-            title = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
+            title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
             hasMessagePlaceholder = true;
         }
 
         PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
-        String description = descriptionPlaceholder != null ? ChatColor.stripColor(placeholders.apply(descriptionPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders))) : null;
+        String description = descriptionPlaceholder != null ? placeholders.apply(descriptionPlaceholder.parseToString(messageWrapper.getSender(), messageWrapper.getSender(), placeholders)) : null;
         if (description != null && description.contains("{message}")) {
             message = messageWrapper.parseToDiscord(description, messageWrapper.getSender());
-            description = MessageUtils.processForDiscord(TextComponent.toPlainText(message));
+            description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
             hasMessagePlaceholder = true;
         }
 

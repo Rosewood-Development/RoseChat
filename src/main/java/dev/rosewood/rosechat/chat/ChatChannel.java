@@ -103,7 +103,7 @@ public class ChatChannel implements Group {
      * Sends a message to the channel.
      * @param message The {@link MessageWrapper} to send.
      */
-    private void sendGeneric(MessageWrapper message, String format, boolean sendToDiscord, boolean sendToBungee) {
+    private void sendGeneric(MessageWrapper message, String format, boolean sendToDiscord, boolean sendToBungee, String discordId) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to the channel spies.
@@ -132,7 +132,9 @@ public class ChatChannel implements Group {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 PlayerData data = api.getPlayerData(player.getUniqueId());
                 if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID()) || !player.hasPermission("rosechat.channel." + this.getId())) continue;
-                player.spigot().sendMessage(message.parse(format, new RoseSender(player)));
+
+                RoseSender sender = new RoseSender(player);
+                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
 
                 this.sendTagSound(message, player, data);
             }
@@ -149,8 +151,9 @@ public class ChatChannel implements Group {
                 PlayerData data = api.getPlayerData(player.getUniqueId());
                 if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
 
+                RoseSender sender = new RoseSender(player);
                 if (player.getLocation().distance(senderLocation) < this.radius)
-                    player.spigot().sendMessage(message.parse(format, new RoseSender(player)));
+                    player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
 
                 this.sendTagSound(message, player, data);
             }
@@ -169,7 +172,8 @@ public class ChatChannel implements Group {
                 PlayerData data = api.getPlayerData(player.getUniqueId());
                 if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(message.parse(format, new RoseSender(player)));
+                RoseSender sender = new RoseSender(player);
+                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
                 this.sendTagSound(message, player, data);
             }
 
@@ -185,7 +189,8 @@ public class ChatChannel implements Group {
                 PlayerData data = api.getPlayerData(player.getUniqueId());
                 if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(message.parse(format, new RoseSender(player)));
+                RoseSender sender = new RoseSender(player);
+                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
                 this.sendTagSound(message, player, data);
             }
         }
@@ -193,18 +198,18 @@ public class ChatChannel implements Group {
 
     @Override
     public void send(MessageWrapper message) {
-        this.sendGeneric(message, this.getFormat(), true, true);
+        this.sendGeneric(message, this.getFormat(), true, true, null);
     }
 
     @Override
     public void sendJson(RoseSender sender, String rawMessage) {
         MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
-        this.sendGeneric(message, this.getFormat(), true, false);
+        this.sendGeneric(message, this.getFormat(), true, false, null);
     }
 
     @Override
     public void sendFromDiscord(String id, MessageWrapper message) {
-        this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true);
+        this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true, id);
     }
 
     /**
