@@ -28,6 +28,7 @@ public class ChannelManager extends Manager {
 
     @Override
     public void reload() {
+        this.channels.clear();
         this.defaultChannel = null;
 
         File channelsFile = new File(this.rosePlugin.getDataFolder(), "channels.yml");

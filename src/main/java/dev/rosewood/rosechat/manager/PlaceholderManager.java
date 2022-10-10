@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.ChatReplacement;
-import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.placeholders.ConditionManager;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
@@ -22,8 +20,6 @@ public class PlaceholderManager extends Manager {
     private final Map<String, RoseChatPlaceholder> placeholders;
     private final Map<String, String> chatFormats;
     private final Map<String, List<String>> parsedFormats;
-    private final Map<String, Tag> tags;
-    private final Map<String, ChatReplacement> emojis;
     private DiscordPlaceholder discordPlaceholder;
 
     public PlaceholderManager(RosePlugin rosePlugin) {
@@ -31,12 +27,14 @@ public class PlaceholderManager extends Manager {
         this.placeholders = new HashMap<>();
         this.chatFormats = new HashMap<>();
         this.parsedFormats = new HashMap<>();
-        this.tags = new HashMap<>();
-        this.emojis = new HashMap<>();
     }
 
     @Override
     public void reload() {
+        this.placeholders.clear();
+        this.chatFormats.clear();
+        this.parsedFormats.clear();
+
         File placeholderFile = new File(this.rosePlugin.getDataFolder(), "placeholders.yml");
         if (!placeholderFile.exists()) this.rosePlugin.saveResource("placeholders.yml", false);
 
@@ -139,38 +137,6 @@ public class PlaceholderManager extends Manager {
 
     public Map<String, List<String>> getParsedFormats() {
         return this.parsedFormats;
-    }
-
-    public void addTag(Tag tag) {
-        this.tags.put(tag.getId(), tag);
-    }
-
-    public void removeTag(Tag tag) {
-        this.tags.remove(tag.getId());
-    }
-
-    public Tag getTag(String id) {
-        return this.tags.get(id);
-    }
-
-    public Map<String, Tag> getTags() {
-        return this.tags;
-    }
-
-    public void addEmoji(ChatReplacement replacement) {
-        this.emojis.put(replacement.getId(), replacement);
-    }
-
-    public void removeEmoji(ChatReplacement replacement) {
-        this.emojis.remove(replacement.getId());
-    }
-
-    public ChatReplacement getEmoji(String id) {
-        return this.emojis.get(id);
-    }
-
-    public Map<String, ChatReplacement> getEmojis() {
-        return this.emojis;
     }
 
     public DiscordPlaceholder getDiscordPlaceholder() {

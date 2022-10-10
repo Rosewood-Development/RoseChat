@@ -20,6 +20,8 @@ public class ReplacementManager extends Manager {
 
     @Override
     public void reload() {
+        this.replacements.clear();
+
         File replacementFile = new File(this.rosePlugin.getDataFolder(), "replacements.yml");
         if (!replacementFile.exists()) this.rosePlugin.saveResource("replacements.yml", false);
 

@@ -19,6 +19,8 @@ public class EmojiManager extends Manager {
 
     @Override
     public void reload() {
+        this.emojis.clear();
+
         File emojiFile = new File(this.rosePlugin.getDataFolder(), "emojis.yml");
         if (!emojiFile.exists()) this.rosePlugin.saveResource("emojis.yml", false);
 

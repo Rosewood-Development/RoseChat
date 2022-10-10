@@ -39,6 +39,7 @@ import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
+import dev.rosewood.rosechat.listener.ChatPreviewListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
@@ -53,7 +54,6 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
-import dev.rosewood.rosechat.message.ChatPreviewHandler;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -72,7 +72,6 @@ public class RoseChat extends RosePlugin {
     private SeniorCommandManager commandManager;
     private Permission vault;
     private DiscordChatProvider discord;
-    private ChatPreviewHandler chatPreviewHandler;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
@@ -140,6 +139,8 @@ public class RoseChat extends RosePlugin {
         // Register Listeners
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
+        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean())
+            pluginManager.registerEvents(new ChatPreviewListener(), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
@@ -156,19 +157,13 @@ public class RoseChat extends RosePlugin {
 
         dataManager.getMutedChannels((channels) -> {});
 
-        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean()) {
-            //this.chatPreviewHandler = new ChatPreviewHandler(this);
-            //this.chatPreviewHandler.enable();
-        }
+
     }
 
     @Override
     public void disable() {
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this);
-
-        if (this.chatPreviewHandler != null)
-            this.chatPreviewHandler.disable();
     }
 
     @Override

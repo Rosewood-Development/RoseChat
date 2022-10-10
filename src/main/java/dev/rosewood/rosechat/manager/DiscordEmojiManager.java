@@ -28,6 +28,8 @@ public class DiscordEmojiManager extends Manager {
 
     @Override
     public void reload() {
+        this.discordEmojis.clear();
+
         File emojiFile = new File(this.rosePlugin.getDataFolder(), "discord-emoji.json");
         if (!emojiFile.exists()) this.rosePlugin.saveResource("discord-emoji.json", false);
 

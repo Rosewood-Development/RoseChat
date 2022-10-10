@@ -21,6 +21,8 @@ public class TagManager extends Manager {
 
     @Override
     public void reload() {
+        this.tags.clear();
+
         File tagsFile = new File(this.rosePlugin.getDataFolder(), "tags.yml");
         if (!tagsFile.exists()) this.rosePlugin.saveResource("tags.yml", false);
 
