@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * The API for the RoseChat plugin.
  */
-public class RoseChatAPI {
+public final class RoseChatAPI {
 
     private static RoseChatAPI instance;
     private final RoseChat plugin;

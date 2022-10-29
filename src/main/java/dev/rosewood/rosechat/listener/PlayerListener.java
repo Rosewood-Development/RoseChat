@@ -10,10 +10,12 @@ import dev.rosewood.rosechat.manager.DataManager;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
@@ -26,8 +28,8 @@ public class PlayerListener implements Listener {
         this.channelManager = plugin.getManager(ChannelManager.class);
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerJoin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
 

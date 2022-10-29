@@ -16,6 +16,8 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -113,7 +115,7 @@ public class MessageTokenizer {
         this.toComponents(componentBuilder, new FormattedColorGenerator(null), this.tokens);
 
         // Appends an empty string to always have something in the component.
-        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.NONE);
+        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.ALL);
         return ComponentSimplifier.simplify(componentBuilder.create());
     }
 
@@ -151,7 +153,7 @@ public class MessageTokenizer {
             }
 
             if (!colorGenerator.isApplicable()) {
-                componentBuilder.append(token.getContent(), ComponentBuilder.FormatRetention.NONE);
+                componentBuilder.append(token.getContent(), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
                 if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                 if (token.getHover() != null) {
@@ -169,13 +171,13 @@ public class MessageTokenizer {
             } else {
                 // Make sure to apply the color even if there's no content
                 if (token.getContent().isEmpty()) {
-                    componentBuilder.append("");
+                    componentBuilder.append("", token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
                     colorGenerator.apply(componentBuilder, false);
                     continue;
                 }
 
                 for (char c : token.getContent().toCharArray()) {
-                    componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
+                    componentBuilder.append(String.valueOf(c), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
                     if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                     colorGenerator.apply(componentBuilder, Character.isSpaceChar(c));

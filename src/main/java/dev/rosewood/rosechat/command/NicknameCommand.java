@@ -67,9 +67,9 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         if (this.isNicknameAllowed(player, nickname)) {
-            setDisplayName(player, nickname);
+            setDisplayName(player, nickname + "&r");
 
-            playerData.setNickname(nickname);
+            playerData.setNickname(nickname + "&r");
             playerData.save();
 
             if (target == null) {

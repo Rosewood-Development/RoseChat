@@ -19,6 +19,7 @@ public class Token {
     protected HoverEvent.Action hoverAction;
     protected ClickEvent.Action clickAction;
     protected boolean requiresTokenizing;
+    protected boolean retainColour;
     protected Set<Tokenizer<?>> ignoredTokenizers;
     protected StringPlaceholders.Builder placeholders;
     protected List<Token> children, hoverChildren;
@@ -32,6 +33,7 @@ public class Token {
         this.hoverAction = settings.hoverAction;
         this.clickAction = settings.clickAction;
         this.requiresTokenizing = settings.requiresTokenizing;
+        this.retainColour = settings.retainColour;
         this.ignoredTokenizers = settings.ignoredTokenizers;
         this.placeholders = settings.placeholders;
         this.children = new ArrayList<>();
@@ -66,6 +68,8 @@ public class Token {
                 child.click = this.getClick();
                 child.clickAction = this.clickAction;
             }
+
+            child.retainColour = this.retainColour;
         }
         this.children.addAll(children);
     }
@@ -144,6 +148,10 @@ public class Token {
         return this.ignoredTokenizers;
     }
 
+    public boolean shouldRetainColour() {
+        return this.retainColour;
+    }
+
     public StringPlaceholders getPlaceholders() {
         return this.placeholders.build();
     }
@@ -151,6 +159,7 @@ public class Token {
     public void applyInheritance(Token child) {
         child.ignoredTokenizers.addAll(this.ignoredTokenizers);
         child.placeholders.addAll(this.getPlaceholders());
+        child.retainColour = this.retainColour;
     }
 
     public static class TokenSettings {
@@ -160,6 +169,7 @@ public class Token {
         private HoverEvent.Action hoverAction;
         private ClickEvent.Action clickAction;
         private boolean requiresTokenizing;
+        private boolean retainColour;
         private final Set<Tokenizer<?>> ignoredTokenizers;
         private final StringPlaceholders.Builder placeholders;
 
@@ -172,6 +182,7 @@ public class Token {
             this.hoverAction = null;
             this.clickAction = null;
             this.requiresTokenizing = true;
+            this.retainColour = false;
             this.ignoredTokenizers = new HashSet<>();
             this.placeholders = StringPlaceholders.builder();
         }
@@ -208,6 +219,11 @@ public class Token {
 
         public TokenSettings requiresTokenizing(boolean tokenizeRecursively) {
             this.requiresTokenizing = tokenizeRecursively;
+            return this;
+        }
+
+        public TokenSettings retainColour(boolean retainColour) {
+            this.retainColour = retainColour;
             return this;
         }
 

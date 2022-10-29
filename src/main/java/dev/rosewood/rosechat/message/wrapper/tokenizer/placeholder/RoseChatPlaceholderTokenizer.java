@@ -39,6 +39,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
             Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction);
             if (originalContent.equals(content))
                 tokenSettings.ignoreTokenizer(this);
+            tokenSettings.retainColour(true);
 
             return new Token(tokenSettings);
         }

@@ -53,7 +53,7 @@ player:
 
 separator:
   text:
-    default: " &e» &f"
+    default: " &r&e» &f"
 
 # Placeholders used in the message format.
 message-sent:
