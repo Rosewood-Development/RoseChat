@@ -87,5 +87,10 @@ public class FormatToken extends Token {
 
         return colorGenerator;
     }
-    
+
+    @Override
+    public boolean hasColorGenerator() {
+        return this.format != null;
+    }
+
 }

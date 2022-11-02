@@ -29,7 +29,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(PlayerLoginEvent event) {
+    public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
 

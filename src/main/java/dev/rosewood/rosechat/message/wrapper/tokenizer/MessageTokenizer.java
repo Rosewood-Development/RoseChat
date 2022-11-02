@@ -79,7 +79,6 @@ public class MessageTokenizer {
             for (Tokenizer<?> tokenizer : this.tokenizers) {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
-
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, parent != null || this.ignorePermissions);
                 if (token != null) {
                     i += token.getOriginalContent().length() - 1;
@@ -115,7 +114,7 @@ public class MessageTokenizer {
         this.toComponents(componentBuilder, new FormattedColorGenerator(null), this.tokens);
 
         // Appends an empty string to always have something in the component.
-        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.ALL);
+        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.FORMATTING);
         return ComponentSimplifier.simplify(componentBuilder.create());
     }
 
@@ -153,7 +152,7 @@ public class MessageTokenizer {
             }
 
             if (!colorGenerator.isApplicable()) {
-                componentBuilder.append(token.getContent(), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
+                componentBuilder.append(token.getContent(), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.FORMATTING : ComponentBuilder.FormatRetention.NONE);
                 if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                 if (token.getHover() != null) {
