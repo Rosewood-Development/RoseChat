@@ -1,8 +1,8 @@
-﻿# When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
-# These can be used for custom color codes, general replacements or regular expressions.
-# These replacements can be used with placeholders in placeholder.yml.
+# When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
+# These can be used for custom color codes, general replacements, or regular expressions.
+# These replacements can be used with placeholders from custom-placeholders.yml.
 # Emojis can be defined in the emojis.yml, as they are parsed separately from replacements.
-# Check the wiki for more information:
+# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#replacementsyml
 rainbow:
   text: "&h"
   replacement: "<r:0.5>"
@@ -11,8 +11,8 @@ heart:
   text: "<3"
   replacement: "\u2764"
 
-  # The '%message%' placeholder can be used to get what was replaced.
-  # For example, this regex matches URLs. The replacement uses a placeholder (defined in placeholders.yml) to make it hoverable and clickable.
+# The '%message%' placeholder can be used to get what was replaced.
+# For example, this regex matches URLs. The replacement uses a placeholder (defined in custom-placeholders.yml) to make it hoverable and clickable.
 regex-example:
   text: '(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\+~#=]{2,32}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
   replacement: "{url}"

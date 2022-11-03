@@ -16,7 +16,7 @@ player:
   # Set to 'none' for no sound.
   sound: BLOCK_NOTE_BLOCK_PLING
 
-  # The format for this tag. These are placeholders defined in placeholders.yml.
+  # The format for this tag. These are placeholders defined in custom-placeholders.yml.
   format: '{player-tag}'
 
 # This tag allows players to use hashtags in-game.
@@ -32,7 +32,7 @@ money:
   format: '{money-tag}'
 
 # This tag allows for a spoiler in-game.
-# This makes the message black and players can over it to see the real message.
+# This makes the message black and players can hover over it to see the real message.
 # Format: <spoiler>Your Message</spoiler>
 spoiler:
   prefix: '<spoiler>'

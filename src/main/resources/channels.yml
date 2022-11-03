@@ -1,6 +1,6 @@
 # Chat channels are different chats that players can use to communicate.
-# These can be accessed with /channel, /c or a custom command.
-# Check the wiki for more information:
+# These can be accessed with /channel, /c, or a custom command.
+# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#channelsyml
 
 # The ID of the channel, the player can use this to join the channel.
 # For example, '/c global'
@@ -9,7 +9,7 @@ global:
   default: true
 
   # This is the format of the channel.
-  # The format uses placeholders defined in placeholders.yml
+  # The format uses custom placeholders defined in custom-placeholders.yml
   format: '{prefix}{player}{separator}{message}'
 
   # Can messages from this channel be sent and read while in other channels?
@@ -38,7 +38,7 @@ staff:
 # If no format is given, then the format of the default channel will be used.
 local:
 
-  # The radius is the disatance between players that can read the messages that are sent/
+  # The radius is the distance, in blocks, between players that can read the messages that are sent.
   radius: 200
 
 # Skyblock Channel - /c skyblock
@@ -51,5 +51,5 @@ skyblock:
   # This stops players from joining the channel with a command.
   joinable: false
 
-  # When auto-join is true and combined with a world channel, as soon as the player enters the world, they will also enter the channel.
+  # When auto-join is true and combined with a world channel, players will enter the channel as soon as they enter the world.
   auto-join: true

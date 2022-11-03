@@ -33,13 +33,13 @@ repositories {
 }
 
 dependencies {
-    api 'dev.rosewood:rosegarden:1.1.0.42-SNAPSHOT'
+    api 'dev.rosewood:rosegarden:1.1.0.48-SNAPSHOT'
     implementation 'org.apache.commons:commons-text:1.9'
 
     compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
-    compileOnly 'me.clip:placeholderapi:2.11.1'
+    compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
-    compileOnly 'com.discordsrv:discordsrv:1.25.1'
+    compileOnly 'com.discordsrv:discordsrv:1.26.0'
     compileOnly 'net.dv8tion:JDA:4.3.0_349'
     compileOnly 'net.kyori:adventure-platform-bukkit:4.1.0'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'

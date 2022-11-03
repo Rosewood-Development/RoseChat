@@ -1,7 +1,7 @@
 # When a message containing the 'text' is sent in chat, it will be replaced with the 'replacement'.
 # These are similar to replacements, however, a font can be specified.
 # This allows for using custom characters or images within a resource pack.
-# Check the wiki for more information:
+# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#emojisyml
 
 # This emoji is used in group chats by default.
 star:

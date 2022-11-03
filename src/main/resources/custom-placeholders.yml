@@ -1,51 +1,50 @@
-# Placeholders allow text, hover events, click events and placeholders from PlaceholderAPI.
-# These can be used in several sections within the config.yml to add more information to chat.
-# The {message} placeholder is reserved for sent messages.
-# You can set the color of a message by using the placeholder before {message}.
-# For example, the {extra} placeholder ends with '&f' this will set the message color to white.
-# These placeholders may also be used within chat if the player has permission. Example: 'rosechat.placeholders.prefix'
-# Check the wiki for more information:
+# Placeholders allow text, hover events, click events, and placeholders from PlaceholderAPI.
+# These can be used in several sections within the other configs to add more information to chat.
 
 # RoseChat has a few placeholders that do not require PlaceholderAPI:
 # %player_name% - The player's name.
-# %player_displayname% - The player's display name.
-# %player_nickname% - The player's nickname that they created using RoseChat's /nick command.
-# If a nickname does not exist then the display name will be used, if that does not exist then the name will be used.
-# %group% - The id of the group a message is sent in.
+# %player_displayname% - The player's displayname.
+# %group% - The ID of the group a message is sent in.
 # %group_name% - The name of the group a message is sent in.
 # %group_owner% - The owner of the group a message is sent in.
 # %channel% - The name of the channel a message is sent in.
-# Placeholders can be prefixed with "other_" to get the viewer rather than the sender.
+# %player_nickname% - The player's nickname, which is created by using RoseChat's /nick command.
+#                     If a nickname does not exist, the displayname will be used.
+#                     If the displayname does not exist, the name will be used.
+# These placeholders can be prefixed with "other_" to get the viewer rather than the sender.
 # For example, %other_player_name% gets the name of the viewer.
+# {message} - An internal placeholder that is reserved for sent messages.
 
-# The ID of the placeholder.
-# This defines the {prefix} placeholder.
+# The ID of the custom placeholder.
 prefix:
   # This defines the text that will be shown.
   text:
-    # Each placeholder has a condition that can be used.
+    # Each custom placeholder has a condition that can be used.
     condition: "%vault_rank%"
-    # These are the options that the condition needs to hit.
-    # If the player who is sending the message has a rank of "admin", their prefix will be set to "&8[#C0FFEEAdmin&8] ".
-    # If the placeholder fails to get a result, or the placeholder is invalid then the default value will be used.
-    # If a default value doesn't exist, then nothing will happen.
+    # These are the options that the condition's value needs to output.
+    # If the player has a %vault_rank% output of "mod", their prefix will be set to "&8[&dMod&8] &d".
+    # If the placeholder fails to get a result, or the placeholder is invalid, the "default" value will be used.
+    # If a default value doesn't exist, nothing will happen.
     default: "&7"
+    mod: "&8[&dMod&8] &d"
     admin: "&8[#C0FFEEAdmin&8] #C0FFEE"
-  # This defines the hover event for this placeholder. This is optional.
+  # This defines the hover event for this custom placeholder. This is optional.
   hover:
     condition: "%vault_rank%"
+    mod:
+      - "&dThis player moderates the server!"
     admin:
       - "&cThis player administrates the server!"
 
 player:
   text:
-    # If no condition is specified, then the default value will be used.
+    # If no condition is specified, the default value will be used.
     default: "%player_nickname%"
   hover:
     default:
       - "&7Username: &f%player_name%"
       - "&7Click to Message"
-  # This defines the click event for this placeholder. This is optional.
+  # This defines the click event for this custom placeholder. This is optional.
   click:
     default:
       action: SUGGEST_COMMAND
@@ -55,7 +54,7 @@ separator:
   text:
     default: " &r&e» &f"
 
-# Placeholders used in the message format.
+# These custom placeholders are used in the private message format.
 message-sent:
   text:
     default: "&8[&eYou &6-> &f%other_player_nickname%&8] "
@@ -82,7 +81,7 @@ message-received:
       action: SUGGEST_COMMAND
       value: "/r "
 
-# Placeholders used in the group format.
+# These custom placeholders are used in the group format.
 group-prefix:
   text:
     default: "&8[&b%group_name%&8] "
@@ -104,7 +103,7 @@ group-member-prefix:
     default:
       - "&7This person owns the group chat."
 
-# Placeholders in channel formats.
+# These custom placeholders are used in the group format.
 staffchat:
   text:
     default: "&8[&cStaff&8]"
@@ -129,7 +128,7 @@ channel-prefix:
     skyblock:
       - "&aYou're playing Skyblock!"
 
-# Placeholders used for social spy.
+# These custom placeholders are used for social spy.
 spy-prefix:
   text:
     default: "&6[&eSocialSpy&6] "
@@ -138,8 +137,8 @@ spy-players:
   text:
     default: "&8[&f%player_nickname% &6-> &f%other_player_nickname%&8] "
 
-# Placeholders used for deleting messages.
-# This placeholder does not need conditions, permissions are checked internally.
+# This custom placeholder is used for deleting messages.
+# This custom placeholder only uses the %type% condition as permissions are checked internally.
 # The %id% placeholder is used for the id of the message being deleted.
 # The %type% placeholder is used for the type of message, server or client.
 # The %message% placeholder is used to define where the X should be shown, before or after the message.
@@ -156,9 +155,9 @@ delete-message:
       action: RUN_COMMAND
       value: "/delmsg %id%"
 
-# This placeholder is used when a message is deleted.
-# This placeholder can be removed and no message will be shown when a message is deleted.
-# This placeholder does not need conditions.
+# This custom placeholder is used when a message is deleted.
+# This custom placeholder can be removed and no message will be shown when a message is deleted.
+# This custom placeholder does not need conditions.
 # The %original% placeholder is used for the original message that was deleted.
 deleted-message:
   text:
@@ -170,7 +169,7 @@ deleted-message:
     true:
       - "%original%"
 
-# Placeholders used for tags.
+# These custom placeholders are used for tags.
 # The %tagged% placeholder is used for the thing that was tagged.
 # The 'other_player' is the player who was tagged.
 player-tag:
@@ -192,7 +191,7 @@ money-tag:
       action: SUGGEST_COMMAND
       value: "/pay %player_name% %tagged%"
 
-# This placeholder uses 1 character in the text.
+# This custom placeholder uses 1 character in the text.
 # This is because the tag has match-length enabled in the config.yml file.
 # This message will be repeated as many times as the amount of letters in the tag.
 spoiler-tag:
@@ -202,7 +201,7 @@ spoiler-tag:
     default:
       - "%tagged%"
 
-# This placeholder uses a different action to allow the viewer to copy a mesage.
+# This custom placeholder uses a different action to allow the viewer to copy a message.
 copy-paste:
   text:
     default: "%tagged%"
@@ -233,7 +232,7 @@ url:
       action: OPEN_URL
       value: "%extra%"
 
-# Discord Placeholders:
+# Discord placeholders:
 # %user_nickname% - The user's nickname.
 # %user_name% - The user's name.
 # %user_role% - The user's role.
@@ -246,8 +245,8 @@ discord-player:
     default:
       - "&f%user_name%&8#%user_tag%"
 
-# This is a unique placeholder.
-# These options will do nothing in-game, only on discord.
+# This is a unique custom placeholder.
+# These options will do nothing in-game, they are only for Discord.
 discord:
   text:
     default: "{channel-prefix}{prefix}{player}{separator}{message}"

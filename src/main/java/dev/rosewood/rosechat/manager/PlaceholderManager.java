@@ -35,8 +35,8 @@ public class PlaceholderManager extends Manager {
         this.chatFormats.clear();
         this.parsedFormats.clear();
 
-        File placeholderFile = new File(this.rosePlugin.getDataFolder(), "placeholders.yml");
-        if (!placeholderFile.exists()) this.rosePlugin.saveResource("placeholders.yml", false);
+        File placeholderFile = new File(this.rosePlugin.getDataFolder(), "custom-placeholders.yml");
+        if (!placeholderFile.exists()) this.rosePlugin.saveResource("custom-placeholders.yml", false);
 
         CommentedFileConfiguration placeholderConfiguration = CommentedFileConfiguration.loadConfiguration(placeholderFile);
 
