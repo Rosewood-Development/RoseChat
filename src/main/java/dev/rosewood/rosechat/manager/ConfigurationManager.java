@@ -74,6 +74,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         USE_MARKDOWN_FORMATTING("chat-settings.use-markdown-formatting-in-game", true,
                 "Should players be allowed to use markdown formatting in-game?",
                 "For example, using **text** to bold something."),
+        CORE_SHADER_COLORS("chat-settings.core-shader-colors", Collections.singletonList("#FFFFFE"), "Which colors are being used by core shaders?",
+                "When a player uses one of these colors, RoseChat will shift the color slightly (#FFFFFE -> #FFFFFD) to avoid the shader being used without permission."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,

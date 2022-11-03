@@ -176,6 +176,10 @@ player-tag:
   text:
     default: "&e@%other_player_nickname%"
 
+bounce-tag:
+  text:
+    default: "#FDFFFF%tagged%"
+
 hashtag:
   text:
     default: "&9#%tagged%"

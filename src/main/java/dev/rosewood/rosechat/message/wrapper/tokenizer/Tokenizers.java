@@ -31,6 +31,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.rainbow.RainbowTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.EmojiTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.RegexReplacementTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.replacement.ReplacementTokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.url.URLTokenizer;
 import java.util.Collections;
@@ -67,6 +68,7 @@ public class Tokenizers {
     public static final Tokenizer<Token> MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), MARKDOWN_BUNDLE);
     public static final Tokenizer<GradientToken> GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<RainbowToken> RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
+    public static final Tokenizer<Token> SHADER_COLORS = register("shader_colors", new ShaderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
     public static final Tokenizer<ColorToken> COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE);
     public static final Tokenizer<FormatToken> FORMAT = register("format", new FormatTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE);
     public static final Tokenizer<Token> URL = register("url", new URLTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
