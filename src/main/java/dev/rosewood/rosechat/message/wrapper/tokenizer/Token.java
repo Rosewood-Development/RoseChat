@@ -71,6 +71,7 @@ public class Token {
 
             child.retainColour = this.retainColour;
         }
+
         this.children.addAll(children);
     }
 
@@ -160,6 +161,16 @@ public class Token {
         child.ignoredTokenizers.addAll(this.ignoredTokenizers);
         child.placeholders.addAll(this.getPlaceholders());
         child.retainColour = this.retainColour;
+
+        if (this.hover != null) {
+            child.hover = this.getHover();
+            child.hoverAction = this.hoverAction;
+        }
+
+        if (this.click != null) {
+            child.click = this.getClick();
+            child.clickAction = this.clickAction;
+        }
     }
 
     public static class TokenSettings {
