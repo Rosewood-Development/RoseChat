@@ -54,8 +54,9 @@ public class ChannelCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (String channel : this.getAPI().getChannelIDs()) {
-                if (sender.hasPermission("rosechat.channel." + channel)) tab.add(channel);
+            for (ChatChannel channel : this.getAPI().getChannels()) {
+                if (sender.hasPermission("rosechat.channel." + channel.getId())
+                        && channel.isJoinable()) tab.add(channel.getId());
             }
         }
 

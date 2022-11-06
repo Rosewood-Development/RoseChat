@@ -39,10 +39,6 @@ public class CustomCommand extends Command {
 
                     RoseSender roseSender = new RoseSender(sender);
                     if (!channel.canSendMessage(roseSender, message)) return false;
-                    if (!channel.isJoinable()) {
-                        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
-                        return false;
-                    }
 
                     MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
                     if (!messageWrapper.canBeSent()) {

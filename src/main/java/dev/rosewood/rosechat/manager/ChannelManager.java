@@ -38,7 +38,7 @@ public class ChannelManager extends Manager {
 
         for (String id : channelsConfig.getKeys(false)) {
             boolean isDefault = channelsConfig.contains(id + ".default") && channelsConfig.getBoolean(id + ".default");
-            String format = channelsConfig.contains(id + ".format") ? channelsConfig.getString(id + ".format") : this.defaultChannel.getFormat();
+            String format = channelsConfig.contains(id + ".format") ? channelsConfig.getString(id + ".format") : null;
             String command = channelsConfig.contains(id + ".command") ? channelsConfig.getString(id + ".command") : null;
             boolean visible = channelsConfig.contains(id + ".visible-anywhere") && channelsConfig.getBoolean(id + ".visible-anywhere");
             boolean joinable = !channelsConfig.contains(id + ".joinable") || channelsConfig.getBoolean(id + ".joinable");
@@ -66,13 +66,17 @@ public class ChannelManager extends Manager {
                 this.defaultChannel = channel;
 
             if (command != null) this.registerCommand(command);
-            this.rosePlugin.getManager(PlaceholderManager.class).parseFormat("channel-" + id, format);
+            if (channel.getFormat() != null) this.rosePlugin.getManager(PlaceholderManager.class).parseFormat("channel-" + id, format);
         }
 
         if (this.defaultChannel == null) {
             this.defaultChannel = (ChatChannel) this.channels.values().toArray()[this.channels.size() - 1];
             this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                     "&eNo default chat channel was found. Using &b" + this.defaultChannel.getId() + " &eas default.");
+        }
+
+        for (ChatChannel channel : this.channels.values()) {
+            if (channel.getFormat() == null) channel.setFormat(this.defaultChannel.getFormat());
         }
     }
 
