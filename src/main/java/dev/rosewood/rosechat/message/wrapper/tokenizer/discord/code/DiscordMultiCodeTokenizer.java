@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 
 public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
 
@@ -29,7 +30,7 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
         String format = Setting.MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE.getString();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
-        return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));
+        return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.DISCORD_CODE));
     }
 
 }

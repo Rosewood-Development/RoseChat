@@ -139,15 +139,6 @@ permissions:
       rosechat.format.channel: true
       rosechat.format.group: true
       rosechat.format.nickname: true
-  rosechat.discord:
-    description: Allows using discord formatting in-game.
-    default: op
-    children:
-      rosechat.discord.chatcolor: true
-      rosechat.discord.message: true
-      rosechat.discord.channel: true
-      rosechat.discord.group: true
-      rosechat.discord.nickname: true
   rosechat.magic:
     description: Allows using the magic fomatting code.
     default: op
