@@ -170,13 +170,13 @@ public class MessageTokenizer {
             } else {
                 // Make sure to apply the color even if there's no content
                 if (token.getContent().isEmpty()) {
-                    componentBuilder.append("", token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
+                    componentBuilder.append("", token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.FORMATTING);
                     colorGenerator.apply(componentBuilder, false);
                     continue;
                 }
 
                 for (char c : token.getContent().toCharArray()) {
-                    componentBuilder.append(String.valueOf(c), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.NONE);
+                    componentBuilder.append(String.valueOf(c), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.FORMATTING);
                     if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
 
                     colorGenerator.apply(componentBuilder, Character.isSpaceChar(c));

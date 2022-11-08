@@ -90,7 +90,7 @@ public class FormatToken extends Token {
 
     @Override
     public boolean hasColorGenerator() {
-        return this.format != null;
+        return this.format == ChatColor.RESET;
     }
 
 }
