@@ -55,7 +55,7 @@ player:
 separator:
   text:
     default: " &e» &f"
-g
+
 # These custom placeholders are used in the private message format.
 message-sent:
   text:
