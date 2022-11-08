@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -183,7 +184,9 @@ public class MessageWrapper {
      * @return The MessageWrapper.
      */
     public MessageWrapper applyDefaultColor() {
-        if (this.senderData != null) this.message = this.senderData.getColor() + this.message;
+        if (this.senderData != null)
+            this.message = this.senderData.getColor() + this.message;
+
         return this;
     }
 
@@ -195,6 +198,26 @@ public class MessageWrapper {
         if (!this.logMessages) return;
         this.deletableMessage = new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false, discordId);
         log.addDeletableMessage(this.deletableMessage);
+    }
+
+    private String getChatColorFromFormat(String format, RoseSender viewer) {
+        String lastColor = "";
+        String lastFormat = "";
+
+        String[] placeholders = format.split("\\{");
+        String colorPlaceholder = placeholders.length > 2 ? placeholders[placeholders.length - 2] : placeholders[0];
+        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(colorPlaceholder.substring(0, colorPlaceholder.length() - 1));
+        String value = placeholder.getText().parseToString(this.sender, viewer, this.placeholders);
+
+        Matcher colorMatcher = MessageUtils.STOP.matcher(value);
+        while (colorMatcher.find())
+            lastColor = colorMatcher.group();
+
+        Matcher formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(value);
+        while (formatMatcher.find())
+            lastFormat = formatMatcher.group();
+
+        return lastFormat + lastColor;
     }
 
     public BaseComponent[] parse(String format, RoseSender viewer) {
@@ -225,11 +248,13 @@ public class MessageWrapper {
             }
 
             if (format.contains("{message}")) {
+                String formatColor = this.getChatColorFromFormat(format, viewer);
+
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
             }
@@ -283,7 +308,9 @@ public class MessageWrapper {
             }
 
             if (format.contains("{message}")) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                String formatColor = this.getChatColorFromFormat(format, viewer);
+
+                componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 

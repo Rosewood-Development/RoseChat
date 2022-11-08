@@ -50,10 +50,12 @@ player:
       action: SUGGEST_COMMAND
       value: "/msg %player_name% "
 
+# This custom placeholder is the last one used before the {message} placeholder.
+# This means that the last color in this custom placeholder will be the default colour of the message.
 separator:
   text:
-    default: " &r&e» &f"
-
+    default: " &e» &f"
+g
 # These custom placeholders are used in the private message format.
 message-sent:
   text:
