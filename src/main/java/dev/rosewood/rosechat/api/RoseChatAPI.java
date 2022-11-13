@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
+import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.MessageLocation;
@@ -38,7 +39,7 @@ public final class RoseChatAPI {
     private static RoseChatAPI instance;
     private final RoseChat plugin;
     private final LocaleManager localeManager;
-    private final DataManager dataManager;
+    private final PlayerDataManager playerDataManager;
     private final GroupManager groupManager;
     private final ChannelManager channelManager;
     private final PlaceholderManager placeholderManager;
@@ -52,9 +53,9 @@ public final class RoseChatAPI {
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
         this.localeManager = this.plugin.getManager(LocaleManager.class);
-        this.dataManager = this.plugin.getManager(DataManager.class);
-        this.groupManager = this.plugin.getManager(GroupManager.class);
         this.channelManager = this.plugin.getManager(ChannelManager.class);
+        this.playerDataManager = this.plugin.getManager(PlayerDataManager.class);
+        this.groupManager = this.plugin.getManager(GroupManager.class);
         this.placeholderManager = this.plugin.getManager(PlaceholderManager.class);
         this.emojiManager = this.plugin.getManager(EmojiManager.class);
         this.replacementManager = this.plugin.getManager(ReplacementManager.class);
@@ -371,7 +372,7 @@ public final class RoseChatAPI {
      * @return The data of the player.
      */
     public PlayerData getPlayerData(UUID uuid) {
-        return this.dataManager.getPlayerData(uuid);
+        return this.playerDataManager.getPlayerData(uuid);
     }
 
     /**
@@ -382,10 +383,10 @@ public final class RoseChatAPI {
     }
 
     /**
-     * @return An instance of the data manager.
+     * @return An instance of the player data manager.
      */
-    public DataManager getDataManager() {
-        return this.dataManager;
+    public PlayerDataManager getPlayerDataManager() {
+        return this.playerDataManager;
     }
 
     /**

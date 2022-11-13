@@ -74,6 +74,7 @@ public abstract class AbstractCommand {
         this.labels.add(label);
 
         if (juniorCommand) {
+            @SuppressWarnings("unchecked")
             List<String> aliases = (List<String>) RoseChat.getInstance().getDescription().getCommands().get(label).get("aliases");
             this.labels.addAll(aliases);
         }

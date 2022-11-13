@@ -161,12 +161,10 @@ public class MessageUtils {
 
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
-            if (offlineTarget != null) {
-                PlayerData targetData = RoseChatAPI.getInstance().getDataManager().getPlayerData(offlineTarget.getUniqueId());
-                if (targetData != null && targetData.getIgnoringPlayers().contains(sender.getUUID())) {
-                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender.asPlayer(), "command-togglemessage-cannot-message");
-                    return;
-                }
+            PlayerData targetData = RoseChatAPI.getInstance().getPlayerDataManager().getPlayerData(offlineTarget.getUniqueId());
+            if (targetData != null && targetData.getIgnoringPlayers().contains(sender.getUUID())) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender.asPlayer(), "command-togglemessage-cannot-message");
+                return;
             }
         }
 
@@ -181,7 +179,7 @@ public class MessageUtils {
             target.spigot().sendMessage(receivedMessage);
         }
 
-        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getMessageSpies()) {
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
             boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
             boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
             if (isSpySender || isSpyTarget) continue;
@@ -197,7 +195,7 @@ public class MessageUtils {
         Player player = Bukkit.getPlayer(name);
         if (player != null) return player;
 
-        for (PlayerData playerData : RoseChatAPI.getInstance().getDataManager().getPlayerData().values()) {
+        for (PlayerData playerData : RoseChatAPI.getInstance().getPlayerDataManager().getPlayerData().values()) {
             if (playerData.getNickname() == null) continue;
             if (ChatColor.stripColor(HexUtils.colorify(playerData.getNickname().toLowerCase())).startsWith(name.toLowerCase())) {
                 player = Bukkit.getPlayer(playerData.getUUID());

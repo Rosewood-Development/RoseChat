@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLog;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -52,7 +53,7 @@ public class PlayerData {
      * Saves player data to the database.
      */
     public void save() {
-        RoseChat.getInstance().getManager(DataManager.class).updatePlayerData(this);
+        RoseChat.getInstance().getManager(PlayerDataManager.class).updatePlayerData(this);
     }
 
     /**
@@ -260,7 +261,7 @@ public class PlayerData {
     public void ignore(UUID target) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.add(target);
-        api.getDataManager().addIgnore(this.getUUID(), target);
+        api.getPlayerDataManager().addIgnore(this.getUUID(), target);
     }
 
     /**
@@ -270,7 +271,7 @@ public class PlayerData {
     public void unignore(UUID target) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.remove(target);
-        api.getDataManager().removeIgnore(this.getUUID(), target);
+        api.getPlayerDataManager().removeIgnore(this.getUUID(), target);
     }
 
     /**

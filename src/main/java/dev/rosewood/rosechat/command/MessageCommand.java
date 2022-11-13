@@ -41,7 +41,7 @@ public class MessageCommand extends AbstractCommand {
 
         if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
             BungeeListener.getPlayers("ALL");
-            if (!this.getAPI().getDataManager().getPlayersOnServer("ALL").contains(target)) {
+            if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
@@ -67,12 +67,11 @@ public class MessageCommand extends AbstractCommand {
         Player targetPlayer = Bukkit.getPlayer(target);
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
         if (targetPlayer != null) {
-            this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
-                if (targetPlayer != null && data != null) {
+            this.getAPI().getPlayerDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
+                if (data != null) {
                     if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
                         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                         canBeMessaged.set(false);
-                        return;
                     }
                 }
             });
@@ -128,8 +127,8 @@ public class MessageCommand extends AbstractCommand {
             }
 
             if (ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
-                if (this.getAPI().getDataManager().getBungeePlayers().containsKey("ALL")) {
-                    Collection<String> players = this.getAPI().getDataManager().getPlayersOnServer("ALL");
+                if (this.getAPI().getPlayerDataManager().getBungeePlayers().containsKey("ALL")) {
+                    Collection<String> players = this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL");
                     for (String player : players) {
                         if (sender instanceof Player && sender.getName().equalsIgnoreCase(player)) continue;
                         tab.add(player);

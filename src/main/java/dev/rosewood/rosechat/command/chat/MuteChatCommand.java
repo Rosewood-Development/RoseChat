@@ -30,10 +30,10 @@ public class MuteChatCommand extends AbstractCommand {
 
         if (channel.isMuted()) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-muted", StringPlaceholders.single("channel", channel.getId()));
-            this.getAPI().getDataManager().addMutedChannel(channel);
+            this.getAPI().getPlayerDataManager().addMutedChannel(channel);
         } else {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.single("channel", channel.getId()));
-            this.getAPI().getDataManager().removeMutedChannel(channel);
+            this.getAPI().getPlayerDataManager().removeMutedChannel(channel);
         }
     }
 

@@ -1,38 +1,28 @@
 package dev.rosewood.rosechat.manager;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
-import java.util.Collection;
-import org.bukkit.Bukkit;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicReference;
+import org.bukkit.Bukkit;
 
 public class DataManager extends AbstractDataManager {
 
     private final ChannelManager channelManager;
-    private final Map<UUID, PlayerData> playerData;
-    private final Multimap<String, String> bungeePlayers;
-    private final List<ChatChannel> mutedChannels;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
-        this.playerData = new HashMap<>();
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
-        this.bungeePlayers = ArrayListMultimap.create();
-        this.mutedChannels = new ArrayList<>();
     }
 
     @Override
@@ -43,256 +33,327 @@ public class DataManager extends AbstractDataManager {
     }
 
     public PlayerData getPlayerData(UUID uuid) {
-        return this.playerData.get(uuid);
-    }
+        AtomicReference<PlayerData> value = new AtomicReference<>(null);
+        this.databaseConnector.connect(connection -> {
+            String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
+                statement.setString(1, uuid.toString());
+                ResultSet result = statement.executeQuery();
 
-    public void unloadPlayerData(UUID uuid) {
-        this.playerData.remove(uuid);
-    }
+                if (result.next()) {
+                    boolean messageSpy = result.getBoolean("has_message_spy");
+                    boolean channelSpy = result.getBoolean("has_channel_spy");
+                    boolean groupSpy = result.getBoolean("has_group_spy");
+                    boolean canBeMessaged = result.getBoolean("can_be_messaged");
+                    boolean hasTagSounds = result.getBoolean("has_tag_sounds");
+                    boolean hasMessageSounds = result.getBoolean("has_message_sounds");
+                    boolean hasEmojis = result.getBoolean("has_emojis");
+                    String currentChannel = result.getString("current_channel");
+                    String color = result.getString("chat_color");
+                    long muteTime = result.getLong("mute_time");
+                    String nickname = result.getString("nickname");
+                    ChatChannel channel = this.channelManager.getChannel(currentChannel);
 
-    public void getPlayerData(UUID uuid, Consumer<PlayerData> callback) {
-        if (this.playerData.containsKey(uuid)) {
-            callback.accept(this.playerData.get(uuid));
-            return;
-        }
-
-        this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                PlayerData playerData;
-
-                String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
-                    statement.setString(1, uuid.toString());
-                    ResultSet result = statement.executeQuery();
-
-                    if (result.next()) {
-                        boolean messageSpy = result.getBoolean("has_message_spy");
-                        boolean channelSpy = result.getBoolean("has_channel_spy");
-                        boolean groupSpy = result.getBoolean("has_group_spy");
-                        boolean canBeMessaged = result.getBoolean("can_be_messaged");
-                        boolean hasTagSounds = result.getBoolean("has_tag_sounds");
-                        boolean hasMessageSounds = result.getBoolean("has_message_sounds");
-                        boolean hasEmojis = result.getBoolean("has_emojis");
-                        String currentChannel = result.getString("current_channel");
-                        String color = result.getString("chat_color");
-                        long muteTime = result.getLong("mute_time");
-                        String nickname = result.getString("nickname");
-                        ChatChannel channel = this.channelManager.getChannel(currentChannel);
-
-                        playerData = new PlayerData(uuid);
-                        playerData.setMessageSpy(messageSpy);
-                        playerData.setChannelSpy(channelSpy);
-                        playerData.setGroupSpy(groupSpy);
-                        playerData.setCanBeMessaged(canBeMessaged);
-                        playerData.setTagSounds(hasTagSounds);
-                        playerData.setMessageSounds(hasMessageSounds);
-                        playerData.setEmojis(hasEmojis);
-                        playerData.setCurrentChannel(channel);
-                        playerData.setColor(color);
-                        playerData.setNickname(nickname);
-                        if (muteTime > 0) playerData.mute(muteTime);
-                        this.playerData.put(uuid, playerData);
-                        callback.accept(playerData);
-                    } else {
-                        playerData = new PlayerData(uuid);
-                        this.playerData.put(uuid, playerData);
-                        callback.accept(playerData);
-                    }
+                    PlayerData playerData = new PlayerData(uuid);
+                    playerData.setMessageSpy(messageSpy);
+                    playerData.setChannelSpy(channelSpy);
+                    playerData.setGroupSpy(groupSpy);
+                    playerData.setCanBeMessaged(canBeMessaged);
+                    playerData.setTagSounds(hasTagSounds);
+                    playerData.setMessageSounds(hasMessageSounds);
+                    playerData.setEmojis(hasEmojis);
+                    playerData.setCurrentChannel(channel);
+                    playerData.setColor(color);
+                    playerData.setNickname(nickname);
+                    if (muteTime > 0) playerData.mute(muteTime);
+                    value.set(playerData);
+                } else {
+                    value.set(new PlayerData(uuid));
                 }
+            }
 
-                String ignoreQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(ignoreQuery)) {
-                    statement.setString(1, uuid.toString());
-                    ResultSet result = statement.executeQuery();
+            String ignoreQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(ignoreQuery)) {
+                statement.setString(1, uuid.toString());
+                ResultSet result = statement.executeQuery();
 
-                    if (result.next()) {
-                        UUID ignored = UUID.fromString(result.getString("ignored_uuid"));
-                        playerData.ignore(ignored);
-                    }
+                if (result.next()) {
+                    UUID ignored = UUID.fromString(result.getString("ignored_uuid"));
+                    value.get().ignore(ignored);
                 }
-            });
+            }
         });
+        return value.get();
     }
 
     public void updatePlayerData(PlayerData playerData) {
-        this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                boolean create;
+        this.databaseConnector.connect(connection -> {
+            boolean create;
 
-                String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+            String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+                statement.setString(1, playerData.getUUID().toString());
+                ResultSet result = statement.executeQuery();
+                create = !result.next();
+            }
+
+            if (create) {
+                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
+                        "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                     statement.setString(1, playerData.getUUID().toString());
-                    ResultSet result = statement.executeQuery();
-                    create = !result.next();
+                    statement.setBoolean(2, playerData.hasMessageSpy());
+                    statement.setBoolean(3, playerData.hasChannelSpy());
+                    statement.setBoolean(4, playerData.hasGroupSpy());
+                    statement.setBoolean(5, playerData.canBeMessaged());
+                    statement.setBoolean(6, playerData.hasTagSounds());
+                    statement.setBoolean(7, playerData.hasMessageSounds());
+                    statement.setBoolean(8, playerData.hasEmojis());
+                    statement.setString(9, playerData.getCurrentChannel().getId());
+                    statement.setString(10, playerData.getColor());
+                    statement.setLong(11, playerData.getMuteExpirationTime());
+                    statement.setString(12, playerData.getNickname());
+                    statement.executeUpdate();
                 }
-
-                if (create) {
-                    String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                            "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                        statement.setString(1, playerData.getUUID().toString());
-                        statement.setBoolean(2, playerData.hasMessageSpy());
-                        statement.setBoolean(3, playerData.hasChannelSpy());
-                        statement.setBoolean(4, playerData.hasGroupSpy());
-                        statement.setBoolean(5, playerData.canBeMessaged());
-                        statement.setBoolean(6, playerData.hasTagSounds());
-                        statement.setBoolean(7, playerData.hasMessageSounds());
-                        statement.setBoolean(8, playerData.hasEmojis());
-                        statement.setString(9, playerData.getCurrentChannel().getId());
-                        statement.setString(10, playerData.getColor());
-                        statement.setLong(11, playerData.getMuteExpirationTime());
-                        statement.setString(12, playerData.getNickname());
-                        statement.executeUpdate();
-                    }
-                } else {
-                    String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
-                            "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, has_emojis = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
-                            "WHERE uuid = ?";
-                    try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                        statement.setBoolean(1, playerData.hasMessageSpy());
-                        statement.setBoolean(2, playerData.hasChannelSpy());
-                        statement.setBoolean(3, playerData.hasGroupSpy());
-                        statement.setBoolean(4, playerData.canBeMessaged());
-                        statement.setBoolean(5, playerData.hasTagSounds());
-                        statement.setBoolean(6, playerData.hasMessageSounds());
-                        statement.setBoolean(7, playerData.hasEmojis());
-                        statement.setString(8, playerData.getCurrentChannel().getId());
-                        statement.setString(9, playerData.getColor());
-                        statement.setLong(10, playerData.getMuteExpirationTime());
-                        statement.setString(11, playerData.getNickname());
-                        statement.setString(12, playerData.getUUID().toString());
-                        statement.executeUpdate();
-                    }
+            } else {
+                String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
+                        "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, has_emojis = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
+                        "WHERE uuid = ?";
+                try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+                    statement.setBoolean(1, playerData.hasMessageSpy());
+                    statement.setBoolean(2, playerData.hasChannelSpy());
+                    statement.setBoolean(3, playerData.hasGroupSpy());
+                    statement.setBoolean(4, playerData.canBeMessaged());
+                    statement.setBoolean(5, playerData.hasTagSounds());
+                    statement.setBoolean(6, playerData.hasMessageSounds());
+                    statement.setBoolean(7, playerData.hasEmojis());
+                    statement.setString(8, playerData.getCurrentChannel().getId());
+                    statement.setString(9, playerData.getColor());
+                    statement.setLong(10, playerData.getMuteExpirationTime());
+                    statement.setString(11, playerData.getNickname());
+                    statement.setString(12, playerData.getUUID().toString());
+                    statement.executeUpdate();
                 }
-            });
+            }
         });
     }
 
     public void addIgnore(UUID ignoring, UUID ignored) {
-        this.async(() -> {
-            this.getDatabaseConnector().connect(connection -> {
-                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data_ignore (ignoring_uuid, ignored_uuid) " +
-                        "VALUES(?, ?)";
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                    statement.setString(1, ignoring.toString());
-                    statement.setString(2, ignored.toString());
-                    statement.executeUpdate();
-                }
-            });
+        this.databaseConnector.connect(connection -> {
+            String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data_ignore (ignoring_uuid, ignored_uuid) " +
+                    "VALUES(?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, ignoring.toString());
+                statement.setString(2, ignored.toString());
+                statement.executeUpdate();
+            }
         });
     }
 
     public void removeIgnore(UUID ignoring, UUID ignored) {
-        this.async(() -> {
-            this.getDatabaseConnector().connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ? AND ignored_uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
-                    statement.setString(1, ignoring.toString());
-                    statement.setString(2, ignored.toString());
-                    statement.executeUpdate();
-                }
-            });
+        this.databaseConnector.connect(connection -> {
+            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "player_data_ignore WHERE ignoring_uuid = ? AND ignored_uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                statement.setString(1, ignoring.toString());
+                statement.setString(2, ignored.toString());
+                statement.executeUpdate();
+            }
         });
     }
 
-    public void getMutedChannels(Consumer<List<ChatChannel>> callback) {
-        if (!this.mutedChannels.isEmpty()) {
-            callback.accept(this.mutedChannels);
-            return;
-        }
-
-        this.async(() -> {
-            this.databaseConnector.connect(connection -> {
-                List<ChatChannel> mutedChannels = new ArrayList<>();
-                String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
-                try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
-                    ResultSet result = statement.executeQuery();
-
-                    while (result.next()) {
-                        ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
-                        channel.setMuted(true);
-                        mutedChannels.add(channel);
-                    }
-
-                    callback.accept(mutedChannels);
+    public List<ChatChannel> getMutedChannels() {
+        List<ChatChannel> mutedChannels = new ArrayList<>();
+        this.databaseConnector.connect(connection -> {
+            String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
+            try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
+                ResultSet result = statement.executeQuery();
+                while (result.next()) {
+                    ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
+                    channel.setMuted(true);
+                    mutedChannels.add(channel);
                 }
-            });
+            }
         });
+        return mutedChannels;
     }
 
     public void addMutedChannel(ChatChannel channel) {
-        this.mutedChannels.add(channel);
-        this.async(() -> {
-            this.getDatabaseConnector().connect(connection -> {
-                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "muted_channels (id) " +
-                        "VALUES(?)";
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                    statement.setString(1, channel.getId());
-                    statement.executeUpdate();
-                }
-            });
+        this.databaseConnector.connect(connection -> {
+            String insertQuery = "INSERT INTO " + this.getTablePrefix() + "muted_channels (id) " +
+                    "VALUES(?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, channel.getId());
+                statement.executeUpdate();
+            }
         });
     }
 
     public void removeMutedChannel(ChatChannel channel) {
-        this.mutedChannels.remove(channel);
-        this.async(() -> {
-            this.getDatabaseConnector().connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "muted_channels WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
-                    statement.setString(1, channel.getId());
-                    statement.executeUpdate();
-                }
-            });
+        this.databaseConnector.connect(connection -> {
+            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "muted_channels WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                statement.setString(1, channel.getId());
+                statement.executeUpdate();
+            }
         });
     }
 
-    private void async(Runnable asyncCallback) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
+    public List<GroupChat> getMemberGroupChats(UUID member) {
+        List<GroupChat> groupChats = new ArrayList<>();
+        this.getDatabaseConnector().connect(connection -> {
+            String groupQuery = "SELECT gc.id, gc.name, gc.owner, gcm.uuid AS member_uuid FROM " + this.getTablePrefix() + "group_chat_member gcm JOIN " +
+                    this.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gc.id IN " +
+                    "(SELECT group_chat FROM " + this.getTablePrefix() + "group_chat_member WHERE uuid = ?) ORDER BY id;";
+
+            try (PreparedStatement statement = connection.prepareStatement(groupQuery)) {
+                statement.setString(1, member.toString());
+                ResultSet result = statement.executeQuery();
+                GroupChat current = null;
+                String previousId = "";
+
+                while (result.next()) {
+                    String id = result.getString(1);
+                    if (current != null && !id.equals(previousId)) {
+                        groupChats.add(current);
+                        current = null;
+                    }
+
+                    if (current == null) {
+                        current = new GroupChat(id);
+                        current.setName(result.getString(2));
+                        current.setOwner(UUID.fromString(result.getString(3)));
+                    }
+
+                    current.addMember(UUID.fromString(result.getString(4)));
+                    previousId = id;
+                }
+
+                if (current != null)
+                    groupChats.add(current);
+            }
+        });
+        return groupChats;
     }
 
-    private void sync(Runnable syncCallback) {
-        Bukkit.getScheduler().runTask(this.rosePlugin, syncCallback);
+    public List<String> getGroupChatNames() {
+        List<String> groupChatNames = new ArrayList<>();
+        this.getDatabaseConnector().connect(connection -> {
+            String getQuery = "SELECT id FROM " + this.getTablePrefix() + "group_chat";
+            try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
+                ResultSet result = statement.executeQuery();
+                if (result.next())
+                    groupChatNames.add(result.getString("id"));
+            }
+        });
+        return groupChatNames;
     }
 
-    public Map<UUID, PlayerData> getPlayerData() {
-        return this.playerData;
+
+    public void addGroupChatMember(GroupChat groupChat, UUID member) {
+        this.getDatabaseConnector().connect(connection -> {
+            String insertQuery = "INSERT INTO " + this.getTablePrefix() + "group_chat_member (group_chat, uuid) " +
+                    "VALUES (?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, groupChat.getId());
+                statement.setString(2, member.toString());
+                statement.executeUpdate();
+            }
+        });
     }
 
-    public List<UUID> getMessageSpies() {
-        List<UUID> spies = new ArrayList<>();
-        for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasMessageSpy()) spies.add(data.getUUID());
-        }
-
-        return spies;
+    public void removeGroupChatMember(GroupChat groupChat, UUID member) {
+        this.getDatabaseConnector().connect(connection -> {
+            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ? AND uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                statement.setString(1, groupChat.getId());
+                statement.setString(2, member.toString());
+                statement.executeUpdate();
+            }
+        });
     }
 
-    public List<UUID> getChannelSpies() {
-        List<UUID> spies = new ArrayList<>();
-        for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasChannelSpy()) spies.add(data.getUUID());
-        }
-
-        return spies;
+    public List<UUID> getGroupChatMembers(String id) {
+        List<UUID> groupChatMembers = new ArrayList<>();
+        this.getDatabaseConnector().connect(connection -> {
+            String membersQuery = "SELECT * FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
+            try (PreparedStatement statement = connection.prepareStatement(membersQuery)) {
+                statement.setString(1, id);
+                ResultSet result = statement.executeQuery();
+                if (result.next())
+                    groupChatMembers.add(UUID.fromString(result.getString("uuid")));
+            }
+        });
+        return groupChatMembers;
     }
 
-    public List<UUID> getGroupSpies() {
-        List<UUID> spies = new ArrayList<>();
-        for (PlayerData data : this.getPlayerData().values()) {
-            if (data.hasGroupSpy()) spies.add(data.getUUID());
-        }
+    public void createOrUpdateGroupChat(GroupChat groupChat) {
+        this.getDatabaseConnector().connect(connection -> {
+            boolean create;
 
-        return spies;
+            String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+                statement.setString(1, groupChat.getId());
+                ResultSet result = statement.executeQuery();
+                create = !result.next();
+            }
+
+            if (create) {
+                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "group_chat (id, name, owner) " +
+                        "VALUES (?, ?, ?)";
+                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                    statement.setString(1, groupChat.getId());
+                    statement.setString(2, groupChat.getName());
+                    statement.setString(3, groupChat.getOwner().toString());
+                    statement.executeUpdate();
+                }
+            } else {
+                String updateQuery = "UPDATE " + this.getTablePrefix() + "group_chat SET " +
+                        "name = ? WHERE owner = ?";
+                try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+                    statement.setString(1, groupChat.getName());
+                    statement.setString(2, groupChat.getOwner().toString());
+                    statement.executeUpdate();
+                }
+            }
+        });
     }
 
-    public Multimap<String, String> getBungeePlayers() {
-        return this.bungeePlayers;
+    public void deleteGroupChat(GroupChat groupChat) {
+        this.getDatabaseConnector().connect(connection -> {
+            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                statement.setString(1, groupChat.getId());
+                statement.executeUpdate();
+            }
+
+            String deleteMembersQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteMembersQuery)) {
+                statement.setString(1, groupChat.getId());
+                statement.executeUpdate();
+            }
+        });
     }
 
-    public Collection<String> getPlayersOnServer(String server) {
-        return this.bungeePlayers.get(server);
-    }
+    public GroupManager.GroupInfo getGroupInfo(String groupId) {
+        AtomicReference<GroupManager.GroupInfo> groupInfo = new AtomicReference<>();
+        this.getDatabaseConnector().connect(connection -> {
+            String getQuery = "SELECT COUNT(gcm.group_chat) as members, gc.id, gc.name, gc.owner FROM " +
+                    this.getTablePrefix() + "group_chat_member gcm JOIN " +
+                    this.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
+                statement.setString(1, groupId);
+                ResultSet result = statement.executeQuery();
 
+                if (result.next()) {
+                    String id = result.getString("id");
+                    String name = result.getString("name");
+                    String owner = result.getString("owner");
+                    int members = result.getInt("members");
+                    groupInfo.set(new GroupManager.GroupInfo(id, name, owner, members));
+                }
+            }
+        });
+        return groupInfo.get();
+    }
 }

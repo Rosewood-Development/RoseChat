@@ -50,7 +50,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
-        api.getDataManager().getPlayerData().forEach(((uuid, playerData) -> {
+        api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
             for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                 if (!deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
                 updatePlayers.add(playerData);
@@ -58,13 +58,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             }
         }));
 
-        processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
+        this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
     }
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
         event.setCancelled(true);
-        processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+        this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
     }
 
     public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
@@ -83,7 +83,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             // If not using the setting, or the player has never joined, use their discord name.
             if (!Setting.USE_IGN_WITH_DISCORD.getBoolean() || uuid == null) {
-                createMessage(message, null, member.getEffectiveName(), channel, placeholders, update, updateFor);
+                this.createMessage(message, null, member.getEffectiveName(), channel, placeholders, update, updateFor);
                 return;
             }
 
@@ -91,19 +91,19 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 PlayerData data = this.api.getPlayerData(player.getUniqueId());
-                createMessage(message, player, data.getNickname() == null ? player.getDisplayName() : data.getNickname(), channel, placeholders, update, updateFor);
+                this.createMessage(message, player, data.getNickname() == null ? player.getDisplayName() : data.getNickname(), channel, placeholders, update, updateFor);
                 return;
             }
 
             // If the cache contains a name, use it.
             String cachedNickname = this.cachedNicknames.getIfPresent(uuid);
             if (cachedNickname != null) {
-                createMessage(message, Bukkit.getOfflinePlayer(uuid), cachedNickname, channel, placeholders, update, updateFor);
+                this.createMessage(message, Bukkit.getOfflinePlayer(uuid), cachedNickname, channel, placeholders, update, updateFor);
                 return;
             }
 
             // If the cache doesn't contain a nickname, get it from the PlayerData.
-            this.api.getDataManager().getPlayerData(uuid, (data) -> {
+            this.api.getPlayerDataManager().getPlayerData(uuid, (data) -> {
                 String name;
 
                 try {
@@ -115,7 +115,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     name = member.getEffectiveName();
                 }
 
-                createMessage(message, Bukkit.getOfflinePlayer(uuid), name, channel, placeholders, update, updateFor);
+                this.createMessage(message, Bukkit.getOfflinePlayer(uuid), name, channel, placeholders, update, updateFor);
             });
 
             return;

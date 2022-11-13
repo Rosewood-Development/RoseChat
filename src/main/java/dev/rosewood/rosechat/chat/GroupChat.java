@@ -40,7 +40,7 @@ public class GroupChat implements Group {
             }
         }
 
-        for (UUID uuid : RoseChatAPI.getInstance().getDataManager().getGroupSpies()) {
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getGroupSpies()) {
             if (!this.members.contains(uuid)) {
                 Player spy = Bukkit.getPlayer(uuid);
                 if (spy != null) spy.spigot().sendMessage(message.parse(Setting.GROUP_SPY_FORMAT.getString(), new RoseSender(spy)));

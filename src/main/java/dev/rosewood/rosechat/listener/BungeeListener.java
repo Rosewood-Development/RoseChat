@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
 import org.bukkit.Bukkit;
@@ -24,11 +25,11 @@ import java.util.UUID;
 public class BungeeListener implements PluginMessageListener {
 
     private final RoseChat plugin;
-    private final DataManager dataManager;
+    private final PlayerDataManager playerDataManager;
 
     public BungeeListener(RoseChat plugin) {
         this.plugin = plugin;
-        this.dataManager = plugin.getManager(DataManager.class);
+        this.playerDataManager = plugin.getManager(PlayerDataManager.class);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class BungeeListener implements PluginMessageListener {
             if (command == null && commandInfo.equalsIgnoreCase("PlayerList")) {
                 String server = in.readUTF();
                 String[] players = in.readUTF().split(", ");
-                this.dataManager.getBungeePlayers().putAll(server, Arrays.asList(players));
+                this.playerDataManager.getBungeePlayers().putAll(server, Arrays.asList(players));
                 return;
             }
 
@@ -59,7 +60,7 @@ public class BungeeListener implements PluginMessageListener {
 
             if (!namespace.equalsIgnoreCase("rosechat")) return;
             if (command.equalsIgnoreCase("message_player")) {
-                PlayerData playerData = this.dataManager.getPlayerData(player.getUniqueId());
+                PlayerData playerData = this.playerDataManager.getPlayerData(player.getUniqueId());
                 if (additional == null || !playerData.getIgnoringPlayers().contains(UUID.fromString(additional))) {
                     RoseSender roseSender = new RoseSender(commandInfoSplit[3], commandInfoSplit[4]);
                     List<String> permissions = new ArrayList<>(Arrays.asList(commandInfoSplit[5].split(",")));
@@ -67,7 +68,7 @@ public class BungeeListener implements PluginMessageListener {
                     MessageUtils.sendPrivateMessage(roseSender, player.getName(), received);
                 }
             } else if (command.equalsIgnoreCase("update_reply")) {
-                PlayerData playerData = this.plugin.getManager(DataManager.class).getPlayerData(player.getUniqueId());
+                PlayerData playerData = this.plugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
                 if (playerData != null) {
                     playerData.setReplyTo(received);
                     playerData.save();

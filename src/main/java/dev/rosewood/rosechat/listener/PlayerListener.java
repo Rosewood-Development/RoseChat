@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.PlayerDataManager;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,18 +15,17 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
 
-    private final DataManager dataManager;
     private final ChannelManager channelManager;
+    private final PlayerDataManager playerDataManager;
 
     public PlayerListener(RoseChat plugin) {
-        this.dataManager = plugin.getManager(DataManager.class);
         this.channelManager = plugin.getManager(ChannelManager.class);
+        this.playerDataManager = plugin.getManager(PlayerDataManager.class);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -33,7 +33,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
 
-        this.dataManager.getPlayerData(player.getUniqueId(), (playerData) -> {
+        this.playerDataManager.getPlayerData(player.getUniqueId(), (playerData) -> {
             if (playerData.getCurrentChannel() == null) {
                 boolean foundChannel = false;
 
@@ -66,9 +66,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        this.dataManager.getPlayerData(player.getUniqueId()).save();
-        this.dataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
-        this.dataManager.unloadPlayerData(player.getUniqueId());
+        this.playerDataManager.getPlayerData(player.getUniqueId()).save();
+        this.playerDataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
+        this.playerDataManager.unloadPlayerData(player.getUniqueId());
     }
 
     @EventHandler

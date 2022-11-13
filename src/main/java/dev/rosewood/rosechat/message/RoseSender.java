@@ -255,7 +255,7 @@ public class RoseSender {
      * @return If a player, their name. If not, returns the display name.
      */
     public String getName() {
-        return this.isConsole() ? this.getDisplayName() : this.asPlayer().getName();
+        return !this.isPlayer() ? this.getDisplayName() : this.asPlayer().getName();
     }
 
     public PlayerData getPlayerData() {

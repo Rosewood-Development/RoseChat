@@ -3,15 +3,13 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
-import org.bukkit.Bukkit;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import org.bukkit.Bukkit;
 
 public class GroupManager extends Manager {
 
@@ -28,12 +26,14 @@ public class GroupManager extends Manager {
 
     @Override
     public void reload() {
-
+        Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId()));
+        this.loadNames();
     }
 
     @Override
     public void disable() {
-
+        this.groupChats.clear();
+        this.groupChatNames.clear();
     }
 
     public GroupChat getGroupChatById(String id) {
@@ -49,191 +49,53 @@ public class GroupManager extends Manager {
     }
 
     public void loadMemberGroupChats(UUID member) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-
-                String groupQuery = "SELECT gc.id, gc.name, gc.owner, gcm.uuid AS member_uuid FROM " + this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
-                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gc.id IN " +
-                        "(SELECT group_chat FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE uuid = ?) ORDER BY id;";
-                try (PreparedStatement statement = connection.prepareStatement(groupQuery)) {
-                    statement.setString(1, member.toString());
-                    ResultSet result = statement.executeQuery();
-                    List<GroupChat> gcs = new ArrayList<>();
-                    GroupChat current = null;
-                    String previousId = "";
-
-                    while (result.next()) {
-                        String id = result.getString(1);
-                        if (current != null && !id.equals(previousId)) {
-                            gcs.add(current);
-                            current = null;
-                        }
-
-                        if (current == null) {
-                            current = new GroupChat(id);
-                            current.setName(result.getString(2));
-                            current.setOwner(UUID.fromString(result.getString(3)));
-                        }
-
-                        current.addMember(UUID.fromString(result.getString(4)));
-                        previousId = id;
-                    }
-
-                    if (current != null) {
-                        gcs.add(current);
-
-                        for (GroupChat groupChat : gcs) {
-                            if (!this.groupChats.containsKey(groupChat.getId()))
-                                this.groupChats.put(groupChat.getId(), groupChat);
-                        }
-                    }
-                }
-            });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            List<GroupChat> groupChats = this.dataManager.getMemberGroupChats(member);
+            for (GroupChat groupChat : groupChats) {
+                if (!this.groupChats.containsKey(groupChat.getId()))
+                    this.groupChats.put(groupChat.getId(), groupChat);
+            }
         });
     }
 
     public void loadNames() {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                String getQuery = "SELECT id FROM " + this.dataManager.getTablePrefix() + "group_chat";
-                try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
-                    ResultSet result = statement.executeQuery();
-
-                    if (result.next()) {
-                        this.groupChatNames.add(result.getString("id"));
-                    }
-                }
-            });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            List<String> groupChatNames = this.dataManager.getGroupChatNames();
+            this.groupChatNames.addAll(groupChatNames);
         });
     }
 
     public void addMember(GroupChat groupChat, UUID member) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                String insertQuery = "INSERT INTO " + this.dataManager.getTablePrefix() + "group_chat_member (group_chat, uuid) " +
-                        "VALUES (?, ?)";
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                    statement.setString(1, groupChat.getId());
-                    statement.setString(2, member.toString());
-                    statement.executeUpdate();
-                }
-            });
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.addGroupChatMember(groupChat, member));
     }
 
     public void removeMember(GroupChat groupChat, UUID member) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ? AND uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
-                    statement.setString(1, groupChat.getId());
-                    statement.setString(2, member.toString());
-                    statement.executeUpdate();
-                }
-            });
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.removeGroupChatMember(groupChat, member));
     }
 
     public void getMembers(String id, Consumer<List<UUID>> callback) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                List<UUID> members = new ArrayList<>();
-
-                String membersQuery = "SELECT * FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
-                try (PreparedStatement statement = connection.prepareStatement(membersQuery)) {
-                    statement.setString(1, id);
-                    ResultSet result = statement.executeQuery();
-
-                    if (result.next()) {
-                        members.add(UUID.fromString(result.getString("uuid")));
-                    }
-                }
-
-                callback.accept(members);
-            });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            List<UUID> members = this.dataManager.getGroupChatMembers(id);
+            callback.accept(members);
         });
     }
 
     public void createOrUpdateGroupChat(GroupChat groupChat) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                boolean create;
-
-                String checkQuery = "SELECT 1 FROM " + this.dataManager.getTablePrefix() + "group_chat WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
-                    statement.setString(1, groupChat.getId());
-                    ResultSet result = statement.executeQuery();
-                    create = !result.next();
-                }
-
-                if (create) {
-                    String insertQuery = "INSERT INTO " + this.dataManager.getTablePrefix() + "group_chat (id, name, owner) " +
-                            "VALUES (?, ?, ?)";
-                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                        statement.setString(1, groupChat.getId());
-                        statement.setString(2, groupChat.getName());
-                        statement.setString(3, groupChat.getOwner().toString());
-                        statement.executeUpdate();
-                    }
-                } else {
-                    String updateQuery = "UPDATE " + this.dataManager.getTablePrefix() + "group_chat SET " +
-                            "name = ? WHERE owner = ?";
-                    try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                        statement.setString(1, groupChat.getName());
-                        statement.setString(2, groupChat.getOwner().toString());
-                        statement.executeUpdate();
-                    }
-                }
-            });
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.createOrUpdateGroupChat(groupChat));
     }
 
     public void deleteGroupChat(GroupChat groupChat) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                String deleteQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
-                    statement.setString(1, groupChat.getId());
-                    statement.executeUpdate();
-                }
-
-                String deleteMembersQuery = "DELETE FROM " + this.dataManager.getTablePrefix() + "group_chat_member WHERE group_chat = ?";
-                try (PreparedStatement statement = connection.prepareStatement(deleteMembersQuery)) {
-                    statement.setString(1, groupChat.getId());
-                    statement.executeUpdate();
-                }
-            });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            this.dataManager.deleteGroupChat(groupChat);
+            this.groupChats.remove(groupChat.getId());
         });
     }
 
     public void getGroupInfo(String groupId, Consumer<GroupInfo> callback) {
-        this.async(() -> {
-            this.dataManager.getDatabaseConnector().connect(connection -> {
-                String getQuery = "SELECT COUNT(gcm.group_chat) as members, gc.id, gc.name, gc.owner FROM " +
-                        this.dataManager.getTablePrefix() + "group_chat_member gcm JOIN " +
-                        this.dataManager.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
-                    statement.setString(1, groupId);
-                    ResultSet result = statement.executeQuery();
-
-                    if (result.next()) {
-                        String id = result.getString("id");
-                        String name = result.getString("name");
-                        String owner = result.getString("owner");
-                        int members = result.getInt("members");
-                        callback.accept(new GroupInfo(id, name, owner, members));
-                    }
-                }
-            });
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            GroupInfo groupInfo = this.dataManager.getGroupInfo(groupId);
+            callback.accept(groupInfo);
         });
-    }
-
-    private void async(Runnable asyncCallback) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, asyncCallback);
-    }
-
-    private void sync(Runnable syncCallback) {
-        Bukkit.getScheduler().runTask(this.rosePlugin, syncCallback);
     }
 
     public void addGroupChat(GroupChat groupChat) {

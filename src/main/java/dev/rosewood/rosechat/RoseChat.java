@@ -52,6 +52,7 @@ import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
+import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -81,7 +82,7 @@ public class RoseChat extends RosePlugin {
     @Override
     public void enable() {
         PluginManager pluginManager = Bukkit.getPluginManager();
-        initHooks(pluginManager);
+        this.initHooks(pluginManager);
 
         // Register Commands
         CommandManager messageCommand = new CommandManager(new MessageCommand());
@@ -144,20 +145,6 @@ public class RoseChat extends RosePlugin {
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
-
-        // Load data and group chats for all players currently online
-        DataManager dataManager = this.getManager(DataManager.class);
-        GroupManager groupManager = this.getManager(GroupManager.class);
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            dataManager.getPlayerData(player.getUniqueId(), data -> {});
-            groupManager.loadMemberGroupChats(player.getUniqueId());
-        });
-
-        groupManager.loadNames();
-
-        dataManager.getMutedChannels((channels) -> {});
-
-
     }
 
     @Override
@@ -177,6 +164,7 @@ public class RoseChat extends RosePlugin {
                 ChannelManager.class,
                 DataManager.class,
                 GroupManager.class,
+                PlayerDataManager.class,
                 DiscordEmojiManager.class
         );
     }

@@ -41,7 +41,7 @@ public class ReplyCommand extends AbstractCommand {
 
         if (!target.equalsIgnoreCase("Console") && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
             BungeeListener.getPlayers("ALL");
-            if (!this.getAPI().getDataManager().getPlayersOnServer("ALL").contains(target)) {
+            if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
@@ -65,12 +65,11 @@ public class ReplyCommand extends AbstractCommand {
 
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(target);
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
-        this.getAPI().getDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
-            if (targetPlayer != null && data != null) {
+        this.getAPI().getPlayerDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
+            if (data != null) {
                 if (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer())) {
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
-                    return;
                 }
             }
         });

@@ -108,7 +108,7 @@ public class ChatChannel implements Group {
 
         // Send the message to the channel spies.
         if (!this.visibleAnywhere) {
-            for (UUID uuid : api.getDataManager().getChannelSpies()) {
+            for (UUID uuid : api.getPlayerDataManager().getChannelSpies()) {
                 if (this.getMembers().contains(uuid) || uuid == message.getSender().getUUID()) continue;
                 Player spy = Bukkit.getPlayer(uuid);
                 if (spy != null)
