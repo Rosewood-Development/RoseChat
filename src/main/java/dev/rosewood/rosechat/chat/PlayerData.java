@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +22,14 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
-    private long muteTime;
     private ChatChannel currentChannel;
     private String color;
     private String nickname;
     private final List<GroupChat> groupInvites;
     private final List<UUID> ignoringPlayers;
+
+    private long muteTime;
+    private MuteTask activeMuteTask;
 
     /**
      * Creates a new PlayerData for a specific player.
@@ -195,20 +198,6 @@ public class PlayerData {
     }
 
     /**
-     * @return The amount of time left in a player's mute, in seconds.
-     */
-    public long getMuteTime() {
-        return this.muteTime;
-    }
-
-    /**
-     * @param muteTime The time to mute the player, in seconds.
-     */
-    public void setMuteTime(long muteTime) {
-        this.muteTime = muteTime;
-    }
-
-    /**
      * @return The current chat color of the player.
      */
     public String getColor() {
@@ -282,6 +271,35 @@ public class PlayerData {
         RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.remove(target);
         api.getDataManager().removeIgnore(this.getUUID(), target);
+    }
+
+    public void mute(long expirationTime) {
+        if (this.activeMuteTask != null)
+            this.activeMuteTask.cancel();
+
+        this.muteTime = expirationTime;
+        if (expirationTime != -1)
+            this.activeMuteTask = new MuteTask(this);
+    }
+
+    public void unmute() {
+        if (this.activeMuteTask != null) {
+            this.activeMuteTask.cancel();
+            this.activeMuteTask = null;
+        }
+        this.muteTime = 0;
+    }
+
+    public boolean isMuted() {
+        return this.muteTime == -1 || this.activeMuteTask != null;
+    }
+
+    public boolean isMuteExpired() {
+        return this.muteTime > 0 && this.muteTime < System.currentTimeMillis();
+    }
+
+    public long getMuteExpirationTime() {
+        return this.muteTime;
     }
 
 }

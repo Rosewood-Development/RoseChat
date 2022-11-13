@@ -21,11 +21,10 @@ public class MuteTask extends BukkitRunnable {
     public void run() {
         if (this.data == null) this.cancel();
         Player player = Bukkit.getPlayer(this.data.getUUID());
-        if (player == null || this.data.getMuteTime() < 0) this.cancel();
-        if (this.data.getMuteTime() < System.currentTimeMillis()) {
-            this.data.setMuteTime(0);
+        if (player == null) this.cancel();
+        if (this.data.isMuteExpired()) {
+            this.data.unmute();
             this.api.getLocaleManager().sendComponentMessage(player, "command-mute-unmuted");
-            this.api.getDataManager().getMuteTasks().remove(this.data.getUUID());
             this.data.save();
             this.cancel();
         }

@@ -15,7 +15,7 @@ public class _1_Create_Tables_Data extends DataMigration {
     @Override
     public void migrate(DatabaseConnector connector, Connection connection, String tablePrefix) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE " + tablePrefix + "player_data (" +
+            statement.executeUpdate("CREATE TABLE " + tablePrefix + "player_data (" +
                     "uuid VARCHAR(36) UNIQUE NOT NULL, " +
                     "has_message_spy BOOLEAN NOT NULL, " +
                     "has_channel_spy BOOLEAN NOT NULL, " +
@@ -30,25 +30,25 @@ public class _1_Create_Tables_Data extends DataMigration {
                     "nickname VARCHAR(255)" +
                     ")");
 
-            statement.execute("CREATE TABLE " + tablePrefix + "group_chat (" +
+            statement.executeUpdate("CREATE TABLE " + tablePrefix + "group_chat (" +
                     "id VARCHAR(255) NOT NULL," +
                     "name VARCHAR(255) NOT NULL, " +
                     "owner VARCHAR(36) NOT NULL, " +
                     "UNIQUE (owner)" +
                     ")");
 
-            statement.execute("CREATE TABLE " + tablePrefix + "group_chat_member (" +
+            statement.executeUpdate("CREATE TABLE " + tablePrefix + "group_chat_member (" +
                     "group_chat INTEGER NOT NULL, " +
                     "uuid VARCHAR(36) NOT NULL, " +
                     "UNIQUE (group_chat, uuid)" +
                     ")");
 
-            statement.execute("CREATE TABLE " + tablePrefix + "player_data_ignore (" +
+            statement.executeUpdate("CREATE TABLE " + tablePrefix + "player_data_ignore (" +
                     "ignoring_uuid VARCHAR(36) NOT NULL, " +
                     "ignored_uuid VARCHAR(36) NOT NULL" +
                     ")");
 
-            statement.execute("CREATE TABLE " + tablePrefix + "muted_channels (" +
+            statement.executeUpdate("CREATE TABLE " + tablePrefix + "muted_channels (" +
                     "id VARCHAR(255) UNIQUE NOT NULL" +
                     ")");
         }

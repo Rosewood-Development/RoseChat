@@ -34,9 +34,9 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             case "current_channel":
                 return playerData.getCurrentChannel().getId();
             case "is_muted":
-                return playerData.getMuteTime() > 0 ? "yes" : "no";
+                return playerData.isMuted() ? "yes" : "no";
             case "mute_time":
-                return String.valueOf(playerData.getMuteTime());
+                return String.valueOf(playerData.getMuteExpirationTime());
             case "has_emojis":
                 return playerData.hasEmojis() ? "yes" : "no";
             case "has_message_sounds":

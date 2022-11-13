@@ -72,13 +72,13 @@ public class ChatChannel implements Group {
         PlayerData data = sender.getPlayerData();
         if (data != null) {
             // Check Mute Expiry
-            if (data.getMuteTime() > 0 && data.getMuteTime() < System.currentTimeMillis()) {
-                data.setMuteTime(0);
+            if (data.isMuteExpired()) {
+                data.unmute();
                 data.save();
             }
 
             // Don't send the message if the player is muted.
-            if (data.getMuteTime() != 0 && !sender.hasPermission("rosechat.mute.bypass")) {
+            if (data.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
                 sender.sendLocaleMessage("command-mute-cannot-send");
                 return false;
             }

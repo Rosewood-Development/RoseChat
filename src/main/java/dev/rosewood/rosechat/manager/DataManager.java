@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -22,7 +21,6 @@ public class DataManager extends AbstractDataManager {
 
     private final ChannelManager channelManager;
     private final Map<UUID, PlayerData> playerData;
-    private final Map<UUID, MuteTask> muteTasks;
     private final Map<String, List<String>> bungeePlayers;
     private final List<ChatChannel> mutedChannels;
 
@@ -30,7 +28,6 @@ public class DataManager extends AbstractDataManager {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
-        this.muteTasks = new HashMap<>();
         this.bungeePlayers = new HashMap<>();
         this.mutedChannels = new ArrayList<>();
     }
@@ -89,10 +86,9 @@ public class DataManager extends AbstractDataManager {
                         playerData.setEmojis(hasEmojis);
                         playerData.setCurrentChannel(channel);
                         playerData.setColor(color);
-                        playerData.setMuteTime(muteTime);
                         playerData.setNickname(nickname);
+                        if (muteTime > 0) playerData.mute(muteTime);
                         this.playerData.put(uuid, playerData);
-                        if (muteTime > 0) this.muteTasks.put(uuid, new MuteTask(playerData));
                         callback.accept(playerData);
                     } else {
                         playerData = new PlayerData(uuid);
@@ -142,7 +138,7 @@ public class DataManager extends AbstractDataManager {
                         statement.setBoolean(8, playerData.hasEmojis());
                         statement.setString(9, playerData.getCurrentChannel().getId());
                         statement.setString(10, playerData.getColor());
-                        statement.setLong(11, playerData.getMuteTime());
+                        statement.setLong(11, playerData.getMuteExpirationTime());
                         statement.setString(12, playerData.getNickname());
                         statement.executeUpdate();
                     }
@@ -160,7 +156,7 @@ public class DataManager extends AbstractDataManager {
                         statement.setBoolean(7, playerData.hasEmojis());
                         statement.setString(8, playerData.getCurrentChannel().getId());
                         statement.setString(9, playerData.getColor());
-                        statement.setLong(10, playerData.getMuteTime());
+                        statement.setLong(10, playerData.getMuteExpirationTime());
                         statement.setString(11, playerData.getNickname());
                         statement.setString(12, playerData.getUUID().toString());
                         statement.executeUpdate();
@@ -286,10 +282,6 @@ public class DataManager extends AbstractDataManager {
         }
 
         return spies;
-    }
-
-    public Map<UUID, MuteTask> getMuteTasks() {
-        return this.muteTasks;
     }
 
     public Map<String, List<String>> getBungeePlayers() {

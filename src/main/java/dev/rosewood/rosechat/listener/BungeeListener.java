@@ -80,9 +80,8 @@ public class BungeeListener implements PluginMessageListener {
                 String senderPermissions = commandInfoSplit[5];
                 List<String> permissions = new ArrayList<>(Arrays.asList(senderPermissions.split(",")));
                 ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(channelTo);
-                RoseSender roseSender = new RoseSender(sender, senderGroup);
+                RoseSender roseSender = new RoseSender(UUID.fromString(senderUUID), sender, senderGroup);
                 roseSender.setIgnoredPermissions(permissions);
-                roseSender.setUuid(UUID.fromString(senderUUID));
                 chatChannel.sendJson(roseSender, received);
             }
 

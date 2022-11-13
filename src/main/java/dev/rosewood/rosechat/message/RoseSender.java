@@ -19,11 +19,9 @@ import java.util.UUID;
 public class RoseSender {
 
     private final RoseChatAPI api;
-    private Player player;
     private String displayName;
     private String group;
-    private OfflinePlayer offlinePlayer;
-    private UUID uuid;
+    private OfflinePlayer player;
     private List<String> ignoredPermissions;
 
     private RoseSender() {
@@ -40,6 +38,22 @@ public class RoseSender {
         this.player = player;
         this.displayName = player.getDisplayName();
         this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
+    }
+
+    /**
+     * Creates a new RoseSender.
+     * @param offlinePlayer The player to use.
+     */
+    public RoseSender(OfflinePlayer offlinePlayer) {
+        this();
+        Player player = offlinePlayer.getPlayer();
+        if (player != null) {
+            this.player = player;
+            this.displayName = player.getDisplayName();
+            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
+        } else {
+            this.player = offlinePlayer;
+        }
     }
 
     /**
@@ -72,11 +86,15 @@ public class RoseSender {
 
     /**
      * Creates a new RoseSender.
-     * @param offlinePlayer The offline player to use.
+     * @param uuid The player UUID to use.
+     * @param name The name to use.
+     * @param group The group to use.
      */
-    public RoseSender(OfflinePlayer offlinePlayer) {
+    public RoseSender(UUID uuid, String name, String group) {
         this();
-        this.offlinePlayer = offlinePlayer;
+        this.player = Bukkit.getOfflinePlayer(uuid);
+        this.displayName = name;
+        this.group = group;
     }
 
     /**
@@ -84,28 +102,37 @@ public class RoseSender {
      * @return True if the RoseSender has the permission.
      */
     public boolean hasPermission(String permission) {
-        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length()))) return true;
+        // If the permission is ignored, return true
+        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length())))
+            return true;
 
-        if (this.api.getVault() != null) {
-            if (this.offlinePlayer != null) {
-                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || api.getVault().playerHas(null, this.offlinePlayer, permission);
-            }
+        // If the player is available, try to use their permissions
+        if (this.player != null) {
+            // Is the player online?
+            Player onlinePlayer = this.player.getPlayer();
+            if (onlinePlayer != null)
+                return onlinePlayer.hasPermission(permission);
 
-            if (this.group != null && this.player == null) {
-                return this.api.getVault().groupHas((String) null, this.group, permission);
-            }
+            // Otherwise check their offline permissions if Vault is available
+            if (this.api.getVault() != null)
+                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.api.getVault().playerHas(null, this.player, permission);
         }
 
-        return this.player == null || this.player.hasPermission(permission);
+        // If the player is not available, check the group permissions as long as we have Vault
+        if (this.group != null && this.api.getVault() != null)
+            return this.api.getVault().groupHas((String) null, this.group, permission);
+
+        // If none of the above worked, just allow it
+        return true;
     }
 
     public List<String> getPermissions() {
         List<String> permissions = new ArrayList<>();
-        if (this.isPlayer()) {
-            for (PermissionAttachmentInfo permission : this.player.getEffectivePermissions()) {
-                if (permission.getPermission().startsWith("rosechat.")) permissions.add(permission.getPermission().substring("rosechat.".length()));
-            }
-        }
+        Player player = this.asPlayer();
+        if (player != null)
+            for (PermissionAttachmentInfo permission : player.getEffectivePermissions())
+                if (permission.getPermission().startsWith("rosechat."))
+                    permissions.add(permission.getPermission().substring("rosechat.".length()));
 
         return permissions;
     }
@@ -122,7 +149,7 @@ public class RoseSender {
      * @return True if the RoseSender is a player.
      */
     public boolean isPlayer() {
-        return this.player != null;
+        return this.player != null && this.player.isOnline();
     }
 
     /**
@@ -147,7 +174,7 @@ public class RoseSender {
      */
     public boolean send(String message) {
         if (this.isPlayer()) {
-            this.player.sendMessage(message);
+            this.asPlayer().sendMessage(message);
         } else if (this.isConsole()) {
             Bukkit.getConsoleSender().sendMessage(message);
         } else {
@@ -164,7 +191,7 @@ public class RoseSender {
      */
     public boolean send(BaseComponent[] message) {
         if (this.isPlayer()) {
-            this.player.spigot().sendMessage(message);
+            this.asPlayer().spigot().sendMessage(message);
         } else if (this.isConsole()) {
             Bukkit.getConsoleSender().spigot().sendMessage(message);
         } else {
@@ -175,21 +202,17 @@ public class RoseSender {
     }
 
     /**
-     * @return A player from the RoseSender.
+     * @return A Player from the RoseSender.
      */
     public Player asPlayer() {
-        if (this.isPlayer()) return this.player;
-        else return null;
+        return this.player != null ? this.player.getPlayer() : null;
     }
 
     /**
      * @return The UUID of the player.
      */
     public UUID getUUID() {
-        if (this.uuid != null) return this.uuid;
-        else if (this.isPlayer()) return this.player.getUniqueId();
-        else if (this.offlinePlayer != null) return this.offlinePlayer.getUniqueId();
-        else return null;
+        return this.player != null ? this.player.getUniqueId() : null;
     }
 
     /**
@@ -236,10 +259,7 @@ public class RoseSender {
     }
 
     public PlayerData getPlayerData() {
-        return this.uuid != null ? this.api.getPlayerData(this.uuid) : null;
+        return this.player != null ? this.api.getPlayerData(this.player.getUniqueId()) : null;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 }

@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.command;
 
-import dev.rosewood.rosechat.chat.MuteTask;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -39,11 +38,10 @@ public class MuteCommand extends AbstractCommand {
         int outTime = 0;
         String outScale = "";
         int muteTime = -1;
-        if (args.length == 1)
-        {
+        if (args.length == 1) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", target.getName()));
             this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
-            targetData.setMuteTime(-1);
+            targetData.mute(-1);
             targetData.save();
             return;
         } else if (args.length == 3) {
@@ -98,10 +96,7 @@ public class MuteCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
 
-        if (muteTime > 0) {
-            targetData.setMuteTime((muteTime * 1000L) + System.currentTimeMillis());
-            this.getAPI().getDataManager().getMuteTasks().put(target.getUniqueId(), new MuteTask(targetData));
-        }
+        if (muteTime > 0) targetData.mute((muteTime * 1000L) + System.currentTimeMillis());
 
         targetData.save();
     }
