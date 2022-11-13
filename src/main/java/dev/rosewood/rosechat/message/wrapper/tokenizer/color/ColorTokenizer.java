@@ -16,11 +16,11 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
         boolean color = MessageUtils.hasDefaultColor(input, messageWrapper);
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
-        if (legacyToken != null) return hasPermission(messageWrapper, ignorePermissions || color, "rosechat.color") ?
+        if (legacyToken != null) return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.color") ?
                 legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
-        if (hexToken != null) return hasPermission(messageWrapper, ignorePermissions || color, "rosechat.hex") ?
+        if (hexToken != null) return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.hex") ?
                 hexToken : new ColorToken(hexToken.getOriginalContent(), null);
 
         return null;
@@ -29,11 +29,9 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
     private ColorToken parseMatcher(Pattern pattern, String input) {
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
-            String match = input.substring(matcher.start(), matcher.end());
-            if (input.startsWith(match)) {
-                String content = input.substring(matcher.start(), matcher.end());
-                return new ColorToken(content, this.fromString(content));
-            }
+            if (matcher.start() != 0) return null;
+            String content = input.substring(0, matcher.end());
+            return new ColorToken(content, this.fromString(content));
         }
 
         return null;

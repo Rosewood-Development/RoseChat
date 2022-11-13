@@ -12,7 +12,7 @@ public class ToDiscordChannelTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.channel")) return null;
+        if (!this.hasPermission(messageWrapper, ignorePermissions, "rosechat.channel")) return null;
         if (!input.startsWith("#")) return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();

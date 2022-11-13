@@ -12,7 +12,8 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
     public RainbowToken tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         // Check if the content contains the rainbow pattern.
         Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(input);
-        if (matcher.find() && matcher.start() == 0) {
+        if (matcher.find()) {
+            if (matcher.start() != 0) return null;
             // Retrieve parameters from the rainbow pattern.
             float saturation = 1.0F;
             float brightness = 1.0F;
@@ -31,7 +32,7 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
                 } catch (NumberFormatException ignored) { }
             }
 
-            return hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.rainbow") ?
+            return this.hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.rainbow") ?
                     new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f);
         }
 

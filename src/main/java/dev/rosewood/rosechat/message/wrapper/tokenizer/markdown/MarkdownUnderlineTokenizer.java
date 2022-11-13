@@ -12,12 +12,13 @@ public class MarkdownUnderlineTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.underline")) return null;
+        if (!this.hasPermission(messageWrapper, ignorePermissions, "rosechat.underline")) return null;
         if (!input.startsWith("__")) return null;
 
         Matcher matcher = MessageUtils.UNDERLINE_MARKDOWN_PATTERN.matcher(input);
         if (matcher.find()) {
-            String originalContent = input.substring(matcher.start(), matcher.end());
+            if (matcher.start() != 0) return null;
+            String originalContent = input.substring(0, matcher.end());
             String content = originalContent.substring(2, originalContent.length() - 2);
 
             String format = ConfigurationManager.Setting.MARKDOWN_FORMAT_UNDERLINE.getString();

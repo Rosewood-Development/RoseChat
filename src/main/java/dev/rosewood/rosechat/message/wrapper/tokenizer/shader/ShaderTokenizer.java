@@ -15,8 +15,8 @@ public class ShaderTokenizer implements Tokenizer<Token> {
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         if (input.startsWith("#")) {
             Matcher matcher = MessageUtils.HEX_REGEX.matcher(input);
-            if (!matcher.find()) return null;
-            String match = input.substring(matcher.start(), matcher.end());
+            if (!matcher.find() || matcher.start() != 0) return null;
+            String match = input.substring(0, matcher.end());
             if (input.startsWith(match)) {
                 if (!Setting.CORE_SHADER_COLORS.getStringList().contains(match)) return null;
                 String freeHex = this.findFreeHex(match.substring(1));

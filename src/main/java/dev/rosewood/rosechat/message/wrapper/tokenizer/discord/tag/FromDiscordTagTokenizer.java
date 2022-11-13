@@ -24,13 +24,13 @@ public class FromDiscordTagTokenizer implements Tokenizer<Token> {
         String content = null;
         boolean isRole = false;
 
-        if (matcher.find()) {
-            originalContent = input.substring(matcher.start(), matcher.end());
+        if (matcher.find() && matcher.start() == 0) {
+            originalContent = input.substring(0, matcher.end());
             content = matcher.group(1);
         }
 
-        if (roleMatcher.find()) {
-            originalContent = input.substring(roleMatcher.start(), roleMatcher.end());
+        if (roleMatcher.find() && roleMatcher.start() == 0) {
+            originalContent = input.substring(0, roleMatcher.end());
             content = roleMatcher.group(1);
             isRole = true;
         }

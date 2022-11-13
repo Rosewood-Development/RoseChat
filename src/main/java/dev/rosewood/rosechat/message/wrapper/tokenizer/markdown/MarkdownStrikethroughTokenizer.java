@@ -12,12 +12,13 @@ public class MarkdownStrikethroughTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.strikethrough")) return null;
+        if (!this.hasPermission(messageWrapper, ignorePermissions, "rosechat.strikethrough")) return null;
         if (!input.startsWith("~~")) return null;
 
         Matcher matcher = MessageUtils.STRIKETHROUGH_MARKDOWN_PATTERN.matcher(input);
         if (matcher.find()) {
-            String originalContent = input.substring(matcher.start(), matcher.end());
+            if (matcher.start() != 0) return null;
+            String originalContent = input.substring(0, matcher.end());
             String content = originalContent.substring(2, originalContent.length() - 2);
 
             String format = ConfigurationManager.Setting.MARKDOWN_FORMAT_STRIKETHROUGH.getString();

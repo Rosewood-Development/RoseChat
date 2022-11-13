@@ -23,8 +23,9 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
 
         Matcher matcher = RC_PATTERN.matcher(input);
         if (matcher.find()) {
-            String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
-            if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) return null;
+            if (matcher.start() != 0) return null;
+            String placeholder = input.substring(1, matcher.end() - 1);
+            if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(originalContent.substring(1, originalContent.length() - 1));

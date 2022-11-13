@@ -19,9 +19,10 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
         Matcher matcher = PAPI_PATTERN.matcher(input);
         if (matcher.find()) {
-            String placeholder = input.substring(matcher.start() + 1, matcher.end() - 1);
+            if (matcher.start() != 0) return null;
+            String placeholder = input.substring(1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
-            if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission)) return null;
+            if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission)) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             String content = originalContent.startsWith("%other_") ?

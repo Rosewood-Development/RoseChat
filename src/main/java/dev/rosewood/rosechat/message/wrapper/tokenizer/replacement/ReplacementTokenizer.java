@@ -13,7 +13,7 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !input.startsWith(replacement.getText())) continue;
-            if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) return null;
+            if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) return null;
             String originalContent = input.substring(0, replacement.getText().length());
             String content = replacement.getReplacement();
 

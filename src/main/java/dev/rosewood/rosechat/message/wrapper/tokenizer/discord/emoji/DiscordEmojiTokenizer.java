@@ -18,12 +18,13 @@ public class DiscordEmojiTokenizer implements Tokenizer<Token> {
         if (!input.startsWith("<")) return null;
         Matcher matcher = MessageUtils.DISCORD_EMOJI_PATTERN.matcher(input);
         if (matcher.find()) {
-            String originalContent = input.substring(matcher.start(), matcher.end());
+            if (matcher.start() != 0) return null;
+            String originalContent = input.substring(0, matcher.end());
             String content = matcher.group(1);
 
             for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
                 if (!emoji.getText().equalsIgnoreCase(content)) continue;
-                if (!hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) return null;
+                if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) return null;
                 content = emoji.getReplacement();
 
                 return new Token(new Token.TokenSettings(originalContent).content(content).font(emoji.getFont())

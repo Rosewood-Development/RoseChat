@@ -13,7 +13,7 @@ public class ToDiscordTagTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.tag")) return null;
+        if (!this.hasPermission(messageWrapper, ignorePermissions, "rosechat.tag")) return null;
         if (!Setting.CAN_TAG_MEMBERS.getBoolean()) return null;
         if (!input.startsWith("@")) return null;
 

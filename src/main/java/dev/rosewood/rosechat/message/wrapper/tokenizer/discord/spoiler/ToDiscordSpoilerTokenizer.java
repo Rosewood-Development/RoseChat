@@ -11,7 +11,7 @@ public class ToDiscordSpoilerTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
-        if (!hasPermission(messageWrapper, ignorePermissions, "rosechat.spoiler")) return null;
+        if (!this.hasPermission(messageWrapper, ignorePermissions, "rosechat.spoiler")) return null;
         String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();
         String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
         String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
