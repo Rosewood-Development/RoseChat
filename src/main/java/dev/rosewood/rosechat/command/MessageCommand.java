@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -128,7 +129,7 @@ public class MessageCommand extends AbstractCommand {
 
             if (ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
                 if (this.getAPI().getDataManager().getBungeePlayers().containsKey("ALL")) {
-                    List<String> players = this.getAPI().getDataManager().getPlayersOnServer("ALL");
+                    Collection<String> players = this.getAPI().getDataManager().getPlayersOnServer("ALL");
                     for (String player : players) {
                         if (sender instanceof Player && sender.getName().equalsIgnoreCase(player)) continue;
                         tab.add(player);

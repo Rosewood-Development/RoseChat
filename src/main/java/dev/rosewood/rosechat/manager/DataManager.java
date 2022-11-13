@@ -1,11 +1,14 @@
 package dev.rosewood.rosechat.manager;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
+import java.util.Collection;
 import org.bukkit.Bukkit;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,14 +24,14 @@ public class DataManager extends AbstractDataManager {
 
     private final ChannelManager channelManager;
     private final Map<UUID, PlayerData> playerData;
-    private final Map<String, List<String>> bungeePlayers;
+    private final Multimap<String, String> bungeePlayers;
     private final List<ChatChannel> mutedChannels;
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
-        this.bungeePlayers = new HashMap<>();
+        this.bungeePlayers = ArrayListMultimap.create();
         this.mutedChannels = new ArrayList<>();
     }
 
@@ -284,11 +287,11 @@ public class DataManager extends AbstractDataManager {
         return spies;
     }
 
-    public Map<String, List<String>> getBungeePlayers() {
+    public Multimap<String, String> getBungeePlayers() {
         return this.bungeePlayers;
     }
 
-    public List<String> getPlayersOnServer(String server) {
+    public Collection<String> getPlayersOnServer(String server) {
         return this.bungeePlayers.get(server);
     }
 

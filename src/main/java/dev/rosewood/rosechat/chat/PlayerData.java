@@ -273,6 +273,10 @@ public class PlayerData {
         api.getDataManager().removeIgnore(this.getUUID(), target);
     }
 
+    /**
+     * Mutes the player from being able to send messages.
+     * @param expirationTime The timestamp of when the mute expires.
+     */
     public void mute(long expirationTime) {
         if (this.activeMuteTask != null)
             this.activeMuteTask.cancel();
@@ -282,6 +286,9 @@ public class PlayerData {
             this.activeMuteTask = new MuteTask(this);
     }
 
+    /**
+     * Unmutes the player.
+     */
     public void unmute() {
         if (this.activeMuteTask != null) {
             this.activeMuteTask.cancel();
@@ -290,14 +297,23 @@ public class PlayerData {
         this.muteTime = 0;
     }
 
+    /**
+     * @return true if the player is muted
+     */
     public boolean isMuted() {
         return this.muteTime == -1 || this.activeMuteTask != null;
     }
 
+    /**
+     * @return true if the mute is expired, or false if it doesn't exist or hasn't expired yet
+     */
     public boolean isMuteExpired() {
         return this.muteTime > 0 && this.muteTime < System.currentTimeMillis();
     }
 
+    /**
+     * @return The timestamp of when the mute expires.
+     */
     public long getMuteExpirationTime() {
         return this.muteTime;
     }

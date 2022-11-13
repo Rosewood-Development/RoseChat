@@ -48,7 +48,7 @@ public class BungeeListener implements PluginMessageListener {
             if (command == null && commandInfo.equalsIgnoreCase("PlayerList")) {
                 String server = in.readUTF();
                 String[] players = in.readUTF().split(", ");
-                this.dataManager.getBungeePlayers().put(server, Arrays.asList(players));
+                this.dataManager.getBungeePlayers().putAll(server, Arrays.asList(players));
                 return;
             }
 
