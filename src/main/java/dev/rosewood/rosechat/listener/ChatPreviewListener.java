@@ -27,7 +27,7 @@ public class ChatPreviewListener implements Listener {
         ChatChannel channel = data.getCurrentChannel();
         RoseSender sender = new RoseSender(player);
 
-        MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filterCaps().filterLanguage().filterURLs().applyDefaultColor();
+        MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filterCaps().filterLanguage().filterURLs().applyDefaultColor().ignoreMessageLogging();
         event.setMessage(TextComponent.toLegacyText(message.parse(channel.getFormat(), sender)));
     }
 }

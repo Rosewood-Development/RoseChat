@@ -190,6 +190,15 @@ public class MessageWrapper {
         return this;
     }
 
+    /**
+     * Allows ignoring message logging.
+     * @return The MessageWrapper.
+     */
+    public MessageWrapper ignoreMessageLogging() {
+        this.logMessages = false;
+        return this;
+    }
+
     public String parseToString() {
         return this.message;
     }

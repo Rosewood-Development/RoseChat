@@ -62,6 +62,21 @@ public class PlayerDataManager extends Manager {
         });
     }
 
+    /**
+     * Gets the PlayerData synchronously. May cause a database query on the main thread.
+     *
+     * @param uuid The UUID of the player to load.
+     * @return The PlayerData for the player.
+     */
+    public PlayerData getPlayerDataSynchronous(UUID uuid) {
+        if (this.playerData.containsKey(uuid))
+            return this.playerData.get(uuid);
+
+        PlayerData playerData = this.dataManager.getPlayerData(uuid);
+        this.playerData.put(uuid, playerData);
+        return playerData;
+    }
+
     public void updatePlayerData(PlayerData playerData) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             this.dataManager.updatePlayerData(playerData);

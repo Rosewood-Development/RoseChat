@@ -29,46 +29,92 @@ public class PacketListener {
     private static Field componentsArrayField;
     private static Field adventureMessageField;
 
+    private static Field contentField;
+    private static Field adventureContentField;
+
     public PacketListener(RoseChat plugin) {
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT) {
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT) {
             final RoseChatAPI api = RoseChatAPI.getInstance();
 
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (event.getPacketType() != PacketType.Play.Server.CHAT) return;
-                Player player = event.getPlayer();
-                PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
-                if (playerData == null) return;
+                if (event.getPacketType() == PacketType.Play.Server.CHAT) {
+                    Player player = event.getPlayer();
+                    PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
+                    if (playerData == null) return;
 
-                PacketContainer packet = event.getPacket();
-                String messageJson;
+                    PacketContainer packet = event.getPacket();
+                    String messageJson;
 
-                WrappedChatComponent chatComponent = packet.getChatComponents().readSafely(0);
-                if (chatComponent == null) {
-                    messageJson = getMessageReflectively(packet);
-                } else {
-                    messageJson = chatComponent.getJson();
-                }
+                    WrappedChatComponent chatComponent = packet.getChatComponents().readSafely(0);
+                    if (chatComponent == null) {
+                        messageJson = getMessageReflectively(packet);
+                    } else {
+                        messageJson = chatComponent.getJson();
+                    }
 
-                if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
+                    if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
 
-                // Ensures chat messages are added separately, to differentiate between client and server messages.
-                if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
-                UUID messageId = UUID.randomUUID();
+                    // Ensures chat messages are added separately, to differentiate between client and server messages.
+                    if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
+                    UUID messageId = UUID.randomUUID();
 
-                if (!player.hasPermission("rosechat.deletemessages.client")) {
+                    if (!player.hasPermission("rosechat.deletemessages.client")) {
+                        playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                        return;
+                    }
+
+                    RoseSender sender = new RoseSender(player);
+                    BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
+
+                    if (deleteClientButton == null) return;
+
+                    messageJson = ComponentSerializer.toString(deleteClientButton);
                     playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
-                    return;
+
+                    // Overwrite the packet since packet fields are final in 1.19
+                    PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.CHAT);
+                    newPacket.getChatComponents().write(0, WrappedChatComponent.fromJson(messageJson));
+                    event.setPacket(newPacket);
+                } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT) {
+                    Player player = event.getPlayer();
+                    PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
+                    if (playerData == null) return;
+
+                    PacketContainer packet = event.getPacket();
+                    String messageJson;
+
+                    String jsonString = packet.getStrings().readSafely(0);
+                    if (jsonString != null) {
+                        messageJson = jsonString;
+                    } else {
+                        messageJson = getMessageReflectively(packet);
+                    }
+
+                    if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
+
+                    // Ensures chat messages are added separately, to differentiate between client and server messages.
+                    if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
+                    UUID messageId = UUID.randomUUID();
+
+                    if (!player.hasPermission("rosechat.deletemessages.client")) {
+                        playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                        return;
+                    }
+
+                    RoseSender sender = new RoseSender(player);
+                    BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
+
+                    if (deleteClientButton == null) return;
+
+                    messageJson = ComponentSerializer.toString(deleteClientButton);
+                    playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+
+                    // Overwrite the packet since packet fields are final in 1.19
+                    PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
+                    newPacket.getStrings().write(0, messageJson);
+                    event.setPacket(newPacket);
                 }
-
-                RoseSender sender = new RoseSender(player);
-                BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
-
-                if (deleteClientButton == null) return;
-
-                messageJson = ComponentSerializer.toString(deleteClientButton);
-                if (!setMessageReflectively(packet, messageJson)) chatComponent.setJson(messageJson);
-                playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
             }
         });
     }
@@ -111,55 +157,69 @@ public class PacketListener {
 
     // Thanks, Nicole!
     private String getMessageReflectively(PacketContainer packet) {
-        // Assume this is a component array message, need to do some reflective nonsense to get it into json
-        try {
-            if (componentsArrayField == null) {
-                try {
-                    componentsArrayField = packet.getHandle().getClass().getDeclaredField("components");
-                    componentsArrayField.setAccessible(true);
-                } catch (ReflectiveOperationException ignored) {
-                    return null;
+        if (packet.getType() == PacketType.Play.Server.CHAT) {
+            // Assume this is a component array message, need to do some reflective nonsense to get it into json
+            try {
+                if (componentsArrayField == null) {
+                    try {
+                        componentsArrayField = packet.getHandle().getClass().getDeclaredField("components");
+                        componentsArrayField.setAccessible(true);
+                    } catch (ReflectiveOperationException ignored) {
+                        return null;
+                    }
                 }
-            }
 
-            return ComponentSerializer.toString((BaseComponent[]) componentsArrayField.get(packet.getHandle()));
-        } catch (Exception ignored) {}
+                return ComponentSerializer.toString((BaseComponent[]) componentsArrayField.get(packet.getHandle()));
+            } catch (Exception ignored) {}
 
-        // Welp, that didn't work
-        // Assume this is an Adventure chat message, need to do some other reflective nonsense to get it into json
-        try {
-            if (adventureMessageField == null) {
-                try {
-                    adventureMessageField = packet.getHandle().getClass().getDeclaredField("adventure$message");
-                    adventureMessageField.setAccessible(true);
-                } catch (ReflectiveOperationException ignored) {
-                    return null;
+            // Welp, that didn't work
+            // Assume this is an Adventure chat message, need to do some other reflective nonsense to get it into json
+            try {
+                if (adventureMessageField == null) {
+                    try {
+                        adventureMessageField = packet.getHandle().getClass().getDeclaredField("adventure$message");
+                        adventureMessageField.setAccessible(true);
+                    } catch (ReflectiveOperationException e) {
+                        return null;
+                    }
                 }
-            }
 
-            GsonComponentSerializer serializer = GsonComponentSerializer.builder().build();
-            return serializer.serialize((Component) adventureMessageField.get(packet.getHandle()));
-        } catch (Exception ignored) {}
+                GsonComponentSerializer serializer = GsonComponentSerializer.builder().build();
+                return serializer.serialize((Component) adventureMessageField.get(packet.getHandle()));
+            } catch (Exception ignored) {}
+        } else if (packet.getType() == PacketType.Play.Server.SYSTEM_CHAT) {
+            // Assume this is a normal json message
+            try {
+                if (contentField == null) {
+                    try {
+                        contentField = packet.getHandle().getClass().getDeclaredField("content");
+                        contentField.setAccessible(true);
+                    } catch (ReflectiveOperationException ignored) {}
+                }
+
+                String value = (String) contentField.get(packet.getHandle());
+                if (value != null)
+                    return value;
+            } catch (Exception ignored) {}
+
+            // Welp, that didn't work
+            // Assume this is an Adventure chat message, need to do some other reflective nonsense to get it into json
+            try {
+                if (adventureContentField == null) {
+                    try {
+                        adventureContentField = packet.getHandle().getClass().getDeclaredField("adventure$content");
+                        adventureContentField.setAccessible(true);
+                    } catch (ReflectiveOperationException e) {
+                        return null;
+                    }
+                }
+
+                GsonComponentSerializer serializer = GsonComponentSerializer.builder().build();
+                return serializer.serialize((Component) adventureContentField.get(packet.getHandle()));
+            } catch (Exception ignored) {}
+        }
 
         return null;
-    }
-
-    private boolean setMessageReflectively(PacketContainer packet, String json) {
-        try {
-            if (componentsArrayField != null) {
-                componentsArrayField.set(packet.getHandle(), ComponentSerializer.parse(json));
-                return true;
-            }
-        } catch (IllegalAccessException ignored) {}
-
-        try {
-            if (adventureMessageField != null) {
-                GsonComponentSerializer serializer = GsonComponentSerializer.builder().build();
-                adventureMessageField.set(packet.getHandle(), serializer.deserialize(json));
-                return true;
-            }
-        } catch (IllegalAccessException ignored) {}
-        return false;
     }
 
 }
