@@ -225,6 +225,7 @@ public class MessageWrapper {
 
         String[] placeholders = format.split("\\{");
         String colorPlaceholder = placeholders.length > 2 ? placeholders[placeholders.length - 2] : placeholders[0];
+        if (!colorPlaceholder.endsWith("}")) colorPlaceholder = colorPlaceholder.substring(0, colorPlaceholder.lastIndexOf("}") + 1);
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(colorPlaceholder.substring(0, colorPlaceholder.length() - 1));
         String value = placeholder.getText().parseToString(this.sender, viewer, this.placeholders);
 
@@ -235,6 +236,18 @@ public class MessageWrapper {
         Matcher formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(value);
         while (formatMatcher.find())
             lastFormat = formatMatcher.group();
+
+        // Check the format string for colours after, e.g. {player}:&c{message}
+        colorMatcher = MessageUtils.STOP.matcher(format);
+        while (colorMatcher.find()) {
+            if (format.indexOf(colorMatcher.group()) > format.indexOf(colorPlaceholder)) lastColor = colorMatcher.group();
+        }
+
+
+        formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(format);
+        while (formatMatcher.find()) {
+            if (format.indexOf(formatMatcher.group()) > format.indexOf(colorPlaceholder)) lastFormat = formatMatcher.group();
+        }
 
         return lastFormat + lastColor;
     }
@@ -480,5 +493,5 @@ public class MessageWrapper {
     public boolean isPrivateMessage() {
         return this.privateMessage;
     }
-    
+
 }
