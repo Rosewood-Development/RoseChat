@@ -252,10 +252,10 @@ permissions:
     default: op
   rosechat.message:
     description: Allows using the message command.
-    default: op
+    default: true
   rosechat.reply:
     description: Allows using the reply command.
-    default: op
+    default: true
   rosechat.spy:
     description: Allows using social spy.
     default: op

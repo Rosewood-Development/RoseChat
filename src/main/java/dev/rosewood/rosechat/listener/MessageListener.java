@@ -25,7 +25,8 @@ public class MessageListener implements Listener {
 
         // If the sender is the same as the viewer (player looking at their own message)
         if (event.getMessage().getSender().isPlayer() && event.getMessage().getSender().getUUID() == event.getViewer().getUUID()) {
-            if (!event.getViewer().hasPermission("rosechat.deletemessages.self")) return;
+            if ((event.getMessage().isPrivateMessage() && !event.getMessage().getSender().hasPermission("rosechat.deletemessages.self"))
+                    || !event.getViewer().hasPermission("rosechat.deletemessages.self")) return;
 
             BaseComponent[] components = event.getMessage().toComponents();
             if (components == null || components.length == 0) return;
@@ -43,7 +44,8 @@ public class MessageListener implements Listener {
             }
             event.getMessage().setComponents(componentBuilder.create());
         } else {
-            if (!event.getViewer().hasPermission("rosechat.deletemessages.other")) return;
+            if ((event.getMessage().isPrivateMessage() && !event.getMessage().getSender().hasPermission("rosechat.deletemessages.other"))
+                    || !event.getViewer().hasPermission("rosechat.deletemessages.other")) return;
 
             BaseComponent[] components = event.getMessage().toComponents();
             if (components == null || components.length == 0) return;

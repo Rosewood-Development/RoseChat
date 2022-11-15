@@ -147,17 +147,20 @@ public class MessageUtils {
     }
 
     public static void sendPrivateMessage(RoseSender sender, String targetName, String message) {
-        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
-        sendPrivateMessage(sender, targetName, messageWrapper);
-    }
-
-    public static void sendPrivateMessage(RoseSender sender, String targetName, MessageWrapper message) {
         Player target = Bukkit.getPlayer(targetName);
         RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
 
-        BaseComponent[] sentMessage = message.parse(Setting.MESSAGE_SENT_FORMAT.getString(), messageTarget);
-        BaseComponent[] receivedMessage = message.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
-        BaseComponent[] spyMessage = message.parse(Setting.MESSAGE_SPY_FORMAT.getString(), messageTarget);
+        MessageWrapper sentMessageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor().setPrivateMessage();
+        MessageWrapper receivedMessageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
+
+        if (!sentMessageWrapper.canBeSent()) {
+            if (sentMessageWrapper.getFilterType() != null) sentMessageWrapper.getFilterType().sendWarning(sender);
+            return;
+        }
+
+        BaseComponent[] sentMessage = sentMessageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), messageTarget);
+        BaseComponent[] receivedMessage = receivedMessageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
+        BaseComponent[] spyMessage = sentMessageWrapper.parse(Setting.MESSAGE_SPY_FORMAT.getString(), messageTarget);
 
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
@@ -173,7 +176,7 @@ public class MessageUtils {
             if (targetName.equalsIgnoreCase("Console")) {
                 Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
             } else {
-                BungeeListener.sendDirectMessage(message.getSender(), targetName, message.getMessage());
+                BungeeListener.sendDirectMessage(sender, targetName, message);
             }
         } else {
             target.spigot().sendMessage(receivedMessage);

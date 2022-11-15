@@ -77,14 +77,7 @@ public class ReplyCommand extends AbstractCommand {
         if (!canBeMessaged.get()) return;
 
         RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
-        if (!messageWrapper.canBeSent()) {
-            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
-            return;
-        }
-
-        MessageUtils.sendPrivateMessage(roseSender, target, messageWrapper);
-
+        MessageUtils.sendPrivateMessage(roseSender, target, message);
 
         PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
         if (targetData == null) return;

@@ -35,6 +35,7 @@ public class MessageWrapper {
     private PlayerData senderData;
     private StringPlaceholders placeholders;
     private boolean logMessages;
+    private boolean privateMessage;
 
     private final List<UUID> taggedPlayers;
     private Sound tagSound;
@@ -196,6 +197,15 @@ public class MessageWrapper {
      */
     public MessageWrapper ignoreMessageLogging() {
         this.logMessages = false;
+        return this;
+    }
+
+    /**
+     * Sets this message as a private message. This means that the sender is used to see if the message can be deleted.
+     * @return The MessageWrapper.
+     */
+    public MessageWrapper setPrivateMessage() {
+        this.privateMessage = true;
         return this;
     }
 
@@ -467,4 +477,8 @@ public class MessageWrapper {
         this.logMessages = logMessages;
     }
 
+    public boolean isPrivateMessage() {
+        return this.privateMessage;
+    }
+    
 }

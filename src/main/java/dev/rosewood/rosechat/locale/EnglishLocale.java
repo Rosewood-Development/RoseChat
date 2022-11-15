@@ -68,7 +68,7 @@ public class EnglishLocale implements Locale {
             this.put("command-socialspy-message", "message");
             this.put("command-socialspy-channel", "channel");
             this.put("command-socialspy-group", "group");
-            this.put("command-socialspy-all", "message, channel and group");
+            this.put("command-socialspy-all", "message, channel, and group");
 
             this.put("#9", "ToggleMessage Command");
             this.put("command-togglemessage-description", "&8 - &d/togglemessage &7- Toggles the ability to receive messages.");

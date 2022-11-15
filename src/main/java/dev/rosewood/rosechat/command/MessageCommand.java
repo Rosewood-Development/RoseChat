@@ -80,13 +80,7 @@ public class MessageCommand extends AbstractCommand {
         if (!canBeMessaged.get()) return;
 
         RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
-        if (!messageWrapper.canBeSent()) {
-            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
-            return;
-        }
-
-        MessageUtils.sendPrivateMessage(roseSender, target, messageWrapper);
+        MessageUtils.sendPrivateMessage(roseSender, target, message);
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
