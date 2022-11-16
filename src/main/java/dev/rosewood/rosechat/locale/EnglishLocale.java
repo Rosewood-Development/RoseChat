@@ -258,7 +258,12 @@ public class EnglishLocale implements Locale {
             this.put("command-mute-months", "months");
             this.put("command-mute-years", "years");
 
-            this.put("#35", "Nickname Command");
+            this.put("#35", "Unmute Command");
+            this.put("command-unmute-description", "&8 - &d/unmute &7- Removes a player's mute.");
+            this.put("command-unmute-usage", "&e/unmute <player>");
+            this.put("command-unmute-success", "&b%player% &eis no longer muted.");
+
+            this.put("#36", "Nickname Command");
             this.put("command-nickname-description", "&8 - &d/nickname &7- Change a display name.");
             this.put("command-nickname-usage", "&e/nickname <name/player> [name/off]");
             this.put("command-nickname-success", "&eYour new nickname is: &f%name%&e.");
@@ -267,7 +272,7 @@ public class EnglishLocale implements Locale {
             this.put("command-nickname-too-long", "&cThis nickname is too long!");
             this.put("command-nickname-not-allowed", "&cThis nickname is not allowed!");
 
-            this.put("#36", "Ignore Command");
+            this.put("#37", "Ignore Command");
             this.put("command-ignore-description", "&8 - &d/ignore &7- Stops you from seeing a player's messages.");
             this.put("command-ignore-usage", "&e/ignore <player>");
             this.put("command-ignore-ignored", "&eYou are now ignoring &b%player%&e.");

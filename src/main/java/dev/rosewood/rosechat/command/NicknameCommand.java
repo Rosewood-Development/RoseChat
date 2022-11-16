@@ -36,7 +36,6 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-
         Player target = Bukkit.getPlayer(args[0]);
         Player player = target == null ? (Player) sender : target;
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
@@ -66,7 +65,7 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        if (this.isNicknameAllowed(player, nickname)) {
+        if (this.isNicknameAllowed((Player) sender, nickname)) {
             setDisplayName(player, nickname + "&r");
 
             playerData.setNickname(nickname + "&r");

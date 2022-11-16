@@ -243,7 +243,6 @@ public class MessageWrapper {
             if (format.indexOf(colorMatcher.group()) > format.indexOf(colorPlaceholder)) lastColor = colorMatcher.group();
         }
 
-
         formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(format);
         while (formatMatcher.find()) {
             if (format.indexOf(formatMatcher.group()) > format.indexOf(colorPlaceholder)) lastFormat = formatMatcher.group();

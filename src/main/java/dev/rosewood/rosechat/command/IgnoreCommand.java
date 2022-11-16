@@ -31,13 +31,20 @@ public class IgnoreCommand extends AbstractCommand {
         }
 
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
+        PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
+        if (targetData == null) {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
+            return;
+        }
+
+        String name = targetData.getNickname() == null ? target.getName() : targetData.getNickname();
 
         if (playerData.getIgnoringPlayers().contains(target.getUniqueId())) {
             playerData.unignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-unignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-unignored", StringPlaceholders.single("player", name));
         } else {
             playerData.ignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-ignored", StringPlaceholders.single("player", target.isOnline() ? target.getPlayer().getDisplayName() : target.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-ignored", StringPlaceholders.single("player", name));
         }
     }
 

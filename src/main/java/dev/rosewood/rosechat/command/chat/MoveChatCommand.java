@@ -49,11 +49,10 @@ public class MoveChatCommand extends AbstractCommand {
         data.save();
 
         RoseSender roseSender = new RoseSender(player);
-        BaseComponent[] name = this.getAPI().parse(roseSender, roseSender, data.getNickname() == null ? player.getDisplayName() : data.getNickname());
-        String formattedName = TextComponent.toLegacyText(name);
+        String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
-                StringPlaceholders.builder("player", formattedName)
+                StringPlaceholders.builder("player", name)
                         .addPlaceholder("channel", channel.getId()).build());
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
     }

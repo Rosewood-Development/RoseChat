@@ -89,8 +89,10 @@ public class MuteCommand extends AbstractCommand {
             }
         }
 
+        String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
+
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-success",
-                StringPlaceholders.builder("player", target.getDisplayName())
+                StringPlaceholders.builder("player", name)
                         .addPlaceholder("time", outTime)
                         .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
 

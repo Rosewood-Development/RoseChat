@@ -54,6 +54,9 @@ commands:
   mute:
     description: Mute a player.
     permission: rosechat.mute
+  unmute:
+    description: Removes a mute from a player.
+    permission: rosechat.unmute
   gc:
     aliases: [group, groupchat]
     description: Displays group chat commands.
@@ -104,6 +107,7 @@ permissions:
       rosechat.togglesound: true
       rosechat.toggleemoji: true
       rosechat.mute: true
+      rosechat.unmute: true
       rosechat.channel: true
       rosechat.channelbypass: true
       rosechat.admin: true
@@ -283,6 +287,9 @@ permissions:
     default: op
   rosechat.mute:
     description: Allows using the mute command.
+    default: op
+  rosechat.unmute:
+    description: Allows using the unmute command.
     default: op
   rosechat.mute.bypass:
     description: Stops the player from being able to be muted.

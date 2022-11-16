@@ -258,7 +258,12 @@ public class JapaneseLocale implements Locale {
             this.put("command-mute-months", "か月間");
             this.put("command-mute-years", "年間");
 
-            this.put("#35", "ニックネーム・コマンド");
+            this.put("#35", "アンミュート・コマンド");
+            this.put("command-unmute-description", "&8 - &d/unmute &7- プレイヤーのミュートを解除しました。");
+            this.put("command-unmute-usage", "&e/unmute <player>");
+            this.put("command-unmute-success", "&eミュートを解除しました。");
+
+            this.put("#36", "ニックネーム・コマンド");
             this.put("command-nickname-description", "&8 - &d/nickname &7- ニックネームを変更します。");
             this.put("command-nickname-usage", "&e/nickname <ニックネーム/プレイヤー> [ニックネーム/off]");
             this.put("command-nickname-success", "&e新しいニックネームは&f%name%&eです。");
@@ -267,7 +272,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-nickname-too-long", "&cこのニックネームは長すぎます！");
             this.put("command-nickname-not-allowed", "&cこのニックネームを使うことができません！");
 
-            this.put("#36", "イグノア・コマンド");
+            this.put("#37", "イグノア・コマンド");
             this.put("command-ignore-description", "&8 - &d/ignore &7- 他のプレイヤーのメッセージを見るのをやめます。");
             this.put("command-ignore-usage", "&e/ignore <プレイヤー>");
             this.put("command-ignore-ignored", "&b%player%&eを無視しています。");
