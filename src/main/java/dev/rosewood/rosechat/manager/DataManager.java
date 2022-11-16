@@ -62,7 +62,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setTagSounds(hasTagSounds);
                     playerData.setMessageSounds(hasMessageSounds);
                     playerData.setEmojis(hasEmojis);
-                    playerData.setCurrentChannel(channel);
+                    playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     if (muteTime > 0) playerData.mute(muteTime);

@@ -39,7 +39,7 @@ public class ChannelCommand extends AbstractCommand {
             RoseSender roseSender = new RoseSender(sender);
 
             if (!channel.canSendMessage(roseSender, message)) return;
-            if (!channel.isJoinable()) {
+            if (!channel.isJoinable() && !(sender.hasPermission("rosechat.channelbypass"))) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-cannot-message");
                 return;
             }
@@ -91,7 +91,7 @@ public class ChannelCommand extends AbstractCommand {
                 return true;
             }
 
-            if (!newChannel.isJoinable()) {
+            if (!newChannel.isJoinable() && !(sender.hasPermission("rosechat.channelbypass"))) {
                 api.getLocaleManager().sendComponentMessage(sender, "command-channel-not-joinable");
                 return true;
             }

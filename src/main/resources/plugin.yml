@@ -105,6 +105,7 @@ permissions:
       rosechat.toggleemoji: true
       rosechat.mute: true
       rosechat.channel: true
+      rosechat.channelbypass: true
       rosechat.admin: true
       rosechat.chatcolor: true
       rosechat.group: true
@@ -292,6 +293,9 @@ permissions:
   rosechat.channel.global:
     description: Allows access to the global channel.
     default: true
+  rosechat.channelbypass:
+    description: Allows joining an un-joinable channel.
+    default: op
   rosechat.admin.mute:
     description: Allows using the chat mute command.
     default: op
