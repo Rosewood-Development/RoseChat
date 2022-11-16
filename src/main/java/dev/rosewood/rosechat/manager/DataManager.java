@@ -88,53 +88,24 @@ public class DataManager extends AbstractDataManager {
 
     public void updatePlayerData(PlayerData playerData) {
         this.databaseConnector.connect(connection -> {
-            boolean create;
 
-            String checkQuery = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
-            try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+            String query = "REPLACE INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
+                    "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, playerData.getUUID().toString());
-                ResultSet result = statement.executeQuery();
-                create = !result.next();
-            }
-
-            if (create) {
-                String insertQuery = "INSERT INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                        "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                    statement.setString(1, playerData.getUUID().toString());
-                    statement.setBoolean(2, playerData.hasMessageSpy());
-                    statement.setBoolean(3, playerData.hasChannelSpy());
-                    statement.setBoolean(4, playerData.hasGroupSpy());
-                    statement.setBoolean(5, playerData.canBeMessaged());
-                    statement.setBoolean(6, playerData.hasTagSounds());
-                    statement.setBoolean(7, playerData.hasMessageSounds());
-                    statement.setBoolean(8, playerData.hasEmojis());
-                    statement.setString(9, playerData.getCurrentChannel().getId());
-                    statement.setString(10, playerData.getColor());
-                    statement.setLong(11, playerData.getMuteExpirationTime());
-                    statement.setString(12, playerData.getNickname());
-                    statement.executeUpdate();
-                }
-            } else {
-                String updateQuery = "UPDATE " + this.getTablePrefix() + "player_data SET has_message_spy = ?, has_channel_spy = ?, has_group_spy = ?, " +
-                        "can_be_messaged = ?, has_tag_sounds = ?, has_message_sounds = ?, has_emojis = ?, current_channel = ?, chat_color = ?, mute_time = ?, nickname = ? " +
-                        "WHERE uuid = ?";
-                try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                    statement.setBoolean(1, playerData.hasMessageSpy());
-                    statement.setBoolean(2, playerData.hasChannelSpy());
-                    statement.setBoolean(3, playerData.hasGroupSpy());
-                    statement.setBoolean(4, playerData.canBeMessaged());
-                    statement.setBoolean(5, playerData.hasTagSounds());
-                    statement.setBoolean(6, playerData.hasMessageSounds());
-                    statement.setBoolean(7, playerData.hasEmojis());
-                    statement.setString(8, playerData.getCurrentChannel().getId());
-                    statement.setString(9, playerData.getColor());
-                    statement.setLong(10, playerData.getMuteExpirationTime());
-                    statement.setString(11, playerData.getNickname());
-                    statement.setString(12, playerData.getUUID().toString());
-                    statement.executeUpdate();
-                }
+                statement.setBoolean(2, playerData.hasMessageSpy());
+                statement.setBoolean(3, playerData.hasChannelSpy());
+                statement.setBoolean(4, playerData.hasGroupSpy());
+                statement.setBoolean(5, playerData.canBeMessaged());
+                statement.setBoolean(6, playerData.hasTagSounds());
+                statement.setBoolean(7, playerData.hasMessageSounds());
+                statement.setBoolean(8, playerData.hasEmojis());
+                statement.setString(9, playerData.getCurrentChannel().getId());
+                statement.setString(10, playerData.getColor());
+                statement.setLong(11, playerData.getMuteExpirationTime());
+                statement.setString(12, playerData.getNickname());
+                statement.executeUpdate();
             }
         });
     }
