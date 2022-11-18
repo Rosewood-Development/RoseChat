@@ -60,12 +60,16 @@ public class DeleteMessageCommand extends AbstractCommand {
                         } else {
                             String json = ComponentSerializer.toString(deletedMessage);
 
-                            BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, playerData, deletableMessage.getUUID().toString(), json);
-                            if (withDeleteButton == null) {
-                                deletableMessage.setJson(json);
+                            if (player.hasPermission("rosechat.deletemessages.client")) {
+                                BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, playerData, deletableMessage.getUUID().toString(), json);
+                                if (withDeleteButton != null) {
+                                    deletableMessage.setJson(ComponentSerializer.toString(withDeleteButton));
+                                    deletableMessage.setClient(true);
+                                } else {
+                                    deletableMessage.setJson(json);
+                                }
                             } else {
-                                deletableMessage.setJson(ComponentSerializer.toString(withDeleteButton));
-                                deletableMessage.setClient(true);
+                                deletableMessage.setJson(json);
                             }
                         }
                     }
