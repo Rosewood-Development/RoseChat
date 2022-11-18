@@ -48,11 +48,8 @@ public class MessageLog {
             }
 
             // Let's maybe not have an array size of... BIG.
-            if (this.messages.size() > this.cleanupAmount * 2) {
-                for (int i = 0; i < this.cleanupAmount; i++) {
-                    this.messages.remove(i);
-                }
-            }
+            if (this.messages.size() > this.cleanupAmount * 2)
+                this.messages.subList(0, this.cleanupAmount).clear();
 
             return similarMessages >= this.cleanupAmount;
         }
