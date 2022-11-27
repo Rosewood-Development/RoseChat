@@ -21,7 +21,7 @@ global:
   discord: global
 
   # This allows messages to be sent to the listed servers.
-  # These are the same server names as defined in bungeecord.yml
+  # These are the same server names as defined in bungee's config.yml
   servers:
     - factions
 

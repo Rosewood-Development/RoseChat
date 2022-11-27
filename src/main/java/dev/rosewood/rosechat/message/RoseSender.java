@@ -113,7 +113,7 @@ public class RoseSender {
             if (onlinePlayer != null)
                 return onlinePlayer.hasPermission(permission);
 
-            // Otherwise check their offline permissions if Vault is available
+            // Otherwise, check their offline permissions if Vault is available
             if (this.api.getVault() != null)
                 return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.api.getVault().playerHas(null, this.player, permission);
         }

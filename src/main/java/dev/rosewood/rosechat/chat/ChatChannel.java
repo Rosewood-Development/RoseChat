@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.chat;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -203,13 +204,17 @@ public class ChatChannel implements Group {
 
     @Override
     public void sendJson(RoseSender sender, String rawMessage) {
-        MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
-        this.sendGeneric(message, this.getFormat(), true, false, null);
+        Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
+            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+            this.sendGeneric(message, this.getFormat(), true, false, null);
+        });
     }
 
     @Override
     public void sendFromDiscord(String id, MessageWrapper message) {
-        this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true, id);
+        Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
+            this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true, id);
+        });
     }
 
     /**

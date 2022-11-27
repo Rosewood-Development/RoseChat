@@ -13,11 +13,15 @@ public interface Tokenizer<T extends Token> {
         return ignorePermissions
                 || wrapper == null
                 || wrapper.getLocation() == MessageLocation.NONE
-                || (wrapper.getSender().hasPermission(permission + "." + wrapper.getLocation().toString() + groupPermission));
+                || (wrapper.getSender().hasPermission(permission + "." + wrapper.getLocation().toString() + groupPermission))
+                || (wrapper.getSender().getIgnoredPermissions().contains(groupPermission.replace("rosechat.", "")))
+                || (wrapper.getSender().getIgnoredPermissions().contains("rosechat.*"));
     }
 
     default boolean hasExtendedPermission(MessageWrapper wrapper, boolean ignorePermissions, String permission, String extendedPermission) {
-        return ignorePermissions || hasPermission(wrapper, ignorePermissions, permission) && (wrapper != null && wrapper.getSender() != null && wrapper.getSender().hasPermission(extendedPermission));
+        return ignorePermissions
+                || (hasPermission(wrapper, ignorePermissions, permission) && (wrapper != null && wrapper.getSender() != null &&
+                ((wrapper.getSender().hasPermission(extendedPermission))) || (wrapper.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", "")) || (wrapper.getSender().getIgnoredPermissions().contains("rosechat.*")))));
     }
 
 }

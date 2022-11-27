@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ChannelManager;
-import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -83,7 +82,7 @@ public class BungeeListener implements PluginMessageListener {
                 ChatChannel chatChannel = this.plugin.getManager(ChannelManager.class).getChannel(channelTo);
                 RoseSender roseSender = new RoseSender(UUID.fromString(senderUUID), sender, senderGroup);
                 roseSender.setIgnoredPermissions(permissions);
-                chatChannel.sendJson(roseSender, received);
+                Bukkit.getServer().getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> chatChannel.sendJson(roseSender, received));
             }
 
         } catch (IOException e) {
@@ -117,6 +116,8 @@ public class BungeeListener implements PluginMessageListener {
                 if (stringBuilder.length() != 0) stringBuilder.append(",");
                 stringBuilder.append(permission);
             }
+
+            if (sender.isPlayer() && sender.asPlayer().isOp()) stringBuilder.append("rosechat.*");
 
             out.writeUTF("rosechat:" + channelTo + ":" + sender.getName() + ":" + sender.getUUID() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
 

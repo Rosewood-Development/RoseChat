@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.listener;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -64,7 +65,9 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
         event.setCancelled(true);
-        this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+        Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
+            this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+        });
     }
 
     public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
