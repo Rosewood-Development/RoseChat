@@ -275,7 +275,7 @@ public class MessageUtils {
             if (i < text.length() - 1) {
                 char nextChar = text.charAt(i + 1);
                 if (currentChar == '&') {
-                    if (Character.toLowerCase(nextChar) == 'r') {
+                    if (Character.toLowerCase(nextChar) == 'r' || Character.isUpperCase(nextChar)) {
                         while (deque.descendingIterator().hasNext()) {
                             Character c = deque.pollLast();
                             if (c != null) {
