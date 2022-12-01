@@ -90,8 +90,8 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         if (hasMessagePlaceholder) {
             MessageEmbed messageEmbed = new MessageEmbed(url,
-                    this.emojiManager.formatUnicode(title),
-                    this.emojiManager.formatUnicode(description),
+                    this.emojiManager.formatUnicode(ChatColor.stripColor(title)),
+                    this.emojiManager.formatUnicode(ChatColor.stripColor(description)),
                     EmbedType.RICH,
                     timestamp ? OffsetDateTime.now(): null,
                     color,
