@@ -2,7 +2,8 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'maven-publish'
 }
 
 group 'dev.rosewood'
@@ -59,6 +60,32 @@ shadowJar {
     relocate('org.apache.commons.text', 'dev.rosewood.rosechat.lib.apache')
 
     minimize()
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+            artifactId = 'rosechat'
+            pom {
+                name = 'rosechat'
+            }
+        }
+    }
+    repositories {
+        if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+            maven {
+                credentials {
+                    username project.mavenUser
+                    password project.mavenPassword
+                }
+
+                def releasesRepoUrl = 'https://repo.rosewooddev.io/repository/public-releases/'
+                def snapshotsRepoUrl = 'https://repo.rosewooddev.io/repository/public-snapshots/'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            }
+        }
+    }
 }
 
 build.dependsOn shadowJar
