@@ -105,7 +105,7 @@ group-member-prefix:
     default:
       - "&7This person owns the group chat."
 
-# These custom placeholders are used in the group format.
+# These custom placeholders are used for different channel formats.
 staffchat:
   text:
     default: "&8[&cStaff&8] &f"
