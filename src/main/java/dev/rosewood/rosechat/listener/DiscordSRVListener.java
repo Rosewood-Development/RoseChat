@@ -53,7 +53,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         List<PlayerData> updatePlayers = new ArrayList<>();
         api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
             for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
-                if (!deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
+                if (deletableMessage.getDiscordId() != null && !deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
                 updatePlayers.add(playerData);
                 return;
             }
@@ -143,7 +143,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, line, placeholders
                         .addPlaceholder("user_nickname", name).build());
 
-                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) messageWrapper.filter().applyDefaultColor();
+                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {
+                    // Don't count the message as spam if the message is being edited.
+                    if (update) messageWrapper.filterCaps().filterURLs().filterLanguage();
+                    else messageWrapper.filter().applyDefaultColor();
+                }
 
                 if (!messageWrapper.canBeSent() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
                     message.delete().queue();
@@ -157,7 +161,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                         messageWrapper.setShouldLogMessages(false);
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
-                            if (!deletableMessage.getDiscordId().equals(message.getId())) continue;
+                            if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId())) continue;
                             messageWrapper.setId(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseFromDiscord(message.getId(), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player));
                             deletableMessage.setJson(ComponentSerializer.toString(components));
