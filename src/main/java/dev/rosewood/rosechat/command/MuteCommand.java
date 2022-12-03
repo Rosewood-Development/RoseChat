@@ -39,7 +39,8 @@ public class MuteCommand extends AbstractCommand {
         String outScale = "";
         int muteTime = -1;
         if (args.length == 1) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", target.getName()));
+            String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", name));
             this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
             targetData.mute(-1);
             targetData.save();
@@ -91,10 +92,15 @@ public class MuteCommand extends AbstractCommand {
 
         String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
 
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-success",
-                StringPlaceholders.builder("player", name)
-                        .addPlaceholder("time", outTime)
-                        .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
+        if (outScale.equalsIgnoreCase("indefinite")) {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite",
+                    StringPlaceholders.builder("player", name).build());
+        } else {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-success",
+                    StringPlaceholders.builder("player", name)
+                            .addPlaceholder("time", outTime)
+                            .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
+        }
 
         this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
 

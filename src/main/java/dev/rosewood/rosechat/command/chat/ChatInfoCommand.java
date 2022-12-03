@@ -26,16 +26,20 @@ public class ChatInfoCommand extends AbstractCommand {
             return;
         }
 
+        String localeTrue = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-true");
+        String localeFalse = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-false");
+        String localeNone = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-none");
+
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-title", StringPlaceholders.single("id", channel.getId()), false);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-format", StringPlaceholders.builder()
-                .addPlaceholder("default", channel.isDefaultChannel())
-                .addPlaceholder("muted", channel.isMuted())
-                .addPlaceholder("command", channel.getCommand() == null ? "None" : "/" + channel.getCommand())
-                .addPlaceholder("world", channel.getWorld() == null ? "None" : channel.getWorld())
-                .addPlaceholder("joinable", channel.isJoinable())
-                .addPlaceholder("discord", channel.getDiscordChannel() == null ? "None" : channel.getDiscordChannel())
+                .addPlaceholder("default", channel.isDefaultChannel() ? localeTrue : localeFalse)
+                .addPlaceholder("muted", channel.isMuted() ? localeTrue : localeFalse)
+                .addPlaceholder("command", channel.getCommand() == null ? localeNone : "/" + channel.getCommand())
+                .addPlaceholder("world", channel.getWorld() == null ? localeNone : channel.getWorld())
+                .addPlaceholder("joinable", channel.isJoinable() ? localeTrue : localeFalse)
+                .addPlaceholder("discord", channel.getDiscordChannel() == null ? localeNone : channel.getDiscordChannel())
                 .addPlaceholder("players", channel.getMembers().size())
-                .addPlaceholder("servers", channel.getServers().isEmpty() ? "None": channel.getServers().toString()).build(), false);
+                .addPlaceholder("servers", channel.getServers().isEmpty() ? localeNone: channel.getServers().toString()).build(), false);
     }
 
     @Override
