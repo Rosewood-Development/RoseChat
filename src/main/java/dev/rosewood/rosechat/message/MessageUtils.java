@@ -262,7 +262,7 @@ public class MessageUtils {
     }
 
     public static String processForDiscord(String text) {
-        text = stripNonLegacyColors(text);
+        text = stripNonLegacyColors(ChatColor.stripColor(text));
         StringBuilder stringBuilder = new StringBuilder();
 
         boolean isFormattingCode = false;

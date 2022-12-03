@@ -8,16 +8,19 @@ import java.util.List;
 public class GradientToken extends Token {
 
     private final List<Color> colors;
+    private final int speed;
 
-    public GradientToken(String originalText, List<Color> colors) {
+    public GradientToken(String originalText, List<Color> colors, int speed) {
         super(new TokenSettings(originalText).content(""));
 
         this.colors = colors;
+        this.speed = speed;
     }
 
     @Override
     public HexUtils.ColorGenerator getColorGenerator(List<Token> futureTokens) {
-        return new HexUtils.Gradient(this.colors, this.getColorGeneratorContentLength(futureTokens));
+        return this.speed == 0 ? new HexUtils.Gradient(this.colors, this.getColorGeneratorContentLength(futureTokens))
+                : new HexUtils.AnimatedGradient(this.colors, this.getColorGeneratorContentLength(futureTokens), 1);
     }
 
     @Override

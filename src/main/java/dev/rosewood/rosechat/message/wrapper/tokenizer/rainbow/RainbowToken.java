@@ -7,17 +7,20 @@ import java.util.List;
 public class RainbowToken extends Token {
 
     private final float saturation, brightness;
+    private final int speed;
 
-    public RainbowToken(String originalText, float saturation, float brightness) {
+    public RainbowToken(String originalText, float saturation, float brightness, int speed) {
         super(new TokenSettings(originalText).content(""));
 
         this.saturation = saturation;
         this.brightness = brightness;
+        this.speed = speed;
     }
 
     @Override
     public HexUtils.ColorGenerator getColorGenerator(List<Token> futureTokens) {
-        return new HexUtils.Rainbow(this.getColorGeneratorContentLength(futureTokens), this.saturation, this.brightness);
+        return this.speed == 0 ? new HexUtils.Rainbow(this.getColorGeneratorContentLength(futureTokens), this.saturation, this.brightness)
+                : new HexUtils.AnimatedRainbow(this.getColorGeneratorContentLength(futureTokens), this.saturation, this.brightness, this.speed);
     }
 
     @Override

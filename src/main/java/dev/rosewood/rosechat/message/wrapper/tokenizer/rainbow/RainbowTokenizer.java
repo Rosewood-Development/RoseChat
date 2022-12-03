@@ -32,8 +32,16 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
                 } catch (NumberFormatException ignored) { }
             }
 
+            int speed = 0;
+            String speedGroup = matcher.group("speed");
+            if (speedGroup != null) {
+                try {
+                    speed = Integer.parseInt(speedGroup);
+                } catch (NumberFormatException ignored) {}
+            }
+
             return this.hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.rainbow") ?
-                    new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f);
+                    new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness, speed) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f, speed);
         }
 
         return null;

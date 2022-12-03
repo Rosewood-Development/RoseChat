@@ -21,9 +21,18 @@ public class GradientTokenizer implements Tokenizer<GradientToken> {
                     .map(x -> x.length() != 4 ? x : String.format("#%s%s%s%s%s%s", x.charAt(1), x.charAt(1), x.charAt(2), x.charAt(2), x.charAt(3), x.charAt(3)))
                     .map(Color::decode)
                     .collect(Collectors.toList());
+
+            int speed = 0;
+            String speedGroup = matcher.group("speed");
+            if (speedGroup != null) {
+                try {
+                    speed = Integer.parseInt(speedGroup);
+                } catch (NumberFormatException ignored) {}
+            }
+
             String content = input.substring(matcher.start(), matcher.end());
             return this.hasPermission(messageWrapper, ignorePermissions || MessageUtils.hasDefaultColor(input, messageWrapper), "rosechat.gradient") ?
-                    new GradientToken(content, hexSteps) : new GradientToken(content, null);
+                    new GradientToken(content, hexSteps, speed) : new GradientToken(content, null, speed);
         }
 
         return null;
