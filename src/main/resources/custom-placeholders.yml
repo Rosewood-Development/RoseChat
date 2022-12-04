@@ -198,7 +198,7 @@ money-tag:
       value: "/pay %player_name% %tagged%"
 
 # This custom placeholder uses 1 character in the text.
-# This is because the tag has match-length enabled in the config.yml file.
+# This is because the tag has match-length enabled in the tags.yml file.
 # This message will be repeated as many times as the amount of letters in the tag.
 spoiler-tag:
   text:
