@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -193,6 +194,9 @@ public class MessageUtils {
             if (spy != null)
                 spy.spigot().sendMessage(spyMessage);
         }
+
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
+                && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
     }
 
     public static Player getPlayer(String name) {

@@ -60,6 +60,11 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Should spaces be allowed in nicknames?"),
         ALLOW_NONALPHANUMERIC_CHARACTERS("nickname-settings.allow-nonalphanumeric-characters", true,
                 "Should non-alphanumeric characters, such as brackets, be allowed in nicknames?"),
+        UPDATE_DISPLAY_NAMES("nickname-settings.update-display-names-on-chat", true,
+                "Should player display names be updated every time the player sends a message?",
+                "When disabled, display names will only be updated when the player uses /nick.",
+                "This allows other plugins to get the display name at the time that the player last sent a message,",
+                "rather than when they set their nickname."),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         CHAT_PREVIEW("chat-settings.chat-preview", true, "Should chat preview be enabled for 1.19 servers?",

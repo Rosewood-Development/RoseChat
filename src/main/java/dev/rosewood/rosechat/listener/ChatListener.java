@@ -4,6 +4,8 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.command.NicknameCommand;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -40,6 +42,8 @@ public class ChatListener implements Listener {
 
             MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
             MessageUtils.sendMessageWrapper(sender, channel, message);
+
+            if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && !player.getDisplayName().equals(data.getNickname())) NicknameCommand.setDisplayName(player, data.getNickname());
         });
     }
 
