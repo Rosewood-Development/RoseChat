@@ -48,7 +48,6 @@ public class MoveChatCommand extends AbstractCommand {
         data.setCurrentChannel(channel);
         data.save();
 
-        RoseSender roseSender = new RoseSender(player);
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
@@ -63,7 +62,7 @@ public class MoveChatCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player != sender) tab.add(player.getName());
+                tab.add(player.getName());
             }
         } else if (args.length == 2) {
             tab.addAll(this.getAPI().getChannelIDs());
