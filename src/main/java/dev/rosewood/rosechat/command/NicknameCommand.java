@@ -36,7 +36,7 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        Player target = Bukkit.getPlayer(args[0]);
+        Player target = Bukkit.getPlayerExact(args[0]);
         Player player = target == null ? (Player) sender : target;
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
         String nickname = (target == null ? getAllArgs(0, args) : getAllArgs(1, args));
