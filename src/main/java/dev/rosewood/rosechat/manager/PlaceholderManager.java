@@ -116,7 +116,7 @@ public class PlaceholderManager extends Manager {
     }
 
     public RoseChatPlaceholder getPlaceholder(String id) {
-        return this.placeholders.get(id);
+        return this.placeholders.getOrDefault(id, null);
     }
 
     public Map<String, RoseChatPlaceholder> getPlaceholders() {

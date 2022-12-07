@@ -149,6 +149,7 @@ public class PacketListener {
     }
 
     private static boolean shouldSuffixButton(RoseSender sender, String placeholderId) {
+        if (placeholderId == null || placeholderId.isEmpty()) return false;
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return false;
 
