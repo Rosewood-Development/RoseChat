@@ -82,6 +82,8 @@ public class NicknameCommand extends AbstractCommand {
     }
 
     public static void setDisplayName(Player player, String nickname) {
+        if (nickname == null || nickname.isEmpty()) return;
+
         RoseSender roseSender = new RoseSender(player);
 
         MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
