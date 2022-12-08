@@ -17,7 +17,6 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,67 +34,73 @@ public class DeleteMessageCommand extends AbstractCommand {
         }
 
         try {
+            Player player = (Player) sender;
             UUID uuid = UUID.fromString(args[0]);
             DeletableMessage message = null;
 
-            List<DeletableMessage> toDelete = new ArrayList<>();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
-
-                for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
-                    if (!deletableMessage.getUUID().equals(uuid)) continue;
-
-                    RoseSender roseSender = new RoseSender(player);
-
-                    BaseComponent[] deletedMessage = this.parseDeletedMessagePlaceholder(roseSender, roseSender,
-                            MessageUtils.getSenderViewerPlaceholders(roseSender, roseSender)
-                            .addPlaceholder("id", deletableMessage.getUUID())
-                            .addPlaceholder("type", deletableMessage.isClient() ? "client" : "server").build(), deletableMessage);
-
-                    if (deletedMessage == null) {
-                        toDelete.add(deletableMessage);
-                    } else {
-                        if (TextComponent.toPlainText(deletedMessage).isEmpty()) {
-                            toDelete.add(deletableMessage);
-                        } else {
-                            String json = ComponentSerializer.toString(deletedMessage);
-
-                            if (player.hasPermission("rosechat.deletemessages.client")) {
-                                BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, playerData, deletableMessage.getUUID().toString(), json);
-                                if (withDeleteButton != null) {
-                                    deletableMessage.setJson(ComponentSerializer.toString(withDeleteButton));
-                                    deletableMessage.setClient(true);
-                                } else {
-                                    deletableMessage.setJson(json);
-                                }
-                            } else {
-                                deletableMessage.setJson(json);
-                            }
-                        }
-                    }
-
-                    message = deletableMessage;
-                }
-
-                if (message == null || !message.getUUID().equals(uuid)) continue;
-                for (DeletableMessage deletableMessage : toDelete) {
-                    if (!deletableMessage.isClient() || (playerData.getUUID() == ((Player) sender).getUniqueId())) {
-                        playerData.getMessageLog().getDeletableMessages().remove(deletableMessage);
-                    }
-                }
-
-                for (int i = 0; i < 100; i++) player.sendMessage("\n");
-                for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
-                    player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+            PlayerData senderData = this.getAPI().getPlayerData(player.getUniqueId());
+            for (DeletableMessage deletableMessage : senderData.getMessageLog().getDeletableMessages()) {
+                if (!deletableMessage.getUUID().equals(uuid)) continue;
+                message = deletableMessage;
+                break;
             }
 
-            // Delete this message from Discord too, if enabled.
-            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
             if (message == null) return;
-            if (this.getAPI().getDiscord() != null && message.getDiscordId() != null) {
-                this.getAPI().getDiscord().deleteMessage(message.getDiscordId());
+            if (message.isClient()) {
+                this.deleteMessageForPlayer(player, message);
+            } else {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(onlinePlayer.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                        if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(onlinePlayer, deletableMessage);
+                    }
+                }
             }
         } catch (IllegalArgumentException ignored) {}
+    }
+
+    private void deleteMessageForPlayer(Player player, DeletableMessage message) {
+        // Get the deleted message placeholder.
+        RoseSender roseSender = new RoseSender(player);
+        BaseComponent[] deletedMessage = this.parseDeletedMessagePlaceholder(roseSender, roseSender,
+                MessageUtils.getSenderViewerPlaceholders(roseSender, roseSender)
+                        .addPlaceholder("id", message.getUUID())
+                        .addPlaceholder("type", message.isClient() ? "client" : "server").build(), message);
+
+        // Append the delete button to the 'Deleted Message' message.
+        boolean updated = false;
+        if (deletedMessage != null && !TextComponent.toPlainText(deletedMessage).isEmpty()) {
+            String json = ComponentSerializer.toString(deletedMessage);
+            if (player.hasPermission("rosechat.deletemessages.client")) {
+                BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, roseSender.getPlayerData(), message.getUUID().toString(), json);
+                if (withDeleteButton != null) {
+                    message.setJson(ComponentSerializer.toString(withDeleteButton));
+                } else {
+                    // If the delete button doesn't exist, use the 'Deleted Message' message.
+                    message.setJson(json);
+                }
+            } else {
+                // If the player doesn't have permission, use the 'Deleted Message' message.
+                message.setJson(json);
+            }
+
+            updated = true;
+        }
+
+        // Remove the original message.
+        if (!updated) roseSender.getPlayerData().getMessageLog().getDeletableMessages().remove(message);
+        // Send blank lines to remove the old messages.
+        for (int i = 0; i < 100; i++) player.sendMessage("\n");
+        // Resend the messages!
+        for (DeletableMessage deletableMessage : roseSender.getPlayerData().getMessageLog().getDeletableMessages())
+            player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+
+        // Delete this message from Discord too.
+        if (message.isClient()) return;
+
+        if (updated) message.setClient(true);
+        if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
+        if (this.getAPI().getDiscord() != null && message.getDiscordId() != null)
+            this.getAPI().getDiscord().deleteMessage(message.getDiscordId());
     }
 
     private BaseComponent[] parseDeletedMessagePlaceholder(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
