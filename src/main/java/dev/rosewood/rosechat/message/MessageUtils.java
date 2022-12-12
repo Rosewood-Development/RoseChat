@@ -153,26 +153,39 @@ public class MessageUtils {
         Player target = Bukkit.getPlayer(targetName);
         RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
 
-        MessageWrapper sentMessageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor().setPrivateMessage();
-        MessageWrapper receivedMessageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor();
+        PrivateMessageInfo info = new PrivateMessageInfo(sender, messageTarget);
+        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor()
+                .setPrivateMessage().setPrivateMessageInfo(info);
 
-        if (!sentMessageWrapper.canBeSent()) {
-            if (sentMessageWrapper.getFilterType() != null) sentMessageWrapper.getFilterType().sendWarning(sender);
+        if (!messageWrapper.canBeSent()) {
+            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(sender);
             return;
         }
 
-        BaseComponent[] sentMessage = sentMessageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), messageTarget);
-        BaseComponent[] receivedMessage = receivedMessageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
-        BaseComponent[] spyMessage = sentMessageWrapper.parse(Setting.MESSAGE_SPY_FORMAT.getString(), messageTarget);
-
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
-            PlayerData targetData = RoseChatAPI.getInstance().getPlayerDataManager().getPlayerData(offlineTarget.getUniqueId());
+            PlayerData targetData = RoseChatAPI.getInstance().getPlayerData(offlineTarget.getUniqueId());
             if (targetData != null && targetData.getIgnoringPlayers().contains(sender.getUUID())) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender.asPlayer(), "command-togglemessage-cannot-message");
                 return;
             }
         }
+
+        // Parse for spies first.
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
+            boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
+            boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
+            if (isSpySender || isSpyTarget) continue;
+
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy == null) continue;
+            info.addSpy(new RoseSender(spy));
+            BaseComponent[] spyMessage = messageWrapper.parse(Setting.MESSAGE_SPY_FORMAT.getString(), new RoseSender(spy));
+            spy.spigot().sendMessage(spyMessage);
+        }
+
+        BaseComponent[] sentMessage = messageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
+        BaseComponent[] receivedMessage = messageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
 
         sender.send(sentMessage);
         if (target == null) {
@@ -183,16 +196,6 @@ public class MessageUtils {
             }
         } else {
             target.spigot().sendMessage(receivedMessage);
-        }
-
-        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
-            boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
-            boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
-            if (isSpySender || isSpyTarget) continue;
-
-            Player spy = Bukkit.getPlayer(uuid);
-            if (spy != null)
-                spy.spigot().sendMessage(spyMessage);
         }
 
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()

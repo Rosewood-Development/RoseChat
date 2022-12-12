@@ -199,7 +199,7 @@ public class RoseChat extends RosePlugin {
 
         if (pluginManager.getPlugin("ProtocolLib") != null) {
             new PacketListener(this);
-            pluginManager.registerEvents(new MessageListener(this), this);
+            pluginManager.registerEvents(new MessageListener(), this);
         }
     }
 

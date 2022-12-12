@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.PrivateMessageInfo;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -17,6 +18,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,22 +38,67 @@ public class DeleteMessageCommand extends AbstractCommand {
         try {
             Player player = (Player) sender;
             UUID uuid = UUID.fromString(args[0]);
-            DeletableMessage message = null;
+            List<DeletableMessage> messages = new ArrayList<>();
 
             PlayerData senderData = this.getAPI().getPlayerData(player.getUniqueId());
             for (DeletableMessage deletableMessage : senderData.getMessageLog().getDeletableMessages()) {
                 if (!deletableMessage.getUUID().equals(uuid)) continue;
-                message = deletableMessage;
-                break;
+                messages.add(deletableMessage);
             }
 
-            if (message == null) return;
-            if (message.isClient()) {
-                this.deleteMessageForPlayer(player, message);
-            } else {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(onlinePlayer.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                        if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(onlinePlayer, deletableMessage);
+            for (DeletableMessage message : messages) {
+                // Handle private messages differently.
+                if (message.getPrivateMessageInfo() != null) {
+                    PrivateMessageInfo info = message.getPrivateMessageInfo();
+                    if (info.getSender() == info.getReceiver()) {
+                        this.deleteMessageForPlayer(player, message);
+                    }
+
+                    else if (info.getSender().getUUID().equals(player.getUniqueId())) {
+                        this.deleteMessageForPlayer(player, message);
+                        if (info.getReceiver().isPlayer()) {
+                            Player receiver = info.getReceiver().asPlayer();
+                            for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                                if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(receiver, deletableMessage);
+                            }
+                        }
+                    }
+
+                    else if (info.getReceiver().getUUID().equals(player.getUniqueId())) {
+                        if (info.getReceiver().isPlayer()) {
+                            Player receiver = info.getReceiver().asPlayer();
+                            for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                                if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(receiver, deletableMessage);
+                            }
+                        }
+                    }
+
+                    else if (info.getSpies().contains(player.getUniqueId())) {
+                        if (info.getSender().isPlayer()) {
+                            Player pmSender = info.getSender().asPlayer();
+                            for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(pmSender.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                                if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(pmSender, deletableMessage);
+                            }
+                        }
+                        if (info.getReceiver().isPlayer()) {
+                            Player receiver = info.getReceiver().asPlayer();
+                            for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                                if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(receiver, deletableMessage);
+                            }
+                        }
+                        this.deleteMessageForPlayer(player, message);
+                    }
+
+                    return;
+                }
+
+                if (message.isClient()) {
+                    this.deleteMessageForPlayer(player, message);
+                } else {
+                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                        for (DeletableMessage deletableMessage : this.getAPI().getPlayerData(onlinePlayer.getUniqueId()).getMessageLog().getDeletableMessages()) {
+                            if (deletableMessage.getUUID().equals(uuid)) this.deleteMessageForPlayer(onlinePlayer, deletableMessage);
+                        }
                     }
                 }
             }

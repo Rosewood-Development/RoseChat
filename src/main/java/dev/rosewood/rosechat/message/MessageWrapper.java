@@ -36,6 +36,7 @@ public class MessageWrapper {
     private StringPlaceholders placeholders;
     private boolean logMessages;
     private boolean privateMessage;
+    private PrivateMessageInfo privateMessageInfo;
 
     private final List<UUID> taggedPlayers;
     private Sound tagSound;
@@ -209,6 +210,15 @@ public class MessageWrapper {
         return this;
     }
 
+    /**
+     * @param info The information about the private message that this wrapper contains.
+     * @return The MessageWrapper.
+     */
+    public MessageWrapper setPrivateMessageInfo(PrivateMessageInfo info) {
+        this.privateMessageInfo = info;
+        return this;
+    }
+
     public String parseToString() {
         return this.message;
     }
@@ -216,6 +226,7 @@ public class MessageWrapper {
     private void logMessage(MessageLog log, String discordId) {
         if (!this.logMessages) return;
         this.deletableMessage = new DeletableMessage(this.id, ComponentSerializer.toString(this.tokenized), false, discordId);
+        this.deletableMessage.setPrivateMessageInfo(this.getPrivateMessageInfo());
         log.addDeletableMessage(this.deletableMessage);
     }
 
@@ -256,14 +267,16 @@ public class MessageWrapper {
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (!preParseMessageEvent.isCancelled()) {
+            RoseSender receivingViewer = this.isPrivateMessage() ? this.getPrivateMessageInfo().getReceiver() : viewer;
+
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
 
@@ -275,23 +288,23 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, before, true, Tokenizers.DEFAULT_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, before, true, Tokenizers.DEFAULT_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
-                String formatColor = this.getChatColorFromFormat(format, viewer);
+                String formatColor = this.getChatColorFromFormat(format, receivingViewer);
 
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
             }
 
             if (after != null && !after.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, after, true, Tokenizers.DEFAULT_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, after, true, Tokenizers.DEFAULT_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             this.tokenized = componentBuilder.create();
@@ -315,14 +328,16 @@ public class MessageWrapper {
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (!preParseMessageEvent.isCancelled()) {
+            RoseSender receivingViewer = this.isPrivateMessage() ? this.getPrivateMessageInfo().getReceiver() : viewer;
+
             ComponentBuilder componentBuilder = new ComponentBuilder();
 
             if (format == null || !format.contains("{message}")) {
                 if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 } else {
-                    componentBuilder.append(new MessageTokenizer(this, viewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
                 }
 
@@ -334,19 +349,19 @@ public class MessageWrapper {
             String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
             if (before != null && !before.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, before, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, before, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (format.contains("{message}")) {
-                String formatColor = this.getChatColorFromFormat(format, viewer);
+                String formatColor = this.getChatColorFromFormat(format, receivingViewer);
 
-                componentBuilder.append(new MessageTokenizer(this, viewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                         .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
             if (after != null && !after.isEmpty()) {
-                componentBuilder.append(new MessageTokenizer(this, viewer, after, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, after, true, Tokenizers.FROM_DISCORD_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.DEFAULT_BUNDLE)
                             .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
             }
 
@@ -491,6 +506,10 @@ public class MessageWrapper {
 
     public boolean isPrivateMessage() {
         return this.privateMessage;
+    }
+
+    public PrivateMessageInfo getPrivateMessageInfo() {
+        return this.privateMessageInfo;
     }
 
 }
