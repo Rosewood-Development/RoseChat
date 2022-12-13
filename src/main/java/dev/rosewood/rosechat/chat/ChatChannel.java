@@ -112,8 +112,10 @@ public class ChatChannel implements Group {
             for (UUID uuid : api.getPlayerDataManager().getChannelSpies()) {
                 if (this.getMembers().contains(uuid) || uuid == message.getSender().getUUID()) continue;
                 Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null)
-                    spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+
+                if (spy == null) continue;
+                if (message.getSender().isPlayer() && spy.getLocation().distance(message.getSender().asPlayer().getLocation()) <= this.radius) continue;
+                spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
             }
         }
 
