@@ -18,6 +18,7 @@ import java.util.UUID;
 
 public class ChatChannel implements Group {
 
+    private final RoseChatAPI api;
     private final String id;
     private boolean defaultChannel;
     private boolean muted;
@@ -39,6 +40,7 @@ public class ChatChannel implements Group {
      * @param defaultChannel Whether this should be the channel players join the first time they join the server.
      */
     public ChatChannel(String id, String format, boolean defaultChannel) {
+        this.api = RoseChatAPI.getInstance();
         this.id = id;
         this.format = format;
         this.defaultChannel = defaultChannel;
@@ -100,6 +102,128 @@ public class ChatChannel implements Group {
         return true;
     }
 
+    private boolean canReceiveMessage(Player receiver, PlayerData data, UUID senderUUID) {
+        return (data != null && !data.getIgnoringPlayers().contains(senderUUID) && receiver.hasPermission("rosechat.channel." + this.getId()));
+    }
+
+    private void sendToPlayer(Player receiver, MessageWrapper message, String format, String discordId) {
+        PlayerData data = this.api.getPlayerData(receiver.getUniqueId());
+        if (!this.canReceiveMessage(receiver, data, message.getSender().getUUID())) return;
+        RoseSender roseSender = new RoseSender(receiver);
+        receiver.spigot().sendMessage(discordId == null ?
+                message.parse(format, roseSender) : message.parseFromDiscord(discordId, format, roseSender));
+
+        this.sendTagSound(message, receiver, data);
+    }
+
+    private void sendGenericVisible(MessageWrapper message, String format, String discordId) {
+        List<UUID> channelSpies = this.api.getPlayerDataManager().getChannelSpies();
+        List<Player> currentSpies = new ArrayList<>();
+
+        if (this.getRadius() != -1 && message.getSender().isPlayer()) {
+            // Send to all players within the radius.
+            Location senderLocation = message.getSender().asPlayer().getLocation();
+            if (senderLocation.getWorld() == null) return;
+
+            for (Player player : senderLocation.getWorld().getPlayers()) {
+                if (player.getUniqueId() == message.getSender().getUUID()) continue;
+                if (player.getLocation().distance(senderLocation) < this.radius) {
+                    this.sendToPlayer(player, message, format, discordId);
+                } else {
+                    // Allow spies to see the message if out of radius.
+                    if (channelSpies.contains(player.getUniqueId())) currentSpies.add(player);
+                }
+            }
+
+            // Allow spies to see the message if not in the same world.
+            for (UUID uuid : channelSpies) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;;
+                if (!player.getWorld().getName().equals(senderLocation.getWorld().getName())) currentSpies.add(player);
+            }
+        } else if (this.world != null) {
+            // Send to all players within the world.
+            World world = Bukkit.getWorld(this.world);
+            if (world == null) return;
+
+            for (Player player : world.getPlayers()) {
+                if (player.getUniqueId() == message.getSender().getUUID()) continue;
+                this.sendToPlayer(player, message, format, discordId);
+            }
+
+            // Allow spies to see the message if not in the same world.
+            for (UUID uuid : channelSpies) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;
+                if (!player.getWorld().getName().equals(world.getName()))
+                    if (channelSpies.contains(player.getUniqueId())) currentSpies.add(player);
+            }
+        } else {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getUniqueId() == message.getSender().getUUID()) continue;
+                this.sendToPlayer(player, message, format, discordId);
+            }
+        }
+
+        for (Player spy : currentSpies) {
+            if (spy == null) continue;
+            if (message.getSender().getUUID() == spy.getUniqueId()) continue;
+            spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        }
+    }
+
+    private void sendGenericHidden(MessageWrapper message, String format, String discordId) {
+        List<UUID> channelSpies = this.api.getPlayerDataManager().getChannelSpies();
+        List<Player> currentSpies = new ArrayList<>();
+
+        if (this.getRadius() != -1 && message.getSender().isPlayer()) {
+            // Send to all members within the radius.
+            Location senderLocation = message.getSender().asPlayer().getLocation();
+            if (senderLocation.getWorld() == null) return;
+
+            for (UUID uuid : this.getMembers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
+                if (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) < this.radius) {
+                    this.sendToPlayer(player, message, format, discordId);
+                } else {
+                    currentSpies.add(player);
+                }
+            }
+
+            // Allow spies to see the message if not in the same world.
+            for (UUID uuid : channelSpies) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;;
+                if (!player.getWorld().getName().equals(senderLocation.getWorld().getName())) currentSpies.add(player);
+            }
+        } else if (this.world != null) {
+            for (UUID uuid : this.getMembers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
+                if (player.getWorld().getName().equals(this.world)) {
+                    this.sendToPlayer(player, message, format, discordId);
+                } else {
+                    currentSpies.add(player);
+                }
+            }
+        } else {
+            for (UUID uuid : this.getMembers()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
+                this.sendToPlayer(player, message, format, discordId);
+            }
+        }
+
+        for (UUID uuid : channelSpies) {
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy == null) continue;
+            if (message.getSender().getUUID() == spy.getUniqueId()) continue;
+            if (this.getMembers().contains(uuid) && !currentSpies.contains(spy)) continue;
+            spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
+        }
+    }
+
     /**
      * Sends a message to the channel.
      * @param message The {@link MessageWrapper} to send.
@@ -107,95 +231,29 @@ public class ChatChannel implements Group {
     private void sendGeneric(MessageWrapper message, String format, boolean sendToDiscord, boolean sendToBungee, String discordId) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        // Send the message to the channel spies.
-        if (!this.visibleAnywhere) {
-            for (UUID uuid : api.getPlayerDataManager().getChannelSpies()) {
-                if (this.getMembers().contains(uuid) || uuid == message.getSender().getUUID()) continue;
-                Player spy = Bukkit.getPlayer(uuid);
-
-                if (spy == null) continue;
-                if (message.getSender().isPlayer() && spy.getLocation().distance(message.getSender().asPlayer().getLocation()) <= this.radius) continue;
-                spy.spigot().sendMessage(message.parse(Setting.CHANNEL_SPY_FORMAT.getString(), new RoseSender(spy)));
-            }
+        // Send the message to the sender. Always happens.
+        Player sender = message.getSender().isPlayer() ? message.getSender().asPlayer() : null;
+        PlayerData senderData = sender != null ? api.getPlayerData(sender.getUniqueId()) : null;
+        if (senderData != null) {
+            sender.spigot().sendMessage(discordId == null ? message.parse(format, message.getSender()) : message.parseFromDiscord(discordId, format, message.getSender()));
         }
 
-        // Send the message to discord.
+        // Send the message to discord. Always happens.
         if (sendToDiscord && api.getDiscord() != null && this.discordChannel != null) {
             MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
         }
 
-        // Send the message to other servers.
+        // Send the message to other servers. Always happens.
         if (sendToBungee && api.isBungee()) {
             for (String server : this.servers)
                 BungeeListener.sendChannelMessage(message.getSender(), server, this.getId(), message.getMessage());
         }
 
-        // Send to everyone who can view it.
+        // Settings should act different if visible anywhere is enabled or disabled, so we handle them differently.
         if (this.isVisibleAnywhere()) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID()) || !player.hasPermission("rosechat.channel." + this.getId())) continue;
-
-                RoseSender sender = new RoseSender(player);
-                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
-
-                this.sendTagSound(message, player, data);
-            }
-
-            return;
-        }
-
-        // Send to players within the radius.
-        if (this.getRadius() != -1 && message.getSender().isPlayer()) {
-            Location senderLocation = message.getSender().asPlayer().getLocation();
-            if (senderLocation.getWorld() == null) return;
-
-            for (Player player : senderLocation.getWorld().getPlayers()) {
-                PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
-
-                RoseSender sender = new RoseSender(player);
-                if (player.getLocation().distance(senderLocation) < this.radius)
-                    player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
-
-                this.sendTagSound(message, player, data);
-            }
-
-            return;
-        }
-
-        // Send to players in the same world.
-        if (this.world != null) {
-            World world = Bukkit.getWorld(this.world);
-            if (world == null) return;
-
-            for (Player player : world.getPlayers()) {
-                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-
-                PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
-
-                RoseSender sender = new RoseSender(player);
-                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
-                this.sendTagSound(message, player, data);
-            }
-
-            return;
-        }
-
-        // If none of the other conditions were met, send to all the players in the channel.
-        for (UUID uuid : this.players) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                if (!player.hasPermission("rosechat.channel." + this.getId())) continue;
-
-                PlayerData data = api.getPlayerData(player.getUniqueId());
-                if (data != null && data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
-
-                RoseSender sender = new RoseSender(player);
-                player.spigot().sendMessage(discordId == null ? message.parse(format, sender) : message.parseFromDiscord(discordId, format, sender));
-                this.sendTagSound(message, player, data);
-            }
+            this.sendGenericVisible(message, format, discordId);
+        } else {
+            this.sendGenericHidden(message, format, discordId);
         }
     }
 
