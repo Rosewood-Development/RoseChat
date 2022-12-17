@@ -82,7 +82,7 @@ public class PacketListener {
                     if (playerData == null) return;
 
                     PacketContainer packet = event.getPacket();
-                    if (packet.getBooleans().readSafely(0)) // Ignore hotbar messages
+                    if (packet.getBooleans().size() == 0 || packet.getBooleans().readSafely(0)) // Ignore hotbar messages
                         return;
 
                     String messageJson;
