@@ -82,6 +82,7 @@ permissions:
     children:
       rosechat.basecommand: true
       rosechat.reload: true
+      rosechat.debug: true
       rosechat.color: true
       rosechat.hex: true
       rosechat.rainbow: true
@@ -122,6 +123,9 @@ permissions:
     default: true
   rosechat.reload:
     description: Allows using the reload command.
+    default: op
+  rosechat.debug:
+    description: Allows enabling debug mode.
     default: op
   rosechat.chat:
     description: Allows using chat.

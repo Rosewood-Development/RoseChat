@@ -2,6 +2,7 @@ package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
+import dev.rosewood.rosechat.command.DebugCommand;
 import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.command.HelpCommand;
 import dev.rosewood.rosechat.command.IgnoreCommand;
@@ -137,6 +138,7 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
                 .addCommandManager(deleteMessageCommand)
+                .addSubcommand(new DebugCommand(this))
                 .addSubcommand(new ReloadCommand())
                 .addSubcommand(new HelpCommand(this));
 
@@ -164,7 +166,6 @@ public class RoseChat extends RosePlugin {
                 ReplacementManager.class,
                 TagManager.class,
                 PlaceholderManager.class,
-                ChannelManager.class,
                 DataManager.class,
                 GroupManager.class,
                 PlayerDataManager.class,

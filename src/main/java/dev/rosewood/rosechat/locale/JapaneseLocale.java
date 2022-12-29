@@ -280,6 +280,11 @@ public class JapaneseLocale implements Locale {
             this.put("command-ignore-usage", "&e/ignore <プレイヤー>");
             this.put("command-ignore-ignored", "&b%player%&eを無視しています。");
             this.put("command-ignore-unignored", "&b%player%&eを無視していません。");
+
+            this.put("#38", "Debug Command");
+            this.put("command-debug-description", "&8 - &d/rc debug &7- デバッグモードをトグルします。");
+            this.put("command-debug-on", "&eデバッグモードは今&aオン&eです。 デバッグインフォをセーブにまた&b/rc debugを使います。");
+            this.put("command-debug-off", "&eデバッグモードは&cオフ&eです。 &bplugins/RoseChat/debug&eに新しいファイルをセーブしました。");
         }};
     }
 

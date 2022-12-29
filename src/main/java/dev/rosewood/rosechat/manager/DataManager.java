@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import org.bukkit.Bukkit;
 
 public class DataManager extends AbstractDataManager {
 

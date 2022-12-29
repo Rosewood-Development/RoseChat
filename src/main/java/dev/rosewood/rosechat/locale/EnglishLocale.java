@@ -280,6 +280,11 @@ public class EnglishLocale implements Locale {
             this.put("command-ignore-usage", "&e/ignore <player>");
             this.put("command-ignore-ignored", "&eYou are now ignoring &b%player%&e.");
             this.put("command-ignore-unignored", "&eYou are no longer ignoring &b%player%&e.");
+
+            this.put("#38", "Debug Command");
+            this.put("command-debug-description", "&8 - &d/rc debug &7- Toggles debug mode.");
+            this.put("command-debug-on", "&eDebug mode is now &aon&e. Use &b/rc debug &eagain to save debug information.");
+            this.put("command-debug-off", "&eDebug mode is now &coff&e. A new file has been saved in &bplugins/RoseChat/debug&e.");
         }};
     }
 
