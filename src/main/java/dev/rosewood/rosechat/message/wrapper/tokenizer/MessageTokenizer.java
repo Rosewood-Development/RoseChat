@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
@@ -16,8 +17,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class MessageTokenizer {
 
+    private final DebugManager debugManager;
     private final List<Tokenizer<?>> tokenizers;
     private final MessageWrapper messageWrapper;
     private final RoseSender viewer;
@@ -36,24 +36,25 @@ public class MessageTokenizer {
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, String... tokenizerBundles) {
-        this.messageWrapper = messageWrapper;
-        this.viewer = viewer;
-        this.tokens = new ArrayList<>();
-        this.ignorePermissions = false;
-        this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.tokenize(parseReplacements(message));
+        this(messageWrapper, viewer, message, false, tokenizerBundles);
     }
 
     public MessageTokenizer(MessageWrapper messageWrapper, RoseSender viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
+        this.debugManager = RoseChat.getInstance().getManager(DebugManager.class);
+
         this.messageWrapper = messageWrapper;
         this.viewer = viewer;
         this.tokens = new ArrayList<>();
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
+        if (this.debugManager.isEnabled())
+            this.debugManager.addMessage("Tokenizing New Message: " + message);
         this.tokenize(parseReplacements(message));
     }
 
     private String parseReplacements(String message) {
+        if (this.debugManager.isEnabled())
+            this.debugManager.addMessage("Parsing Replacements...");
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
             if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
@@ -73,14 +74,20 @@ public class MessageTokenizer {
     }
 
     private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
+        if (this.debugManager.isEnabled())
+            this.debugManager.addMessage("Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
             String substring = content.substring(i);
             for (Tokenizer<?> tokenizer : this.tokenizers) {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
+                if (this.debugManager.isEnabled())
+                    this.debugManager.addMessage("Starting Tokenizing " + tokenizer.toString() + "...");
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, parent != null || this.ignorePermissions);
                 if (token != null) {
+                    if (this.debugManager.isEnabled())
+                        this.debugManager.addMessage("Completed Tokenizing " + tokenizer.toString() + ", " + token.toString() + ", " + token.getOriginalContent() + " -> " + token.getContent());
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {
                         RoseChat.getInstance().getLogger().warning("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.messageWrapper.getMessage());
