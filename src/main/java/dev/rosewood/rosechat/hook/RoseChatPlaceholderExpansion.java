@@ -18,57 +18,61 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String placeholder) {
-        if (player == null) return null;
+        if (placeholder == null) return null;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
-        PlayerData playerData = api.getPlayerData(player.getUniqueId());
-        GroupManager groupManager = api.getGroupManager();
         PlaceholderManager placeholderSettingManager = api.getPlaceholderManager();
-        if (playerData == null) return null;
+        GroupManager groupManager = api.getGroupManager();
 
-        switch (placeholder) {
-            case "chat_color":
-                return playerData.getColor();
-            case "nickname":
-                return playerData.getNickname();
-            case "current_channel":
-                return playerData.getCurrentChannel().getId();
-            case "is_muted":
-                return playerData.isMuted() ? "yes" : "no";
-            case "mute_time":
-                return String.valueOf(playerData.getMuteExpirationTime());
-            case "has_emojis":
-                return playerData.hasEmojis() ? "yes" : "no";
-            case "has_message_sounds":
-                return playerData.hasMessageSounds() ? "yes" : "no";
-            case "has_tag_sounds":
-                return playerData.hasTagSounds() ? "yes" : "no";
-            case "can_be_messaged":
-                return playerData.canBeMessaged() ? "yes" : "no";
-            case "has_group_spy":
-                return playerData.hasGroupSpy() ? "yes" : "no";
-            case "has_channel_spy":
-                return playerData.hasChannelSpy() ? "yes" : "no";
-            case "has_message_spy":
-                return playerData.hasMessageSpy() ? "yes" : "no";
-            case "last_messaged":
-                return playerData.getReplyTo();
-            case "is_group_leader":
-                return groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
-            case "group":
-                GroupChat group = groupManager.getGroupChatByOwner(playerData.getUUID());
-                return group != null ? group.getId() : null;
+        if (player != null) {
+            PlayerData playerData = api.getPlayerData(player.getUniqueId());
+            if (playerData == null) return null;
+
+            switch (placeholder) {
+                case "chat_color":
+                    return playerData.getColor();
+                case "nickname":
+                    return playerData.getNickname();
+                case "current_channel":
+                    return playerData.getCurrentChannel().getId();
+                case "is_muted":
+                    return playerData.isMuted() ? "yes" : "no";
+                case "mute_time":
+                    return String.valueOf(playerData.getMuteExpirationTime());
+                case "has_emojis":
+                    return playerData.hasEmojis() ? "yes" : "no";
+                case "has_message_sounds":
+                    return playerData.hasMessageSounds() ? "yes" : "no";
+                case "has_tag_sounds":
+                    return playerData.hasTagSounds() ? "yes" : "no";
+                case "can_be_messaged":
+                    return playerData.canBeMessaged() ? "yes" : "no";
+                case "has_group_spy":
+                    return playerData.hasGroupSpy() ? "yes" : "no";
+                case "has_channel_spy":
+                    return playerData.hasChannelSpy() ? "yes" : "no";
+                case "has_message_spy":
+                    return playerData.hasMessageSpy() ? "yes" : "no";
+                case "last_messaged":
+                    return playerData.getReplyTo();
+                case "is_group_leader":
+                    return groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
+                case "group":
+                    GroupChat group = groupManager.getGroupChatByOwner(playerData.getUUID());
+                    return group != null ? group.getId() : null;
+            }
+
+            if (placeholder.startsWith("placeholder_")) {
+                String rcPlaceholderId = placeholder.substring("placeholder_".length());
+                RoseSender sender = new RoseSender(player);
+                RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
+                if (rcPlaceholder == null) return null;
+
+                return HexUtils.colorify(rcPlaceholder.getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
+            }
         }
 
-        if (placeholder.startsWith("placeholder_")) {
-            String rcPlaceholderId = placeholder.substring("placeholder_".length());
-            RoseSender sender = new RoseSender(player);
-            RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
-            if (rcPlaceholder == null) return null;
-
-            return HexUtils.colorify(rcPlaceholder.getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
-        }
-
+        // These placeholders don't require a player.
         if (placeholder.startsWith("group_")) {
             if (placeholder.endsWith("_owner")) {
                 String gc = placeholder.substring("group_".length(), placeholder.indexOf("_owner"));
