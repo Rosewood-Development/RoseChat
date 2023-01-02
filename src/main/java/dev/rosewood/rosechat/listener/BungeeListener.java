@@ -118,7 +118,7 @@ public class BungeeListener implements PluginMessageListener {
                 stringBuilder.append(permission);
             }
 
-            if (sender.isPlayer() && sender.asPlayer().isOp()) stringBuilder.append("rosechat.*");
+            if (sender.isPlayer() && sender.asPlayer().isOp() || sender.hasPermission("*")) stringBuilder.append("rosechat.*");
 
             out.writeUTF("rosechat:" + channelTo + ":" + sender.getName() + ":" + sender.getUUID() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
 
@@ -141,6 +141,8 @@ public class BungeeListener implements PluginMessageListener {
                 if (stringBuilder.length() != 0) stringBuilder.append(",");
                 stringBuilder.append(permission);
             }
+
+            if (sender.isPlayer() && sender.asPlayer().isOp() || sender.hasPermission("*")) stringBuilder.append("rosechat.*");
 
             out.writeUTF("rosechat:message_player:" + sender.getUUID() + ":" + sender.getName() + ":" + sender.getGroup() + ":" + stringBuilder.toString());
 
