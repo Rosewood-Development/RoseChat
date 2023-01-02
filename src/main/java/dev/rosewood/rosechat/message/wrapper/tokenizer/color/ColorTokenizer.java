@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
+import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
@@ -28,8 +29,17 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
                 spigotHexToken : new ColorToken(spigotHexToken.getOriginalContent(), null);
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
-        if (legacyToken != null) return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.color") ?
-                legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
+        if (legacyToken != null) {
+            if (ConfigurationManager.Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()) {
+                char colorCode = legacyToken.getOriginalContent().charAt(1);
+                return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.color") &&
+                        this.hasBasicPermission(messageWrapper, ignorePermissions, "rosechat.color." + ChatColor.getByChar(colorCode).getName().toLowerCase())?
+                        legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
+            } else {
+                return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.color") ?
+                        legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
+            }
+        }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
         if (hexToken != null) return this.hasPermission(messageWrapper, ignorePermissions || color, "rosechat.hex") ?
