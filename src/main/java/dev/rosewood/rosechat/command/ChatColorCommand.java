@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -59,11 +60,16 @@ public class ChatColorCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
             tab.add("remove");
-            if (sender.hasPermission("rosechat.color.chatcolor")) tab.add("&a");
+            if (sender.hasPermission("rosechat.color.chatcolor") && !Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()) tab.add("&a");
             if (sender.hasPermission("rosechat.format.chatcolor")) tab.add("&l");
             if (sender.hasPermission("rosechat.hex.chatcolor")) tab.add("#FFFFFF");
             if (sender.hasPermission("rosechat.rainbow.chatcolor")) tab.add("<r:0.5>");
             if (sender.hasPermission("rosechat.gradient.chatcolor")) tab.add("<g:#FFFFFF:#000000>");
+            if (Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()) {
+                for (ChatColor color : ChatColor.values()) {
+                    if (sender.hasPermission("rosechat." + color.getName().toLowerCase() + ".chatcolor")) tab.add("&" + color.toString().substring(1));
+                }
+            }
         }
 
         return tab;

@@ -83,7 +83,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "When a player uses one of these colors, RoseChat will shift the color slightly (#FFFFFE -> #FFFFFD) to avoid the shader being used without permission."),
         USE_PER_COLOR_PERMISSIONS("chat-settings.use-per-color-permissions", false,
                 "Should there be a permission to use each chat color?",
-                "For example, using 'rosechat.color.red' to use &c.",
+                "For example, using 'rosechat.red.<location>' to use &c.",
+                "More information can be found on the wiki: https://github.com/Rosewood-Development/RoseChat/wiki/Commands-%26-Permissions/",
                 "A full list of colors can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html"),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),

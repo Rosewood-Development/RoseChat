@@ -229,7 +229,11 @@ public class MessageUtils {
         Matcher gradientMatcher = GRADIENT_PATTERN.matcher(str);
         Matcher rainbowMatcher = RAINBOW_PATTERN.matcher(str);
 
-        boolean canColor = !colorMatcher.find() || sender.hasPermission("rosechat.color." + permissionArea);
+        boolean hasColor = colorMatcher.find();
+        boolean usePerColorPerms = Setting.USE_PER_COLOR_PERMISSIONS.getBoolean();
+        boolean hasLocationPermission = sender.hasPermission("rosechat.color." + permissionArea);
+        boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." + ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + permissionArea);
+        boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
         boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + permissionArea);
         boolean canFormat = !formatMatcher.find() || sender.hasPermission("rosechat.format." + permissionArea);
         boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + permissionArea);

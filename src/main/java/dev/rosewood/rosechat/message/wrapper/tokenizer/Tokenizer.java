@@ -24,11 +24,4 @@ public interface Tokenizer<T extends Token> {
                 ((wrapper.getSender().hasPermission(extendedPermission))) || (wrapper.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", "")) || (wrapper.getSender().getIgnoredPermissions().contains("rosechat.*")))));
     }
 
-    default boolean hasBasicPermission(MessageWrapper wrapper, boolean ignorePermissions, String permission) {
-        return ignorePermissions
-                || wrapper == null
-                || wrapper.getLocation() == MessageLocation.NONE
-                || (wrapper.getSender().hasPermission(permission));
-    }
-
 }

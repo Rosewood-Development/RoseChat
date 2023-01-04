@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'dev.rosewood'
-version 'Beta-8'
+version 'Beta-9'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
