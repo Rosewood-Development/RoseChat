@@ -11,6 +11,7 @@ softdepend:
   - ProtocolLib
   - Essentials
   - LuckPerms
+  - Towny
 commands:
   rosechat:
     aliases: [rc]
