@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
@@ -24,6 +25,7 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -39,28 +41,34 @@ public final class RoseChatAPI {
     private static RoseChatAPI instance;
     private final RoseChat plugin;
     private final LocaleManager localeManager;
-    private final PlayerDataManager playerDataManager;
-    private final GroupManager groupManager;
-    private final ChannelManager channelManager;
-    private final PlaceholderManager placeholderManager;
-    private final EmojiManager emojiManager;
-    private final ReplacementManager replacementManager;
-    private final TagManager tagManager;
-    private final DiscordEmojiManager discordEmojiManager;
+    private PlayerDataManager playerDataManager;
+    private GroupManager groupManager;
+    private ChannelManager channelManager;
+    private PlaceholderManager placeholderManager;
+    private EmojiManager emojiManager;
+    private ReplacementManager replacementManager;
+    private TagManager tagManager;
+    private DiscordEmojiManager discordEmojiManager;
+    private BungeeManager bungeeManager;
     private Class<?> spigotConfigClass;
     private Field bungeeField;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
         this.localeManager = this.plugin.getManager(LocaleManager.class);
-        this.channelManager = this.plugin.getManager(ChannelManager.class);
-        this.playerDataManager = this.plugin.getManager(PlayerDataManager.class);
-        this.groupManager = this.plugin.getManager(GroupManager.class);
-        this.placeholderManager = this.plugin.getManager(PlaceholderManager.class);
-        this.emojiManager = this.plugin.getManager(EmojiManager.class);
-        this.replacementManager = this.plugin.getManager(ReplacementManager.class);
-        this.tagManager = this.plugin.getManager(TagManager.class);
-        this.discordEmojiManager = this.plugin.getManager(DiscordEmojiManager.class);
+
+        // Ensures the managers are loaded fully before getting them.
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            this.channelManager = this.plugin.getManager(ChannelManager.class);
+            this.playerDataManager = this.plugin.getManager(PlayerDataManager.class);
+            this.groupManager = this.plugin.getManager(GroupManager.class);
+            this.placeholderManager = this.plugin.getManager(PlaceholderManager.class);
+            this.emojiManager = this.plugin.getManager(EmojiManager.class);
+            this.replacementManager = this.plugin.getManager(ReplacementManager.class);
+            this.tagManager = this.plugin.getManager(TagManager.class);
+            this.discordEmojiManager = this.plugin.getManager(DiscordEmojiManager.class);
+            this.bungeeManager = this.plugin.getManager(BungeeManager.class);
+        }, 20L);
     }
 
     /**
@@ -436,6 +444,13 @@ public final class RoseChatAPI {
      */
     public DiscordEmojiManager getDiscordEmojiManager() {
         return this.discordEmojiManager;
+    }
+
+    /**
+     * @return An instance of the bungee manager.
+     */
+    public BungeeManager getBungeeManager() {
+        return this.bungeeManager;
     }
 
     /**

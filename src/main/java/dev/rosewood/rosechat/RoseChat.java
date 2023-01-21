@@ -46,6 +46,7 @@ import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
+import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.DataManager;
@@ -166,10 +167,10 @@ public class RoseChat extends RosePlugin {
                 ReplacementManager.class,
                 TagManager.class,
                 PlaceholderManager.class,
-                DataManager.class,
                 GroupManager.class,
                 PlayerDataManager.class,
-                DiscordEmojiManager.class
+                DiscordEmojiManager.class,
+                BungeeManager.class
         );
     }
 

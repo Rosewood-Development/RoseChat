@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.Tag;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -43,7 +42,7 @@ public class TagManager extends Manager {
             }
 
             this.tags.put(id, new Tag(id, prefix, suffix, tagOnlinePlayers, matchLength, format, sound));
-            MessageUtils.parseFormat("tag-" + id, format);
+            this.rosePlugin.getManager(PlaceholderManager.class).parseFormat("tag-" + id, format);
         }
     }
 

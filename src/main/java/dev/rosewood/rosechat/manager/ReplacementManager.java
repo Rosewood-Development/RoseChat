@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.chat.ChatReplacement;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -33,7 +32,7 @@ public class ReplacementManager extends Manager {
             boolean regex = replacementConfiguration.contains(id + ".regex") && replacementConfiguration.getBoolean(id + ".regex");
 
             if (replacement.startsWith("{") && replacement.endsWith("}"))
-                MessageUtils.parseFormat("replacement-" + id, replacement);
+                this.rosePlugin.getManager(PlaceholderManager.class).parseFormat("replacement-" + id, replacement);
 
             this.replacements.put(id, new ChatReplacement(id, text, replacement, regex));
         }
