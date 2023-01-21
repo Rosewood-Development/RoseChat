@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizer;
-import org.bukkit.Bukkit;
 import java.util.regex.Matcher;
 
 public class ShaderTokenizer implements Tokenizer<Token> {

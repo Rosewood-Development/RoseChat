@@ -126,6 +126,9 @@ public class RoseSender {
         return true;
     }
 
+    /**
+     * @return A list of RoseChat permissions that this RoseSender has.
+     */
     public List<String> getPermissions() {
         List<String> permissions = new ArrayList<>();
         Player player = this.asPlayer();

@@ -5,6 +5,9 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+/**
+ * A placeholder condition for boolean values.
+ */
 public class BooleanPlaceholderCondition extends PlaceholderCondition {
 
     private Operator operator;
@@ -74,4 +77,5 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
         super.parseValues();
         return this;
     }
+
 }

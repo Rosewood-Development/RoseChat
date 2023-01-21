@@ -7,6 +7,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.List;
 
+/**
+ * A placeholder condition for number values.
+ * Allows checking if a value is more, less, or equal to a given number.
+ */
 public class NumberPlaceholderCondition extends PlaceholderCondition {
 
     public NumberPlaceholderCondition(ConfigurationSection section, String condition) {

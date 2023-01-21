@@ -5,6 +5,9 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.configuration.ConfigurationSection;
 
+/**
+ * A placeholder condition for when no conditions are specified.
+ */
 public class NullPlaceholderCondition extends PlaceholderCondition {
 
     public NullPlaceholderCondition(ConfigurationSection section, String condition) {
@@ -25,4 +28,5 @@ public class NullPlaceholderCondition extends PlaceholderCondition {
     public ClickEvent.Action parseToAction(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
         return this.getClickAction("default");
     }
+
 }

@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
-import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

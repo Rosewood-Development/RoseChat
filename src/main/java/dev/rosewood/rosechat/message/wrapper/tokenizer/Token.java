@@ -24,6 +24,10 @@ public class Token {
     protected StringPlaceholders.Builder placeholders;
     protected List<Token> children, hoverChildren;
 
+    /**
+     * Creates a new token with the given settings.
+     * @param settings The {@link TokenSettings} to use.
+     */
     public Token(TokenSettings settings) {
         this.originalContent = settings.originalContent;
         this.content = settings.content;
@@ -40,14 +44,23 @@ public class Token {
         this.hoverChildren = new ArrayList<>();
     }
 
+    /**
+     * @return The original text before any changes.
+     */
     public final String getOriginalContent() {
         return this.originalContent;
     }
 
+    /**
+     * @return The final text after changes are applied.
+     */
     public String getContent() {
         return this.placeholders.build().apply(this.content);
     }
 
+    /**
+     * @return Whether this token can be tokenized.
+     */
     public boolean requiresTokenizing() {
         return this.requiresTokenizing;
     }

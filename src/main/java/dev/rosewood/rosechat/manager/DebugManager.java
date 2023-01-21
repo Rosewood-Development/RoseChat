@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;

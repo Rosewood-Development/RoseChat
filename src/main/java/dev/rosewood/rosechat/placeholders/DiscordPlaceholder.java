@@ -26,4 +26,8 @@ public class DiscordPlaceholder {
         return this.placeholders.get(id);
     }
 
+    public String getId() {
+        return this.id;
+    }
+
 }

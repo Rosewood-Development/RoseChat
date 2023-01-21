@@ -21,6 +21,12 @@ public class PlaceholderCondition {
     protected final Map<String, List<String>> conditionValues;
     protected  final Map<String, ClickEvent.Action> clickActions;
 
+    /**
+     * Creates a new placeholder condition.
+     * These are used to change format based on the given condition.
+     * @param section The {@link ConfigurationSection} to read from.
+     * @param condition The pre-parsed condition.
+     */
     public PlaceholderCondition(ConfigurationSection section, String condition) {
         this.section = section;
         this.condition = condition;
@@ -28,18 +34,43 @@ public class PlaceholderCondition {
         this.clickActions = new HashMap<>();
     }
 
+    /**
+     * Parses the given condition into a string, using the given sender, viewer, and placeholders.
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     * @return The message after parsing has occurred.
+     */
     protected String parse(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
         return null;
     }
 
+    /**
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     * @return The parsed condition as a string.
+     */
     public String parseToString(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
         return null;
     }
 
+    /**
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     * @return The parsed condition as a boolean.
+     */
     public boolean parseToBoolean(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
         return false;
     }
 
+    /**
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     * @return The parsed condition as a {@link ClickEvent.Action}.
+     */
     public ClickEvent.Action parseToAction(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
         return null;
     }

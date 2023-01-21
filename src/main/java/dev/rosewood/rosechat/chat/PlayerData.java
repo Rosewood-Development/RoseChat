@@ -2,10 +2,8 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLog;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;

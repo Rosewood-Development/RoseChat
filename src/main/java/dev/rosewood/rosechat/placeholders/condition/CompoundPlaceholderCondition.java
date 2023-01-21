@@ -7,6 +7,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A placeholder condition that contains multiple conditions.
+ */
 public class CompoundPlaceholderCondition extends PlaceholderCondition {
 
     private final List<BooleanPlaceholderCondition> conditions;

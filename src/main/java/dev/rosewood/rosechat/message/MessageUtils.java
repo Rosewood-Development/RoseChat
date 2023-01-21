@@ -57,6 +57,11 @@ public class MessageUtils {
                     "#([A-Fa-f0-9]){6}"
     );
 
+    /**
+     * Removes the accents from a string.
+     * @param string The string to use.
+     * @return A string without accents.
+     */
     public static String stripAccents(String string) {
         StringBuilder sb = new StringBuilder(string.length());
         string = Normalizer.normalize(string, Normalizer.Form.NFKD);
@@ -68,6 +73,12 @@ public class MessageUtils {
         return sb.toString();
     }
 
+    /**
+     * Gets the {@link LevenshteinDistance} between two given strings.
+     * @param first The first string to use.
+     * @param second The string to compare with.
+     * @return A percentage of difference between the two strings.
+     */
     public static double getLevenshteinDistancePercent(String first, String second) {
         int levDistance = LevenshteinDistance.getDefaultInstance().apply(MessageUtils.stripAccents(first.toLowerCase()), MessageUtils.stripAccents(second.toLowerCase()));
 
@@ -77,11 +88,20 @@ public class MessageUtils {
         return (longerMessage.length() - levDistance) / (double) longerMessage.length();
     }
 
+    /**
+     * Checks if the given string is empty.
+     * @param message The string to check.
+     * @return True if the message is empty.
+     */
     public static boolean isMessageEmpty(String message) {
         String colorified = HexUtils.colorify(message);
         return StringUtils.isBlank(ChatColor.stripColor(colorified));
     }
 
+    /**
+     * @param cs The {@link CharSequence} to check.
+     * @return True if the {@link CharSequence} is alphanumeric or a space.
+     */
     public static boolean isAlphanumericSpace(final CharSequence cs) {
         if (cs == null) {
             return false;
@@ -95,7 +115,11 @@ public class MessageUtils {
         return true;
     }
 
-
+    /**
+     * @param sender The {@link RoseSender} who will send these placeholders.
+     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
+     */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
                 .addPlaceholder("player_name", sender.getName())
@@ -113,6 +137,12 @@ public class MessageUtils {
         return builder;
     }
 
+    /**
+     * @param sender The {@link RoseSender} who will send these placeholders.
+     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param group The {@link Group} that these placeholders will be sent in.
+     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
+     */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group) {
         if (group == null) return getSenderViewerPlaceholders(sender, viewer);
         else if (group instanceof GroupChat) return getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
@@ -120,6 +150,13 @@ public class MessageUtils {
         else return getSenderViewerPlaceholders(sender, viewer);
     }
 
+    /**
+     * @param sender The {@link RoseSender} who will send these placeholders.
+     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param group The {@link Group} that these placeholders will be sent in.
+     * @param extra More {@link StringPlaceholders} to use.
+     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
+     */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group, StringPlaceholders extra) {
         StringPlaceholders.Builder builder;
         if (group == null) builder =  getSenderViewerPlaceholders(sender, viewer);
@@ -130,6 +167,12 @@ public class MessageUtils {
         return extra == null ? builder : builder.addAll(extra);
     }
 
+    /**
+     * @param sender The {@link RoseSender} who will send these placeholders.
+     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param group The {@link GroupChat} that these placeholders will be sent in.
+     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
+     */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, GroupChat group) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
         builder.addPlaceholder("group", group.getId())
@@ -139,16 +182,34 @@ public class MessageUtils {
         return builder;
     }
 
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, ChatChannel inChannel) {
+    /**
+     * @param sender The {@link RoseSender} who will send these placeholders.
+     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param channel The {@link ChatChannel} that these placeholders will be sent in.
+     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
+     */
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, ChatChannel channel) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("channel", inChannel.getId());;
+        builder.addPlaceholder("channel", channel.getId());;
         return builder;
     }
 
+    /**
+     * Sends a message to a Discord channel.
+     * @param message The message to send.
+     * @param group The {@link Group} that the message was sent from.
+     * @param channel The channel to send the message to.
+     */
     public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 
+    /**
+     * Sends a private message from one player to another.
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param targetName The name of the player receiving the message.
+     * @param message The message to send.
+     */
     public static void sendPrivateMessage(RoseSender sender, String targetName, String message) {
         Player target = Bukkit.getPlayer(targetName);
         RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
@@ -187,21 +248,34 @@ public class MessageUtils {
         BaseComponent[] sentMessage = messageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
         BaseComponent[] receivedMessage = messageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
 
-        sender.send(sentMessage);
         if (target == null) {
             if (targetName.equalsIgnoreCase("Console")) {
                 Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
             } else {
-                BungeeListener.sendDirectMessage(sender, targetName, message);
+                RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (sent) -> {
+                    if (sent) {
+                        sender.send(sentMessage);
+                    } else {
+                        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
+                    }
+                });
+                return;
             }
         } else {
             target.spigot().sendMessage(receivedMessage);
         }
 
+        sender.send(sentMessage);
+
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
                 && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
     }
 
+    /**
+     * Gets the player whose name, display name or nickname contains the given name.
+     * @param name The name, display name, or nickname of the player.
+     * @return A {@link Player} retrieved from the given name.
+     */
     public static Player getPlayer(String name) {
         if (name == null || name.isEmpty()) return null;
         Player player = Bukkit.getPlayer(name);
@@ -218,10 +292,22 @@ public class MessageUtils {
         return null;
     }
 
+    /**
+     * Parses a given format.
+     * @param id The id of the format.
+     * @param format The format.
+     */
     public static void parseFormat(String id, String format) {
         RoseChatAPI.getInstance().getPlaceholderManager().parseFormat(id, format);
     }
 
+    /**
+     * Checks if a message can be coloured by the given sender.
+     * @param sender The {@link CommandSender} sender who is sending the string.
+     * @param str The string to check.
+     * @param permissionArea The location, from a {@link MessageLocation} as a string.
+     * @return True if the message can be colored.
+     */
     public static boolean canColor(CommandSender sender, String str, String permissionArea) {
         Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
         Matcher formatMatcher = VALID_LEGACY_REGEX_FORMATTING.matcher(str);
@@ -248,6 +334,11 @@ public class MessageUtils {
         return true;
     }
 
+    /**
+     * @param input The string to check.
+     * @param messageWrapper The {@link MessageWrapper} containing the message.
+     * @return True if this message starts with a saved /chatcolor.
+     */
     public static boolean hasDefaultColor(String input, MessageWrapper messageWrapper) {
         if (messageWrapper == null || messageWrapper.getSenderData() == null || messageWrapper.getSenderData().getColor() == null) return false;
 
@@ -259,19 +350,23 @@ public class MessageUtils {
         return input.startsWith(start);
     }
 
-    public static String stripColors(String message) {
-        return message.replaceAll(VALID_LEGACY_REGEX.pattern(), "")
-                .replaceAll(HEX_REGEX.pattern(), "")
-                .replaceAll(GRADIENT_PATTERN.pattern(), "")
-                .replaceAll(RAINBOW_PATTERN.pattern(), "");
-    }
-
+    /**
+     * Removes all non-legacy colors from a string.
+     * @param message The string to remove colors from.
+     * @return The string without any non-legacy colors.
+     */
     public static String stripNonLegacyColors(String message) {
         return message.replaceAll(HEX_REGEX.pattern(), "")
                 .replaceAll(GRADIENT_PATTERN.pattern(), "")
                 .replaceAll(RAINBOW_PATTERN.pattern(), "");
     }
 
+    /**
+     * Processes the given string to be sent on Discord.
+     * Converts Minecraft formatting to Discord formatting.
+     * @param text The string to use.
+     * @return The string ready to be sent to Discord.
+     */
     public static String processForDiscord(String text) {
         text = stripNonLegacyColors(ChatColor.stripColor(text));
         StringBuilder stringBuilder = new StringBuilder();
@@ -325,6 +420,12 @@ public class MessageUtils {
         return ChatColor.stripColor(stringBuilder.toString());
     }
 
+    /**
+     * Converts Minecraft formatting to Discord formatting.
+     * For example, &l to **.
+     * @param c The character to convert.
+     * @return The converted string, as Discord formatting.
+     */
     private static String getDiscordFormatting(char c) {
         switch (Character.toLowerCase(c)) {
             case 'o':

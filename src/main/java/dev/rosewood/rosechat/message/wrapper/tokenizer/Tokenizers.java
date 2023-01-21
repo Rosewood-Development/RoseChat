@@ -84,6 +84,13 @@ public class Tokenizers {
         return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::getTokenizer).collect(Collectors.toList()));
     }
 
+    /**
+     * Registers a new tokenizer
+     * @param name The id of the tokenizer.
+     * @param tokenizer The {@link Tokenizer} tokenizer to register.
+     * @param bundles The bundles that contain this tokenizer.
+     * @return The registered Tokenizer.
+     */
     public static <T extends Token> Tokenizer<T> register(String name, Tokenizer<T> tokenizer, String... bundles) {
         if (bundles.length == 0)
             bundles = new String[] { DEFAULT_BUNDLE };

@@ -19,6 +19,11 @@ public class ComponentSimplifier {
 
     }
 
+    /**
+     * Simplifies a complicated {@link BaseComponent[]}.
+     * @param components The {@link BaseComponent[]} to simplify.
+     * @return The simplified components.
+     */
     public static BaseComponent[] simplify(BaseComponent[] components) {
         removeUselessBits(components);
         components = compress(components);

@@ -46,10 +46,18 @@ public class MessageWrapper {
     private UUID id;
     private DeletableMessage deletableMessage;
 
-    public MessageWrapper(RoseSender sender, MessageLocation messageLocation, Group group, String message) {
+    /**
+     * Creates a new MessageWrapper to be parsed later.
+     * This should be parsed using {@link #parse(String, RoseSender)}.
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param location The {@link MessageLocation} that the message was sent in.
+     * @param group The {@link Group} that the message was sent in.
+     * @param message The message that was sent.
+     */
+    public MessageWrapper(RoseSender sender, MessageLocation location, Group group, String message) {
         this.sender = sender;
         this.group = group;
-        this.location = messageLocation;
+        this.location = location;
         this.locationPermission = this.location.toString().toLowerCase() + (group == null ? "" : "." + group.getLocationPermission());
         this.message = message;
         this.canBeSent = true;
@@ -60,11 +68,27 @@ public class MessageWrapper {
         this.placeholders = StringPlaceholders.empty();
     }
 
+    /**
+     * Creates a new MessageWrapper to be parsed later.
+     * This should be parsed using {@link #parse(String, RoseSender)}.
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param location The {@link MessageLocation} that the message was sent in.
+     * @param group The {@link Group} that the message was sent in.
+     * @param message The message that was sent.
+     * @param placeholders The {@link StringPlaceholders} to use in this message.
+     */
     public MessageWrapper(RoseSender sender, MessageLocation location, Group group, String message, StringPlaceholders placeholders) {
         this(sender, location, group, message);
         this.placeholders = placeholders;
     }
 
+    /**
+     * Creates a new MessageWrapper to be parsed later.
+     * This should be parsed using {@link #parse(String, RoseSender)}.
+     * @param sender The {@link RoseSender} who sent the message.
+     * @param group The {@link Group} that the message was sent in.
+     * @param message The message that was sent.
+     */
     public MessageWrapper(Player sender, MessageLocation messageLocation, Group group, String message) {
         this(new RoseSender(sender), messageLocation, group, message);
     }
@@ -181,7 +205,7 @@ public class MessageWrapper {
     }
 
     /**
-     * Applys the sender's default chat colour.
+     * Applies the sender's default chat colour.
      * This should be used after validating and filtering as it may cause issues.
      * @return The MessageWrapper.
      */
@@ -217,10 +241,6 @@ public class MessageWrapper {
     public MessageWrapper setPrivateMessageInfo(PrivateMessageInfo info) {
         this.privateMessageInfo = info;
         return this;
-    }
-
-    public String parseToString() {
-        return this.message;
     }
 
     private void logMessage(MessageLog log, String discordId) {
@@ -262,6 +282,12 @@ public class MessageWrapper {
         return lastFormat + lastColor;
     }
 
+    /**
+     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * @param format The format to use.
+     * @param viewer The {@link RoseSender} viewing this message.
+     * @return A {@link BaseComponent[]} containing this message.
+     */
     public BaseComponent[] parse(String format, RoseSender viewer) {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
@@ -323,6 +349,12 @@ public class MessageWrapper {
         return this.toComponents();
     }
 
+    /**
+     * Parses the message using RoseChat's {@link MessageTokenizer}, using Discord formatting.
+     * @param format The format to use.
+     * @param viewer The {@link RoseSender} viewing this message.
+     * @return A {@link BaseComponent[]} containing this message.
+     */
     public BaseComponent[] parseFromDiscord(String id, String format, RoseSender viewer) {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
@@ -380,6 +412,12 @@ public class MessageWrapper {
         return this.toComponents();
     }
 
+    /**
+     * Parses the message using RoseChat's {@link MessageTokenizer} using Discord formatting.
+     * @param format The format to use.
+     * @param viewer The {@link RoseSender} viewing this message.
+     * @return A {@link BaseComponent[]} containing this message.
+     */
     public BaseComponent[] parseToDiscord(String format, RoseSender viewer) {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
@@ -428,14 +466,24 @@ public class MessageWrapper {
         return this.toComponents();
     }
 
+    /**
+     * @return The components of this message. Will be null if the message has not been parsed.
+     */
     public BaseComponent[] toComponents() {
         return this.tokenized;
     }
 
+    /**
+     * Sets the components in this message.
+     * @param components The components to use.
+     */
     public void setComponents(BaseComponent[] components) {
         this.tokenized = components;
     }
 
+    /**
+     * @return A list of players who have been tagged in this message.
+     */
     public List<UUID> getTaggedPlayers() {
         return this.taggedPlayers;
     }

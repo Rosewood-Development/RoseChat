@@ -9,7 +9,6 @@ import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
-import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -25,7 +24,6 @@ import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -40,35 +38,11 @@ public final class RoseChatAPI {
 
     private static RoseChatAPI instance;
     private final RoseChat plugin;
-    private final LocaleManager localeManager;
-    private PlayerDataManager playerDataManager;
-    private GroupManager groupManager;
-    private ChannelManager channelManager;
-    private PlaceholderManager placeholderManager;
-    private EmojiManager emojiManager;
-    private ReplacementManager replacementManager;
-    private TagManager tagManager;
-    private DiscordEmojiManager discordEmojiManager;
-    private BungeeManager bungeeManager;
     private Class<?> spigotConfigClass;
     private Field bungeeField;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
-        this.localeManager = this.plugin.getManager(LocaleManager.class);
-
-        // Ensures the managers are loaded fully before getting them.
-        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
-            this.channelManager = this.plugin.getManager(ChannelManager.class);
-            this.playerDataManager = this.plugin.getManager(PlayerDataManager.class);
-            this.groupManager = this.plugin.getManager(GroupManager.class);
-            this.placeholderManager = this.plugin.getManager(PlaceholderManager.class);
-            this.emojiManager = this.plugin.getManager(EmojiManager.class);
-            this.replacementManager = this.plugin.getManager(ReplacementManager.class);
-            this.tagManager = this.plugin.getManager(TagManager.class);
-            this.discordEmojiManager = this.plugin.getManager(DiscordEmojiManager.class);
-            this.bungeeManager = this.plugin.getManager(BungeeManager.class);
-        }, 20L);
     }
 
     /**
@@ -129,7 +103,7 @@ public final class RoseChatAPI {
      */
     public ChatChannel createChannel(String id, String format) {
         ChatChannel channel = new ChatChannel(id, format);
-        this.channelManager.addChannel(channel);
+        this.getChannelManager().addChannel(channel);
         return channel;
     }
 
@@ -138,7 +112,7 @@ public final class RoseChatAPI {
      * @param channel The channel to delete.
      */
     public void deleteChannel(ChatChannel channel) {
-        this.channelManager.removeChannel(channel);
+        this.getChannelManager().removeChannel(channel);
     }
 
     /**
@@ -146,21 +120,21 @@ public final class RoseChatAPI {
      * @return The channel found, or null if it doesn't exist.
      */
     public ChatChannel getChannelById(String id) {
-        return this.channelManager.getChannel(id);
+        return this.getChannelManager().getChannel(id);
     }
 
     /**
      * @return A list of all the chat channels.
      */
     public List<ChatChannel> getChannels() {
-        return new ArrayList<>(this.channelManager.getChannels().values());
+        return new ArrayList<>(this.getChannelManager().getChannels().values());
     }
 
     /**
      * @return A list of all the chat channel IDs.
      */
     public List<String> getChannelIDs() {
-        return new ArrayList<>(this.channelManager.getChannels().keySet());
+        return new ArrayList<>(this.getChannelManager().getChannels().keySet());
     }
 
     /**
@@ -173,7 +147,7 @@ public final class RoseChatAPI {
      */
     public ChatReplacement createReplacement(String id, String text, String replacement, boolean regex) {
         ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, regex);
-        this.replacementManager.addReplacement(chatReplacement);
+        this.getReplacementManager().addReplacement(chatReplacement);
         return chatReplacement;
     }
 
@@ -182,7 +156,7 @@ public final class RoseChatAPI {
      * @param replacement The replacement to delete.
      */
     public void deleteReplacement(ChatReplacement replacement) {
-        this.replacementManager.removeReplacement(replacement);
+        this.getReplacementManager().removeReplacement(replacement);
     }
 
     /**
@@ -190,21 +164,21 @@ public final class RoseChatAPI {
      * @return The chat replacement found, or null if it doesn't exist.
      */
     public ChatReplacement getReplacementById(String id) {
-        return this.replacementManager.getReplacement(id);
+        return this.getReplacementManager().getReplacement(id);
     }
 
     /**
      * @return A list of all chat replacements.
      */
     public List<ChatReplacement> getReplacements() {
-        return new ArrayList<>(this.replacementManager.getReplacements().values());
+        return new ArrayList<>(this.getReplacementManager().getReplacements().values());
     }
 
     /**
      * @return A list of all chat replacement IDs.
      */
     public List<String> getReplacementIDs() {
-        return new ArrayList<>(this.replacementManager.getReplacements().keySet());
+        return new ArrayList<>(this.getReplacementManager().getReplacements().keySet());
     }
 
     /**
@@ -218,7 +192,7 @@ public final class RoseChatAPI {
      */
     public ChatReplacement createEmoji(String id, String text, String replacement, String hoverText, String font) {
         ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, font, false);
-        this.emojiManager.addEmoji(chatReplacement);
+        this.getEmojiManager().addEmoji(chatReplacement);
         return chatReplacement;
     }
 
@@ -227,7 +201,7 @@ public final class RoseChatAPI {
      * @param emoji The emoji to delete.
      */
     public void deleteEmoji(ChatReplacement emoji) {
-        this.emojiManager.removeEmoji(emoji);
+        this.getEmojiManager().removeEmoji(emoji);
     }
 
     /**
@@ -235,21 +209,21 @@ public final class RoseChatAPI {
      * @return The emoji found, or null if it doesn't exist.
      */
     public ChatReplacement getEmojiById(String id) {
-        return this.emojiManager.getEmoji(id);
+        return this.getEmojiManager().getEmoji(id);
     }
 
     /**
      * @return A list of all emojis, specified in emojis.yml.
      */
     public List<ChatReplacement> getEmojis() {
-        return new ArrayList<>(this.emojiManager.getEmojis().values());
+        return new ArrayList<>(this.getEmojiManager().getEmojis().values());
     }
 
     /**
      * @return A list of all emoji IDs.
      */
     public List<String> getEmojiIds() {
-        return new ArrayList<>(this.emojiManager.getEmojis().keySet());
+        return new ArrayList<>(this.getEmojiManager().getEmojis().keySet());
     }
 
     /**
@@ -262,8 +236,8 @@ public final class RoseChatAPI {
         GroupChat groupChat = new GroupChat(id);
         groupChat.setOwner(owner);
         groupChat.addMember(owner);
-        this.groupManager.addGroupChat(groupChat);
-        this.groupManager.addMember(groupChat, owner);
+        this.getGroupManager().addGroupChat(groupChat);
+        this.getGroupManager().addMember(groupChat, owner);
         return groupChat;
     }
 
@@ -272,8 +246,8 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to delete.
      */
     public void deleteGroupChat(GroupChat groupChat) {
-        this.groupManager.removeGroupChat(groupChat);
-        this.groupManager.deleteGroupChat(groupChat);
+        this.getGroupManager().removeGroupChat(groupChat);
+        this.getGroupManager().deleteGroupChat(groupChat);
     }
 
     /**
@@ -283,7 +257,7 @@ public final class RoseChatAPI {
      */
     public void addGroupChatMember(GroupChat groupChat, Player member) {
         groupChat.addMember(member);
-        this.groupManager.addMember(groupChat, member.getUniqueId());
+        this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -293,7 +267,7 @@ public final class RoseChatAPI {
      */
     public void removeGroupChatMember(GroupChat groupChat, Player member) {
         groupChat.removeMember(member);
-        this.groupManager.removeMember(groupChat, member.getUniqueId());
+        this.getGroupManager().removeMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -301,7 +275,7 @@ public final class RoseChatAPI {
      * @return The group chat found, or null if it doesn't exist.
      */
     public GroupChat getGroupChatByOwner(UUID owner) {
-        return this.groupManager.getGroupChatByOwner(owner);
+        return this.getGroupManager().getGroupChatByOwner(owner);
     }
 
     /**
@@ -309,14 +283,14 @@ public final class RoseChatAPI {
      * @return The group chat found, or null if it doesn't exist.
      */
     public GroupChat getGroupChatById(String id) {
-        return this.groupManager.getGroupChatById(id);
+        return this.getGroupManager().getGroupChatById(id);
     }
 
     /**
      * @return A list of all group chats.
      */
     public List<GroupChat> getGroupChats() {
-        return new ArrayList<>(this.groupManager.getGroupChats().values());
+        return new ArrayList<>(this.getGroupManager().getGroupChats().values());
     }
 
     /**
@@ -324,14 +298,14 @@ public final class RoseChatAPI {
      * @return A list of all group chats that the player is in.
      */
     public List<GroupChat> getGroupChats(UUID player) {
-        return this.groupManager.getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
+        return this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
     }
 
     /**
      * @return A list of all group chat IDs.
      */
     public List<String> getGroupChatIDs() {
-        return new ArrayList<>(this.groupManager.getGroupChats().keySet());
+        return new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
     }
 
     /**
@@ -341,7 +315,7 @@ public final class RoseChatAPI {
      */
     public Tag createTag(String id) {
         Tag tag = new Tag(id);
-        this.tagManager.addTag(tag);
+        this.getTagManager().addTag(tag);
         return tag;
     }
 
@@ -350,7 +324,7 @@ public final class RoseChatAPI {
      * @param tag The tag to delete
      */
     public void deleteTag(Tag tag) {
-        this.tagManager.removeTag(tag);
+        this.getTagManager().removeTag(tag);
     }
 
     /**
@@ -358,21 +332,21 @@ public final class RoseChatAPI {
      * @return The tag found, or null if it doesn't exist.
      */
     public Tag getTagById(String id) {
-        return this.tagManager.getTag(id);
+        return this.getTagManager().getTag(id);
     }
 
     /**
      * @return A list of all tags.
      */
     public List<Tag> getTags() {
-        return new ArrayList<>(this.tagManager.getTags().values());
+        return new ArrayList<>(this.getTagManager().getTags().values());
     }
 
     /**
      * @return A list of all tag IDs.
      */
     public List<String> getTagIDs() {
-        return new ArrayList<>(this.tagManager.getTags().keySet());
+        return new ArrayList<>(this.getTagManager().getTags().keySet());
     }
 
     /**
@@ -380,77 +354,77 @@ public final class RoseChatAPI {
      * @return The data of the player.
      */
     public PlayerData getPlayerData(UUID uuid) {
-        return this.playerDataManager.getPlayerData(uuid);
+        return this.getPlayerDataManager().getPlayerData(uuid);
     }
 
     /**
      * @return An instance of the locale manager.
      */
     public LocaleManager getLocaleManager() {
-        return this.localeManager;
+        return this.plugin.getManager(LocaleManager.class);
     }
 
     /**
      * @return An instance of the player data manager.
      */
     public PlayerDataManager getPlayerDataManager() {
-        return this.playerDataManager;
+        return this.plugin.getManager(PlayerDataManager.class);
     }
 
     /**
      * @return An instance of the group manager.
      */
     public GroupManager getGroupManager() {
-        return this.groupManager;
+        return this.plugin.getManager(GroupManager.class);
     }
 
     /**
      * @return An instance of the channel manager.
      */
     public ChannelManager getChannelManager() {
-        return this.channelManager;
+        return this.plugin.getManager(ChannelManager.class);
     }
 
     /**
      * @return An instance of the placeholder manager.
      */
     public PlaceholderManager getPlaceholderManager() {
-        return this.placeholderManager;
+        return this.plugin.getManager(PlaceholderManager.class);
     }
 
     /**
      * @return An instance of the emoji manager.
      */
     public EmojiManager getEmojiManager() {
-        return this.emojiManager;
+        return this.plugin.getManager(EmojiManager.class);
     }
 
     /**
      * @return An instance of the replacement manager.
      */
     public ReplacementManager getReplacementManager() {
-        return this.replacementManager;
+        return this.plugin.getManager(ReplacementManager.class);
     }
 
     /**
      * @return An instance of the tag manager.
      */
     public TagManager getTagManager() {
-        return this.tagManager;
+        return this.plugin.getManager(TagManager.class);
     }
 
     /**
      * @return An instance of the discord emoji manager.
      */
     public DiscordEmojiManager getDiscordEmojiManager() {
-        return this.discordEmojiManager;
+        return this.plugin.getManager(DiscordEmojiManager.class);
     }
 
     /**
      * @return An instance of the bungee manager.
      */
     public BungeeManager getBungeeManager() {
-        return this.bungeeManager;
+        return this.plugin.getManager(BungeeManager.class);
     }
 
     /**
