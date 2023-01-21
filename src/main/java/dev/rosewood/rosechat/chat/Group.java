@@ -16,9 +16,10 @@ public interface Group {
     /**
      * Sends a json message to the group.
      * @param sender The name of the player who sent the message.
+     * @param messageId The {@link UUID} of the message.
      * @param rawMessage The message that was originally sent.
      */
-    void sendJson(RoseSender sender, String rawMessage);
+    void sendJson(RoseSender sender, UUID messageId, String rawMessage);
 
     /**
      * Sends a message from discord.

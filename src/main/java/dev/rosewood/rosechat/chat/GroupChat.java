@@ -54,8 +54,9 @@ public class GroupChat implements Group {
     }
 
     @Override
-    public void sendJson(RoseSender sender, String rawMessage) {
+    public void sendJson(RoseSender sender, UUID messageId, String rawMessage) {
         MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+        message.setId(messageId);
         this.sendGeneric(message);
     }
 

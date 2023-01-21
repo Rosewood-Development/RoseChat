@@ -2,20 +2,17 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -40,7 +37,7 @@ public class MessageCommand extends AbstractCommand {
         String target = args[0];
 
         if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
-            BungeeListener.getPlayers("ALL");
+            this.getAPI().getBungeeManager().getPlayers("ALL");
             if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
@@ -92,7 +89,7 @@ public class MessageCommand extends AbstractCommand {
         if (target.equalsIgnoreCase("Console")) return;
 
         if (this.getAPI().isBungee()) {
-            BungeeListener.updateReply(sender.getName(), target);
+            this.getAPI().getBungeeManager().sendUpdateReply(sender.getName(), target);
         } else {
             if (!targetPlayer.isOnline()) return;
             Player player = targetPlayer.getPlayer();
@@ -113,9 +110,10 @@ public class MessageCommand extends AbstractCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         List<String> tab = new ArrayList<>();
 
-        if (args.length == 1) {
-            BungeeListener.getPlayers("ALL");
+        // Get the players online before the sender starts typing a name.
+        this.getAPI().getBungeeManager().getPlayers("ALL");
 
+        if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player != sender) tab.add(player.getName());
             }

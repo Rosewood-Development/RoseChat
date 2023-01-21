@@ -246,7 +246,7 @@ public class ChatChannel implements Group {
         // Send the message to other servers. Always happens.
         if (sendToBungee && api.isBungee()) {
             for (String server : this.servers)
-                BungeeListener.sendChannelMessage(message.getSender(), server, this.getId(), message.getMessage());
+                api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getId(), message.getMessage());
         }
 
         // Settings should act different if visible anywhere is enabled or disabled, so we handle them differently.
@@ -263,9 +263,10 @@ public class ChatChannel implements Group {
     }
 
     @Override
-    public void sendJson(RoseSender sender, String rawMessage) {
+    public void sendJson(RoseSender sender, UUID messageId, String rawMessage) {
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
             MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+            message.setId(messageId);
             this.sendGeneric(message, this.getFormat(), true, false, null);
         });
     }
@@ -309,9 +310,8 @@ public class ChatChannel implements Group {
 
         // Send the message to other servers.
         if (api.isBungee()) {
-            for (String server : this.servers) {
-                BungeeListener.sendChannelMessage(new RoseSender("", ""), server, this.id, message);
-            }
+            for (String server : this.servers)
+                api.getBungeeManager().sendChannelMessage(new RoseSender("", ""), server, this.getId(), null, message);
         }
 
         // Send to everyone who can view it.

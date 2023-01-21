@@ -72,6 +72,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Enabling this setting will disable message signing from clients due to technical limitations."),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true,
                 "Should players be allowed to message other players on connected servers?", "Requires BungeeCord"),
+        BUNGEECORD_MESSAGE_TIMEOUT("chat-settings.bungeecord-message-timeout", 500,
+                "How long should the server wait when sending a message to another server?", "Requires BungeeCord"),
         MESSAGE_SOUND("chat-settings.message-sound", "BLOCK_NOTE_BLOCK_PLING",
                 "The sound that will be sent to a player when they receive a message.",
                 "Players can individually disable this in-game with /togglesound.",

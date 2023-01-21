@@ -40,7 +40,6 @@ public class ReplyCommand extends AbstractCommand {
         }
 
         if (!target.equalsIgnoreCase("Console") && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
-            BungeeListener.getPlayers("ALL");
             if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
@@ -67,7 +66,7 @@ public class ReplyCommand extends AbstractCommand {
         AtomicBoolean canBeMessaged = new AtomicBoolean(true);
         this.getAPI().getPlayerDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
             if (data != null) {
-                if (!data.canBeMessaged() || (targetPlayer.isOnline() && (sender instanceof Player)) && !((Player) sender).canSee(targetPlayer.getPlayer())) {
+                if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged())) {
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                     canBeMessaged.set(false);
                 }
@@ -89,6 +88,7 @@ public class ReplyCommand extends AbstractCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, String[] args) {
+        this.getAPI().getBungeeManager().getPlayers("ALL");
         return null;
     }
 
