@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.placeholders.condition;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -34,11 +35,11 @@ public class StringPlaceholderCondition extends PlaceholderCondition  {
 
             boolean hasCondition = false;
             for (String conditionValue : this.conditionValues.keySet()) {
-                hasCondition = conditionValue.toLowerCase().contains(resultBuilder.toString().toLowerCase() + parsed.toLowerCase());
+                hasCondition = conditionValue.toLowerCase().contains(ChatColor.stripColor(resultBuilder.toString().toLowerCase() + parsed.toLowerCase()));
                 if (hasCondition) break;
             }
 
-            resultBuilder.append(hasCondition ? parsed.toLowerCase() : "default");
+            resultBuilder.append(hasCondition ? ChatColor.stripColor(parsed.toLowerCase()) : "default");
         }
 
         return resultBuilder.toString();
