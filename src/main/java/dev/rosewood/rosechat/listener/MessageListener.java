@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.PrivateMessageInfo;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -69,7 +68,8 @@ public class MessageListener implements Listener {
         String text = placeholder.getText().parseToString(event.getMessage().getSender(), event.getViewer(),
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
-                        .addPlaceholder("type", "server").build());
+                        .addPlaceholder("type", "server")
+                        .addPlaceholder("channel", event.getMessage().getGroup().getLocationPermission()).build());
         return text.trim().startsWith("%message%");
     }
 
@@ -80,6 +80,7 @@ public class MessageListener implements Listener {
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getId())
                         .addPlaceholder("type", "server")
+                        .addPlaceholder("channel", event.getMessage().getGroup().getLocationPermission())
                         .addPlaceholder("message", "").build());
     }
 

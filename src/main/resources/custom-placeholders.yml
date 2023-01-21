@@ -144,6 +144,7 @@ spy-players:
 # The %id% placeholder is used for the id of the message being deleted.
 # The %type% placeholder is used for the type of message, server or client.
 # The %message% placeholder is used to define where the X should be shown, before or after the message.
+# The %channel% placeholder is used to choose which servers should also delete the message, when using BungeeCord.
 delete-message:
   text:
     condition: "%type%"
@@ -155,7 +156,7 @@ delete-message:
   click:
     default:
       action: RUN_COMMAND
-      value: "/delmsg %id%"
+      value: "/delmsg %id% %channel%"
 
 # This custom placeholder is used when a message is deleted.
 # This custom placeholder can be removed and no message will be shown when a message is deleted.

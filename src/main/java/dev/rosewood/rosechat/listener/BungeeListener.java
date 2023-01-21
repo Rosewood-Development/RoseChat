@@ -83,13 +83,10 @@ public class BungeeListener implements PluginMessageListener {
                     break;
                 }
                 case "delete_message": {
-                    String rcChannel = data.readUTF();
                     UUID messageId = UUID.fromString(data.readUTF());
-                    this.bungeeManager.receiveMessageDeletion(rcChannel, messageId);
+                    this.bungeeManager.receiveMessageDeletion(messageId);
                     break;
                 }
-                default:
-                    return;
             }
         } catch (IOException e) {
             e.printStackTrace();

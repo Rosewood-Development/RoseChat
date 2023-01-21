@@ -5,6 +5,8 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.command.DeleteMessageCommand;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class BungeeManager extends Manager {
 
@@ -317,15 +320,13 @@ public class BungeeManager extends Manager {
     /**
      * Sends a message to delete a message.
      * @param server The server to delete the message on.
-     * @param channel The {@link ChatChannel} to delete the message in.
      * @param messageId The {@link UUID} of the message to delete.
      */
-    public void sendMessageDeletion(String server, ChatChannel channel, UUID messageId) {
+    public void sendMessageDeletion(String server, UUID messageId) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
-            out.writeUTF(channel.getId());
             out.writeUTF(messageId.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -337,11 +338,15 @@ public class BungeeManager extends Manager {
 
     /**
      * Called when the server receives a "delete_message" message.
-     * @param channelId The id of the channel that the message is in.
      * @param messageId The id of the message to delete.
      */
-    public void receiveMessageDeletion(String channelId, UUID messageId) {
-        //Bukkit.broadcastMessage("Delete Message " + messageId.toString() + " in channel: " + channelId);
+    public void receiveMessageDeletion(UUID messageId) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerData data = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
+            for (DeletableMessage message : data.getMessageLog().getDeletableMessages()) {
+                if (message.getUUID().equals(messageId)) DeleteMessageCommand.deleteMessageForPlayer(player, message);
+            }
+        }
     }
 
 }

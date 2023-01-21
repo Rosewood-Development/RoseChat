@@ -25,9 +25,15 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission)) return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
-            String content = originalContent.startsWith("%other_") ?
-                    PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", "")) :
-                    PlaceholderAPIHook.applyPlaceholders(messageWrapper.getSender().asPlayer(), originalContent);
+
+            String content;
+            if (originalContent.startsWith("%other_")) {
+                if (!viewer.isPlayer()) content = originalContent;
+                else content = PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", ""));
+            } else {
+                content = PlaceholderAPIHook.applyPlaceholders(messageWrapper.getSender().asPlayer(), originalContent);
+            }
+
             content = content.replace(ChatColor.COLOR_CHAR, '&');
 
             Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content);
