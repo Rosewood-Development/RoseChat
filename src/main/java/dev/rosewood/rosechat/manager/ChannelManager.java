@@ -47,6 +47,7 @@ public class ChannelManager extends Manager {
             boolean autoJoin = channelsConfig.contains(id + ".auto-join") && channelsConfig.getBoolean(id + ".auto-join");
             List<String> servers = channelsConfig.contains(id + ".servers") ? channelsConfig.getStringList(id + ".servers") : new ArrayList<>();
             String discord = channelsConfig.contains(id + ".discord") ? channelsConfig.getString(id + ".discord") : null;
+            boolean keepFormatOverBungee = channelsConfig.contains(id + ".keep-format-over-bungee") && channelsConfig.getBoolean(id + ".keep-format-over-bungee");
 
             if (id.length() > 255) id = id.substring(255);
 
@@ -59,6 +60,7 @@ public class ChannelManager extends Manager {
             channel.setServers(servers);
             channel.setDiscordChannel(discord);
             channel.setJoinable(joinable);
+            channel.setShouldKeepFormatOverBungee(keepFormatOverBungee);
 
             this.channels.put(id, channel);
 

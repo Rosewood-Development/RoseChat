@@ -12,6 +12,11 @@ import java.util.regex.Pattern;
 public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
     private static final Pattern PAPI_PATTERN = Pattern.compile("\\%(.*?)\\%");
+    private final boolean isBungee;
+
+    public PAPIPlaceholderTokenizer(boolean isBungee) {
+        this.isBungee = isBungee;
+    }
 
     @Override
     public Token tokenize(MessageWrapper messageWrapper, RoseSender viewer, String input, boolean ignorePermissions) {
@@ -27,7 +32,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             String originalContent = input.substring(matcher.start(), matcher.end());
 
             String content;
-            if (originalContent.startsWith("%other_")) {
+            if (originalContent.startsWith("%other_") && !this.isBungee) {
                 if (!viewer.isPlayer()) content = originalContent;
                 else content = PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", ""));
             } else {

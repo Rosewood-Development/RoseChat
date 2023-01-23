@@ -344,7 +344,10 @@ public class BungeeManager extends Manager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData data = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
             for (DeletableMessage message : data.getMessageLog().getDeletableMessages()) {
-                if (message.getUUID().equals(messageId)) DeleteMessageCommand.deleteMessageForPlayer(player, message);
+                if (message.getUUID().equals(messageId)) {
+                    DeleteMessageCommand.deleteMessageForPlayer(player, message);
+                    break;
+                }
             }
         }
     }

@@ -2,12 +2,14 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -29,6 +31,7 @@ public class ChatChannel implements Group {
     private boolean autoJoin;
     private boolean visibleAnywhere;
     private boolean joinable;
+    private boolean keepFormatOverBungee;
     private String discordChannel;
     private List<String> servers;
     private List<UUID> players;
@@ -106,17 +109,23 @@ public class ChatChannel implements Group {
         return (data != null && !data.getIgnoringPlayers().contains(senderUUID) && receiver.hasPermission("rosechat.channel." + this.getId()));
     }
 
-    private void sendToPlayer(Player receiver, MessageWrapper message, String format, String discordId) {
+    private void sendToPlayer(Player receiver, MessageWrapper message, String format, String discordId, boolean parse) {
         PlayerData data = this.api.getPlayerData(receiver.getUniqueId());
         if (!this.canReceiveMessage(receiver, data, message.getSender().getUUID())) return;
         RoseSender roseSender = new RoseSender(receiver);
-        receiver.spigot().sendMessage(discordId == null ?
-                message.parse(format, roseSender) : message.parseFromDiscord(discordId, format, roseSender));
+        if (parse) {
+            receiver.spigot().sendMessage(discordId == null ?
+                    message.parse(format, roseSender) : message.parseFromDiscord(discordId, format, roseSender));
+        } else {
+            // May edit messages with "%other_" in them, this is a temporary fix and will be adjusted later
+            receiver.spigot().sendMessage(ComponentSerializer.parse(PlaceholderAPIHook.applyPlaceholders(receiver, message.getMessage().replace("%other_", "%"))));
+            data.getMessageLog().addDeletableMessage(new DeletableMessage(message.getId(), message.getMessage(), false, discordId));
+        }
 
         this.sendTagSound(message, receiver, data);
     }
 
-    private void sendGenericVisible(MessageWrapper message, String format, String discordId) {
+    private void sendGenericVisible(MessageWrapper message, String format, String discordId, boolean parse) {
         List<UUID> channelSpies = this.api.getPlayerDataManager().getChannelSpies();
         List<Player> currentSpies = new ArrayList<>();
 
@@ -128,7 +137,7 @@ public class ChatChannel implements Group {
             for (Player player : senderLocation.getWorld().getPlayers()) {
                 if (player.getUniqueId() == message.getSender().getUUID()) continue;
                 if (player.getLocation().distance(senderLocation) < this.radius) {
-                    this.sendToPlayer(player, message, format, discordId);
+                    this.sendToPlayer(player, message, format, discordId, parse);
                 } else {
                     // Allow spies to see the message if out of radius.
                     if (channelSpies.contains(player.getUniqueId())) currentSpies.add(player);
@@ -148,7 +157,7 @@ public class ChatChannel implements Group {
 
             for (Player player : world.getPlayers()) {
                 if (player.getUniqueId() == message.getSender().getUUID()) continue;
-                this.sendToPlayer(player, message, format, discordId);
+                this.sendToPlayer(player, message, format, discordId, parse);
             }
 
             // Allow spies to see the message if not in the same world.
@@ -161,7 +170,7 @@ public class ChatChannel implements Group {
         } else {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player.getUniqueId() == message.getSender().getUUID()) continue;
-                this.sendToPlayer(player, message, format, discordId);
+                this.sendToPlayer(player, message, format, discordId, parse);
             }
         }
 
@@ -172,7 +181,7 @@ public class ChatChannel implements Group {
         }
     }
 
-    private void sendGenericHidden(MessageWrapper message, String format, String discordId) {
+    private void sendGenericHidden(MessageWrapper message, String format, String discordId, boolean parse) {
         List<UUID> channelSpies = this.api.getPlayerDataManager().getChannelSpies();
         List<Player> currentSpies = new ArrayList<>();
 
@@ -185,7 +194,7 @@ public class ChatChannel implements Group {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
                 if (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) < this.radius) {
-                    this.sendToPlayer(player, message, format, discordId);
+                    this.sendToPlayer(player, message, format, discordId, parse);
                 } else {
                     currentSpies.add(player);
                 }
@@ -202,7 +211,7 @@ public class ChatChannel implements Group {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
                 if (player.getWorld().getName().equals(this.world)) {
-                    this.sendToPlayer(player, message, format, discordId);
+                    this.sendToPlayer(player, message, format, discordId, parse);
                 } else {
                     currentSpies.add(player);
                 }
@@ -211,7 +220,7 @@ public class ChatChannel implements Group {
             for (UUID uuid : this.getMembers()) {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null || player.getUniqueId() == message.getSender().getUUID()) continue;
-                this.sendToPlayer(player, message, format, discordId);
+                this.sendToPlayer(player, message, format, discordId, parse);
             }
         }
 
@@ -228,7 +237,7 @@ public class ChatChannel implements Group {
      * Sends a message to the channel.
      * @param message The {@link MessageWrapper} to send.
      */
-    private void sendGeneric(MessageWrapper message, String format, boolean sendToDiscord, boolean sendToBungee, String discordId) {
+    private void sendGeneric(MessageWrapper message, String format, boolean sendToDiscord, boolean sendToBungee, String discordId, boolean parse) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message to the sender. Always happens.
@@ -240,41 +249,52 @@ public class ChatChannel implements Group {
 
         // Send the message to discord. Always happens.
         if (sendToDiscord && api.getDiscord() != null && this.discordChannel != null) {
-            MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
+            if (parse && !this.keepFormatOverBungee) MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
         }
 
         // Send the message to other servers. Always happens.
         if (sendToBungee && api.isBungee()) {
-            for (String server : this.servers)
-                api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getId(), message.getMessage());
+            for (String server : this.servers) {
+                if (this.keepFormatOverBungee) {
+                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getId(), message.parseToBungee(this.getFormat(), message.getSender()));
+                } else {
+                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getId(), message.getMessage());
+                }
+            }
         }
 
         // Settings should act different if visible anywhere is enabled or disabled, so we handle them differently.
         if (this.isVisibleAnywhere()) {
-            this.sendGenericVisible(message, format, discordId);
+            this.sendGenericVisible(message, format, discordId, parse);
         } else {
-            this.sendGenericHidden(message, format, discordId);
+            this.sendGenericHidden(message, format, discordId, parse);
         }
     }
 
     @Override
     public void send(MessageWrapper message) {
-        this.sendGeneric(message, this.getFormat(), true, true, null);
+        this.sendGeneric(message, this.getFormat(), true, true, null, true);
     }
 
     @Override
     public void sendJson(RoseSender sender, UUID messageId, String rawMessage) {
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
-            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
-            message.setId(messageId);
-            this.sendGeneric(message, this.getFormat(), true, false, null);
+            if (rawMessage.startsWith("{")) {
+                MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage);
+                message.setId(messageId);
+                this.sendGeneric(message, this.getFormat(), true, false, null, false);
+            } else {
+                MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+                message.setId(messageId);
+                this.sendGeneric(message, this.getFormat(), true, false, null, true);
+            }
         });
     }
 
     @Override
     public void sendFromDiscord(String id, MessageWrapper message) {
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
-            this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true, id);
+            this.sendGeneric(message, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), false, true, id, true);
         });
     }
 
@@ -571,6 +591,20 @@ public class ChatChannel implements Group {
      */
     public void setJoinable(boolean joinable) {
         this.joinable = joinable;
+    }
+
+    /**
+     * @return Whether the channel keeps the format when sending over BungeeCord.
+     */
+    public boolean shouldKeepFormatOverBungee() {
+        return this.keepFormatOverBungee;
+    }
+
+    /**
+     * @param keepFormatOverBungee Whether the channel keeps the format when sending over BungeeCord.
+     */
+    public void setShouldKeepFormatOverBungee(boolean keepFormatOverBungee) {
+        this.keepFormatOverBungee = keepFormatOverBungee;
     }
 
 }

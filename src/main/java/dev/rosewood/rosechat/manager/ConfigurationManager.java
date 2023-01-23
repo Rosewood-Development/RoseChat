@@ -91,7 +91,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,
-                "Should a player's in-game name (nickname, displayname or username) be used instead of the Discord name?",
+                "Should a player's in-game name (nickname, displayname, or username) be used instead of the Discord name?",
                 "Will only work if a player links their accounts.",
                 "Requires DiscordSRV"),
         DELETE_DISCORD_MESSAGES("discord-settings.delete-discord-messages", true,

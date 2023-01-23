@@ -335,7 +335,7 @@ public class MessageWrapper {
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, false);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
 
             if (viewer != null) {
@@ -464,6 +464,63 @@ public class MessageWrapper {
         }
 
         return this.toComponents();
+    }
+
+    public String parseToBungee(String format, RoseSender viewer) {
+        PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
+        Bukkit.getPluginManager().callEvent(preParseMessageEvent);
+
+        if (!preParseMessageEvent.isCancelled()) {
+            RoseSender receivingViewer = this.isPrivateMessage() ? this.getPrivateMessageInfo().getReceiver() : viewer;
+
+            ComponentBuilder componentBuilder = new ComponentBuilder();
+
+            if (format == null || !format.contains("{message}")) {
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.BUNGEE_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                } else {
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, this.message, true, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.BUNGEE_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                }
+
+                this.tokenized = componentBuilder.create();
+                return ComponentSerializer.toString(this.tokenized);
+            }
+
+            String[] formatSplit = format.split("\\{message\\}");
+            String before = formatSplit[0];
+            String after = formatSplit.length > 1 ? formatSplit[1] : null;
+
+            if (before != null && !before.isEmpty()) {
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, before, true, Tokenizers.BUNGEE_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            }
+
+            if (format.contains("{message}")) {
+                String formatColor = this.getChatColorFromFormat(format, receivingViewer);
+
+                if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.MARKDOWN_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.BUNGEE_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                } else {
+                    componentBuilder.append(new MessageTokenizer(this, receivingViewer, formatColor + this.message, Tokenizers.DISCORD_EMOJI_BUNDLE, Tokenizers.BUNGEE_BUNDLE)
+                            .toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+                }
+            }
+
+            if (after != null && !after.isEmpty()) {
+                componentBuilder.append(new MessageTokenizer(this, receivingViewer, after, true, Tokenizers.BUNGEE_BUNDLE).toComponents(), ComponentBuilder.FormatRetention.FORMATTING);
+            }
+
+            this.tokenized = componentBuilder.create();
+
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer,false);
+            Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+
+            return ComponentSerializer.toString(this.tokenized);
+        }
+
+        return null;
     }
 
     /**
