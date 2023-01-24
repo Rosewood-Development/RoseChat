@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.placeholders.condition;
 
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -44,7 +45,7 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
 
         boolean result;
         if (this.operator != null) {
-            result = this.operator.evaluate(leftParsed, rightParsed);
+            result = this.operator.evaluate(ChatColor.stripColor(leftParsed), ChatColor.stripColor(rightParsed));
         } else {
             result = singleParsed.equalsIgnoreCase("yes") || singleParsed.equals("true");
         }
