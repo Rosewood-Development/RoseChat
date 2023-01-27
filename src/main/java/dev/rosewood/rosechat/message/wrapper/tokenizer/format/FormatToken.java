@@ -14,7 +14,7 @@ public class FormatToken extends Token {
     private final boolean value;
 
     public FormatToken(String originalText, ChatColor format, boolean value) {
-        super(new TokenSettings(originalText).content(""));
+        super(new TokenSettings(originalText).ignoreTokenizer(Tokenizers.FORMAT).content(""));
 
         this.format = format;
         this.value = value;

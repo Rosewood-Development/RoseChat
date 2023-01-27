@@ -87,10 +87,13 @@ public class MessageTokenizer {
                 Token token = tokenizer.tokenize(this.messageWrapper, this.viewer, substring, parent != null || this.ignorePermissions);
                 if (token != null) {
                     if (this.debugManager.isEnabled())
-                        this.debugManager.addMessage("Completed Tokenizing " + tokenizer.toString() + ", " + token.toString() + ", " + token.getOriginalContent() + " -> " + token.getContent());
+                        this.debugManager.addMessage("Completed Tokenizing " + tokenizer + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {
                         RoseChat.getInstance().getLogger().warning("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.messageWrapper.getMessage());
+                        if (this.debugManager.isEnabled())
+                            this.debugManager.addMessage("Infinite recursion detected: Message: " + this.messageWrapper.getMessage()
+                                    + ", Original: " + token.getOriginalContent() + ", Content: " + token.getContent() + ", Token: " + token);
                         continue;
                     }
 

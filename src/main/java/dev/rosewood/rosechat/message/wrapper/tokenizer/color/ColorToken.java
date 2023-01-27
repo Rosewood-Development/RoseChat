@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper.tokenizer.color;
 
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Token;
+import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
 import java.awt.Color;
@@ -11,7 +12,7 @@ public class ColorToken extends Token {
     private final ChatColor color;
 
     public ColorToken(String originalText, ChatColor color) {
-        super(new TokenSettings(originalText).content(""));
+        super(new TokenSettings(originalText).ignoreTokenizer(Tokenizers.COLOR).content(""));
 
         this.color = color;
     }
