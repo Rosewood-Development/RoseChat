@@ -37,7 +37,6 @@ public class RoseSender {
         this();
         this.player = player;
         this.displayName = player.getDisplayName();
-        this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
     }
 
     /**
@@ -50,7 +49,6 @@ public class RoseSender {
         if (player != null) {
             this.player = player;
             this.displayName = player.getDisplayName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.player = offlinePlayer;
         }
@@ -66,7 +64,6 @@ public class RoseSender {
             Player player = (Player) sender;
             this.player = player;
             this.displayName = player.getDisplayName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.displayName = "&cConsole";
             this.group = "default";
@@ -222,7 +219,16 @@ public class RoseSender {
      * @return The group of the RoseSender.
      */
     public String getGroup() {
-        return this.group;
+        if (this.group == null) {
+            if (this.player.isOnline()) {
+                Player onlinePlayer = this.player.getPlayer();
+                return this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(onlinePlayer);
+            } else {
+                return "default";
+            }
+        } else {
+            return this.group;
+        }
     }
 
     /**

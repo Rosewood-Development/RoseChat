@@ -7,6 +7,8 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -20,9 +22,11 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class PacketListener {
 
@@ -32,7 +36,15 @@ public class PacketListener {
     private static Field contentField;
     private static Field adventureContentField;
 
+    private final Cache<UUID, Boolean> permissionsCache;
+    private final Cache<UUID, String> groupCache;
+
     public PacketListener(RoseChat plugin) {
+        this.permissionsCache = CacheBuilder.newBuilder()
+                        .expireAfterWrite(5, TimeUnit.MINUTES).build();
+        this.groupCache = CacheBuilder.newBuilder()
+                        .expireAfterWrite(5, TimeUnit.MINUTES).build();
+
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT) {
             final RoseChatAPI api = RoseChatAPI.getInstance();
 
@@ -59,12 +71,27 @@ public class PacketListener {
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
                     UUID messageId = UUID.randomUUID();
 
-                    if (!player.hasPermission("rosechat.deletemessages.client")) {
+                    if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
+                        permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
+
+                    if (!permissionsCache.getIfPresent(player.getUniqueId())) {
                         playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
                         return;
                     }
 
                     RoseSender sender = new RoseSender(player);
+                    if (!groupCache.asMap().containsKey(player.getUniqueId())) {
+                        Permission vault = this.api.getVault();
+                        if (vault != null) {
+                            String group = this.api.getVault().getPrimaryGroup(player);
+                            groupCache.put(player.getUniqueId(), group);
+                        }
+                    }
+
+                    String group = groupCache.getIfPresent(player.getUniqueId());
+                    if (group != null) sender.setGroup(group);
+                    else sender.setGroup("default");
+
                     BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
 
                     if (deleteClientButton == null) return;
@@ -100,12 +127,28 @@ public class PacketListener {
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
                     UUID messageId = UUID.randomUUID();
 
-                    if (!player.hasPermission("rosechat.deletemessages.client")) {
+
+                    if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
+                        permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
+
+                    if (!permissionsCache.getIfPresent(player.getUniqueId())) {
                         playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
                         return;
                     }
 
                     RoseSender sender = new RoseSender(player);
+                    if (!groupCache.asMap().containsKey(player.getUniqueId())) {
+                        Permission vault = this.api.getVault();
+                        if (vault != null) {
+                            String group = this.api.getVault().getPrimaryGroup(player);
+                            groupCache.put(player.getUniqueId(), group);
+                        }
+                    }
+
+                    String group = groupCache.getIfPresent(player.getUniqueId());
+                    if (group != null) sender.setGroup(group);
+                    else sender.setGroup("default");
+
                     BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
 
                     if (deleteClientButton == null) return;
