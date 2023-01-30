@@ -41,9 +41,9 @@ public class PacketListener {
 
     public PacketListener(RoseChat plugin) {
         this.permissionsCache = CacheBuilder.newBuilder()
-                        .expireAfterWrite(5, TimeUnit.MINUTES).build();
+                        .expireAfterWrite(5, TimeUnit.SECONDS).build();
         this.groupCache = CacheBuilder.newBuilder()
-                        .expireAfterWrite(5, TimeUnit.MINUTES).build();
+                        .expireAfterWrite(5, TimeUnit.SECONDS).build();
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT) {
             final RoseChatAPI api = RoseChatAPI.getInstance();
