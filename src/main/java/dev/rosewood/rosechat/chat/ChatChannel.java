@@ -244,7 +244,11 @@ public class ChatChannel implements Group {
         Player sender = message.getSender().isPlayer() ? message.getSender().asPlayer() : null;
         PlayerData senderData = sender != null ? api.getPlayerData(sender.getUniqueId()) : null;
         if (senderData != null) {
-            sender.spigot().sendMessage(discordId == null ? message.parse(format, message.getSender()) : message.parseFromDiscord(discordId, format, message.getSender()));
+            if (discordId != null) {
+                sender.spigot().sendMessage(message.parseFromDiscord(discordId, format, message.getSender()));
+            } else {
+                this.sendToPlayer(sender, message, format, null, parse);
+            }
         }
 
         // Send the message to discord. Always happens.
