@@ -2,13 +2,16 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.MessageWrapper;
 import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -117,9 +120,16 @@ public class ChatChannel implements Group {
             receiver.spigot().sendMessage(discordId == null ?
                     message.parse(format, roseSender) : message.parseFromDiscord(discordId, format, roseSender));
         } else {
+            BaseComponent[] parsed = ComponentSerializer.parse(PlaceholderAPIHook.applyPlaceholders(receiver, message.getMessage().replace("%other_", "%")));
+            message.setComponents(parsed);
+
+            // Call the post parse message event for the correct viewer if the message was sent over bungee
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, roseSender, MessageDirection.FROM_BUNGEE_SERVER);
+            Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+
             // May edit messages with "%other_" in them, this is a temporary fix and will be adjusted later
-            receiver.spigot().sendMessage(ComponentSerializer.parse(PlaceholderAPIHook.applyPlaceholders(receiver, message.getMessage().replace("%other_", "%"))));
-            data.getMessageLog().addDeletableMessage(new DeletableMessage(message.getId(), message.getMessage(), false, discordId));
+            receiver.spigot().sendMessage(message.toComponents());
+            data.getMessageLog().addDeletableMessage(new DeletableMessage(message.getId(), ComponentSerializer.toString(message.toComponents()), false, discordId));
         }
 
         this.sendTagSound(message, receiver, data);

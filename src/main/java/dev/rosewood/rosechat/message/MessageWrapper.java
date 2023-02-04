@@ -335,7 +335,7 @@ public class MessageWrapper {
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, false);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, MessageDirection.PLAYER_TO_SERVER);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
 
             if (viewer != null) {
@@ -399,7 +399,7 @@ public class MessageWrapper {
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, MessageDirection.FROM_DISCORD);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
 
             if (viewer != null) {
@@ -458,7 +458,7 @@ public class MessageWrapper {
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, true);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, MessageDirection.TO_DISCORD);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
             return this.tokenized;
         }
@@ -514,7 +514,7 @@ public class MessageWrapper {
 
             this.tokenized = componentBuilder.create();
 
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer,false);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, MessageDirection.TO_BUNGEE_SERVER);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
 
             return ComponentSerializer.toString(this.tokenized);

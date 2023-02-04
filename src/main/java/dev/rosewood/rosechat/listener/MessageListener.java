@@ -3,10 +3,14 @@ package dev.rosewood.rosechat.listener;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -20,7 +24,7 @@ public class MessageListener implements Listener {
 
     @EventHandler
     public void onPostParseMessage(PostParseMessageEvent event) {
-        if (event.isToDiscord()) return;
+        if (event.getMessageDirection() == MessageDirection.TO_DISCORD || event.getMessageDirection() == MessageDirection.TO_BUNGEE_SERVER) return;
 
         // Private messages already have the delete button applied via packets.
         if (event.getMessage().isPrivateMessage()) return;
@@ -28,7 +32,6 @@ public class MessageListener implements Listener {
         // If the sender is the same as the viewer (player looking at their own message)
         if (event.getMessage().getSender().isPlayer() && event.getMessage().getSender().getUUID() == event.getViewer().getUUID()) {
             if (!event.getViewer().hasPermission("rosechat.deletemessages.self")) return;
-
             BaseComponent[] components = event.getMessage().toComponents();
             if (components == null || components.length == 0) return;
 
