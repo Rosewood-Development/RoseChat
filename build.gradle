@@ -31,6 +31,8 @@ repositories {
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 
+    maven { url = 'https://repo.glaremasters.me/repository/towny/' }
+
 }
 
 dependencies {
@@ -44,6 +46,9 @@ dependencies {
     compileOnly 'net.dv8tion:JDA:4.3.0_349'
     compileOnly 'net.kyori:adventure-platform-bukkit:4.1.0'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'
+
+    // Plugin Support
+    compileOnly 'com.palmergames.bukkit.towny:towny:0.98.5.0'
 }
 
 processResources {
