@@ -265,7 +265,7 @@ public class MessageUtils {
             target.spigot().sendMessage(receivedMessage);
         }
 
-        sender.send(sentMessage);
+        if (sender.isConsole() && sender.getName().equalsIgnoreCase("Console")) sender.send(sentMessage);
 
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
                 && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
