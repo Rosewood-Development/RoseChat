@@ -4,35 +4,21 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class DiscordSRVListener extends ListenerAdapter implements Listener {
@@ -59,18 +45,18 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             }
         }));
 
-        this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
+        //this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
     }
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
         event.setCancelled(true);
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
-            this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+            //this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
         });
     }
 
-    public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
+    /*public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
         for (ChatChannel channel : this.api.getChannels()) {
             if (channel.getDiscordChannel() == null) continue;
             if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel))) continue;
@@ -123,9 +109,9 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             return;
         }
-    }
+    }*/
 
-    private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, ChatChannel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
+    /*private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, ChatChannel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
         RoseSender sender = (offlinePlayer == null ? new RoseSender(name, "default") : new RoseSender(offlinePlayer));
 
@@ -179,7 +165,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 }
             }
         }
-    }
+    }*/
 
     public static String getColor(Member member) {
         if (member.getColor() != null) return Integer.toHexString(member.getColorRaw());

@@ -7,7 +7,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -36,7 +36,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
                 case "nickname_fallback":
                     return (playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname());
                 case "current_channel":
-                    return playerData.getCurrentChannel().getId();
+                    return null;//playerData.getCurrentChannel().getId();
                 case "is_muted":
                     return playerData.isMuted() ? "yes" : "no";
                 case "mute_time":
@@ -66,7 +66,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
 
             if (placeholder.startsWith("placeholder_")) {
                 String rcPlaceholderId = placeholder.substring("placeholder_".length());
-                RoseSender sender = new RoseSender(player);
+                RosePlayer sender = new RosePlayer(player);
                 RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
                 if (rcPlaceholder == null) return null;
 

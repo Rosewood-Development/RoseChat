@@ -1,14 +1,5 @@
 package dev.rosewood.rosechat.command;
 
-import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import java.util.Collections;
@@ -22,7 +13,7 @@ public class CustomCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String cmd, String[] args) {
-        for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
+       /* for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
             if (channel.getCommand() != null && channel.getCommand().equalsIgnoreCase(cmd)) {
                 if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
                     RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "no-permission");
@@ -52,7 +43,7 @@ public class CustomCommand extends Command {
                 }
                 return true;
             }
-        }
+        }*/
 
         return false;
     }

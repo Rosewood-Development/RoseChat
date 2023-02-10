@@ -1,10 +1,13 @@
 package dev.rosewood.rosechat.hook.channel.rosechat;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -64,21 +67,38 @@ public class RoseChatChannel extends Channel {
     }
 
     @Override
-    public void send(MessageWrapper message) {
-        if (this.visibleAnywhere) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendMessage("Sending Message from channel " + this.getId() + ": test");
-            }
+    public void send(RosePlayer sender, String message) {
+        // Create the rules for this message.
+        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor();
+
+        // Parses the first message synchronously
+        // Allows for creating a token storage.
+        RoseMessage consoleMessage = new RoseMessage(sender, this, message);
+        consoleMessage.applyRules(rules);
+        BaseComponent[] parsedConsoleMessage = consoleMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
+
+        // Send the parsed message to the console
+        Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
+
+        // Asynchronously send the message for every player.
+        // This allows for the message to be parsed separately for each player.
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                RoseMessage roseMessage = new RoseMessage(sender, this, message);
+                roseMessage.applyRules(rules);
+                BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
+                player.spigot().sendMessage(parsedMessage);
+            });
         }
     }
 
     @Override
-    public List<UUID> getMembers(RoseSender sender) {
+    public List<UUID> getMembers(RosePlayer sender) {
         return this.members;
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RoseSender sender) {
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender) {
         return super.getInfoPlaceholders(sender)
                 .addPlaceholder("radius", this.radius)
                 .addPlaceholder("discord", this.discordChannel)

@@ -15,7 +15,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -79,7 +79,7 @@ public class PacketListener {
                         return;
                     }
 
-                    RoseSender sender = new RoseSender(player);
+                    RosePlayer sender = new RosePlayer(player);
                     if (!groupCache.asMap().containsKey(player.getUniqueId())) {
                         Permission vault = this.api.getVault();
                         if (vault != null) {
@@ -136,7 +136,7 @@ public class PacketListener {
                         return;
                     }
 
-                    RoseSender sender = new RoseSender(player);
+                    RosePlayer sender = new RosePlayer(player);
                     if (!groupCache.asMap().containsKey(player.getUniqueId())) {
                         Permission vault = this.api.getVault();
                         if (vault != null) {
@@ -166,7 +166,7 @@ public class PacketListener {
     }
 
     // Allow the client message to be deletable.
-    public static BaseComponent[] appendButton(RoseSender sender, PlayerData playerData, String messageId, String messageJson) {
+    public static BaseComponent[] appendButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
@@ -191,7 +191,7 @@ public class PacketListener {
         return builder.create();
     }
 
-    private static boolean shouldSuffixButton(RoseSender sender, String placeholderId) {
+    private static boolean shouldSuffixButton(RosePlayer sender, String placeholderId) {
         if (placeholderId == null || placeholderId.isEmpty()) return false;
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return false;

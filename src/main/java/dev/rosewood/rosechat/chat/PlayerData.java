@@ -21,7 +21,7 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
-    private ChatChannel currentChannel;
+    //private ChatChannel currentChannel;
     private String color;
     private String nickname;
     private final List<GroupChat> groupInvites;
@@ -42,7 +42,7 @@ public class PlayerData {
         this.messageSounds = true;
         this.emojis = true;
         this.color = "";
-        this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
+        //this.currentChannel = null;//RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();
     }
@@ -184,17 +184,17 @@ public class PlayerData {
     /**
      * @return The current channel the player is in.
      */
-    public ChatChannel getCurrentChannel() {
-        return this.currentChannel;
-    }
+    //public ChatChannel getCurrentChannel() {
+      //  return this.currentChannel;
+    //}
 
     /**
      * Sets the current channel that the player is in.
      * @param currentChannel The channel to use.
      */
-    public void setCurrentChannel(ChatChannel currentChannel) {
-        this.currentChannel = currentChannel;
-    }
+    //public void setCurrentChannel(ChatChannel currentChannel) {
+     //   this.currentChannel = currentChannel;
+    //}
 
     /**
      * @return The current chat color of the player.

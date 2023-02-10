@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -15,7 +14,7 @@ public class MuteChatCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if (args.length == 0) {
+       /* if (args.length == 0) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
@@ -34,7 +33,7 @@ public class MuteChatCommand extends AbstractCommand {
         } else {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.single("channel", channel.getId()));
             this.getAPI().getPlayerDataManager().removeMutedChannel(channel);
-        }
+        }*/
     }
 
     @Override

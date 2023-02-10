@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.chat;
 
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public interface Group {
      * Sends the message wrapper to the group.
      * @param message The message wrapper to send.
      */
-    void send(MessageWrapper message);
+    void send(RoseMessage message);
 
     /**
      * Sends a json message to the group.
@@ -19,13 +19,13 @@ public interface Group {
      * @param messageId The {@link UUID} of the message.
      * @param rawMessage The message that was originally sent.
      */
-    void sendJson(RoseSender sender, UUID messageId, String rawMessage);
+    void sendJson(RosePlayer sender, UUID messageId, String rawMessage);
 
     /**
      * Sends a message from discord.
      * @param message The message that was sent.
      */
-    void sendFromDiscord(String id, MessageWrapper message);
+    void sendFromDiscord(String id, RoseMessage message);
 
     /**
      * @return The members of the group.

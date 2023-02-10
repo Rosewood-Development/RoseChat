@@ -4,8 +4,8 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,9 +50,9 @@ public class MessageGroupCommand extends AbstractCommand {
             return;
         }
 
-        RoseSender messageSender = new RoseSender((Player) sender);
-        MessageWrapper messageWrapper = new MessageWrapper(messageSender, MessageLocation.GROUP, groupChat, message).filter().applyDefaultColor();
-        groupChat.send(messageWrapper);
+        RosePlayer messageSender = new RosePlayer((Player) sender);
+       // RoseMessage roseMessage = new RoseMessage(messageSender, MessageLocation.GROUP, groupChat, message).filter().applyDefaultColor();
+      //  groupChat.send(roseMessage);
     }
 
     @Override

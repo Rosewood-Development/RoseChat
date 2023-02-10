@@ -1,15 +1,14 @@
 package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.PrivateMessageInfo;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -42,11 +41,11 @@ public class DeleteMessageCommand extends AbstractCommand {
         handleMessageDeletion(player, uuid);
 
         if (args.length > 1) {
-            ChatChannel channel = this.getAPI().getChannelById(args[1]);
-            if (channel == null) return;
-            for (String server : channel.getServers()) {
-                this.getAPI().getBungeeManager().sendMessageDeletion(server,  uuid);
-            }
+            //ChatChannel channel = this.getAPI().getChannelById(args[1]);
+            //if (channel == null) return;
+            //for (String server : channel.getServers()) {
+            //    this.getAPI().getBungeeManager().sendMessageDeletion(server,  uuid);
+            //}
         }
     }
 
@@ -122,9 +121,9 @@ public class DeleteMessageCommand extends AbstractCommand {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Get the deleted message placeholder.
-        RoseSender roseSender = new RoseSender(player);
-        BaseComponent[] deletedMessage = parseDeletedMessagePlaceholder(roseSender, roseSender,
-                MessageUtils.getSenderViewerPlaceholders(roseSender, roseSender)
+        RosePlayer rosePlayer = new RosePlayer(player);
+        BaseComponent[] deletedMessage = parseDeletedMessagePlaceholder(rosePlayer, rosePlayer,
+                MessageUtils.getSenderViewerPlaceholders(rosePlayer, rosePlayer)
                         .addPlaceholder("id", message.getUUID())
                         .addPlaceholder("type", message.isClient() ? "client" : "server").build(), message);
 
@@ -133,7 +132,7 @@ public class DeleteMessageCommand extends AbstractCommand {
         if (deletedMessage != null && !TextComponent.toPlainText(deletedMessage).isEmpty()) {
             String json = ComponentSerializer.toString(deletedMessage);
             if (player.hasPermission("rosechat.deletemessages.client")) {
-                BaseComponent[] withDeleteButton = PacketListener.appendButton(roseSender, roseSender.getPlayerData(), message.getUUID().toString(), json);
+                BaseComponent[] withDeleteButton = PacketListener.appendButton(rosePlayer, rosePlayer.getPlayerData(), message.getUUID().toString(), json);
                 if (withDeleteButton != null) {
                     message.setJson(ComponentSerializer.toString(withDeleteButton));
                 } else {
@@ -149,11 +148,11 @@ public class DeleteMessageCommand extends AbstractCommand {
         }
 
         // Remove the original message.
-        if (!updated) roseSender.getPlayerData().getMessageLog().getDeletableMessages().remove(message);
+        if (!updated) rosePlayer.getPlayerData().getMessageLog().getDeletableMessages().remove(message);
         // Send blank lines to remove the old messages.
         for (int i = 0; i < 100; i++) player.sendMessage("\n");
         // Resend the messages!
-        for (DeletableMessage deletableMessage : roseSender.getPlayerData().getMessageLog().getDeletableMessages())
+        for (DeletableMessage deletableMessage : rosePlayer.getPlayerData().getMessageLog().getDeletableMessages())
             player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
 
         // Delete this message from Discord too.
@@ -165,7 +164,7 @@ public class DeleteMessageCommand extends AbstractCommand {
             api.getDiscord().deleteMessage(message.getDiscordId());
     }
 
-    private static BaseComponent[] parseDeletedMessagePlaceholder(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
+    private static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();

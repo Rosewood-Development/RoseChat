@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message;
 
+import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import java.util.UUID;
 
 public class DeletableMessage {

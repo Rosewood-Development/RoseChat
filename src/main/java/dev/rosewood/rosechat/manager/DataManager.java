@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
@@ -51,7 +50,7 @@ public class DataManager extends AbstractDataManager {
                     String color = result.getString("chat_color");
                     long muteTime = result.getLong("mute_time");
                     String nickname = result.getString("nickname");
-                    ChatChannel channel = this.channelManager.getChannel(currentChannel);
+                    //ChatChannel channel = null;//this.channelManager.getChannel(currentChannel);
 
                     PlayerData playerData = new PlayerData(uuid);
                     playerData.setMessageSpy(messageSpy);
@@ -61,7 +60,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setTagSounds(hasTagSounds);
                     playerData.setMessageSounds(hasMessageSounds);
                     playerData.setEmojis(hasEmojis);
-                    playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
+                    //playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     if (muteTime > 0) playerData.mute(muteTime);
@@ -100,7 +99,7 @@ public class DataManager extends AbstractDataManager {
                 statement.setBoolean(6, playerData.hasTagSounds());
                 statement.setBoolean(7, playerData.hasMessageSounds());
                 statement.setBoolean(8, playerData.hasEmojis());
-                statement.setString(9, playerData.getCurrentChannel().getId());
+               // statement.setString(9, playerData.getCurrentChannel().getId());
                 statement.setString(10, playerData.getColor());
                 statement.setLong(11, playerData.getMuteExpirationTime());
                 statement.setString(12, playerData.getNickname());
@@ -132,16 +131,16 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public List<ChatChannel> getMutedChannels() {
+    /*public List<ChatChannel> getMutedChannels() {
         List<ChatChannel> mutedChannels = new ArrayList<>();
         this.databaseConnector.connect(connection -> {
             String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
             try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                 ResultSet result = statement.executeQuery();
                 while (result.next()) {
-                    ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
-                    channel.setMuted(true);
-                    mutedChannels.add(channel);
+                   // ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
+                   // channel.setMuted(true);
+                   // mutedChannels.add(channel);
                 }
             }
         });
@@ -325,6 +324,6 @@ public class DataManager extends AbstractDataManager {
             }
         });
         return groupInfo.get();
-    }
+    }*/
 
 }

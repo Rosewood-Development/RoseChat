@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.placeholders.condition;
 
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,7 +20,7 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public String parse(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         boolean result = false;
         for (BooleanPlaceholderCondition condition : this.conditions)
             result = result || condition.parseToBoolean(sender, viewer, placeholders);
@@ -29,13 +29,13 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public String parseToString(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         String parsed = this.parse(sender, viewer, placeholders);
         String result = this.combineConditionValues(parsed);
         return this.combineConditionValues(String.valueOf(result));
     }
 
-    public boolean parseToBoolean(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         boolean result = false;
         for (BooleanPlaceholderCondition condition : this.conditions)
             result = result || condition.parseToBoolean(sender, viewer, placeholders);
@@ -44,7 +44,7 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public ClickEvent.Action parseToAction(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public ClickEvent.Action parseToAction(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         String parsed = this.parse(sender, viewer, placeholders);
         return this.getClickAction(parsed);
     }

@@ -4,8 +4,8 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,17 +41,17 @@ public class CreateGroupCommand extends AbstractCommand {
 
         if (!MessageUtils.canColor(sender, name, "group")) return;
 
-        RoseSender roseSender = new RoseSender(player);
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, null, name).filterLanguage();
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
-            return;
-        }
+        RosePlayer rosePlayer = new RosePlayer(player);
+       // RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, null, name).filterLanguage();
+        //if (!message.canBeSent()) {
+       //     if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+      //      return;
+      //  }
 
         GroupChat groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + message.getMessage() + "&f&r";
+       // name = "&f&r" + message.getMessage() + "&f&r";
         groupChat.setName(name);
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
     }

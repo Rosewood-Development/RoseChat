@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.api;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -18,9 +17,9 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
@@ -29,7 +28,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * The API for the RoseChat plugin.
@@ -61,38 +59,41 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message) {
-        return new MessageWrapper(sender, MessageLocation.NONE, null, message).parse(null, viewer);
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message) {
+       // return new RoseMessage(sender, MessageLocation.NONE, null, message).parse(null, viewer);
+        return null;
     }
 
     /**
-     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
      * @param placeholders A set of placeholders to use.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RoseSender sender, RoseSender viewer, String message, StringPlaceholders placeholders) {
-        return new MessageWrapper(sender, MessageLocation.NONE, null, message, placeholders).parse(null, viewer);
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, StringPlaceholders placeholders) {
+        //return new RoseMessage(sender, MessageLocation.NONE, null, message, placeholders).parse(null, viewer);
+        return null;
     }
 
     /**
-     * Parses a string into the RoseChat {@link MessageWrapper} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
      * @param location The location that the chat message is in.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(MessageLocation location, RoseSender sender, RoseSender viewer, String message) {
-        return new MessageWrapper(sender, location, null, message).parse(null, viewer);
+    public BaseComponent[] parse(MessageLocation location, RosePlayer sender, RosePlayer viewer, String message) {
+        //return new RoseMessage(sender, location, null, message).parse(null, viewer);
+        return null;
     }
 
     /**
@@ -101,34 +102,36 @@ public final class RoseChatAPI {
      * @param format The format to use.
      * @return The new chat channel.
      */
-    public ChatChannel createChannel(String id, String format) {
+    /*public ChatChannel createChannel(String id, String format) {
         ChatChannel channel = new ChatChannel(id, format);
-        this.getChannelManager().addChannel(channel);
+        //this.getChannelManager().addChannel(channel);
         return channel;
-    }
+    }*/
 
     /**
      * Deletes a chat channel.
      * @param channel The channel to delete.
      */
-    public void deleteChannel(ChatChannel channel) {
-        this.getChannelManager().removeChannel(channel);
-    }
+    /*public void deleteChannel(ChatChannel channel) {
+        //this.getChannelManager().removeChannel(channel);
+    }*/
 
     /**
      * @param id The ID to use.
      * @return The channel found, or null if it doesn't exist.
      */
-    public ChatChannel getChannelById(String id) {
-        return this.getChannelManager().getChannel(id);
-    }
+    /*public ChatChannel getChannelById(String id) {
+        //return this.getChannelManager().getChannel(id);
+        return null;
+    }*/
 
     /**
      * @return A list of all the chat channels.
      */
-    public List<ChatChannel> getChannels() {
-        return new ArrayList<>(this.getChannelManager().getChannels().values());
-    }
+    /*public List<ChatChannel> getChannels() {
+        //return new ArrayList<>(this.getChannelManager().getChannels().values());
+        return null;
+    }*/
 
     /**
      * @return A list of all the chat channel IDs.
@@ -236,8 +239,8 @@ public final class RoseChatAPI {
         GroupChat groupChat = new GroupChat(id);
         groupChat.setOwner(owner);
         groupChat.addMember(owner);
-        this.getGroupManager().addGroupChat(groupChat);
-        this.getGroupManager().addMember(groupChat, owner);
+        //this.getGroupManager().addGroupChat(groupChat);
+        //this.getGroupManager().addMember(groupChat, owner);
         return groupChat;
     }
 
@@ -246,8 +249,8 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to delete.
      */
     public void deleteGroupChat(GroupChat groupChat) {
-        this.getGroupManager().removeGroupChat(groupChat);
-        this.getGroupManager().deleteGroupChat(groupChat);
+       // this.getGroupManager().removeGroupChat(groupChat);
+       // this.getGroupManager().deleteGroupChat(groupChat);
     }
 
     /**
@@ -257,7 +260,7 @@ public final class RoseChatAPI {
      */
     public void addGroupChatMember(GroupChat groupChat, Player member) {
         groupChat.addMember(member);
-        this.getGroupManager().addMember(groupChat, member.getUniqueId());
+        //this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -267,7 +270,7 @@ public final class RoseChatAPI {
      */
     public void removeGroupChatMember(GroupChat groupChat, Player member) {
         groupChat.removeMember(member);
-        this.getGroupManager().removeMember(groupChat, member.getUniqueId());
+        //this.getGroupManager().removeMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -290,7 +293,7 @@ public final class RoseChatAPI {
      * @return A list of all group chats.
      */
     public List<GroupChat> getGroupChats() {
-        return new ArrayList<>(this.getGroupManager().getGroupChats().values());
+        return null;//new ArrayList<>(this.getGroupManager().getGroupChats().values());
     }
 
     /**
@@ -298,14 +301,14 @@ public final class RoseChatAPI {
      * @return A list of all group chats that the player is in.
      */
     public List<GroupChat> getGroupChats(UUID player) {
-        return this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
+        return null;//this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
     }
 
     /**
      * @return A list of all group chat IDs.
      */
     public List<String> getGroupChatIDs() {
-        return new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
+        return null;//new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
     }
 
     /**

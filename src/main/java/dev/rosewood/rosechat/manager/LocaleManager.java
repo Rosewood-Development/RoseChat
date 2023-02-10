@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.locale.EnglishLocale;
 import dev.rosewood.rosechat.locale.JapaneseLocale;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.locale.Locale;
 import dev.rosewood.rosegarden.manager.AbstractLocaleManager;
@@ -28,8 +28,8 @@ public class LocaleManager extends AbstractLocaleManager {
         if (this.getMessage(messageKey).isEmpty()) return;
 
         if (!prefix) {
-            RoseSender roseSender = new RoseSender(sender);
-            roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey)));
+            RosePlayer rosePlayer = new RosePlayer(sender);
+            rosePlayer.send(RoseChatAPI.getInstance().parse(rosePlayer, rosePlayer, this.getMessage(messageKey)));
         } else {
             this.sendComponentMessage(sender, messageKey);
         }
@@ -39,8 +39,8 @@ public class LocaleManager extends AbstractLocaleManager {
         if (this.getMessage(messageKey).isEmpty()) return;
 
         if (!prefix) {
-            RoseSender roseSender = new RoseSender(sender);
-            roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey, stringPlaceholders)));
+            RosePlayer rosePlayer = new RosePlayer(sender);
+            rosePlayer.send(RoseChatAPI.getInstance().parse(rosePlayer, rosePlayer, this.getMessage(messageKey, stringPlaceholders)));
         } else {
             this.sendComponentMessage(sender, messageKey, stringPlaceholders);
         }
@@ -53,21 +53,15 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders) {
-        if (this.getMessage(messageKey).isEmpty()) return;
-
-        RoseSender roseSender = new RoseSender(sender);
-        this.sendComponentMessage(roseSender, messageKey, stringPlaceholders);
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        this.sendComponentMessage(rosePlayer, messageKey, stringPlaceholders);
     }
 
-    public void sendComponentMessage(RoseSender sender, String messageKey) {
-        if (this.getMessage(messageKey).isEmpty()) return;
-
+    public void sendComponentMessage(RosePlayer sender, String messageKey) {
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }
 
-    public void sendComponentMessage(RoseSender sender, String messageKey, StringPlaceholders stringPlaceholders) {
-        if (this.getMessage(messageKey).isEmpty()) return;
-
+    public void sendComponentMessage(RosePlayer sender, String messageKey, StringPlaceholders stringPlaceholders) {
         sender.send(RoseChatAPI.getInstance().parse(sender, sender, this.getMessage("prefix") + this.getMessage(messageKey, stringPlaceholders)));
     }
 

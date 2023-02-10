@@ -4,8 +4,8 @@ import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,16 +35,16 @@ public class RenameGroupCommand extends AbstractCommand {
         String name = getAllArgs(1, args);
         if (!MessageUtils.canColor(sender, name, "group")) return;
 
-        RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();
+        RosePlayer rosePlayer = new RosePlayer(sender);
+       // RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();
 
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
-            return;
-        }
+        //i//f (!message.canBeSent()) {
+           // if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+           // return;
+       // }
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = message.getMessage();
+      //  name = message.getMessage();
         groupChat.setName(name);
         groupChat.save();
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));

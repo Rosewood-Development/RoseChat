@@ -5,7 +5,7 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -76,8 +76,8 @@ public class MessageCommand extends AbstractCommand {
 
         if (!canBeMessaged.get()) return;
 
-        RoseSender roseSender = new RoseSender(sender);
-        MessageUtils.sendPrivateMessage(roseSender, target, message);
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        MessageUtils.sendPrivateMessage(rosePlayer, target, message);
 
         if (sender instanceof Player) {
             Player player = (Player) sender;

@@ -2,14 +2,12 @@ package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
+import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,13 +33,17 @@ public class ChatListener implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             Player player = event.getPlayer();
             PlayerData data = this.api.getPlayerData(player.getUniqueId());
-            ChatChannel channel = data.getCurrentChannel();
-            RoseSender sender = new RoseSender(player);
+            //ChatChannel channel = data.getCurrentChannel();
+            RosePlayer sender = new RosePlayer(player);
 
-            if (!channel.canSendMessage(sender, event.getMessage())) return;
+            Channel channel = this.plugin.getManager(ChannelManager.class).getChannels().get("global");
+            channel.send(new RosePlayer(player), player.getName() + " >> " + event.getMessage());
+            //if (!channel.canSendMessage(sender, event.getMessage())) return;
 
-            MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
-            MessageUtils.sendMessageWrapper(sender, channel, message);
+            //MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();
+
+
+            //MessageUtils.sendMessageWrapper(sender, channel, message);
 
             if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && !player.getDisplayName().equals(data.getNickname())) NicknameCommand.setDisplayName(player, data.getNickname());
         });

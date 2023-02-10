@@ -1,13 +1,15 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.Group;
 import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
-import dev.rosewood.rosechat.listener.BungeeListener;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -116,11 +118,11 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
                 .addPlaceholder("player_name", sender.getName())
                 .addPlaceholder("player_displayname", sender.getDisplayName())
@@ -138,42 +140,43 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param group The {@link Group} that these placeholders will be sent in.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
+     * @param channel The {@link Channel} that these placeholders will be sent in.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group) {
-        if (group == null) return getSenderViewerPlaceholders(sender, viewer);
-        else if (group instanceof GroupChat) return getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
-        else if (group instanceof ChatChannel) return getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
-        else return getSenderViewerPlaceholders(sender, viewer);
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel) {
+        if (channel == null) return getSenderViewerPlaceholders(sender, viewer);
+        else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
+
+        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
+        builder.addPlaceholder("channel", channel.getId());;
+        return builder;
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param group The {@link Group} that these placeholders will be sent in.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
+     * @param channel The {@link Channel} that these placeholders will be sent in.
      * @param extra More {@link StringPlaceholders} to use.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group, StringPlaceholders extra) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel, StringPlaceholders extra) {
         StringPlaceholders.Builder builder;
-        if (group == null) builder =  getSenderViewerPlaceholders(sender, viewer);
-        else if (group instanceof GroupChat) builder = getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
-        else if (group instanceof ChatChannel) builder = getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
-        else builder = getSenderViewerPlaceholders(sender, viewer);
+        if (channel == null) builder =  getSenderViewerPlaceholders(sender, viewer);
+        else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
+        else builder = getSenderViewerPlaceholders(sender, viewer, channel);
 
         return extra == null ? builder : builder.addAll(extra);
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
      * @param group The {@link GroupChat} that these placeholders will be sent in.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, GroupChat group) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
         builder.addPlaceholder("group", group.getId())
                 .addPlaceholder("group_name", group.getName())
@@ -183,43 +186,31 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param channel The {@link ChatChannel} that these placeholders will be sent in.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, ChatChannel channel) {
-        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("channel", channel.getId());;
-        return builder;
-    }
-
-    /**
      * Sends a message to a Discord channel.
      * @param message The message to send.
      * @param group The {@link Group} that the message was sent from.
      * @param channel The channel to send the message to.
      */
-    public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
+    public static void sendDiscordMessage(RoseMessage message, Group group, String channel) {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 
     /**
      * Sends a private message from one player to another.
-     * @param sender The {@link RoseSender} who sent the message.
+     * @param sender The {@link RosePlayer} who sent the message.
      * @param targetName The name of the player receiving the message.
      * @param message The message to send.
      */
-    public static void sendPrivateMessage(RoseSender sender, String targetName, String message) {
-        Player target = Bukkit.getPlayer(targetName);
-        RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
+    public static void sendPrivateMessage(RosePlayer sender, String targetName, String message) {
+        /*Player target = Bukkit.getPlayer(targetName);
+        RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
         PrivateMessageInfo info = new PrivateMessageInfo(sender, messageTarget);
-        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor()
+        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor()
                 .setPrivateMessage().setPrivateMessageInfo(info);
 
-        if (!messageWrapper.canBeSent()) {
-            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(sender);
+        if (!roseMessage.canBeSent()) {
+            if (roseMessage.getFilterType() != null) roseMessage.getFilterType().sendWarning(sender);
             return;
         }
 
@@ -240,13 +231,13 @@ public class MessageUtils {
 
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
-            info.addSpy(new RoseSender(spy));
-            BaseComponent[] spyMessage = messageWrapper.parse(Setting.MESSAGE_SPY_FORMAT.getString(), new RoseSender(spy));
+            info.addSpy(new RosePlayer(spy));
+            BaseComponent[] spyMessage = roseMessage.parse(Setting.MESSAGE_SPY_FORMAT.getString(), new RosePlayer(spy));
             spy.spigot().sendMessage(spyMessage);
         }
 
-        BaseComponent[] sentMessage = messageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
-        BaseComponent[] receivedMessage = messageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
+        BaseComponent[] sentMessage = roseMessage.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
+        BaseComponent[] receivedMessage = roseMessage.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
 
         if (target == null) {
             if (targetName.equalsIgnoreCase("Console")) {
@@ -269,6 +260,8 @@ public class MessageUtils {
 
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
                 && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
+
+         */
     }
 
     /**
@@ -336,14 +329,14 @@ public class MessageUtils {
 
     /**
      * @param input The string to check.
-     * @param messageWrapper The {@link MessageWrapper} containing the message.
+     * @param roseMessage The {@link RoseMessage} containing the message.
      * @return True if this message starts with a saved /chatcolor.
      */
-    public static boolean hasDefaultColor(String input, MessageWrapper messageWrapper) {
-        if (messageWrapper == null || messageWrapper.getSenderData() == null || messageWrapper.getSenderData().getColor() == null) return false;
+    public static boolean hasDefaultColor(String input, RoseMessage roseMessage) {
+        if (roseMessage == null || roseMessage.getSenderData() == null || roseMessage.getSenderData().getColor() == null) return false;
 
-        String message = messageWrapper.getMessage();
-        String color = messageWrapper.getSenderData().getColor();
+        String message = roseMessage.getMessage();
+        String color = roseMessage.getSenderData().getColor();
         if (color.isEmpty() || color.length() >= message.length()) return false;
 
         String start = message.substring(0, color.length());
@@ -449,7 +442,7 @@ public class MessageUtils {
         }
     }
 
-    public static void sendMessageWrapper(RoseSender sender, ChatChannel channel, MessageWrapper message) {
+    /*public static void sendMessageWrapper(RoseSender sender, ChatChannel channel, MessageWrapper message) {
         if (!message.canBeSent()) {
             if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
             return;
@@ -458,6 +451,6 @@ public class MessageUtils {
         channel.send(message);
         BaseComponent[] messageComponents = message.toComponents();
         if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
-    }
+    }*/
 
 }

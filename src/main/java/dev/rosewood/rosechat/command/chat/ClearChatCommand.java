@@ -1,12 +1,8 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +14,7 @@ public class ClearChatCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        RoseSender roseSender = new RoseSender(sender);
+       /* RoseSender roseSender = new RoseSender(sender);
         ChatChannel channel = null;
 
         if (args.length == 0) {
@@ -42,7 +38,7 @@ public class ClearChatCommand extends AbstractCommand {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
         if (sender instanceof Player) {
             this.getAPI().getLocaleManager().sendComponentMessage(Bukkit.getConsoleSender(), "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
-        }
+        }*/
     }
 
     @Override

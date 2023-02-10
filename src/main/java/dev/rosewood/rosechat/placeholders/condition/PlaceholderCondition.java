@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.placeholders.condition;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -36,42 +36,42 @@ public class PlaceholderCondition {
 
     /**
      * Parses the given condition into a string, using the given sender, viewer, and placeholders.
-     * @param sender The {@link RoseSender} who sent the message.
-     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param placeholders The {@link StringPlaceholders} to use.
      * @return The message after parsing has occurred.
      */
-    protected String parse(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    protected String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return null;
     }
 
     /**
-     * @param sender The {@link RoseSender} who sent the message.
-     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param placeholders The {@link StringPlaceholders} to use.
      * @return The parsed condition as a string.
      */
-    public String parseToString(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return null;
     }
 
     /**
-     * @param sender The {@link RoseSender} who sent the message.
-     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param placeholders The {@link StringPlaceholders} to use.
      * @return The parsed condition as a boolean.
      */
-    public boolean parseToBoolean(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return false;
     }
 
     /**
-     * @param sender The {@link RoseSender} who sent the message.
-     * @param viewer The {@link RoseSender} who is viewing the message.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param placeholders The {@link StringPlaceholders} to use.
      * @return The parsed condition as a {@link ClickEvent.Action}.
      */
-    public ClickEvent.Action parseToAction(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public ClickEvent.Action parseToAction(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return null;
     }
 

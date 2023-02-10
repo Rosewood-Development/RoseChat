@@ -5,18 +5,13 @@ import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -84,13 +79,13 @@ public class NicknameCommand extends AbstractCommand {
     public static void setDisplayName(Player player, String nickname) {
         if (nickname == null || nickname.isEmpty()) return;
 
-        RoseSender roseSender = new RoseSender(player);
+        RosePlayer rosePlayer = new RosePlayer(player);
 
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
-            return;
-        }
+      //  RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
+        //if (!message.canBeSent()) {
+        // //   if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+       //     return;
+      //  }
 
         // Remove emojis from the display name.
         String displayName = nickname;
@@ -100,9 +95,9 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         String[] bundles = ConfigurationManager.Setting.USE_MARKDOWN_FORMATTING.getBoolean() ? new String[] { Tokenizers.DEFAULT_BUNDLE, Tokenizers.DISCORD_FORMATTING_BUNDLE, Tokenizers.MARKDOWN_BUNDLE } : new String[] { Tokenizers.DEFAULT_BUNDLE };
-        BaseComponent[] nicknameComponent = new MessageTokenizer(message, roseSender, displayName, bundles).toComponents();
+       // BaseComponent[] nicknameComponent = new MessageTokenizer(message, rosePlayer, displayName, bundles).toComponents();
 
-        player.setDisplayName(TextComponent.toLegacyText(nicknameComponent));
+       // player.setDisplayName(TextComponent.toLegacyText(nicknameComponent));
     }
 
     @Override

@@ -1,12 +1,10 @@
 package dev.rosewood.rosechat.chat;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -29,39 +27,39 @@ public class GroupChat implements Group {
     }
 
 
-    private void sendGeneric(MessageWrapper message) {
+    private void sendGeneric(RoseMessage message) {
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 PlayerData data = RoseChatAPI.getInstance().getPlayerData(player.getUniqueId());
                 if (data.getIgnoringPlayers().contains(message.getSender().getUUID())) continue;
 
-                player.spigot().sendMessage(message.parse(Setting.GROUP_FORMAT.getString(), new RoseSender(player)));
+               // player.spigot().sendMessage(message.parse(Setting.GROUP_FORMAT.getString(), new RosePlayer(player)));
             }
         }
 
         for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getGroupSpies()) {
             if (!this.members.contains(uuid)) {
                 Player spy = Bukkit.getPlayer(uuid);
-                if (spy != null) spy.spigot().sendMessage(message.parse(Setting.GROUP_SPY_FORMAT.getString(), new RoseSender(spy)));
+                //if (spy != null) spy.spigot().sendMessage(message.parse(Setting.GROUP_SPY_FORMAT.getString(), new RosePlayer(spy)));
             }
         }
     }
 
     @Override
-    public void send(MessageWrapper message) {
+    public void send(RoseMessage message) {
         this.sendGeneric(message);
     }
 
     @Override
-    public void sendJson(RoseSender sender, UUID messageId, String rawMessage) {
-        MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
-        message.setId(messageId);
-        this.sendGeneric(message);
+    public void sendJson(RosePlayer sender, UUID messageId, String rawMessage) {
+       //RoseMessage message = new RoseMessage(sender, MessageLocation.CHANNEL, this, rawMessage).filter().applyDefaultColor();
+       // message.setId(messageId);
+       // this.sendGeneric(message);
     }
 
     @Override
-    public void sendFromDiscord(String id, MessageWrapper message) {
+    public void sendFromDiscord(String id, RoseMessage message) {
         this.sendGeneric(message);
     }
 
@@ -79,7 +77,7 @@ public class GroupChat implements Group {
      * Saves the group chat.
      */
     public void save() {
-        RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
+       // RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
     }
 
     /**

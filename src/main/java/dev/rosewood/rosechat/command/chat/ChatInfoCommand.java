@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -20,7 +19,7 @@ public class ChatInfoCommand extends AbstractCommand {
             return;
         }
 
-        ChatChannel channel = this.getAPI().getChannelById(args[0]);
+        /*ChatChannel channel = this.getAPI().getChannelById(args[0]);
         if (channel == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
@@ -39,7 +38,7 @@ public class ChatInfoCommand extends AbstractCommand {
                 .addPlaceholder("joinable", channel.isJoinable() ? localeTrue : localeFalse)
                 .addPlaceholder("discord", channel.getDiscordChannel() == null ? localeNone : channel.getDiscordChannel())
                 .addPlaceholder("players", channel.getMembers().size())
-                .addPlaceholder("servers", channel.getServers().isEmpty() ? localeNone: channel.getServers().toString()).build(), false);
+                .addPlaceholder("servers", channel.getServers().isEmpty() ? localeNone: channel.getServers().toString()).build(), false);*/
     }
 
     @Override

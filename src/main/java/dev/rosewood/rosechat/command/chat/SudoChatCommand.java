@@ -1,13 +1,7 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -21,7 +15,7 @@ public class SudoChatCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if (args.length < 3) {
+       /* if (args.length < 3) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
             return;
         }
@@ -38,7 +32,7 @@ public class SudoChatCommand extends AbstractCommand {
         RoseSender sudoSender = (player == null || !player.isOnline()) ? new RoseSender(playerStr, "default") : new RoseSender(player.getPlayer());
         MessageWrapper message = new MessageWrapper(sudoSender, MessageLocation.CHANNEL, channel, getAllArgs(2, args));
 
-        channel.send(message);
+        channel.send(message);*/
     }
 
     @Override

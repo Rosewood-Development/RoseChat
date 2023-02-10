@@ -26,7 +26,7 @@ public class InfoGroupCommand extends AbstractCommand {
         }
 
         GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
-        if (groupChat == null) {
+        /*if (groupChat == null) {
             GroupManager groupManager = this.getAPI().getGroupManager();
             groupManager.getGroupInfo(args[0], info -> {
                 if (info != null) {
@@ -73,7 +73,7 @@ public class InfoGroupCommand extends AbstractCommand {
                     Bukkit.getOfflinePlayer(groupChat.getOwner()).getName() : nickname;
 
             this.sendInfoMessage(sender, groupChat.getId(), groupChat.getName(), ownerName, groupChat.getMembers().size());
-        }
+        }*/
     }
 
     public void sendInfoMessage(CommandSender sender, String id, String name, String owner, int members) {

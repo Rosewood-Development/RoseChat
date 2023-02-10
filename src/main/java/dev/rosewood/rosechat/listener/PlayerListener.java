@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -33,7 +32,7 @@ public class PlayerListener implements Listener {
         World world = player.getWorld();
 
         PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUniqueId());
-        if (playerData.getCurrentChannel() == null) {
+       /* if (playerData.getCurrentChannel() == null) {
             boolean foundChannel = false;
 
             // Place the player in the correct channel.
@@ -47,10 +46,10 @@ public class PlayerListener implements Listener {
             }
 
             // If no channel was found, place them in the default channel.
-            if (!foundChannel) {
-                playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
-                this.channelManager.getDefaultChannel().add(playerData.getUUID());
-            }
+            //if (!foundChannel) {
+            //    playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
+            //    this.channelManager.getDefaultChannel().add(playerData.getUUID());
+           // }
 
             playerData.save();
         } else {
@@ -59,14 +58,14 @@ public class PlayerListener implements Listener {
 
         if (playerData.getNickname() != null) NicknameCommand.setDisplayName(player, playerData.getNickname());
 
-        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
+        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());*/
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         this.playerDataManager.getPlayerData(player.getUniqueId()).save();
-        this.playerDataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
+       // this.playerDataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
         this.playerDataManager.unloadPlayerData(player.getUniqueId());
     }
 
@@ -76,14 +75,14 @@ public class PlayerListener implements Listener {
         event.getCommands().remove("delmsg");
         event.getCommands().remove("rosechat:delmsg");
 
-        for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
+        /*for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
             if (channel.getCommand() != null) {
                 String command = channel.getCommand();
                 event.getCommands().remove(command + ":" + command);
 
                 if (!event.getPlayer().hasPermission("rosechat.channel." + channel.getId())) event.getCommands().remove(command);
             }
-        }
+        }*/
     }
 
     @EventHandler
@@ -93,15 +92,15 @@ public class PlayerListener implements Listener {
         World world = player.getWorld();
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
 
-        for (ChatChannel channel : api.getChannels()) {
+        /*for (ChatChannel channel : api.getChannels()) {
             if (channel.getWorld() == null) continue;
 
             // Remove the player from the channel when leaving the world.
             if (channel.getWorld().equals(event.getFrom().getName())) {
-                ChatChannel defaultChannel = api.getChannelManager().getDefaultChannel();
+               // ChatChannel defaultChannel = api.getChannelManager().getDefaultChannel();
                 playerData.getCurrentChannel().remove(player);
-                playerData.setCurrentChannel(defaultChannel);
-                defaultChannel.add(playerData.getUUID());
+              //  playerData.setCurrentChannel(defaultChannel);
+               // defaultChannel.add(playerData.getUUID());
                 playerData.save();
             }
 
@@ -112,7 +111,7 @@ public class PlayerListener implements Listener {
                 playerData.save();
                 return;
             }
-        }
+        }*/
     }
 
 }

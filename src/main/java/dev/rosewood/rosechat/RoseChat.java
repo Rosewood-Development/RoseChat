@@ -38,6 +38,8 @@ import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
+import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannelProvider;
+import dev.rosewood.rosechat.hook.channel.towny.TownyChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
@@ -70,9 +72,14 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
+    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
@@ -206,6 +213,10 @@ public class RoseChat extends RosePlugin {
             new PacketListener(this);
             pluginManager.registerEvents(new MessageListener(), this);
         }
+
+        new RoseChatChannelProvider().register();
+        if (pluginManager.getPlugin("Towny") != null)
+            new TownyChannelProvider().register();
     }
 
     public Permission getVault() {

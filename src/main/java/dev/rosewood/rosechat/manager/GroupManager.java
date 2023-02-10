@@ -26,8 +26,8 @@ public class GroupManager extends Manager {
 
     @Override
     public void reload() {
-        Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId()));
-        this.loadNames();
+       // Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId()));
+       // this.loadNames();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class GroupManager extends Manager {
         return null;
     }
 
-    public void loadMemberGroupChats(UUID member) {
+    /*public void loadMemberGroupChats(UUID member) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             List<GroupChat> groupChats = this.dataManager.getMemberGroupChats(member);
             for (GroupChat groupChat : groupChats) {
@@ -113,7 +113,7 @@ public class GroupManager extends Manager {
 
     public List<String> getGroupChatNames() {
         return this.groupChatNames;
-    }
+    }*/
 
     public static class GroupInfo {
 

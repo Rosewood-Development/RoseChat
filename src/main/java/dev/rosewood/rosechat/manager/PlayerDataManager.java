@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.manager;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -20,14 +19,14 @@ public class PlayerDataManager extends Manager {
     private final DataManager dataManager;
     private final Map<UUID, PlayerData> playerData;
     private final Multimap<String, String> bungeePlayers;
-    private final List<ChatChannel> mutedChannels;
+    //private final List<ChatChannel> mutedChannels;
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.bungeePlayers = ArrayListMultimap.create();
-        this.mutedChannels = new ArrayList<>();
+       // this.mutedChannels = new ArrayList<>();
 
         // Need to make sure this always gets loaded before the PlayerDataManager
         rosePlugin.getManager(ChannelManager.class);
@@ -36,13 +35,13 @@ public class PlayerDataManager extends Manager {
     @Override
     public void reload() {
         Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> { }));
-        this.getMutedChannels((channels) -> {});
+       // this.getMutedChannels((channels) -> {});
     }
 
     @Override
     public void disable() {
         this.playerData.clear();
-        this.mutedChannels.clear();
+        //this.mutedChannels.clear();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -99,7 +98,7 @@ public class PlayerDataManager extends Manager {
         });
     }
 
-    public void getMutedChannels(Consumer<List<ChatChannel>> callback) {
+   /* public void getMutedChannels(Consumer<List<ChatChannel>> callback) {
         if (!this.mutedChannels.isEmpty()) {
             callback.accept(this.mutedChannels);
             return;
@@ -120,7 +119,7 @@ public class PlayerDataManager extends Manager {
     public void removeMutedChannel(ChatChannel channel) {
         this.mutedChannels.remove(channel);
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.removeMutedChannel(channel));
-    }
+    }*/
 
     public Map<UUID, PlayerData> getPlayerData() {
         return this.playerData;

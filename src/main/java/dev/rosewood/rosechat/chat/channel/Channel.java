@@ -3,12 +3,10 @@ package dev.rosewood.rosechat.chat.channel;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +42,7 @@ public abstract class Channel {
 
     /**
      * Called when a player joins the channel.
-     * @param player The {@link Player} is joining the channel.
+     * @param player The {@link Player} who is joining the channel.
      */
     public void onJoin(Player player) {
 
@@ -60,19 +58,20 @@ public abstract class Channel {
 
     /**
      * Called when a message is sent to the channel.
-     * @param message The message that was sent.
+     * @param sender The {@link RosePlayer} who is sending the message.
+     * @param message The message to be sent.
      */
-    public abstract void send(MessageWrapper message);
+    public abstract void send(RosePlayer sender, String message);
 
     /**
-     * @param sender The {@link RoseSender} sending the message.
+     * @param sender The {@link RosePlayer} sending the message.
      * @return A list of UUIDs for the members of the channel.
      */
-    public abstract List<UUID> getMembers(RoseSender sender);
+    public abstract List<UUID> getMembers(RosePlayer sender);
 
     public abstract String getId();
 
-    public StringPlaceholders.Builder getInfoPlaceholders(RoseSender sender) {
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender) {
         return StringPlaceholders.builder()
                 .addPlaceholder("default", this.isDefaultChannel())
                 .addPlaceholder("muted", this.isMuted())

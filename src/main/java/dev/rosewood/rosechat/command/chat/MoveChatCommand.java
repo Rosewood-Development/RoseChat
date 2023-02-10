@@ -1,12 +1,8 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,7 +17,7 @@ public class MoveChatCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if (args.length != 2) {
+       /* if (args.length != 2) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-usage");
             return;
         }
@@ -53,7 +49,7 @@ public class MoveChatCommand extends AbstractCommand {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", name)
                         .addPlaceholder("channel", channel.getId()).build());
-        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));*/
     }
 
     @Override
