@@ -372,6 +372,9 @@ permissions:
   rosechat.nickname:
     description: Allows using the nickname command.
     default: op
+  rosechat.nickname.edit:
+    description: Allows the player to edit their nickname
+    default: true
   rosechat.nickname.others:
     description: Allows setting the nickname of another player.
     default: op

@@ -274,6 +274,7 @@ public class EnglishLocale implements Locale {
             this.put("command-nickname-too-short", "&cThis nickname is too short!");
             this.put("command-nickname-too-long", "&cThis nickname is too long!");
             this.put("command-nickname-not-allowed", "&cThis nickname is not allowed!");
+            this.put("command-nickname-colors-only", "&cYou can only use colors in your nickname!");
 
             this.put("#37", "Ignore Command");
             this.put("command-ignore-description", "&8 - &d/ignore &7- Stops you from seeing a player's messages.");

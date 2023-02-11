@@ -274,6 +274,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-nickname-too-short", "&cこのニックネームは短すぎます！");
             this.put("command-nickname-too-long", "&cこのニックネームは長すぎます！");
             this.put("command-nickname-not-allowed", "&cこのニックネームを使うことができません！");
+            this.put("command-nickname-colors-only", "&cニックネームには色のだけを含めることができます！");
 
             this.put("#37", "イグノア・コマンド");
             this.put("command-ignore-description", "&8 - &d/ignore &7- 他のプレイヤーのメッセージを見るのをやめます。");

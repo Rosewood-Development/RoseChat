@@ -41,7 +41,7 @@ public class NicknameCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
         String nickname = (target == null ? getAllArgs(0, args) : getAllArgs(1, args));
 
-        if (target != null && !sender.hasPermission("rosechat.nickname.others")) {
+        if (target != null && (!sender.hasPermission("rosechat.nickname.others") && !sender.getName().equalsIgnoreCase(target.getName()))) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-permission");
             return;
         }
@@ -139,6 +139,13 @@ public class NicknameCommand extends AbstractCommand {
         if (!MessageUtils.canColor(player, nickname, "nickname")) return false;
 
         String formattedNickname = ChatColor.stripColor(HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(player, nickname)));
+
+        if (!player.hasPermission("rosechat.nickname.edit")) {
+            if (!formattedNickname.equals(player.getName())) {
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-colors-only");
+                return false;
+            }
+        }
 
         if (formattedNickname.length() < ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt()) {
             this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-too-short");
