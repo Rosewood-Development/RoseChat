@@ -285,6 +285,13 @@ public class EnglishLocale implements Locale {
             this.put("command-debug-description", "&8 - &d/rc debug &7- Toggles debug mode.");
             this.put("command-debug-on", "&eDebug mode is now &aon&e. Use &b/rc debug &eagain to save debug information.");
             this.put("command-debug-off", "&eDebug mode is now &coff&e. A new file has been saved in &bplugins/RoseChat/debug&e.");
+
+            this.put("#39", "Nick Color Command");
+            this.put("command-nickcolor-description", "&8 - &d/nickcolor &7- Change your nickname color.");
+            this.put("command-nickcolor-usage", "&e/nickcolor <color>");
+            this.put("command-nickcolor-success", "&eYour new nickname is: &f%name%&e.");
+            this.put("command-nickcolor-invalid", "&eThis is not a valid color!");
+            this.put("command-nickcolor-removed", "&eYour nickname color has been removed.");
         }};
     }
 

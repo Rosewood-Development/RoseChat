@@ -70,6 +70,10 @@ commands:
     aliases: [nick]
     description: Set a nickname.
     permission: rosechat.nickname
+  nickcolor:
+    aliases: [nickcolour]
+    description: Set a nickname color.
+    permission: rosechat.nickcolor
   ignore:
     description: Ignore a player.
     permission: rosechat.ignore
