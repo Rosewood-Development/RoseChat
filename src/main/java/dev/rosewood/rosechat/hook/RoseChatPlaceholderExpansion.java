@@ -33,6 +33,8 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
                     return playerData.getColor();
                 case "nickname":
                     return playerData.getNickname();
+                case "nickname_fallback":
+                    return (playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname());
                 case "current_channel":
                     return playerData.getCurrentChannel().getId();
                 case "is_muted":
