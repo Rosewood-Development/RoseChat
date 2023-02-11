@@ -280,6 +280,9 @@ public class EnglishLocale implements Locale {
             this.put("command-ignore-usage", "&e/ignore <player>");
             this.put("command-ignore-ignored", "&eYou are now ignoring &b%player%&e.");
             this.put("command-ignore-unignored", "&eYou are no longer ignoring &b%player%&e.");
+            this.put("command-ignore-list-title", "&eYou are ignoring %amount% players:");
+            this.put("command-ignore-list-color", "&e");
+            this.put("command-ignore-list-separator", "&7, &e");
 
             this.put("#38", "Debug Command");
             this.put("command-debug-description", "&8 - &d/rc debug &7- Toggles debug mode.");

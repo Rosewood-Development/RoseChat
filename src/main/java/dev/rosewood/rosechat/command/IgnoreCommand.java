@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -9,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class IgnoreCommand extends AbstractCommand {
 
@@ -24,13 +26,42 @@ public class IgnoreCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
+        PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
+
+        // List the players that the sender is ignoring.
+        if (args[0].equalsIgnoreCase("list")) {
+            List<UUID> ignoring = playerData.getIgnoringPlayers();
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-list-title", StringPlaceholders.single("amount", ignoring.size()));
+
+            if (ignoring.isEmpty()) return;
+            StringBuilder playersBuilder = new StringBuilder();
+            playersBuilder.append(this.getAPI().getLocaleManager().getMessage("command-ignore-list-color"));
+
+            boolean first = true;
+            for (UUID uuid : ignoring) {
+                OfflinePlayer ignoringPlayer = Bukkit.getOfflinePlayer(uuid);
+                if (ignoringPlayer == null) continue;
+
+                String name = ignoringPlayer.isOnline() ? ignoringPlayer.getPlayer().getDisplayName() : ignoringPlayer.getName();
+                if (first) {
+                    playersBuilder.append(name);
+                    first = false;
+                } else {
+                    playersBuilder.append(this.getAPI().getLocaleManager().getMessage("command-ignore-list-separator")).append(name);
+                }
+            }
+
+            player.sendMessage(HexUtils.colorify(playersBuilder.toString()));
+            return;
+        }
+
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
         if (target == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
 
-        PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
+
         PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
         if (targetData == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
@@ -56,6 +87,7 @@ public class IgnoreCommand extends AbstractCommand {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player != sender) tab.add(player.getName());
             }
+            tab.add("list");
         }
 
         return tab;

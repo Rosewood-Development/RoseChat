@@ -280,6 +280,9 @@ public class JapaneseLocale implements Locale {
             this.put("command-ignore-usage", "&e/ignore <プレイヤー>");
             this.put("command-ignore-ignored", "&b%player%&eを無視しています。");
             this.put("command-ignore-unignored", "&b%player%&eを無視していません。");
+            this.put("command-ignore-list-title", "&eプレイヤーたちを%amount%人無視しています：");
+            this.put("command-ignore-list-color", "&e");
+            this.put("command-ignore-list-separator", "&7、 &e");
 
             this.put("#38", "デバッグ・コマンド");
             this.put("command-debug-description", "&8 - &d/rc debug &7- デバッグモードをトグルします。");
