@@ -10,7 +10,9 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -260,6 +262,9 @@ public class MessageWrapper {
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(colorPlaceholder.substring(0, colorPlaceholder.length() - 1));
         String value = placeholder.getText().parseToString(this.sender, viewer, this.placeholders);
 
+        if (this.sender.isPlayer())
+            value = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), value).replace(ChatColor.COLOR_CHAR, '&');
+
         Matcher colorMatcher = MessageUtils.STOP.matcher(value);
         while (colorMatcher.find())
             lastColor = colorMatcher.group();
@@ -267,6 +272,10 @@ public class MessageWrapper {
         Matcher formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(value);
         while (formatMatcher.find())
             lastFormat = formatMatcher.group();
+
+        // Applies Placeholders in order to get any colour within them.
+        if (this.sender.isPlayer())
+            format = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), format).replace(ChatColor.COLOR_CHAR, '&');
 
         // Check the format string for colours after, e.g. {player}:&c{message}
         colorMatcher = MessageUtils.STOP.matcher(format);
