@@ -12,6 +12,16 @@ softdepend:
   - Essentials
   - LuckPerms
   - Towny
+  - mcMMO
+  - WorldGuard
+  - WorldEdit
+  - SimpleClans
+  - Factions
+  - Kingdoms
+  - BentoBox
+  - SuperiorSkyblock
+  - IridiumSkyblock
+  - FabledSkyblock
 commands:
   rosechat:
     aliases: [rc]

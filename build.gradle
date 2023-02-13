@@ -32,6 +32,14 @@ repositories {
     maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 
     maven { url = 'https://repo.glaremasters.me/repository/towny/' }
+    maven { url = 'https://nexus.neetgames.com/repository/maven-releases/' }
+    maven { url = 'https://maven.enginehub.org/repo/' }
+    maven { url = 'https://repo.roinujnosde.me/releases/' }
+    maven { url = 'https://ci.ender.zone/plugin/repository/everything/' }
+    maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+    maven { url = 'https://repo.bg-software.com/repository/api/' }
+    maven { url = 'https://nexus.iridiumdevelopment.net/repository/maven-releases/' }
+    maven { url = 'https://repo.songoda.com/repository/public/' }
 
 }
 
@@ -49,6 +57,21 @@ dependencies {
 
     // Plugin Support
     compileOnly 'com.palmergames.bukkit.towny:towny:0.98.5.0'
+    compileOnly 'com.gmail.nossr50.mcMMO:mcMMO:2.1.210'
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.13'
+    compileOnly 'net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.18.1'
+    compileOnly 'com.massivecraft:Factions:1.6.9.5-U0.6.21'
+    compileOnly 'com.github.cryptomorin:kingdoms:1.14.15.3-SNAPSHOT'
+    compileOnly 'world.bentobox:bentobox:1.20.0-SNAPSHOT'
+    compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2022.9'
+    compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
+    compileOnly 'com.songoda:skyblock:2.3.30'
+}
+
+configurations.all {
+    exclude group: 'org.snakeyaml'
+    exclude module: 'libmanager'
 }
 
 processResources {

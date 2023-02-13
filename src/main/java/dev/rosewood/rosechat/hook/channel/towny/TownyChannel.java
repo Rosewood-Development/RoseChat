@@ -26,7 +26,7 @@ public class TownyChannel extends RoseChatChannel {
     @Override
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
-        if (config.contains("towny-channel-type")) this.channelType = TownyChannelType.valueOf(config.getString("towny-channel-type"));
+        if (config.contains("channel-type")) this.channelType = TownyChannelType.valueOf(config.getString("channel-type").toUpperCase());
     }
 
     @Override
@@ -34,7 +34,7 @@ public class TownyChannel extends RoseChatChannel {
         for (UUID uuid : this.getMembers(sender)) {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            player.sendMessage("[towny]" + message);
+            player.sendMessage("[" + this.channelType + "] " + message);
         }
     }
 
@@ -53,9 +53,8 @@ public class TownyChannel extends RoseChatChannel {
         }
     }
 
-    @Override
-    public String getId() {
-        return "towny";
+    public TownyChannelType getChannelType() {
+        return this.channelType;
     }
 
     public enum TownyChannelType {

@@ -38,8 +38,17 @@ import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
+import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
+import dev.rosewood.rosechat.hook.channel.fabledskyblock.FabledSkyblockChannelProvider;
+import dev.rosewood.rosechat.hook.channel.factionsuuid.FactionsUUIDChannelProvider;
+import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
+import dev.rosewood.rosechat.hook.channel.kingdomsx.KingdomsXChannelProvider;
+import dev.rosewood.rosechat.hook.channel.mcmmo.McMMOChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannelProvider;
+import dev.rosewood.rosechat.hook.channel.simpleclans.SimpleClansChannelProvider;
+import dev.rosewood.rosechat.hook.channel.superiorskyblock.SuperiorSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.towny.TownyChannelProvider;
+import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
@@ -214,9 +223,38 @@ public class RoseChat extends RosePlugin {
             pluginManager.registerEvents(new MessageListener(), this);
         }
 
+        // Channel Hooks
         new RoseChatChannelProvider().register();
+
         if (pluginManager.getPlugin("Towny") != null)
             new TownyChannelProvider().register();
+
+        if (pluginManager.getPlugin("mcMMO") != null)
+            new McMMOChannelProvider().register();
+
+        if (pluginManager.getPlugin("WorldGuard") != null)
+            new WorldGuardChannelProvider().register();
+
+        if (pluginManager.getPlugin("SimpleClans") != null)
+            new SimpleClansChannelProvider().register();
+
+        if (pluginManager.getPlugin("Factions") != null)
+            new FactionsUUIDChannelProvider().register();
+
+        if (pluginManager.getPlugin("Kingdoms") != null)
+            new KingdomsXChannelProvider().register();
+
+        if (pluginManager.getPlugin("BentoBox") != null)
+            new BentoBoxChannelProvider().register();
+
+        if (pluginManager.getPlugin("SuperiorSkyblock") != null)
+            new SuperiorSkyblockChannelProvider().register();
+
+        if (pluginManager.getPlugin("IridiumSkyblock") != null)
+            new IridiumSkyblockChannelProvider().register();
+
+        if (pluginManager.getPlugin("FabledSkyblock") != null)
+            new FabledSkyblockChannelProvider().register();
     }
 
     public Permission getVault() {
