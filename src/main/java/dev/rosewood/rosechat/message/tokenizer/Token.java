@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -206,6 +207,27 @@ public class Token implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Token token = (Token) o;
+        return this.requiresTokenizing == token.requiresTokenizing
+                && this.retainColour == token.retainColour
+                && this.allowsCaching == token.allowsCaching
+                && Objects.equals(this.hover, token.hover)
+                && Objects.equals(this.click, token.click)
+                && Objects.equals(this.font, token.font)
+                && this.hoverAction == token.hoverAction
+                && this.clickAction == token.clickAction
+                && this.ignoredTokenizers.equals(token.ignoredTokenizers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.hover, this.click, this.font, this.hoverAction, this.clickAction, this.requiresTokenizing, this.retainColour, this.ignoredTokenizers, this.allowsCaching);
     }
 
     public static class TokenSettings {

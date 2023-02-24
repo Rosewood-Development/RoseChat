@@ -1,33 +1,32 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
 
-    private static final Cache<String, List<Token>> TOKEN_CACHE = CacheBuilder.newBuilder()
+    private static final Cache<TokenKey, List<Token>> TOKEN_CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
 
@@ -78,9 +77,12 @@ public class MessageTokenizer {
         this.debugManager.addMessage(() -> "Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
 
         // Check cache first
-        List<Token> cachedResult = TOKEN_CACHE.getIfPresent(content);
-        if (cachedResult != null)
+        TokenKey tokenKey = new TokenKey(content, parent == null ? null : parent.clone());
+        List<Token> cachedResult = TOKEN_CACHE.getIfPresent(tokenKey);
+        if (cachedResult != null) {
+            Bukkit.getLogger().warning("Cache hit: " + cachedResult.size());
             return cachedResult;
+        }
 
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
@@ -125,7 +127,7 @@ public class MessageTokenizer {
 
         // Cache the result if allowed
         if (added.stream().allMatch(Token::allowsCaching))
-            TOKEN_CACHE.put(content, added.stream().map(Token::clone).collect(Collectors.toList()));
+            TOKEN_CACHE.put(tokenKey, added.stream().map(Token::clone).collect(Collectors.toList()));
 
         return added;
     }
@@ -216,6 +218,29 @@ public class MessageTokenizer {
                         componentBuilder.event(new ClickEvent(token.getClickAction(), PlaceholderAPIHook.applyPlaceholders(this.roseMessage.getSender().asPlayer(), MessageUtils.getSenderViewerPlaceholders(this.roseMessage.getSender(), this.viewer).build().apply(token.getClick()))));
                 }
             }
+        }
+    }
+
+    private static class TokenKey {
+        private final String content;
+        private final Token parent;
+
+        public TokenKey(String content, Token parent) {
+            this.content = content;
+            this.parent = parent;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || this.getClass() != o.getClass()) return false;
+            TokenKey tokenKey = (TokenKey) o;
+            return this.content.equals(tokenKey.content) && Objects.equals(this.parent, tokenKey.parent);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.content, this.parent);
         }
     }
 
