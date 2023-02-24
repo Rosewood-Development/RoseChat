@@ -44,6 +44,7 @@ import dev.rosewood.rosechat.hook.channel.factionsuuid.FactionsUUIDChannelProvid
 import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.kingdomsx.KingdomsXChannelProvider;
 import dev.rosewood.rosechat.hook.channel.mcmmo.McMMOChannelProvider;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannelProvider;
 import dev.rosewood.rosechat.hook.channel.simpleclans.SimpleClansChannelProvider;
 import dev.rosewood.rosechat.hook.channel.superiorskyblock.SuperiorSkyblockChannelProvider;

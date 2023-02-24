@@ -83,6 +83,10 @@ message-received:
       action: SUGGEST_COMMAND
       value: "/r "
 
+console-message:
+  text:
+    default: "&8[&f%player_nickname% &6-> &e%other_player_nickname%&7] &f"
+
 # These custom placeholders are used in the group format.
 group-prefix:
   text:

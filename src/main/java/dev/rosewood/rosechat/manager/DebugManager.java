@@ -29,7 +29,7 @@ public class DebugManager extends Manager {
 
         LocalDateTime now = LocalDateTime.now();
         String prefix = "[" + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond() + ":" + System.currentTimeMillis() + "]";
-        this.messages.add(prefix + " " + message + "\n");
+        this.messages.add(prefix + " " + message.get() + "\n");
     }
 
     @Override

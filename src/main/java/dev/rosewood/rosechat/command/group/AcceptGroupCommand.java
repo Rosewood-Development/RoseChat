@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -29,12 +29,12 @@ public class AcceptGroupCommand extends AbstractCommand {
         }
 
         if (args.length == 0) {
-            GroupChat invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
+            GroupChannel invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
             this.accept(playerData, player, invite);
         } else {
             String id = args[0];
 
-            for (GroupChat invite : playerData.getGroupInvites()) {
+            for (GroupChannel invite : playerData.getGroupInvites()) {
                 if (invite.getId().equalsIgnoreCase(id)) {
                     this.accept(playerData, player, invite);
                     return;
@@ -50,7 +50,7 @@ public class AcceptGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
             if (sender instanceof Player) {
-                for (GroupChat groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
+                for (GroupChannel groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
                     tab.add(groupChat.getId());
                 }
             }
@@ -71,8 +71,8 @@ public class AcceptGroupCommand extends AbstractCommand {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-group-accept-usage");
     }
 
-    private void accept(PlayerData data, Player player, GroupChat groupChat) {
-        int currentGroups = (int) this.getAPI().getGroupChats().stream().filter(gc -> (gc.getMembers().contains(player.getUniqueId()))).count();
+    private void accept(PlayerData data, Player player, GroupChannel groupChat) {
+        int currentGroups = 0;//(int) this.getAPI().getGroupChats().stream().filter(gc -> (gc.getMembers().contains(player.getUniqueId()))).count();
 
         int amount = 1;
         for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
@@ -93,12 +93,12 @@ public class AcceptGroupCommand extends AbstractCommand {
 
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
-        for (UUID uuid : groupChat.getMembers()) {
+        /*for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null)
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-accept-accepted",
                             StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
-        }
+        }*/
 
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-success",
                 StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());

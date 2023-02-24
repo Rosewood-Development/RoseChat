@@ -36,4 +36,12 @@ public abstract class ChannelProvider {
         RoseChat.getInstance().getManager(ChannelManager.class).register(this);
     }
 
+    /**
+     * Uses the channel generator to create a channel dynamically.
+     * @param id The id to use for the channel.
+     */
+    public void generateDynamicChannel(String id) {
+        RoseChat.getInstance().getManager(ChannelManager.class).generateChannel(this, id);
+    }
+
 }

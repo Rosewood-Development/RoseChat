@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -25,11 +25,11 @@ public class LeaveGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
-        if (groupChat == null || !groupChat.getMembers().contains(player.getUniqueId())) {
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
+        /*if (groupChat == null || !groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }
+        }*/
 
         if (groupChat.getOwner() == player.getUniqueId()) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-own");
@@ -41,10 +41,10 @@ public class LeaveGroupCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.single("name", groupChat.getName()));
 
-        groupChat.removeMember(player);
+       // groupChat.removeMember(player);
         //this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
 
-        for (UUID uuid : groupChat.getMembers()) {
+        /*for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
@@ -52,7 +52,7 @@ public class LeaveGroupCommand extends AbstractCommand {
                                 .addPlaceholder("name", groupChat.getName())
                                 .build());
             }
-        }
+        }*/
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LeaveGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (GroupChat groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
+            for (GroupChannel groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
                 tab.add(groupChat.getId());
             }
         }

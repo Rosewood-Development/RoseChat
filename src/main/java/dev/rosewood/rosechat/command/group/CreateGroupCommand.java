@@ -1,10 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -48,11 +46,11 @@ public class CreateGroupCommand extends AbstractCommand {
       //      return;
       //  }
 
-        GroupChat groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
+        GroupChannel groupChat = this.getAPI().createGroupChat(id, player.getUniqueId());
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
        // name = "&f&r" + message.getMessage() + "&f&r";
-        groupChat.setName(name);
+       // groupChat.setName(name);
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
     }
 

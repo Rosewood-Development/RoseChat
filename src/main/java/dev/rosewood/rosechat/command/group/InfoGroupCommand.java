@@ -1,16 +1,12 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
-import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.manager.GroupManager;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class InfoGroupCommand extends AbstractCommand {
 
@@ -25,7 +21,7 @@ public class InfoGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
         /*if (groupChat == null) {
             GroupManager groupManager = this.getAPI().getGroupManager();
             groupManager.getGroupInfo(args[0], info -> {
@@ -90,11 +86,11 @@ public class InfoGroupCommand extends AbstractCommand {
 
         if (args.length == 1) {
             if (sender.hasPermission("rosechat.group.admin")) {
-                for (GroupChat groupChat : this.getAPI().getGroupChats()) {
+                for (GroupChannel groupChat : this.getAPI().getGroupChats()) {
                     tab.add(groupChat.getId());
                 }
             } else {
-                GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
+                GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
                 if (groupChat != null) tab.add(groupChat.getId());
             }
         }

@@ -1,10 +1,14 @@
 package dev.rosewood.rosechat.api;
 
+import com.gmail.nossr50.datatypes.chat.ChatChannel;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatReplacement;
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
+import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.hook.channel.ChannelProvider;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -99,39 +103,35 @@ public final class RoseChatAPI {
     /**
      * Creates a new chat channel.
      * @param id The ID to use.
-     * @param format The format to use.
-     * @return The new chat channel.
+     * @return The new chat channel, may return null if failed to register properly.
      */
-    /*public ChatChannel createChannel(String id, String format) {
-        ChatChannel channel = new ChatChannel(id, format);
-        //this.getChannelManager().addChannel(channel);
-        return channel;
-    }*/
+    public Channel createChannel(ChannelProvider provider, String id) {
+        provider.generateDynamicChannel(id);
+        return this.getChannelManager().getChannel(id);
+    }
 
     /**
      * Deletes a chat channel.
-     * @param channel The channel to delete.
+     * @param id The ID of the channel.
      */
-    /*public void deleteChannel(ChatChannel channel) {
-        //this.getChannelManager().removeChannel(channel);
-    }*/
+    public void deleteChannel(String id) {
+        this.getChannelManager().deleteChannel(id);
+    }
 
     /**
      * @param id The ID to use.
      * @return The channel found, or null if it doesn't exist.
      */
-    /*public ChatChannel getChannelById(String id) {
-        //return this.getChannelManager().getChannel(id);
-        return null;
-    }*/
+    public Channel getChannelById(String id) {
+        return this.getChannelManager().getChannel(id);
+    }
 
     /**
      * @return A list of all the chat channels.
      */
-    /*public List<ChatChannel> getChannels() {
-        //return new ArrayList<>(this.getChannelManager().getChannels().values());
-        return null;
-    }*/
+    public List<Channel> getChannels() {
+        return new ArrayList<>(this.getChannelManager().getChannels().values());
+    }
 
     /**
      * @return A list of all the chat channel IDs.
@@ -235,20 +235,23 @@ public final class RoseChatAPI {
      * @param owner The owner of the group chat.
      * @return The new group chat.
      */
-    public GroupChat createGroupChat(String id, UUID owner) {
-        GroupChat groupChat = new GroupChat(id);
-        groupChat.setOwner(owner);
-        groupChat.addMember(owner);
-        //this.getGroupManager().addGroupChat(groupChat);
-        //this.getGroupManager().addMember(groupChat, owner);
-        return groupChat;
+    public GroupChannel createGroupChat(String id, UUID owner) {
+       // ChannelProvider provider = this.getGroupManager()
+
+        //GroupChannel groupChat = new GroupChannel(id);
+        //groupChat.setOwner(owner);
+       // groupChat.addMember(owner);
+       // this.getGroupManager().addGroupChat(groupChat);
+       // this.getGroupManager().addMember(groupChat, owner);
+        //return groupChat;
+        return null;
     }
 
     /**
      * Deletes a group chat.
      * @param groupChat The group chat to delete.
      */
-    public void deleteGroupChat(GroupChat groupChat) {
+    public void deleteGroupChat(GroupChannel groupChat) {
        // this.getGroupManager().removeGroupChat(groupChat);
        // this.getGroupManager().deleteGroupChat(groupChat);
     }
@@ -258,8 +261,8 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to be added to.
      * @param member The player to be added.
      */
-    public void addGroupChatMember(GroupChat groupChat, Player member) {
-        groupChat.addMember(member);
+    public void addGroupChatMember(GroupChannel groupChat, Player member) {
+        //groupChat.addMember(member);
         //this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
 
@@ -268,8 +271,8 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to be removed from.
      * @param member The player to be removed.
      */
-    public void removeGroupChatMember(GroupChat groupChat, Player member) {
-        groupChat.removeMember(member);
+    public void removeGroupChatMember(GroupChannel groupChat, Player member) {
+       // groupChat.removeMember(member);
         //this.getGroupManager().removeMember(groupChat, member.getUniqueId());
     }
 
@@ -277,7 +280,7 @@ public final class RoseChatAPI {
      * @param owner The owner to use.
      * @return The group chat found, or null if it doesn't exist.
      */
-    public GroupChat getGroupChatByOwner(UUID owner) {
+    public GroupChannel getGroupChatByOwner(UUID owner) {
         return this.getGroupManager().getGroupChatByOwner(owner);
     }
 
@@ -285,14 +288,14 @@ public final class RoseChatAPI {
      * @param id The ID to use.
      * @return The group chat found, or null if it doesn't exist.
      */
-    public GroupChat getGroupChatById(String id) {
+    public GroupChannel getGroupChatById(String id) {
         return this.getGroupManager().getGroupChatById(id);
     }
 
     /**
      * @return A list of all group chats.
      */
-    public List<GroupChat> getGroupChats() {
+    public List<GroupChannel> getGroupChats() {
         return null;//new ArrayList<>(this.getGroupManager().getGroupChats().values());
     }
 
@@ -300,7 +303,7 @@ public final class RoseChatAPI {
      * @param player The UUID of the player to use.
      * @return A list of all group chats that the player is in.
      */
-    public List<GroupChat> getGroupChats(UUID player) {
+    public List<GroupChannel> getGroupChats(UUID player) {
         return null;//this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
     }
 

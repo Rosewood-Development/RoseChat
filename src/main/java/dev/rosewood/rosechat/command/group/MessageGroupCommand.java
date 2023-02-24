@@ -1,10 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -30,7 +28,7 @@ public class MessageGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
 
         if (groupChat == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
@@ -38,10 +36,10 @@ public class MessageGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        if (!groupChat.getMembers().contains(player.getUniqueId())) {
+        /*if (!groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }
+        }*/
 
         String message = getAllArgs(1, args);
 
@@ -60,7 +58,7 @@ public class MessageGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (GroupChat groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
+            for (GroupChannel groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
                 tab.add(groupChat.getId());
             }
         } else if (args.length == 2) {

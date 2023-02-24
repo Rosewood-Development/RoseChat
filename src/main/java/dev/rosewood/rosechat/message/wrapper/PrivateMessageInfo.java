@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.wrapper;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

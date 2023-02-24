@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Utility class for managing commands and subcommands.
+ * @deprecated Use {@link dev.rosewood.rosegarden.manager.AbstractCommandManager} instead.
  */
 public class CommandManager implements CommandExecutor, TabCompleter {
 

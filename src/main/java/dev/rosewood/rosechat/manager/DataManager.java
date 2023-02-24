@@ -1,8 +1,9 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
 import dev.rosewood.rosegarden.manager.AbstractDataManager;
@@ -50,7 +51,7 @@ public class DataManager extends AbstractDataManager {
                     String color = result.getString("chat_color");
                     long muteTime = result.getLong("mute_time");
                     String nickname = result.getString("nickname");
-                    //ChatChannel channel = null;//this.channelManager.getChannel(currentChannel);
+                    Channel channel = this.channelManager.getChannel(currentChannel);
 
                     PlayerData playerData = new PlayerData(uuid);
                     playerData.setMessageSpy(messageSpy);
@@ -60,7 +61,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setTagSounds(hasTagSounds);
                     playerData.setMessageSounds(hasMessageSounds);
                     playerData.setEmojis(hasEmojis);
-                    //playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
+                    playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     if (muteTime > 0) playerData.mute(muteTime);
@@ -99,7 +100,7 @@ public class DataManager extends AbstractDataManager {
                 statement.setBoolean(6, playerData.hasTagSounds());
                 statement.setBoolean(7, playerData.hasMessageSounds());
                 statement.setBoolean(8, playerData.hasEmojis());
-               // statement.setString(9, playerData.getCurrentChannel().getId());
+                statement.setString(9, playerData.getCurrentChannel().getId());
                 statement.setString(10, playerData.getColor());
                 statement.setLong(11, playerData.getMuteExpirationTime());
                 statement.setString(12, playerData.getNickname());
@@ -131,23 +132,23 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    /*public List<ChatChannel> getMutedChannels() {
-        List<ChatChannel> mutedChannels = new ArrayList<>();
+    public List<Channel> getMutedChannels() {
+        List<Channel> mutedChannels = new ArrayList<>();
         this.databaseConnector.connect(connection -> {
             String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
             try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                 ResultSet result = statement.executeQuery();
                 while (result.next()) {
-                   // ChatChannel channel = this.channelManager.getChannel(result.getString("id"));
-                   // channel.setMuted(true);
-                   // mutedChannels.add(channel);
+                    Channel channel = this.channelManager.getChannel(result.getString("id"));
+                    channel.setMuted(true);
+                    mutedChannels.add(channel);
                 }
             }
         });
         return mutedChannels;
     }
 
-    public void addMutedChannel(ChatChannel channel) {
+    public void addMutedChannel(Channel channel) {
         this.databaseConnector.connect(connection -> {
             String insertQuery = "INSERT INTO " + this.getTablePrefix() + "muted_channels (id) " +
                     "VALUES(?)";
@@ -158,7 +159,7 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public void removeMutedChannel(ChatChannel channel) {
+    public void removeMutedChannel(Channel channel) {
         this.databaseConnector.connect(connection -> {
             String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "muted_channels WHERE id = ?";
             try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
@@ -168,8 +169,8 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public List<GroupChat> getMemberGroupChats(UUID member) {
-        List<GroupChat> groupChats = new ArrayList<>();
+    public List<GroupChannel> getMemberGroupChats(UUID member) {
+        List<GroupChannel> groupChats = new ArrayList<>();
         this.getDatabaseConnector().connect(connection -> {
             String groupQuery = "SELECT gc.id, gc.name, gc.owner, gcm.uuid AS member_uuid FROM " + this.getTablePrefix() + "group_chat_member gcm JOIN " +
                     this.getTablePrefix() + "group_chat gc ON gc.id = gcm.group_chat WHERE gc.id IN " +
@@ -178,7 +179,7 @@ public class DataManager extends AbstractDataManager {
             try (PreparedStatement statement = connection.prepareStatement(groupQuery)) {
                 statement.setString(1, member.toString());
                 ResultSet result = statement.executeQuery();
-                GroupChat current = null;
+                GroupChannel current = null;
                 String previousId = "";
 
                 while (result.next()) {
@@ -188,14 +189,14 @@ public class DataManager extends AbstractDataManager {
                         current = null;
                     }
 
-                    if (current == null) {
-                        current = new GroupChat(id);
+                    /*if (current == null) {
+                        current = new GroupChannel(id);
                         current.setName(result.getString(2));
                         current.setOwner(UUID.fromString(result.getString(3)));
                     }
 
                     current.addMember(UUID.fromString(result.getString(4)));
-                    previousId = id;
+                    previousId = id;*/
                 }
 
                 if (current != null)
@@ -219,7 +220,7 @@ public class DataManager extends AbstractDataManager {
     }
 
 
-    public void addGroupChatMember(GroupChat groupChat, UUID member) {
+    public void addGroupChatMember(GroupChannel groupChat, UUID member) {
         this.getDatabaseConnector().connect(connection -> {
             String insertQuery = "INSERT INTO " + this.getTablePrefix() + "group_chat_member (group_chat, uuid) " +
                     "VALUES (?, ?)";
@@ -231,7 +232,7 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public void removeGroupChatMember(GroupChat groupChat, UUID member) {
+    public void removeGroupChatMember(GroupChannel groupChat, UUID member) {
         this.getDatabaseConnector().connect(connection -> {
             String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat_member WHERE group_chat = ? AND uuid = ?";
             try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
@@ -256,7 +257,7 @@ public class DataManager extends AbstractDataManager {
         return groupChatMembers;
     }
 
-    public void createOrUpdateGroupChat(GroupChat groupChat) {
+    public void createOrUpdateGroupChat(GroupChannel groupChat) {
         this.getDatabaseConnector().connect(connection -> {
             boolean create;
 
@@ -288,7 +289,7 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public void deleteGroupChat(GroupChat groupChat) {
+    public void deleteGroupChat(GroupChannel groupChat) {
         this.getDatabaseConnector().connect(connection -> {
             String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
             try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
@@ -324,6 +325,6 @@ public class DataManager extends AbstractDataManager {
             }
         });
         return groupInfo.get();
-    }*/
+    }
 
 }

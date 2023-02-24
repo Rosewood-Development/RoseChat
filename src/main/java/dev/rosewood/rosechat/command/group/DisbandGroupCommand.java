@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -25,36 +25,36 @@ public class DisbandGroupCommand extends AbstractCommand {
             }
 
             Player player = (Player) sender;
-            GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
+            GroupChannel groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
             if (groupChat == null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-gc");
                 return;
             }
 
-            for (UUID uuid : groupChat.getMembers()) {
+            /*for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
                 }
-            }
+            }*/
 
             this.getAPI().deleteGroupChat(groupChat);
             return;
         }
 
         if (sender.hasPermission("rosechat.group.admin")) {
-            GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
+            GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
             if (groupChat == null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
                 return;
             }
 
-            for (UUID uuid : groupChat.getMembers()) {
+            /*for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
                 }
-            }
+            }*/
 
             this.getAPI().deleteGroupChat(groupChat);
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.single("name", groupChat.getName()));
@@ -67,7 +67,7 @@ public class DisbandGroupCommand extends AbstractCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         List<String> tab = new ArrayList<>();
         if (args.length == 1 && sender.hasPermission("rosechat.group.admin")) {
-            for (GroupChat groupChat : this.getAPI().getGroupChats()) {
+            for (GroupChannel groupChat : this.getAPI().getGroupChats()) {
                 tab.add(groupChat.getId());
             }
         }

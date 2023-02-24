@@ -9,8 +9,6 @@ import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
-import org.bukkit.configuration.ConfigurationSection;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -62,6 +60,7 @@ public class ChannelManager extends Manager {
                 for (Class<? extends Channel> channelClass : channelProvider.getChannels()) {
                     Channel channel = channelClass.getDeclaredConstructor(ChannelProvider.class).newInstance(channelProvider);
                     channel.onLoad();
+                    if (channel.isDefaultChannel()) this.defaultChannel = channel;
                     this.channels.put(channel.getId(), channel);
                     this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                             "&eGenerated " + channelProvider.getSupportedPlugin() + " channel: " + channel.getId());
@@ -96,20 +95,34 @@ public class ChannelManager extends Manager {
 
             // If the plugin is installed, generate channels based off of the provider.
             ChannelProvider provider = this.channelProviders.get(plugin.toLowerCase());
-            Class<? extends Channel> base = provider.getChannelGenerator();
+            this.generateChannel(provider, id);
+        }
+    }
 
-            if (base != null) {
-                try {
-                    Channel channel = base.getDeclaredConstructor(ChannelProvider.class).newInstance(provider);
-                    channel.onLoad(id, this.channelsConfig.getConfigurationSection(id));
-                    this.channels.put(id, channel);
-                    this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
-                            "&eLoaded " + provider.getSupportedPlugin() + " channel: " + channel.getId());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    /**
+     * Generates a single channel from a provider, with the given ID.
+     * @param provider The {@link ChannelProvider} to generate the channel from.
+     * @param id The ID of the channel.
+     */
+    public void generateChannel(ChannelProvider provider, String id) {
+        Class<? extends Channel> base = provider.getChannelGenerator();
+
+        if (base != null) {
+            try {
+                Channel channel = base.getDeclaredConstructor(ChannelProvider.class).newInstance(provider);
+                channel.onLoad(id, this.channelsConfig.getConfigurationSection(id));
+                if (channel.isDefaultChannel()) this.defaultChannel = channel;
+                this.channels.put(id, channel);
+                this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
+                        "&eLoaded " + provider.getSupportedPlugin() + " channel: " + channel.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    public void deleteChannel(String id) {
+        this.channels.remove(id);
     }
 
     /**
@@ -133,6 +146,10 @@ public class ChannelManager extends Manager {
 
     public Map<String, Channel> getChannels() {
         return this.channels;
+    }
+
+    public Channel getChannel(String id) {
+        return this.channels.get(id);
     }
 
     public Channel getDefaultChannel() {

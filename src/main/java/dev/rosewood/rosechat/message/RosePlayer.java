@@ -267,6 +267,9 @@ public class RosePlayer {
         return !this.isPlayer() ? this.getDisplayName() : this.asPlayer().getName();
     }
 
+    /**
+     * @return The {@link PlayerData} associated with this RosePlayer.
+     */
     public PlayerData getPlayerData() {
         return this.player != null ? this.api.getPlayerData(this.player.getUniqueId()) : null;
     }

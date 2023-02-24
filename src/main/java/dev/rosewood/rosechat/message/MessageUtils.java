@@ -1,13 +1,13 @@
 package dev.rosewood.rosechat.message;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.Group;
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -173,7 +173,7 @@ public class MessageUtils {
     /**
      * @param sender The {@link RosePlayer} who will send these placeholders.
      * @param viewer The {@link RosePlayer} who will view these placeholders.
-     * @param group The {@link GroupChat} that these placeholders will be sent in.
+     * @param group The {@link GroupChannel} that these placeholders will be sent in.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
@@ -188,10 +188,10 @@ public class MessageUtils {
     /**
      * Sends a message to a Discord channel.
      * @param message The message to send.
-     * @param group The {@link Group} that the message was sent from.
+     * @param group The {@link GroupChannel} that the message was sent from.
      * @param channel The channel to send the message to.
      */
-    public static void sendDiscordMessage(RoseMessage message, Group group, String channel) {
+    public static void sendDiscordMessage(RoseMessage message, GroupChannel group, String channel) {
         RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
     }
 
@@ -202,18 +202,23 @@ public class MessageUtils {
      * @param message The message to send.
      */
     public static void sendPrivateMessage(RosePlayer sender, String targetName, String message) {
-        /*Player target = Bukkit.getPlayer(targetName);
+        Player target = Bukkit.getPlayerExact(targetName);
         RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
-        PrivateMessageInfo info = new PrivateMessageInfo(sender, messageTarget);
-        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor()
-                .setPrivateMessage().setPrivateMessageInfo(info);
+        // Create the private message info, rules, and the message, then apply the rules.
+        PrivateMessageInfo privateMessageInfo = new PrivateMessageInfo(sender, messageTarget);
+        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor().setPrivateMessageInfo(privateMessageInfo);
 
-        if (!roseMessage.canBeSent()) {
+        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, message);
+        roseMessage.applyRules(rules);
+
+        // If the message is blocked, send a warning to the player.
+        if (roseMessage.isBlocked()) {
             if (roseMessage.getFilterType() != null) roseMessage.getFilterType().sendWarning(sender);
             return;
         }
 
+        // If the message was sent by a player, check if the receiver is ignoring them.
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
             PlayerData targetData = RoseChatAPI.getInstance().getPlayerData(offlineTarget.getUniqueId());
@@ -223,45 +228,67 @@ public class MessageUtils {
             }
         }
 
-        // Parse for spies first.
-        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
-            boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
-            boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
-            if (isSpySender || isSpyTarget) continue;
+        // Parse the message for the console to generate the tokens
+        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString());
 
+        // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
+        // The tokens will always be generated before even if this message is not sent.
+        if (target != null && !targetName.equalsIgnoreCase("Console")) Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
+
+        // Parse for the channel spies.
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getChannelSpies()) {
+            // Don't send the spy message if the spy is the sender or receiver.
+            if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID())) continue;
+
+            // If the spy isn't valid, continue.
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
-            info.addSpy(new RosePlayer(spy));
-            BaseComponent[] spyMessage = roseMessage.parse(Setting.MESSAGE_SPY_FORMAT.getString(), new RosePlayer(spy));
-            spy.spigot().sendMessage(spyMessage);
+
+            // Adds the spy to the private message info.
+            privateMessageInfo.addSpy(new RosePlayer(spy));
+
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
+                spy.spigot().sendMessage(parsedSpyMessage);
+            });
         }
 
-        BaseComponent[] sentMessage = roseMessage.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
-        BaseComponent[] receivedMessage = roseMessage.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
+        // Parse the message for the sender and the receiver.
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
+            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
 
-        if (target == null) {
-            if (targetName.equalsIgnoreCase("Console")) {
-                Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
+            if (target == null) {
+                // If the target is not valid and the name is "Console", then send the message to the console.
+                if (targetName.equalsIgnoreCase("Console")) {
+                    sender.send(parsedSentMessage);
+                    Bukkit.getConsoleSender().spigot().sendMessage(parsedReceivedMessage);
+                } else {
+                    // If the target is not valid, but the name isn't console, we should see if it is a bungee player.
+                    RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (success) -> {
+                        if (success) {
+                            // If the message was received successfully, send the sent message to the sender.
+                            sender.send(parsedMessage);
+                        } else {
+                            // If the message was not received successfully, then the player is assumed to not be online.
+                            RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
+                        }
+                    });
+
+                    return;
+                }
             } else {
-                RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (sent) -> {
-                    if (sent) {
-                        sender.send(sentMessage);
-                    } else {
-                        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
-                    }
-                });
-                return;
+                // The sender should receive the message first.
+                sender.send(parsedSentMessage);
+
+                // If the target is online, send the message.
+                messageTarget.send(parsedReceivedMessage);
             }
-        } else {
-            target.spigot().sendMessage(receivedMessage);
-        }
+        });
 
-        sender.send(sentMessage);
-
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
-                && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
-
-         */
+        // Update the player's display name if the setting is enabled.
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer() && !sender.getDisplayName().equals(sender.getNickname()))
+            NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
     }
 
     /**

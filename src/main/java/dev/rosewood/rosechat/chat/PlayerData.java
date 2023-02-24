@@ -2,6 +2,8 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLog;
 import org.bukkit.entity.Player;
@@ -21,10 +23,10 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
-    //private ChatChannel currentChannel;
+    private Channel currentChannel;
     private String color;
     private String nickname;
-    private final List<GroupChat> groupInvites;
+    private final List<GroupChannel> groupInvites;
     private final List<UUID> ignoringPlayers;
 
     private long muteTime;
@@ -42,7 +44,7 @@ public class PlayerData {
         this.messageSounds = true;
         this.emojis = true;
         this.color = "";
-        //this.currentChannel = null;//RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
+        this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();
     }
@@ -184,17 +186,17 @@ public class PlayerData {
     /**
      * @return The current channel the player is in.
      */
-    //public ChatChannel getCurrentChannel() {
-      //  return this.currentChannel;
-    //}
+    public Channel getCurrentChannel() {
+        return this.currentChannel;
+    }
 
     /**
      * Sets the current channel that the player is in.
      * @param currentChannel The channel to use.
      */
-    //public void setCurrentChannel(ChatChannel currentChannel) {
-     //   this.currentChannel = currentChannel;
-    //}
+    public void setCurrentChannel(Channel currentChannel) {
+          this.currentChannel = currentChannel;
+    }
 
     /**
      * @return The current chat color of the player.
@@ -233,7 +235,7 @@ public class PlayerData {
     /**
      * @return The invites the player has received.
      */
-    public List<GroupChat> getGroupInvites() {
+    public List<GroupChannel> getGroupInvites() {
         return this.groupInvites;
     }
 
@@ -241,7 +243,7 @@ public class PlayerData {
      * Adds to the group invites list.
      * @param groupChat The group chat to add.
      */
-    public void inviteToGroup(GroupChat groupChat) {
+    public void inviteToGroup(GroupChannel groupChat) {
         this.groupInvites.add(groupChat);
     }
 

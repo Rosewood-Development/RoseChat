@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.message.wrapper;
 import dev.rosewood.rosechat.chat.FilterType;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-
 import java.util.regex.Matcher;
 
 public class MessageRules {
@@ -186,7 +185,7 @@ public class MessageRules {
         if (this.filterCaps) this.filterCaps(message);
         if (this.filterURLs) this.filterURLs(message);
         if (this.filterLanguage) this.filterLanguage(message);
-        if (this.applySenderChatColor) message.setMessage(message.getSender().getPlayerData().getColor() + message.getMessage());
+        if (this.applySenderChatColor && message.getSenderData() != null) message.setMessage(message.getSenderData().getColor() + message.getMessage());
     }
 
     /**

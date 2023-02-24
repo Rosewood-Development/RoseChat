@@ -117,6 +117,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The format of a /message sent to another player."),
         MESSAGE_RECEIVED_FORMAT("chat-formats.message-received", "{message-received}{message}",
                 "The format of a /message received from another player."),
+        CONSOLE_MESSAGE_FORMAT("chat-formats.console-message", "{console-message}{message}",
+                "The format of a /message which will be displayed in the console."),
         MESSAGE_SPY_FORMAT("chat-formats.message-spy", "{spy-prefix}{spy-players}{message}",
                 "The format of a spied /message."),
         GROUP_FORMAT("chat-formats.group", "{group-prefix}{group-member-prefix}{player}{separator}{message}",

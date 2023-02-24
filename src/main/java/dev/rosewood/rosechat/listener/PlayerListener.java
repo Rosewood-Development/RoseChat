@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.listener;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
@@ -32,40 +33,40 @@ public class PlayerListener implements Listener {
         World world = player.getWorld();
 
         PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUniqueId());
-       /* if (playerData.getCurrentChannel() == null) {
+        if (playerData.getCurrentChannel() == null) {
             boolean foundChannel = false;
 
             // Place the player in the correct channel.
-            for (ChatChannel channel : this.channelManager.getChannels().values()) {
+            /*for (Channel channel : this.channelManager.getChannels().values()) {
                 if (channel.isAutoJoin() && (channel.getWorld() != null && channel.getWorld().equalsIgnoreCase(world.getName()))) {
                     playerData.setCurrentChannel(channel);
                     channel.add(playerData.getUUID());
                     foundChannel = true;
                     break;
                 }
-            }
+            }*/
 
             // If no channel was found, place them in the default channel.
-            //if (!foundChannel) {
-            //    playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
-            //    this.channelManager.getDefaultChannel().add(playerData.getUUID());
-           // }
+            if (!foundChannel) {
+                playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
+                this.channelManager.getDefaultChannel().onJoin(player);
+            }
 
             playerData.save();
         } else {
-            playerData.getCurrentChannel().add(player);
+            playerData.getCurrentChannel().onJoin(player);
         }
 
         if (playerData.getNickname() != null) NicknameCommand.setDisplayName(player, playerData.getNickname());
 
-        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());*/
+        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         this.playerDataManager.getPlayerData(player.getUniqueId()).save();
-       // this.playerDataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().remove(player);
+        this.playerDataManager.getPlayerData(player.getUniqueId()).getCurrentChannel().onLeave(player);
         this.playerDataManager.unloadPlayerData(player.getUniqueId());
     }
 

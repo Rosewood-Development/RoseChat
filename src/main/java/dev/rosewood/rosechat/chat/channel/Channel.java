@@ -30,7 +30,7 @@ public abstract class Channel {
      * Called when a channel is loaded from a config file.
      */
     public void onLoad(String id, ConfigurationSection config) {
-
+        if (config.contains("default")) this.defaultChannel = true;
     }
 
     /**

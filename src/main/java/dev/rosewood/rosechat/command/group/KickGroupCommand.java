@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -26,7 +26,7 @@ public class KickGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
+        GroupChannel groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
         if (groupChat == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-gc");
             return;
@@ -38,10 +38,10 @@ public class KickGroupCommand extends AbstractCommand {
             return;
         }
 
-        if (target == null || !groupChat.getMembers().contains(target.getUniqueId())) {
+        /*if (target == null || !groupChat.getMembers().contains(target.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-kick-invalid-player");
             return;
-        }
+        }*/
 
         PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
         String name = data.getNickname() == null ? target.getName() : data.getNickname();
@@ -53,10 +53,10 @@ public class KickGroupCommand extends AbstractCommand {
             }
         }
 
-        groupChat.removeMember(target.getUniqueId());
+        //groupChat.removeMember(target.getUniqueId());
         //this.getAPI().getGroupManager().removeMember(groupChat, target.getUniqueId());
 
-        for (UUID uuid : groupChat.getMembers()) {
+       /* for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null){
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-kick-success",
@@ -64,7 +64,7 @@ public class KickGroupCommand extends AbstractCommand {
                                 .addPlaceholder("name", groupChat.getName())
                                 .build());
             }
-        }
+        }*/
     }
 
     @Override
@@ -72,12 +72,12 @@ public class KickGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
+            GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
             if (groupChat != null) {
-                for (UUID uuid : groupChat.getMembers()) {
+                /*for (UUID uuid : groupChat.getMembers()) {
                     Player member = Bukkit.getPlayer(uuid);
                     if (member != null && member != sender) tab.add(member.getName());
-                }
+                }*/
             }
         }
 

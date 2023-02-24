@@ -73,9 +73,9 @@ public class RoseChatChannel extends Channel {
 
         // Parses the first message synchronously
         // Allows for creating a token storage.
-        RoseMessage consoleMessage = new RoseMessage(sender, this, message);
-        consoleMessage.applyRules(rules);
-        BaseComponent[] parsedConsoleMessage = consoleMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
+        RoseMessage roseMessage = new RoseMessage(sender, this, message);
+        roseMessage.applyRules(rules);
+        BaseComponent[] parsedConsoleMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
 
         // Send the parsed message to the console
         Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
@@ -84,9 +84,7 @@ public class RoseChatChannel extends Channel {
         // This allows for the message to be parsed separately for each player.
         for (Player player : Bukkit.getOnlinePlayers()) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessage roseMessage = new RoseMessage(sender, this, message);
-                roseMessage.applyRules(rules);
-                BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
+                BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(player), this.getFormat());
                 player.spigot().sendMessage(parsedMessage);
             });
         }

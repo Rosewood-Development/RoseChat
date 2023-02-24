@@ -14,6 +14,7 @@ import java.util.List;
  * This manager acts as a way to have a help command to show all commands,
  * multiple command managers can be used without a senior command manager,
  * but no help menu will be shown.
+ * @deprecated Use {@link dev.rosewood.rosegarden.manager.AbstractCommandManager} instead.
  */
 public class SeniorCommandManager extends CommandManager {
 

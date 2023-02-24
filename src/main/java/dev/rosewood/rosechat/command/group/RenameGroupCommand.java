@@ -1,10 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -25,12 +23,12 @@ public class RenameGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
-        if (groupChat == null
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
+        /*if (groupChat == null
                 || (sender instanceof Player && !groupChat.getMembers().contains(((Player) sender).getUniqueId()) && !sender.hasPermission("rosechat.group.admin"))) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }
+        }*/
 
         String name = getAllArgs(1, args);
         if (!MessageUtils.canColor(sender, name, "group")) return;
@@ -45,8 +43,8 @@ public class RenameGroupCommand extends AbstractCommand {
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
       //  name = message.getMessage();
-        groupChat.setName(name);
-        groupChat.save();
+        //groupChat.setName(name);
+       // groupChat.save();
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));
     }
 
@@ -56,11 +54,11 @@ public class RenameGroupCommand extends AbstractCommand {
 
         if (args.length == 1) {
             if (sender.hasPermission("rosechat.group.admin")) {
-                for (GroupChat groupChat : this.getAPI().getGroupChats()) {
+                for (GroupChannel groupChat : this.getAPI().getGroupChats()) {
                     tab.add(groupChat.getId());
                 }
             } else {
-                GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
+                GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
                 if (groupChat != null) tab.add(groupChat.getId());
             }
         }

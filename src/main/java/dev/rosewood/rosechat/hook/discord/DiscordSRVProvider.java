@@ -1,27 +1,22 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.Group;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Emote;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.GuildChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import java.time.OffsetDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +33,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     }
 
     @Override
-    public void sendMessage(RoseMessage roseMessage, Group group, String channel) {
+    public void sendMessage(RoseMessage roseMessage, GroupChannel group, String channel) {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
         if (textChannel == null) return;
 
