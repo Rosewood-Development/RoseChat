@@ -162,9 +162,4 @@ public class TagTokenizer implements Tokenizer<Token> {
 
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

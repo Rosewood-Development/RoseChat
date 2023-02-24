@@ -25,9 +25,4 @@ public class ToDiscordTagTokenizer implements Tokenizer<Token> {
                 .ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

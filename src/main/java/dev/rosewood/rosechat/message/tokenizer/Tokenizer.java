@@ -50,6 +50,4 @@ public interface Tokenizer<T extends Token> {
         return true;
     }
 
-    boolean isPerPlayer();
-
 }

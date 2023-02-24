@@ -38,9 +38,4 @@ public class FromDiscordChannelTokenizer implements Tokenizer<Token> {
         return null;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

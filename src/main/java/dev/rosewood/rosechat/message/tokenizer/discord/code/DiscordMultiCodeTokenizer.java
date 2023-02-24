@@ -33,9 +33,4 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.DISCORD_CODE));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

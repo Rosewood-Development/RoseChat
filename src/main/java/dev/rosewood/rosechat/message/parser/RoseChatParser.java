@@ -19,7 +19,7 @@ public class RoseChatParser implements MessageParser {
         ComponentBuilder componentBuilder = new ComponentBuilder();
 
         // If there is no format, or the format does not contain "{message}", then parse without the format.
-        if (format != null || !format.contains("{message}")) {
+        if (format == null || !format.contains("{message}")) {
             if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
                         new MessageTokenizer(message, receiver, message.getMessage(), true,

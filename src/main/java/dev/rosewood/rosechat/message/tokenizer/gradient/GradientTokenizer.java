@@ -38,9 +38,4 @@ public class GradientTokenizer implements Tokenizer<GradientToken> {
         return null;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

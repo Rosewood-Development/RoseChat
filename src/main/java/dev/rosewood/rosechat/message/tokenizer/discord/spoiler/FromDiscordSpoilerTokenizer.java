@@ -31,9 +31,4 @@ public class FromDiscordSpoilerTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(originalContent).content(content).ignoreTokenizer(this));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

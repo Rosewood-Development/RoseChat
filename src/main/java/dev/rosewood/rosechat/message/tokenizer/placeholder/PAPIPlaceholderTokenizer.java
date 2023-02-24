@@ -41,17 +41,12 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
 
             content = content.replace(ChatColor.COLOR_CHAR, '&');
 
-            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content);
+            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).noCaching();
             if (originalContent.equals(content))
                 tokenSettings.ignoreTokenizer(this);
             return new Token(tokenSettings);
         }
         return null;
-    }
-
-    @Override
-    public boolean isPerPlayer() {
-        return true;
     }
 
 }

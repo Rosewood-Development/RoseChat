@@ -23,9 +23,4 @@ public class DiscordQuoteTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(input).content(content).ignoreTokenizer(this));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

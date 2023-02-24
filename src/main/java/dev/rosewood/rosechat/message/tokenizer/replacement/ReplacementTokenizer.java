@@ -22,9 +22,4 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
         return null;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

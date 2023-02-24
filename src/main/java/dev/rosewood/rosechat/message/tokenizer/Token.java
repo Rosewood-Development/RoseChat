@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Token {
+public class Token implements Cloneable {
 
     protected final String originalContent;
     protected String content;
@@ -23,6 +24,7 @@ public class Token {
     protected Set<Tokenizer<?>> ignoredTokenizers;
     protected StringPlaceholders.Builder placeholders;
     protected List<Token> children, hoverChildren;
+    protected boolean allowsCaching;
 
     /**
      * Creates a new token with the given settings.
@@ -40,6 +42,7 @@ public class Token {
         this.retainColour = settings.retainColour;
         this.ignoredTokenizers = settings.ignoredTokenizers;
         this.placeholders = settings.placeholders;
+        this.allowsCaching = settings.allowsCaching;
         this.children = new ArrayList<>();
         this.hoverChildren = new ArrayList<>();
     }
@@ -154,6 +157,12 @@ public class Token {
         return false;
     }
 
+    public boolean allowsCaching() {
+        return this.allowsCaching
+                && this.children.stream().allMatch(Token::allowsCaching)
+                && this.hoverChildren.stream().allMatch(Token::allowsCaching);
+    }
+
     public String getEffectiveFont() {
         return this.font == null ? "default" : this.font;
     }
@@ -186,6 +195,19 @@ public class Token {
         }
     }
 
+    @Override
+    public Token clone() {
+        try {
+            Token clone = (Token) super.clone();
+            clone.ignoredTokenizers = new HashSet<>(this.ignoredTokenizers);
+            clone.children = this.children.stream().map(Token::clone).collect(Collectors.toList());
+            clone.hoverChildren = this.hoverChildren.stream().map(Token::clone).collect(Collectors.toList());
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
     public static class TokenSettings {
 
         private final String originalContent;
@@ -196,6 +218,7 @@ public class Token {
         private boolean retainColour;
         private final Set<Tokenizer<?>> ignoredTokenizers;
         private final StringPlaceholders.Builder placeholders;
+        private boolean allowsCaching;
 
         public TokenSettings(String originalContent) {
             this.originalContent = originalContent;
@@ -207,6 +230,7 @@ public class Token {
             this.clickAction = null;
             this.requiresTokenizing = true;
             this.retainColour = false;
+            this.allowsCaching = true;
             this.ignoredTokenizers = new HashSet<>();
             this.placeholders = StringPlaceholders.builder();
         }
@@ -258,6 +282,11 @@ public class Token {
 
         public TokenSettings placeholder(String placeholder, Object value) {
             this.placeholders.addPlaceholder(placeholder, value);
+            return this;
+        }
+
+        public TokenSettings noCaching() {
+            this.allowsCaching = false;
             return this;
         }
 

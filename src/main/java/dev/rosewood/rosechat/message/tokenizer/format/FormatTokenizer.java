@@ -40,9 +40,4 @@ public class FormatTokenizer implements Tokenizer<FormatToken> {
         return null;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

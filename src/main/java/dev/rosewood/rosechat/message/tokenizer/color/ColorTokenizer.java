@@ -72,9 +72,4 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
         return HexUtils.translateHex(string.substring(hashIndex, hashIndex + 7));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

@@ -19,8 +19,8 @@ public class DebugCommand extends AbstractCommand {
     public void onCommand(CommandSender sender, String[] args) {
         DebugManager debugManager = this.plugin.getManager(DebugManager.class);
         if (debugManager.isEnabled()) {
-            debugManager.setEnabled(false);
             debugManager.save();
+            debugManager.setEnabled(false);
             this.getAPI().getLocaleManager().sendMessage(sender, "command-debug-off");
         } else {
             debugManager.setEnabled(true);

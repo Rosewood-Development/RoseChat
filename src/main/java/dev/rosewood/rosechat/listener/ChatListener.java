@@ -37,7 +37,7 @@ public class ChatListener implements Listener {
             RosePlayer sender = new RosePlayer(player);
 
             Channel channel = this.plugin.getManager(ChannelManager.class).getChannels().get("global");
-            channel.send(new RosePlayer(player), player.getName() + " >> " + event.getMessage());
+            channel.send(new RosePlayer(player), event.getMessage());
             //if (!channel.canSendMessage(sender, event.getMessage())) return;
 
             //MessageWrapper message = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, event.getMessage()).filter().applyDefaultColor();

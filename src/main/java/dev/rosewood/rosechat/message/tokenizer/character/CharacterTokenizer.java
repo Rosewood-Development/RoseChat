@@ -12,9 +12,4 @@ public class CharacterTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(String.valueOf(input.charAt(0))).requiresTokenizing(false));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

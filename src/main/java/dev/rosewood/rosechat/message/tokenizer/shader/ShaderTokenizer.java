@@ -33,9 +33,4 @@ public class ShaderTokenizer implements Tokenizer<Token> {
         return nextHex;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

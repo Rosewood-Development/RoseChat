@@ -23,9 +23,4 @@ public class ToDiscordChannelTokenizer implements Tokenizer<Token> {
                 .ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG).ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

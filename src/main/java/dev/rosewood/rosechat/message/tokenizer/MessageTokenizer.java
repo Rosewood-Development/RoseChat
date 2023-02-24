@@ -1,5 +1,8 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
+import com.google.common.base.Stopwatch;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.DebugManager;
@@ -9,6 +12,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.util.concurrent.TimeUnit;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -17,12 +21,15 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
+
+    private static final Cache<String, List<Token>> TOKEN_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .build();
 
     private final DebugManager debugManager;
     private final List<Tokenizer<?>> tokenizers;
@@ -47,15 +54,13 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        if (this.debugManager.isEnabled())
-            this.debugManager.addMessage("Tokenizing New Message: " + message);
-        this.tokenize(message);
-       // this.tokenize(parseReplacements(message));
+        this.debugManager.addMessage(() -> "Tokenizing New Message: " + message);
+        this.tokens.addAll(this.tokenizeContent(message, true, 0, null));
+        // this.tokens.addAll(this.tokenizeContent(parseReplacements(message), true, 0, null));
     }
 
    /* private String parseReplacements(String message) {
-        if (this.debugManager.isEnabled())
-            this.debugManager.addMessage("Parsing Replacements...");
+        this.debugManager.addMessage(() -> "Parsing Replacements...");
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
             if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
@@ -69,51 +74,33 @@ public class MessageTokenizer {
         return message;
     }*/
 
-    private void tokenize(String message) {
-        this.tokens.clear();
-        this.tokens.addAll(this.tokenizeContent(message, true, 0, null));
-    }
-
     private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
-        boolean isFirstPass = !Tokenizers.TOKEN_CACHE.containsKey(this.roseMessage.getUUID());
-        Map<Token, Token> cache = Tokenizers.TOKEN_CACHE.getOrDefault(this.roseMessage.getUUID(), new HashMap<>());
+        this.debugManager.addMessage(() -> "Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
 
-        if (this.debugManager.isEnabled())
-            this.debugManager.addMessage("Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
+        // Check cache first
+        List<Token> cachedResult = TOKEN_CACHE.getIfPresent(content);
+        if (cachedResult != null)
+            return cachedResult;
+
         List<Token> added = new ArrayList<>();
-        Token previousToken = null;
-        Token token;
-
         for (int i = 0; i < content.length(); i++) {
             String substring = content.substring(i);
 
             for (Tokenizer<?> tokenizer : this.tokenizers) {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
-                if (this.debugManager.isEnabled())
-                    this.debugManager.addMessage("Starting Tokenizing " + tokenizer.toString() + "...");
 
-                if (isFirstPass) {
-                    token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);
-                    if (token == null) continue;
-                } else {
-                    if (cache.containsKey(previousToken) && !tokenizer.isPerPlayer()) {
-                        token = cache.get(previousToken);
-                    } else {
-                        token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);
-                    }
+                this.debugManager.addMessage(() -> "Starting Tokenizing " + tokenizer.toString() + "...");
 
-                }
-
+                Token token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);;
                 if (token != null) {
-                    if (this.debugManager.isEnabled())
-                        this.debugManager.addMessage("Completed Tokenizing " + tokenizer + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
+                    this.debugManager.addMessage(() -> "Completed Tokenizing " + tokenizer + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
+
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {
                         RoseChat.getInstance().getLogger().warning("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.roseMessage.getMessage());
-                        if (this.debugManager.isEnabled())
-                            this.debugManager.addMessage("Infinite recursion detected: Message: " + this.roseMessage.getMessage()
-                                    + ", Original: " + token.getOriginalContent() + ", Content: " + token.getContent() + ", Token: " + token);
+                        this.debugManager.addMessage(() -> "Infinite recursion detected: Message: " + this.roseMessage.getMessage()
+                                + ", Original: " + token.getOriginalContent() + ", Content: " + token.getContent() + ", Token: " + token);
                         continue;
                     }
 
@@ -123,8 +110,7 @@ public class MessageTokenizer {
                             parent.applyInheritance(token);
 
                         added.add(token);
-                        List<Token> generatedContent = this.tokenizeContent(token.getContent(), true, depth + 1, token);
-                        token.addChildren(generatedContent);
+                        token.addChildren(this.tokenizeContent(token.getContent(), true, depth + 1, token));
                     } else {
                         added.add(token);
                     }
@@ -132,14 +118,15 @@ public class MessageTokenizer {
                     if (tokenizeHover && token.getHover() != null && !token.getHover().isEmpty())
                         token.addHoverChildren(this.tokenizeContent(token.getHover(), false, depth + 1, token));
 
-                    if (tokenizer.isPerPlayer()) cache.put(previousToken, token);
-                    previousToken = token;
                     break;
                 }
             }
         }
 
-        Tokenizers.TOKEN_CACHE.put(this.roseMessage.getUUID(), cache);
+        // Cache the result if allowed
+        if (added.stream().allMatch(Token::allowsCaching))
+            TOKEN_CACHE.put(content, added.stream().map(Token::clone).collect(Collectors.toList()));
+
         return added;
     }
 

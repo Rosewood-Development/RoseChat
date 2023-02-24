@@ -47,9 +47,4 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
         return null;
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }

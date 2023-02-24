@@ -85,8 +85,6 @@ public class Tokenizers {
     public static final Tokenizer<Token> REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer<Token> CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 
-    public static final Map<UUID, Map<Token, Token>> TOKEN_CACHE = new HashMap<>();
-
     public static List<Tokenizer<?>> getBundleValues(String bundle) {
         return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::getTokenizer).collect(Collectors.toList()));
     }

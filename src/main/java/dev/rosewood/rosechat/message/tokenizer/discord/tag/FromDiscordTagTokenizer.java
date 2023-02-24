@@ -60,9 +60,4 @@ public class FromDiscordTagTokenizer implements Tokenizer<Token> {
         return new Token(new Token.TokenSettings(originalContent).content(finalTag));
     }
 
-    @Override
-    public boolean isPerPlayer() {
-        return false;
-    }
-
 }
