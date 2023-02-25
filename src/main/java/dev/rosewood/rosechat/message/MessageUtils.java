@@ -202,7 +202,7 @@ public class MessageUtils {
      * @param message The message to send.
      */
     public static void sendPrivateMessage(RosePlayer sender, String targetName, String message) {
-        Player target = Bukkit.getPlayerExact(targetName);
+        Player target = Bukkit.getPlayer(targetName);
         RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
         // Create the private message info, rules, and the message, then apply the rules.
@@ -233,10 +233,11 @@ public class MessageUtils {
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         // The tokens will always be generated before even if this message is not sent.
-        if (target != null && !targetName.equalsIgnoreCase("Console")) Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
+        if (target != null && !targetName.equalsIgnoreCase("Console") && !sender.isConsole())
+            Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
 
         // Parse for the channel spies.
-        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getChannelSpies()) {
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
             // Don't send the spy message if the spy is the sender or receiver.
             if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID())) continue;
 
@@ -274,8 +275,6 @@ public class MessageUtils {
                             RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                         }
                     });
-
-                    return;
                 }
             } else {
                 // The sender should receive the message first.
@@ -468,16 +467,5 @@ public class MessageUtils {
             return null;
         }
     }
-
-    /*public static void sendMessageWrapper(RoseSender sender, ChatChannel channel, MessageWrapper message) {
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
-            return;
-        }
-
-        channel.send(message);
-        BaseComponent[] messageComponents = message.toComponents();
-        if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
-    }*/
 
 }

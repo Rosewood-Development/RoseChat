@@ -61,7 +61,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setTagSounds(hasTagSounds);
                     playerData.setMessageSounds(hasMessageSounds);
                     playerData.setEmojis(hasEmojis);
-                    playerData.setCurrentChannel(channel == null ? this.channelManager.getDefaultChannel() : channel);
+                    playerData.setCurrentChannel(channel);
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     if (muteTime > 0) playerData.mute(muteTime);
@@ -82,6 +82,7 @@ public class DataManager extends AbstractDataManager {
                 }
             }
         });
+
         return value.get();
     }
 
@@ -145,6 +146,7 @@ public class DataManager extends AbstractDataManager {
                 }
             }
         });
+
         return mutedChannels;
     }
 
@@ -203,6 +205,7 @@ public class DataManager extends AbstractDataManager {
                     groupChats.add(current);
             }
         });
+
         return groupChats;
     }
 
@@ -216,6 +219,7 @@ public class DataManager extends AbstractDataManager {
                     groupChatNames.add(result.getString("id"));
             }
         });
+
         return groupChatNames;
     }
 
@@ -254,6 +258,7 @@ public class DataManager extends AbstractDataManager {
                     groupChatMembers.add(UUID.fromString(result.getString("uuid")));
             }
         });
+
         return groupChatMembers;
     }
 
@@ -324,6 +329,7 @@ public class DataManager extends AbstractDataManager {
                 }
             }
         });
+
         return groupInfo.get();
     }
 

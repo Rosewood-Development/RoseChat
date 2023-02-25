@@ -13,8 +13,14 @@ public class RoseChatParser implements MessageParser {
     @Override
     public BaseComponent[] parse(RoseMessage message, RosePlayer sender, RosePlayer viewer, String format) {
         // If the message is a private message, then the viewer should be the one who received the pm.
-        RosePlayer receiver = message.getMessageRules().isPrivateMessage() ?
-                message.getMessageRules().getPrivateMessageInfo().getReceiver() : viewer;
+        RosePlayer receiver;
+
+        if (message.getMessageRules() != null) {
+            receiver = message.getMessageRules().isPrivateMessage() ?
+                    message.getMessageRules().getPrivateMessageInfo().getReceiver() : viewer;
+        } else {
+            receiver = viewer;
+        }
 
         ComponentBuilder componentBuilder = new ComponentBuilder();
 

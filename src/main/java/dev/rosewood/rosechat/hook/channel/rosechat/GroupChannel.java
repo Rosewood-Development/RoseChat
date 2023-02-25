@@ -3,6 +3,8 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.message.RosePlayer;
+import org.bukkit.entity.Player;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,16 @@ public class GroupChannel extends Channel {
     @Override
     public String getId() {
         return "group";
+    }
+
+    @Override
+    public List<String> getServers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean canJoinByCommand(Player player) {
+        return true;
     }
 
     public String getName() {

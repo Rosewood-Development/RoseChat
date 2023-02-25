@@ -37,7 +37,7 @@ public class ChannelManager extends Manager {
         this.channelsConfig = CommentedFileConfiguration.loadConfiguration(channelsFile);
 
         // Delay generating channels until channel providers are registered.
-        Bukkit.getScheduler().runTaskLater(this.rosePlugin, this::generateChannels, 40L);
+        Bukkit.getScheduler().runTaskLater(this.rosePlugin, this::generateChannels, 0L);
     }
 
     @Override

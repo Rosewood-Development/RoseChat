@@ -81,6 +81,7 @@ public class NicknameCommand extends AbstractCommand {
 
         RosePlayer rosePlayer = new RosePlayer(player);
 
+        // TODO: Check permissions for everything before setting the display name
       //  RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, null, nickname).filterCaps().filterLanguage().filterURLs();
         //if (!message.canBeSent()) {
         // //   if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);

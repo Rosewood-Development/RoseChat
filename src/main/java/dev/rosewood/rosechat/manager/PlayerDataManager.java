@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -35,8 +36,11 @@ public class PlayerDataManager extends Manager {
 
     @Override
     public void reload() {
-        Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> { }));
-        this.getMutedChannels((channels) -> {});
+        // Delay to make sure channels are loaded first.
+        Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
+            Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> { }));
+            this.getMutedChannels((channels) -> {});
+        }, 5L);
     }
 
     @Override

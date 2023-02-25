@@ -1,8 +1,10 @@
 package dev.rosewood.rosechat.hook.channel.worldguard;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -38,6 +40,24 @@ public class WorldGuardChannel extends RoseChatChannel {
         this.whitelist = config.contains("whitelist") ? config.getStringList("whitelist") : new ArrayList<>();
         this.blacklist = config.contains("blacklist") ? config.getStringList("blacklist") : new ArrayList<>();
         this.useMembers = config.getBoolean("use-members") && config.getBoolean("use-members");
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        Location location = player.getLocation();
+        if (location.getWorld() == null) return false;
+
+        RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(location.getWorld()));
+        if (regionManager == null) return false;
+
+        ApplicableRegionSet regions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        for (ProtectedRegion region : regions.getRegions()) {
+            if (this.whitelist.contains(region.getId())) {
+                return !this.useMembers || region.getMembers().contains(player.getUniqueId());
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -95,18 +115,6 @@ public class WorldGuardChannel extends RoseChatChannel {
         }
 
         return members;
-    }
-
-    public List<String> getWhitelist() {
-        return this.whitelist;
-    }
-
-    public List<String> getBlacklist() {
-        return this.blacklist;
-    }
-
-    public boolean useMembers() {
-        return this.useMembers;
     }
 
 }

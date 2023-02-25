@@ -32,7 +32,8 @@ staff:
 
   # Creates a command alias, /staff, for this channel.
   # A restart is required for this command to be available.
-  command: staff
+  commands:
+    - staff
 
 
 # Local Channel - /c local
@@ -47,7 +48,8 @@ skyblock:
   format: '{channel-prefix}{player}{separator}{message}'
 
   # This option makes messages only able to be sent and received when the player is in this world.
-  world: skyblock
+  worlds:
+    - skyblock
 
   # This stops players from joining the channel with a command.
   joinable: false

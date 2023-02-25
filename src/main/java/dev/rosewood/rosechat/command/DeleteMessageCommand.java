@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -41,11 +42,11 @@ public class DeleteMessageCommand extends AbstractCommand {
         handleMessageDeletion(player, uuid);
 
         if (args.length > 1) {
-            //ChatChannel channel = this.getAPI().getChannelById(args[1]);
-            //if (channel == null) return;
-            //for (String server : channel.getServers()) {
-            //    this.getAPI().getBungeeManager().sendMessageDeletion(server,  uuid);
-            //}
+            Channel channel = this.getAPI().getChannelById(args[1]);
+            if (channel == null) return;
+            for (String server : channel.getServers()) {
+                this.getAPI().getBungeeManager().sendMessageDeletion(server,  uuid);
+            }
         }
     }
 
@@ -178,7 +179,7 @@ public class DeleteMessageCommand extends AbstractCommand {
         if (placeholder.getText() == null) return null;
         String text = placeholder.getText().parseToString(sender, viewer, placeholders);
         if (text == null) return null;
-        components = api.parse(sender, viewer, text, placeholders);
+        components = api.parse(sender, viewer, text);
 
         if (placeholder.getHover() != null) {
             String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
@@ -186,7 +187,7 @@ public class DeleteMessageCommand extends AbstractCommand {
                 if (hover.equalsIgnoreCase("%original%")) {
                     hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
                 } else {
-                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover, placeholders));
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover));
                 }
             }
         }
@@ -195,7 +196,7 @@ public class DeleteMessageCommand extends AbstractCommand {
             String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
             ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
             if (click != null && action != null) {
-                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click, placeholders)));
+                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
             }
         }
 

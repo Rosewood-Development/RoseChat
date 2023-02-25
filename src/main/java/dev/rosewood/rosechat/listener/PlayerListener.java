@@ -30,32 +30,28 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        World world = player.getWorld();
 
         PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUniqueId());
-        if (playerData.getCurrentChannel() == null) {
-            boolean foundChannel = false;
 
-            // Place the player in the correct channel.
-            /*for (Channel channel : this.channelManager.getChannels().values()) {
-                if (channel.isAutoJoin() && (channel.getWorld() != null && channel.getWorld().equalsIgnoreCase(world.getName()))) {
-                    playerData.setCurrentChannel(channel);
-                    channel.add(playerData.getUUID());
-                    foundChannel = true;
-                    break;
-                }
-            }*/
-
-            // If no channel was found, place them in the default channel.
-            if (!foundChannel) {
-                playerData.setCurrentChannel(this.channelManager.getDefaultChannel());
-                this.channelManager.getDefaultChannel().onJoin(player);
+        // Place the player in the correct channel.
+        for (Channel channel : this.channelManager.getChannels().values()) {
+            if (channel.onLogin(player)) {
+                playerData.setCurrentChannel(channel);
+                break;
             }
-
-            playerData.save();
-        } else {
-            playerData.getCurrentChannel().onJoin(player);
         }
+
+        // If no channel was found, force put player in the default channel.
+        if (playerData.getCurrentChannel() == null) {
+            Channel defaultChannel = this.channelManager.getDefaultChannel();
+            defaultChannel.onJoin(player);
+            playerData.setCurrentChannel(defaultChannel);
+        } else {
+            Channel channel = playerData.getCurrentChannel();
+            channel.onJoin(player);
+        }
+
+        playerData.save();
 
         if (playerData.getNickname() != null) NicknameCommand.setDisplayName(player, playerData.getNickname());
 
@@ -76,43 +72,54 @@ public class PlayerListener implements Listener {
         event.getCommands().remove("delmsg");
         event.getCommands().remove("rosechat:delmsg");
 
-        /*for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
-            if (channel.getCommand() != null) {
-                String command = channel.getCommand();
+        for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
+            if (channel.getCommands().isEmpty()) continue;
+            for (String command : channel.getCommands()) {
                 event.getCommands().remove(command + ":" + command);
-
-                if (!event.getPlayer().hasPermission("rosechat.channel." + channel.getId())) event.getCommands().remove(command);
+                if (!event.getPlayer().hasPermission("rosechat.channel." + channel.getId()))
+                    event.getCommands().remove(command);
             }
-        }*/
+        }
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         Player player = event.getPlayer();
-        World world = player.getWorld();
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
+        World world = player.getWorld();
+        Channel currentChannel = playerData.getCurrentChannel();
 
-        /*for (ChatChannel channel : api.getChannels()) {
-            if (channel.getWorld() == null) continue;
+        // Check if the player can leave their current channel first.
+        if (currentChannel.onWorldLeave(player, event.getFrom(), world)) {
+            // Leave the channel
+            currentChannel.onLeave(player);
+            // Temporarily set the current channel to null
+            playerData.setCurrentChannel(null);
+        }
 
-            // Remove the player from the channel when leaving the world.
-            if (channel.getWorld().equals(event.getFrom().getName())) {
-               // ChatChannel defaultChannel = api.getChannelManager().getDefaultChannel();
-                playerData.getCurrentChannel().remove(player);
-              //  playerData.setCurrentChannel(defaultChannel);
-               // defaultChannel.add(playerData.getUUID());
-                playerData.save();
-            }
-
-            if (channel.getWorld().equalsIgnoreCase(world.getName()) && channel.isAutoJoin()) {
-                playerData.getCurrentChannel().remove(player);
+        // Loop through the channels to find if the player should join one.
+        boolean foundChannel = false;
+        for (Channel channel : api.getChannels()) {
+            // If the player can join a channel, join.
+            if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
+                channel.onJoin(player);
                 playerData.setCurrentChannel(channel);
-                channel.add(player);
-                playerData.save();
-                return;
+                foundChannel = true;
+                break;
             }
-        }*/
+
+        }
+
+        // If no suitable channel was found, put the player in the default channel.
+        if (!foundChannel) {
+            // Force join the default channel as there is no other option
+            Channel defaultChannel = api.getChannelManager().getDefaultChannel();
+            defaultChannel.onJoin(player);
+            playerData.setCurrentChannel(defaultChannel);
+        }
+
+        playerData.save();
     }
 
 }

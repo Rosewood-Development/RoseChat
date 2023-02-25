@@ -22,7 +22,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 
 public class MessageTokenizer {
 
@@ -79,10 +78,8 @@ public class MessageTokenizer {
         // Check cache first
         TokenKey tokenKey = new TokenKey(content, parent == null ? null : parent.clone());
         List<Token> cachedResult = TOKEN_CACHE.getIfPresent(tokenKey);
-        if (cachedResult != null) {
-            Bukkit.getLogger().warning("Cache hit: " + cachedResult.size());
+        if (cachedResult != null)
             return cachedResult;
-        }
 
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {

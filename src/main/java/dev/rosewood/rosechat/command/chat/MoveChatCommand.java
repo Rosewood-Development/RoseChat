@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
@@ -17,7 +18,7 @@ public class MoveChatCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-       /* if (args.length != 2) {
+        if (args.length != 2) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-usage");
             return;
         }
@@ -36,11 +37,11 @@ public class MoveChatCommand extends AbstractCommand {
             return;
         }
 
-        ChatChannel oldChannel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
-        ChatChannel channel = this.getAPI().getChannelById(channelStr);
+        Channel oldChannel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
+        Channel channel = this.getAPI().getChannelById(channelStr);
 
-        oldChannel.remove(player);
-        channel.add(player);
+        oldChannel.onLeave(player);
+        channel.onJoin(player);
         data.setCurrentChannel(channel);
         data.save();
 
@@ -49,7 +50,7 @@ public class MoveChatCommand extends AbstractCommand {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", name)
                         .addPlaceholder("channel", channel.getId()).build());
-        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));*/
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
     }
 
     @Override

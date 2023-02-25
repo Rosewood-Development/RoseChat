@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.api;
 
-import com.gmail.nossr50.datatypes.chat.ChatChannel;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -8,7 +7,6 @@ import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -21,9 +19,9 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
@@ -70,8 +68,7 @@ public final class RoseChatAPI {
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message) {
-       // return new RoseMessage(sender, MessageLocation.NONE, null, message).parse(null, viewer);
-        return null;
+        return new RoseMessage(sender, MessageLocation.NONE, message).parse(viewer, null);
     }
 
     /**
@@ -79,25 +76,11 @@ public final class RoseChatAPI {
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
-     * @param placeholders A set of placeholders to use.
-     * @return A {@link BaseComponent} consisting of the parsed message.
-     */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, StringPlaceholders placeholders) {
-        //return new RoseMessage(sender, MessageLocation.NONE, null, message, placeholders).parse(null, viewer);
-        return null;
-    }
-
-    /**
-     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
      * @param location The location that the chat message is in.
-     * @param sender The person sending the message.
-     * @param viewer The person receiving the message.
-     * @param message The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(MessageLocation location, RosePlayer sender, RosePlayer viewer, String message) {
-        //return new RoseMessage(sender, location, null, message).parse(null, viewer);
-        return null;
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, MessageLocation location) {
+        return new RoseMessage(sender, location, message).parse(viewer, null);
     }
 
     /**

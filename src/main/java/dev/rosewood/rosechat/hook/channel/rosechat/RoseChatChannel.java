@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -16,9 +17,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class RoseChatChannel extends Channel {
-
-    private String id;
-    private List<UUID> members;
 
     // Channel Settings
     private int radius;
@@ -36,12 +34,7 @@ public class RoseChatChannel extends Channel {
 
     @Override
     public void onLoad(String id, ConfigurationSection config) {
-        this.id = id;
-
-        // Set settings for all channels
-        if (config.contains("default") && config.getBoolean("default")) this.setDefault();
-        if (config.contains("format")) this.setFormat(config.getString("format"));
-        if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
+        super.onLoad(id, config);
 
         // Set settings specifically for RoseChat Channels
         this.radius = config.contains("radius") ? config.getInt("radius") : -1;
@@ -52,18 +45,33 @@ public class RoseChatChannel extends Channel {
         this.keepFormatOverBungee = config.contains("keep-format") && config.getBoolean("keep-format");
         this.worlds = config.contains("worlds") ? config.getStringList("worlds") : new ArrayList<>();
         this.servers = config.contains("servers") ? config.getStringList("servers") : new ArrayList<>();
-
-        this.members = new ArrayList<>();
     }
 
     @Override
-    public void onJoin(Player player) {
-        this.members.add(player.getUniqueId());
+    public boolean onLogin(Player player) {
+        return this.autoJoin && (this.worlds.isEmpty() || this.worlds.contains(player.getWorld().getName()));
     }
 
     @Override
-    public void onLeave(Player player) {
-        this.members.remove(player.getUniqueId());
+    public boolean onWorldJoin(Player player, World from, World to) {
+        if (this.worlds.isEmpty()) return false;
+
+        // No point in joining again if the new world is linked too.
+        if (this.worlds.contains(from.getName()) && this.worlds.contains(to.getName())) return false;
+
+        // Join the channel if the world is linked to the channel.
+        return this.worlds.contains(to.getName());
+    }
+
+    @Override
+    public boolean onWorldLeave(Player player, World from, World to) {
+        if (this.worlds.isEmpty()) return false;
+
+        // No point in leaving if the new world is linked too.
+        if (this.worlds.contains(from.getName()) && this.worlds.contains(to.getName())) return false;
+
+        // Leave the channel if the world is linked to the channel.
+        return this.worlds.contains(from.getName());
     }
 
     @Override
@@ -96,8 +104,23 @@ public class RoseChatChannel extends Channel {
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender) {
-        return super.getInfoPlaceholders(sender)
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public List<String> getServers() {
+        return this.servers;
+    }
+
+    @Override
+    public boolean canJoinByCommand(Player player) {
+        return (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable) || player.hasPermission("rosechat.channelbypass");
+    }
+
+    @Override
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
+        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
                 .addPlaceholder("radius", this.radius)
                 .addPlaceholder("discord", this.discordChannel)
                 .addPlaceholder("auto-join", this.autoJoin)
@@ -106,11 +129,6 @@ public class RoseChatChannel extends Channel {
                 .addPlaceholder("keep-format", this.keepFormatOverBungee)
                 .addPlaceholder("worlds", this.worlds.toString())
                 .addPlaceholder("servers", this.servers.toString());
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
     }
 
 }

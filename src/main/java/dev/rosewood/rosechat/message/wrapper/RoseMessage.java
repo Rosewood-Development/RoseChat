@@ -88,7 +88,7 @@ public class RoseMessage {
     }
 
     private void logMessage(MessageLog log, String discordId) {
-        if (this.messageRules.isIgnoringMessageLogging()) return;
+        if (this.messageRules == null || this.messageRules.isIgnoringMessageLogging()) return;
 
         this.deletableMessage = new DeletableMessage(this.uuid, ComponentSerializer.toString(this.tokenized), false);
         this.deletableMessage.setPrivateMessageInfo(this.messageRules.getPrivateMessageInfo());

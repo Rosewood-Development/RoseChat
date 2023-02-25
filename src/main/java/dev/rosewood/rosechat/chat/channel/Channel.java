@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.UUID;
 public abstract class Channel {
 
     private final ChannelProvider provider;
+    protected String id;
+    protected final List<UUID> members;
     private boolean defaultChannel;
     private boolean muted;
 
@@ -22,6 +25,7 @@ public abstract class Channel {
     private List<String> commands;
 
     public Channel(ChannelProvider provider) {
+        this.members = new ArrayList<>();
         this.provider = provider;
         this.commands = new ArrayList<>();
     }
@@ -30,14 +34,57 @@ public abstract class Channel {
      * Called when a channel is loaded from a config file.
      */
     public void onLoad(String id, ConfigurationSection config) {
-        if (config.contains("default")) this.defaultChannel = true;
+        this.id = id;
+        if (config.contains("default") && config.getBoolean("default")) this.setDefault();
+        if (config.contains("format")) this.setFormat(config.getString("format"));
+        if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
+
+        for (String command : this.commands)
+            this.registerCommand(command);
     }
 
     /**
      * Called when a channel is loaded.
      */
     public void onLoad() {
+        // No default implementation.
+    }
 
+    /**
+     * Called when the player joins the server.
+     * This is used to check if the player should join the channel when logging in
+     * @param player The {@link Player} who is joining the channel.
+     * @return True if the player can join.
+     */
+    public boolean onLogin(Player player) {
+        // No default implementation.
+        return true;
+    }
+
+    /**
+     * Called when the player enters a world.
+     * This is used to check if the player should join the channel when changing world.
+     * @param player The {@link Player} who is changing world.
+     * @param from The {@link World} that the player was in.
+     * @param to The {@link World} that the player is going to.
+     * @return True if the player should join the channel when entering the world.
+     */
+    public boolean onWorldJoin(Player player, World from, World to) {
+        // No default implementation.
+        return true;
+    }
+
+    /**
+     * Called when the player leaves a world.
+     * This is used to check if the player should join the channel when changing world.
+     * @param player The {@link Player} who is changing world.
+     * @param from The {@link World} that the player was in.
+     * @param to The {@link World} that the player is going to.
+     * @return True if the player should leave the channel when leaving the world.
+     */
+    public boolean onWorldLeave(Player player, World from, World to) {
+        // No default implementation.
+        return true;
     }
 
     /**
@@ -45,7 +92,7 @@ public abstract class Channel {
      * @param player The {@link Player} who is joining the channel.
      */
     public void onJoin(Player player) {
-
+        this.members.add(player.getUniqueId());
     }
 
     /**
@@ -53,7 +100,7 @@ public abstract class Channel {
      * @param player The {@link Player} who is leaving the channel.
      */
     public void onLeave(Player player) {
-
+        this.members.remove(player.getUniqueId());
     }
 
     /**
@@ -69,17 +116,39 @@ public abstract class Channel {
      */
     public abstract List<UUID> getMembers(RosePlayer sender);
 
+    /**
+     * @return The id of the channel.
+     */
     public abstract String getId();
 
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender) {
+    /**
+     * @return A list of servers linked to the channel.
+     */
+    public abstract List<String> getServers();
+
+    /**
+     * Called when a player uses a command to join the channel.
+     * @param player The {@link Player} using the command.
+     * @return True if the player can join by using the command.
+     */
+    public abstract boolean canJoinByCommand(Player player);
+
+    /**
+     * @param sender The {@link RosePlayer} getting the info.
+     * @param trueValue A value representing 'true', e.g. &aTrue
+     * @param falseValue A value representing 'false', e.g. &cFalse
+     * @param nullValue A value representing 'null', e.g. &eNone
+     * @return A {@link StringPlaceholders.Builder} containing values to be shown in the /chat info command.
+     */
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return StringPlaceholders.builder()
-                .addPlaceholder("default", this.isDefaultChannel())
-                .addPlaceholder("muted", this.isMuted())
-                .addPlaceholder("members", this.getMembers(sender).size())
-                .addPlaceholder("players", this.getMembers(sender).size())
+                .addPlaceholder("default", this.isDefaultChannel() ? trueValue : falseValue)
+                .addPlaceholder("muted", this.isMuted() ? trueValue : falseValue)
+                .addPlaceholder("members", this.getMembers(sender).isEmpty() ? nullValue : this.getMembers(sender).size())
+                .addPlaceholder("players", this.getMembers(sender).isEmpty() ? nullValue : this.getMembers(sender).size())
                 .addPlaceholder("id", this.getId())
-                .addPlaceholder("format", this.getFormat())
-                .addPlaceholder("commands", this.getCommands().toString());
+                .addPlaceholder("format", this.getFormat() == null ? nullValue : this.getFormat())
+                .addPlaceholder("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
     }
 
     public ChannelProvider getProvider() {
@@ -87,8 +156,15 @@ public abstract class Channel {
     }
 
     public void registerCommand(String command) {
-        this.commands.add(command);
         RoseChat.getInstance().getManager(ChannelManager.class).registerCommand(command);
+    }
+
+    /**
+     * Floods the channel with the specified message.
+     * @param message The message to use
+     */
+    public void flood(String message) {
+        // No default implementation.
     }
 
     public boolean isDefaultChannel() {
