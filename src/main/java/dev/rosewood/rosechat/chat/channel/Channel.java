@@ -1,9 +1,11 @@
 package dev.rosewood.rosechat.chat.channel;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -111,6 +113,39 @@ public abstract class Channel {
     public abstract void send(RosePlayer sender, String message);
 
     /**
+     * Called when a message is sent to the channel from Discord.
+     * @param message The {@link RoseMessage} to be sent.
+     * @param discordId The ID of the message sent in Discord.
+     */
+    public void send(RoseMessage message, String discordId) {
+        // No default implementation
+    }
+
+    /**
+     * Called when a message is sent from Bungee.
+     * @param sender The {@link RosePlayer} who is sending the message.
+     * @param message The message to be sent.
+     * @param messageId The {@link UUID} of the message sent from the other server.
+     */
+    public void send(RosePlayer sender, String message, UUID messageId) {
+        // No default implementation
+    }
+
+    /**
+     * Called when a Json message is sent from Bungee.
+     * Typically, only when keep-format-over-bungee is enabled.
+     * @param sender The {@link RosePlayer} who is sending the message.
+     * @param message The message to be sent.
+     * @param messageId The {@link UUID} of the message sent from the other server.
+     */
+    public void sendJson(RosePlayer sender, String message, UUID messageId) {
+
+    }
+
+    /**
+     * Returns a list of members for the given channel.
+     * Use {@link #members} if a player does not need to be specified.
+     * A player should be specified when getting a team from a supported plugin.
      * @param sender The {@link RosePlayer} sending the message.
      * @return A list of UUIDs for the members of the channel.
      */
@@ -165,6 +200,17 @@ public abstract class Channel {
      */
     public void flood(String message) {
         // No default implementation.
+    }
+
+    /**
+     * Checks if a message can be received by a player.
+     * @param receiver The {@link Player} to receive the message.
+     * @param data The {@link PlayerData} of the receiver.
+     * @param senderUUID The {@link UUID} of the player sending the message.
+     * @return True if the receiver can receive the message.
+     */
+    public boolean canReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
+        return (data != null && !data.getIgnoringPlayers().contains(senderUUID) && receiver.hasPermission("rosechat.channel." + this.getId()));
     }
 
     public boolean isDefaultChannel() {

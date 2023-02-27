@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.hook.discord;
 
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface DiscordChatProvider {
      * @param group The group that the message was sent from.
      * @param channel The channel that the message should go in.
      */
-    void sendMessage(RoseMessage roseMessage, GroupChannel group, String channel);
+    void sendMessage(RoseMessage roseMessage, Channel group, String channel);
 
     /**
      * Deletes a message from Discord.

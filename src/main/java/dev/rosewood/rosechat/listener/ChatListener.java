@@ -6,9 +6,9 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,15 +28,49 @@ public class ChatListener implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
 
+        RosePlayer sender = new RosePlayer(event.getPlayer());
+        PlayerData data = sender.getPlayerData();
+
+        // Don't send the message if the player doesn't have permission.
+        if (data == null || !sender.hasPermission("rosechat.chat")) {
+            this.api.getLocaleManager().sendComponentMessage(event.getPlayer(), "no-permission");
+            return;
+        }
+
+        // Check the mute expiry.
+        if (data.isMuteExpired()) {
+            data.unmute();
+            data.save();
+        }
+
+        // Check if the player is muted.
+        if (data.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
+            sender.sendLocaleMessage("command-mute-cannot-send");
+            return;
+        }
+
+        // Make the message isn't empty.
+        if (MessageUtils.isMessageEmpty(event.getMessage())) {
+            sender.sendLocaleMessage("message-blank");
+            return;
+        }
+
         // Force the event to run async.
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            Player player = event.getPlayer();
-            PlayerData data = this.api.getPlayerData(player.getUniqueId());
             Channel channel = data.getCurrentChannel();
 
-            channel.send(new RosePlayer(player), event.getMessage());
+            // Check if the player has permission for this channel.
+            if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
+                sender.sendLocaleMessage("no-permission");
+                return;
+            }
 
-            if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && !player.getDisplayName().equals(data.getNickname())) NicknameCommand.setDisplayName(player, data.getNickname());
+            // Send the message.
+            channel.send(sender, event.getMessage());
+
+            // Update the player's display name if the setting is enabled.
+            if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && !sender.getDisplayName().equals(data.getNickname()))
+                NicknameCommand.setDisplayName(sender.asPlayer(), data.getNickname());
         });
     }
 

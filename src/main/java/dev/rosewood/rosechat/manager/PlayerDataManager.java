@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.manager;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -38,7 +39,17 @@ public class PlayerDataManager extends Manager {
     public void reload() {
         // Delay to make sure channels are loaded first.
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
-            Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> { }));
+            Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> {
+                // Put the player in the right channel when the plugin is reloaded.
+                if (data.getCurrentChannel() != null) {
+                    data.getCurrentChannel().onJoin(player);
+                } else {
+                    Channel defaultChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
+                    defaultChannel.onJoin(player);
+                    data.setCurrentChannel(defaultChannel);
+                    data.save();
+                }
+            }));
             this.getMutedChannels((channels) -> {});
         }, 5L);
     }

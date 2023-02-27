@@ -97,6 +97,11 @@ public class ChannelManager extends Manager {
             ChannelProvider provider = this.channelProviders.get(plugin.toLowerCase());
             this.generateChannel(provider, id);
         }
+
+        // If a channel does not have a format, set the format to the same as the default channel.
+        for (Channel channel : this.channels.values()) {
+            if (channel.getFormat() == null) channel.setFormat(this.defaultChannel.getFormat());
+        }
     }
 
     /**

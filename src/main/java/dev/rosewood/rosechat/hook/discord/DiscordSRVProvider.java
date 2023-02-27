@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
@@ -33,7 +34,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     }
 
     @Override
-    public void sendMessage(RoseMessage roseMessage, GroupChannel group, String channel) {
+    public void sendMessage(RoseMessage roseMessage, Channel group, String channel) {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
         if (textChannel == null) return;
 

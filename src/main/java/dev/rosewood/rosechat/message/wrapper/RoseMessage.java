@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
  */
 public class RoseMessage {
 
-    private final UUID uuid;
+    private UUID uuid;
     private DeletableMessage deletableMessage;
 
     // In Values
@@ -227,10 +227,18 @@ public class RoseMessage {
     }
 
     /**
-     * @return The {@link UUID} of this message.
+     * @return The {@link UUID} of the message.
      */
     public UUID getUUID() {
         return this.uuid;
+    }
+
+    /**
+     * Sets the {@link UUID} of the message.
+     * @param uuid The {@link UUID} to use.
+     */
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
     }
 
     /**

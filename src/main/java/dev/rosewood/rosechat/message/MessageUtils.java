@@ -188,11 +188,11 @@ public class MessageUtils {
     /**
      * Sends a message to a Discord channel.
      * @param message The message to send.
-     * @param group The {@link GroupChannel} that the message was sent from.
-     * @param channel The channel to send the message to.
+     * @param channel The {@link Channel} that the message was sent from.
+     * @param discordChannel The channel to send the message to.
      */
-    public static void sendDiscordMessage(RoseMessage message, GroupChannel group, String channel) {
-        RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
+    public static void sendDiscordMessage(RoseMessage message, Channel channel, String discordChannel) {
+        RoseChatAPI.getInstance().getDiscord().sendMessage(message, channel, discordChannel);
     }
 
     /**
