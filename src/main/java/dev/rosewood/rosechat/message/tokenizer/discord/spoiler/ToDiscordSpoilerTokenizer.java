@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.spoiler;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -11,7 +12,7 @@ public class ToDiscordSpoilerTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.spoiler")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.spoiler")) return null;
         String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();
         String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
         String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());

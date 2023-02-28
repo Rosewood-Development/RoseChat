@@ -12,7 +12,7 @@ public class MarkdownBoldTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.bold")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.bold")) return null;
         if (!input.startsWith("**")) return null;
 
         Matcher matcher = MessageUtils.BOLD_MARKDOWN_PATTERN.matcher(input);

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.code;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -11,7 +12,7 @@ public class DiscordMultiCodeTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.multicode")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.multicode")) return null;
         if (!input.startsWith("```")) return null;
         int lastIndex = 0;
 

@@ -29,7 +29,9 @@ public class ShaderTokenizer implements Tokenizer<Token> {
 
     private String findFreeHex(String hex) {
         String nextHex = Integer.toHexString(Integer.parseInt(hex, 16) - 1);
-        if (Setting.CORE_SHADER_COLORS.getStringList().stream().anyMatch(x -> x.equalsIgnoreCase("#" + nextHex))) return findFreeHex(nextHex);
+        if (Setting.CORE_SHADER_COLORS.getStringList().stream().anyMatch(x -> x.equalsIgnoreCase("#" + nextHex)))
+            return findFreeHex(nextHex);
+
         return nextHex;
     }
 

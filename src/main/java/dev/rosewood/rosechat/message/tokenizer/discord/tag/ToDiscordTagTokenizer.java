@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.discord.tag;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -13,7 +14,7 @@ public class ToDiscordTagTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.tag")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.tag")) return null;
         if (!Setting.CAN_TAG_MEMBERS.getBoolean()) return null;
         if (!input.startsWith("@")) return null;
 

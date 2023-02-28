@@ -10,7 +10,6 @@ import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +25,9 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
         if (matcher.find()) {
             if (matcher.start() != 0) return null;
             String placeholder = input.substring(1, matcher.end() - 1);
-            if (!this.hasExtendedPermission(messageWrapper, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) return null;
+            if (!ignorePermissions
+                    && !MessageUtils.hasExtendedTokenPermission(messageWrapper, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder))
+                return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
             RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(originalContent.substring(1, originalContent.length() - 1));

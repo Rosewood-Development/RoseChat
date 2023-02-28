@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
 public class RoseChatChannel extends Channel {
@@ -82,6 +83,25 @@ public class RoseChatChannel extends Channel {
 
         // Leave the channel if the world is linked to the channel.
         return this.worlds.contains(from.getName());
+    }
+
+    private List<Player> getSpies(RoseMessage message, Predicate<Player> condition) {
+        List<UUID> channelSpies = RoseChatAPI.getInstance().getPlayerDataManager().getChannelSpies();
+        List<Player> spies = new ArrayList<>();
+
+        for (UUID uuid : channelSpies) {
+            if (message.getSender().getUUID().equals(uuid)) continue;
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+
+
+            if (condition.test(player)) {
+                spies.add(player);
+            }
+        }
+
+        return spies;
     }
 
     private void sendToPlayer(RoseMessage message, RosePlayer receiver, MessageDirection direction, String format, String discordId) {
@@ -157,7 +177,6 @@ public class RoseChatChannel extends Channel {
             }
         }
 
-        List<UUID> channelSpies = api.getPlayerDataManager().getChannelSpies();
         List<Player> currentSpies = new ArrayList<>();
 
         // Use the settings to decide who to send the message to.
@@ -179,16 +198,9 @@ public class RoseChatChannel extends Channel {
                 }
 
                 // Allow spies who are not in the same world to see the message.
-                for (UUID uuid : channelSpies) {
-                    if (message.getSender().getUUID().equals(uuid)) continue;
-
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null) continue;
-                    if (!player.getWorld().getName().equals(senderLocation.getWorld().getName())
-                            || (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) >=this.radius)) {
-                        currentSpies.add(player);
-                    }
-                }
+                Predicate<Player> condition = player -> !player.getWorld().getName().equals(senderLocation.getWorld().getName())
+                        || (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) >= this.radius);
+                currentSpies.addAll(this.getSpies(message, condition));
             } else if (!this.worlds.isEmpty()){
                 // Visible Anywhere + World - Send to players in the world, without them being in the channel.
                 for (String worldStr : this.worlds) {
@@ -204,14 +216,8 @@ public class RoseChatChannel extends Channel {
                 }
 
                 // Allow spies who are not in the same world to see the message.
-                for (UUID uuid : channelSpies) {
-                    if (message.getSender().getUUID().equals(uuid)) continue;
-
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null) continue;
-                    if (!this.worlds.contains(player.getWorld().getName()))
-                        currentSpies.add(player);
-                }
+                Predicate<Player> condition = player -> !this.worlds.contains(player.getWorld().getName());
+                currentSpies.addAll(this.getSpies(message, condition));
             } else {
                 // ONLY Visible Anywhere Enabled - Send to all players.
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -248,17 +254,10 @@ public class RoseChatChannel extends Channel {
                 }
 
                 // Allow spies to see the message if they aren't in the world or distance.
-                for (UUID uuid : channelSpies) {
-                    if (message.getSender().getUUID().equals(uuid)) continue;
-
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null) continue;
-
-                    if (!this.members.contains(uuid) || (this.members.contains(uuid) && (!player.getWorld().getName().equals(senderLocation.getWorld().getName())
-                            || (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) > this.radius)))) {
-                        currentSpies.add(player);
-                    }
-                }
+                Predicate<Player> condition = player -> !this.members.contains(player.getUniqueId()) ||
+                        (this.members.contains(player.getUniqueId()) && (!player.getWorld().getName().equals(senderLocation.getWorld().getName())
+                        || (player.getWorld().getName().equals(senderLocation.getWorld().getName()) && player.getLocation().distance(senderLocation) > this.radius)));
+                currentSpies.addAll(this.getSpies(message, condition));
             } else if (!this.worlds.isEmpty()) {
                 // Not Visible Anywhere + World - Player must be in the channel AND the world to see the message
                 for (UUID uuid : this.getMembers(message.getSender())) {
@@ -272,15 +271,10 @@ public class RoseChatChannel extends Channel {
                     }
                 }
 
-                for (UUID uuid : channelSpies) {
-                    if (message.getSender().getUUID().equals(uuid)) continue;
 
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null) continue;
-
-                    if (!this.members.contains(uuid) || (this.members.contains(uuid) && !this.worlds.contains(player.getWorld().getName())))
-                        currentSpies.add(player);
-                }
+                Predicate<Player> condition = player -> !this.members.contains(player.getUniqueId())
+                        || (this.members.contains(player.getUniqueId()) && !this.worlds.contains(player.getWorld().getName()));
+                currentSpies.addAll(this.getSpies(message, condition));
             } else {
                 // Not Visible Anywhere - Send to the members
                 for (UUID uuid : this.getMembers(message.getSender())) {
@@ -292,15 +286,8 @@ public class RoseChatChannel extends Channel {
                     this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
                 }
 
-                for (UUID uuid: channelSpies) {
-                    if (message.getSender().getUUID().equals(uuid)) continue;
-
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null) continue;
-
-                    if (!this.members.contains(uuid))
-                        currentSpies.add(player);
-                }
+                Predicate<Player> condition = player -> !this.members.contains(player.getUniqueId());
+                currentSpies.addAll(this.getSpies(message, condition));
             }
 
             // Send the message to all the spies who will not receive the message by being in the channel.

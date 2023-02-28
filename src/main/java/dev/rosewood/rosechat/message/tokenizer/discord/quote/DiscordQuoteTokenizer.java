@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.quote;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -12,7 +13,7 @@ public class DiscordQuoteTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.quote")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.quote")) return null;
         if (!ChatColor.stripColor(HexUtils.colorify(roseMessage.getMessage())).startsWith("> ")) return null;
         if (!input.startsWith("> ")) return null;
         String content = input.substring(2);

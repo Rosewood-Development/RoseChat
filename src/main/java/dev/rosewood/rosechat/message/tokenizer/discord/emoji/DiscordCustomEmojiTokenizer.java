@@ -13,7 +13,7 @@ public class DiscordCustomEmojiTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.emoji")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.emoji"))
         if (!input.startsWith(":")) return null;
         Matcher matcher = MessageUtils.EMOJI_PATTERN.matcher(input);
         if (matcher.find()) {

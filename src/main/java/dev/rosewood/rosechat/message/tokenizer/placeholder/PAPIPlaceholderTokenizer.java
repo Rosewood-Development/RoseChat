@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -27,7 +28,9 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             if (matcher.start() != 0) return null;
             String placeholder = input.substring(1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
-            if (!this.hasExtendedPermission(roseMessage, ignorePermissions, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission)) return null;
+            if (!ignorePermissions
+                    && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
+                return null;
 
             String originalContent = input.substring(matcher.start(), matcher.end());
 

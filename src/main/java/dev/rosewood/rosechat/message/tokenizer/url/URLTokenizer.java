@@ -18,7 +18,8 @@ public class URLTokenizer implements Tokenizer<Token> {
             Matcher matcher = MessageUtils.URL_MARKDOWN_PATTERN.matcher(input);
             if (matcher.find()) {
                 if (matcher.start() != 0) return null;
-                if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.url")) return null;
+                if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.url"))
+                    return null;
 
                 String originalContent = input.substring(matcher.start(), matcher.end());
                 String content = matcher.group(1);

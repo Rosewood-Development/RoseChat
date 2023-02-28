@@ -35,10 +35,7 @@ import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.tag.TagTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.url.URLTokenizer;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Tokenizers {

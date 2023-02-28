@@ -17,7 +17,7 @@ public class FromDiscordChannelTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.channel")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.discordchannel"))
         if (!input.startsWith("<")) return null;
 
         Matcher matcher = MessageUtils.DISCORD_CHANNEL_PATTERN.matcher(input);

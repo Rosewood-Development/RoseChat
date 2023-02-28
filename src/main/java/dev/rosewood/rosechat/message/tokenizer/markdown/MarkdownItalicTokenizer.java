@@ -12,7 +12,7 @@ public class MarkdownItalicTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.italic")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.italic")) return null;
         if (!input.startsWith("*")) return null;
 
         Matcher matcher = MessageUtils.ITALIC_MARKDOWN_PATTERN.matcher(input);

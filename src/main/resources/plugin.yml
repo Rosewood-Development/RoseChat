@@ -133,6 +133,14 @@ permissions:
       rosechat.nickname: true
       rosechat.ignore: true
       rosechat.deletemessages: true
+      rosechat.discordchannel: true
+      rosechat.code: true
+      rosechat.multicode: true
+      rosechat.quote: true
+      rosechat.bold: true
+      rosechat.italic: true
+      rosechat.strikethrough: true
+      rosechat.underline: true
   rosechat.basecommand:
     description: Allows using the rc command.
     default: true
@@ -399,3 +407,27 @@ permissions:
       rosechat.deletemessages.self: true
       rosechat.deletemessages.others: true
       rosechat.deletemessages.see: true
+    rosechat.discordchannel:
+      description: Allows linking to discord channels.
+      default: op
+    rosechat.code:
+      description: Allows using code markdown.
+      default: op
+    rosechat.multicode:
+      description: Allows using multicode markdown.
+      default: op
+    rosechat.quote:
+      description: Allows using quote markdown.
+      default: op
+    rosechat.bold:
+      description: Allows using bold markdown.
+      default: op
+    rosechat.italic:
+      description: Allows using italic markdown.
+      default: op
+    rosechat.strikethrough:
+      description: Allows using strikethrough markdown.
+      default: op
+    rosechat.underline:
+      description: Allows using underline markdown.
+      default: op

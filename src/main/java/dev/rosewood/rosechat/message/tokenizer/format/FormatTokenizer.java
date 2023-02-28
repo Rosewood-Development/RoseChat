@@ -17,7 +17,7 @@ public class FormatTokenizer implements Tokenizer<FormatToken> {
             String content = input.substring(0, matcher.end());
             char formatCharacter = content.charAt(1);
             char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
-            boolean hasPermission = this.hasPermission(roseMessage, ignorePermissions, this.getPermissionForFormat(formatCharacterLowercase));
+            boolean hasPermission = ignorePermissions || MessageUtils.hasTokenPermission(roseMessage, this.getPermissionForFormat(formatCharacterLowercase));
             return hasPermission ? new FormatToken(content, ChatColor.getByChar(formatCharacterLowercase), Character.isLowerCase(formatCharacter)) : new FormatToken(content, null);
         }
         return null;

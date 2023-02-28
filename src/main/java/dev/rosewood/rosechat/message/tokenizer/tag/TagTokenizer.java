@@ -23,7 +23,9 @@ public class TagTokenizer implements Tokenizer<Token> {
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
         for (Tag tag : RoseChatAPI.getInstance().getTags()) {
             if (input.startsWith(tag.getPrefix())) {
-                if (!this.hasExtendedPermission(roseMessage, ignorePermissions, "rosechat.tags", "rosechat.tag." + tag.getId())) return null;
+                if (!ignorePermissions
+                        && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.tags", "rosechat.tag." + tag.getId()))
+                    return null;
 
                 if (tag.getSuffix() != null) {
                     if (!input.contains(tag.getSuffix())) continue;

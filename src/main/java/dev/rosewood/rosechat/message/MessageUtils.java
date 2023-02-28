@@ -468,4 +468,39 @@ public class MessageUtils {
         }
     }
 
+    /**
+     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'.
+     * @return True if the sender has the permission
+     */
+    public static boolean hasTokenPermission(RoseMessage message, String permission) {
+        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
+        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE) return true;
+
+        // Gets the full permission, e.g. rosechat.emoji.channel.global
+        String fullPermission = permission + "." + message.getLocationPermission();
+
+        return message.getSender().hasPermission(fullPermission)
+                || message.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
+                || message.getSender().getIgnoredPermissions().contains("*");
+    }
+
+    /**
+     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * Checks against the first permission, for example, 'rosechat.emojis', and extended permissions such as 'rosechat.emoji.smile'.
+     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'
+     * @param extendedPermission The extended permission, should not contain the location information. For example, 'rosechat.emoji.smile'.
+     * @return True if the sender has permission.
+     */
+    public static boolean hasExtendedTokenPermission(RoseMessage message, String permission, String extendedPermission) {
+        // The sender will not have an extended permission if they do not have the base permission.
+        if (!hasTokenPermission(message, permission)) return false;
+
+        return message.getSender().hasPermission(extendedPermission)
+                || message.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
+                || message.getSender().getIgnoredPermissions().contains("*");
+    }
+
 }

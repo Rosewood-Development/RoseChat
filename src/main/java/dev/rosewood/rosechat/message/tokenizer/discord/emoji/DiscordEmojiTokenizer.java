@@ -24,7 +24,9 @@ public class DiscordEmojiTokenizer implements Tokenizer<Token> {
 
             for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
                 if (!emoji.getText().equalsIgnoreCase(content)) continue;
-                if (!this.hasExtendedPermission(roseMessage, ignorePermissions, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) return null;
+                if (!ignorePermissions && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
+                    return null;
+
                 content = emoji.getReplacement();
 
                 return new Token(new Token.TokenSettings(originalContent).content(content).font(emoji.getFont())

@@ -40,8 +40,9 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
                 } catch (NumberFormatException ignored) {}
             }
 
-            return this.hasPermission(roseMessage, ignorePermissions || MessageUtils.hasDefaultColor(input, roseMessage), "rosechat.rainbow") ?
-                    new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness, speed) : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f, speed);
+            return ignorePermissions || MessageUtils.hasDefaultColor(input, roseMessage) || MessageUtils.hasTokenPermission(roseMessage, "rosechat.rainbow") ?
+                    new RainbowToken(input.substring(matcher.start(), matcher.end()), saturation, brightness, speed)
+                    : new RainbowToken(input.substring(matcher.start(), matcher.end()), 0.0f, 0.0f, speed);
         }
 
         return null;

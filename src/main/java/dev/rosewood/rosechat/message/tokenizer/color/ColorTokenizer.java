@@ -25,28 +25,32 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
 
         // Run this first since it can contain legacy tokens
         ColorToken spigotHexToken = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX, input);
-        if (spigotHexToken != null) return this.hasPermission(roseMessage, ignorePermissions || isDefaultColor, "rosechat.color") ?
-                spigotHexToken : new ColorToken(spigotHexToken.getOriginalContent(), null);
+        if (spigotHexToken != null)
+            return (ignorePermissions || isDefaultColor || MessageUtils.hasTokenPermission(roseMessage, "rosechat.color")) ?
+                    spigotHexToken : new ColorToken(spigotHexToken.getOriginalContent(), null);
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) {
             if (ConfigurationManager.Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()) {
                 char colorCode = legacyToken.getOriginalContent().charAt(1);
-                return this.hasPermission(roseMessage, ignorePermissions || isDefaultColor, "rosechat.color") &&
-                        this.hasPermission(roseMessage, ignorePermissions || isDefaultColor, "rosechat." + ChatColor.getByChar(Character.toLowerCase(colorCode)).getName().toLowerCase()) ?
+
+                return ignorePermissions || isDefaultColor || (MessageUtils.hasTokenPermission(roseMessage, "rosechat.color")
+                        && MessageUtils.hasTokenPermission(roseMessage, "rosechat." + ChatColor.getByChar(Character.toLowerCase(colorCode)).getName().toLowerCase())) ?
                         legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
             } else {
-                return this.hasPermission(roseMessage, ignorePermissions || isDefaultColor, "rosechat.color") ?
+                return ignorePermissions || isDefaultColor || MessageUtils.hasTokenPermission(roseMessage, "rosechat.color") ?
                         legacyToken : new ColorToken(legacyToken.getOriginalContent(), null);
             }
         }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
-        if (hexToken != null) return this.hasPermission(roseMessage, ignorePermissions || isDefaultColor, "rosechat.hex") ?
-                hexToken : new ColorToken(hexToken.getOriginalContent(), null);
+        if (hexToken != null)
+            return ignorePermissions || isDefaultColor || MessageUtils.hasTokenPermission(roseMessage, "rosechat.hex") ?
+                    hexToken : new ColorToken(hexToken.getOriginalContent(), null);
 
         ColorToken spigotHexTokenParsed = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX_PARSED, input);
-        if (spigotHexTokenParsed != null) return spigotHexTokenParsed; // Bypass permission checks since players can't input this themselves
+        if (spigotHexTokenParsed != null)
+            return spigotHexTokenParsed; // Bypass permission checks since players can't input this themselves
 
         return null;
     }

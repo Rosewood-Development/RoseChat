@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -14,7 +15,8 @@ public class EmojiTokenizer implements Tokenizer<Token> {
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
         for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
             if (input.startsWith(emoji.getText())) {
-                if (!this.hasExtendedPermission(roseMessage, ignorePermissions, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) return null;
+                if (!ignorePermissions && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.emojis", "rosechat.emoji." + emoji.getId()))
+                    return null;
 
                 PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(roseMessage.getSender().getUUID());
                 if (playerData != null && !playerData.hasEmojis()) continue;

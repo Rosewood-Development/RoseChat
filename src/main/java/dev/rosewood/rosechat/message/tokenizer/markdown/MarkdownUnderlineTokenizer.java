@@ -12,7 +12,7 @@ public class MarkdownUnderlineTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!this.hasPermission(roseMessage, ignorePermissions, "rosechat.underline")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.underline")) return null;
         if (!input.startsWith("__")) return null;
 
         Matcher matcher = MessageUtils.UNDERLINE_MARKDOWN_PATTERN.matcher(input);

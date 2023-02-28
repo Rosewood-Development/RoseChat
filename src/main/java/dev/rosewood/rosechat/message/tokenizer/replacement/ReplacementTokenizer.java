@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -13,7 +14,9 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !input.startsWith(replacement.getText())) continue;
-            if (!this.hasExtendedPermission(roseMessage, ignorePermissions, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) return null;
+            if (!ignorePermissions
+                    && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.replacements", "rosechat.replacment." + replacement.getId()))
+                return null;
             String originalContent = input.substring(0, replacement.getText().length());
             String content = replacement.getReplacement();
 
