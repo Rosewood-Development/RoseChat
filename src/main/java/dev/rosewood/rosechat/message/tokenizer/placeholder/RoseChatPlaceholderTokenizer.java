@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
 
-    private static final Pattern RC_PATTERN = Pattern.compile("\\{(.*?)\\}");
+    public static final Pattern RC_PATTERN = Pattern.compile("\\{(.*?)\\}");
 
     @Override
     public Token tokenize(RoseMessage messageWrapper, RosePlayer viewer, String input, boolean ignorePermissions) {
@@ -46,6 +46,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
 
             return new Token(tokenSettings);
         }
+
         return null;
     }
 

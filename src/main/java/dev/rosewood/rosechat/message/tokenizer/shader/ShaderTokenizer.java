@@ -18,7 +18,7 @@ public class ShaderTokenizer implements Tokenizer<Token> {
             String match = input.substring(0, matcher.end());
             if (input.startsWith(match)) {
                 if (!Setting.CORE_SHADER_COLORS.getStringList().contains(match)) return null;
-                String freeHex = this.findFreeHex(match.substring(1));
+                String freeHex = findFreeHex(match.substring(1));
 
                 return new Token(new Token.TokenSettings(match).content("#" + freeHex).ignoreTokenizer(this));
             }
@@ -27,7 +27,7 @@ public class ShaderTokenizer implements Tokenizer<Token> {
         return null;
     }
 
-    private String findFreeHex(String hex) {
+    public static String findFreeHex(String hex) {
         String nextHex = Integer.toHexString(Integer.parseInt(hex, 16) - 1);
         if (Setting.CORE_SHADER_COLORS.getStringList().stream().anyMatch(x -> x.equalsIgnoreCase("#" + nextHex)))
             return findFreeHex(nextHex);

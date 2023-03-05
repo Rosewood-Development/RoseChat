@@ -49,6 +49,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
                 tokenSettings.ignoreTokenizer(this);
             return new Token(tokenSettings);
         }
+
         return null;
     }
 

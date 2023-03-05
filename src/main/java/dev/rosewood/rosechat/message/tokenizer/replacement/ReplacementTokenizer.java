@@ -15,7 +15,7 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !input.startsWith(replacement.getText())) continue;
             if (!ignorePermissions
-                    && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.replacements", "rosechat.replacment." + replacement.getId()))
+                    && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
             String originalContent = input.substring(0, replacement.getText().length());
             String content = replacement.getReplacement();

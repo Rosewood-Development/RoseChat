@@ -28,7 +28,7 @@ public class RoseChatParser implements MessageParser {
         if (format == null || !format.contains("{message}")) {
             if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), true,
+                        new MessageTokenizer(message, receiver, message.getMessage(), false,
                                 Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
@@ -37,7 +37,7 @@ public class RoseChatParser implements MessageParser {
                 ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), true,
+                        new MessageTokenizer(message, receiver, message.getMessage(), false,
                                 Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.DEFAULT_BUNDLE)
                                 .toComponents(),
@@ -53,11 +53,23 @@ public class RoseChatParser implements MessageParser {
         String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
         if (before != null && !before.isEmpty()) {
-            componentBuilder.append(
-                    new MessageTokenizer(message, receiver, before, true,
-                            Tokenizers.DEFAULT_BUNDLE)
-                            .toComponents(),
-            ComponentBuilder.FormatRetention.FORMATTING);
+            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+                componentBuilder.append(
+                        new MessageTokenizer(message, receiver, before, true,
+                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+                                Tokenizers.MARKDOWN_BUNDLE,
+                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
+                                Tokenizers.DEFAULT_BUNDLE)
+                                .toComponents(),
+                        ComponentBuilder.FormatRetention.FORMATTING);
+            } else {
+                componentBuilder.append(
+                        new MessageTokenizer(message, receiver, before, true,
+                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+                                Tokenizers.DEFAULT_BUNDLE)
+                                .toComponents(),
+                        ComponentBuilder.FormatRetention.FORMATTING);
+            }
         }
 
         if (format.contains("{message}")) {
@@ -83,11 +95,23 @@ public class RoseChatParser implements MessageParser {
         }
 
         if (after != null && !after.isEmpty()) {
-            componentBuilder.append(
-                    new MessageTokenizer(message, receiver, after, true,
-                            Tokenizers.DEFAULT_BUNDLE)
-                            .toComponents(),
-                    ComponentBuilder.FormatRetention.FORMATTING);
+            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+                componentBuilder.append(
+                        new MessageTokenizer(message, receiver, after, true,
+                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+                                Tokenizers.MARKDOWN_BUNDLE,
+                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
+                                Tokenizers.DEFAULT_BUNDLE)
+                                .toComponents(),
+                        ComponentBuilder.FormatRetention.FORMATTING);
+            } else {
+                componentBuilder.append(
+                        new MessageTokenizer(message, receiver, after, true,
+                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+                                Tokenizers.DEFAULT_BUNDLE)
+                                .toComponents(),
+                        ComponentBuilder.FormatRetention.FORMATTING);
+            }
         }
 
         return componentBuilder.create();

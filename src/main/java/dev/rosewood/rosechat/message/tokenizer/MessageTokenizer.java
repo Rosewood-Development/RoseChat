@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.DebugManager;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
@@ -56,19 +55,16 @@ public class MessageTokenizer {
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
         this.debugManager.addMessage(() -> "Tokenizing New Message: " + message);
-        this.tokens.addAll(this.tokenizeContent(parseReplacements(message), true, 0, null));
+        this.tokens.addAll(this.tokenizeContent(parseReplacements(message, ignorePermissions), true, 0, null));
     }
 
     // Parse replacements before the tokenizing to allow some replacements, such as custom colours, to work properly.
-    private String parseReplacements(String message) {
+    private String parseReplacements(String message, boolean ignorePermissions) {
         this.debugManager.addMessage(() -> "Parsing Replacements...");
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
             if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
-            String groupPermission = this.roseMessage.getChannel() == null ? "" : "." + this.roseMessage.getLocationPermission();
-            if (this.roseMessage.getLocation() != MessageLocation.NONE
-                    && !this.roseMessage.getSender().hasPermission("rosechat.replacements." + this.roseMessage.getLocation().toString().toLowerCase() + groupPermission)
-                    || !this.roseMessage.getSender().hasPermission("rosechat.replacement." + replacement.getId())) continue;
+            if (!ignorePermissions && !MessageUtils.hasExtendedTokenPermission(this.roseMessage, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) continue;
             message = message.replace(replacement.getText(), replacement.getReplacement());
         }
 
@@ -76,6 +72,7 @@ public class MessageTokenizer {
     }
 
     private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
+        content = this.parseReplacements(content, parent != null);
         this.debugManager.addMessage(() -> "Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
 
         // Check cache first
