@@ -31,7 +31,7 @@ public class RenameGroupCommand extends AbstractCommand {
         }*/
 
         String name = getAllArgs(1, args);
-        if (!MessageUtils.canColor(sender, name, "group")) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
         RosePlayer rosePlayer = new RosePlayer(sender);
        // RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();

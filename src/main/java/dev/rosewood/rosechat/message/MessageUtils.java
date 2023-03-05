@@ -286,8 +286,14 @@ public class MessageUtils {
         });
 
         // Update the player's display name if the setting is enabled.
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer() && !sender.getDisplayName().equals(sender.getNickname()))
-            NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
+                nickname.parse(sender, null);
+
+                if (sender.getPlayerData().getNickname() != null) NicknameCommand.setDisplayName(sender, nickname);
+            });
+        }
     }
 
     /**
@@ -322,12 +328,12 @@ public class MessageUtils {
 
     /**
      * Checks if a message can be coloured by the given sender.
-     * @param sender The {@link CommandSender} sender who is sending the string.
+     * @param sender The {@link RosePlayer} who is sending the string.
      * @param str The string to check.
      * @param permissionArea The location, from a {@link MessageLocation} as a string.
      * @return True if the message can be colored.
      */
-    public static boolean canColor(CommandSender sender, String str, String permissionArea) {
+    public static boolean canColor(RosePlayer sender, String str, String permissionArea) {
         Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
         Matcher formatMatcher = VALID_LEGACY_REGEX_FORMATTING.matcher(str);
         Matcher hexMatcher = HEX_REGEX.matcher(str);
@@ -346,7 +352,7 @@ public class MessageUtils {
         boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + permissionArea);
 
         if (!(canColor && canMagic && canFormat && canHex && canGradient && canRainbow)) {
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "no-permission");
+            sender.sendLocaleMessage("no-permission");
             return false;
         }
 
@@ -476,7 +482,7 @@ public class MessageUtils {
      */
     public static boolean hasTokenPermission(RoseMessage message, String permission) {
         // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE) return true;
+        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE || message.getSender().isConsole()) return true;
 
         // Gets the full permission, e.g. rosechat.emoji.channel.global
         String fullPermission = permission + "." + message.getLocationPermission();

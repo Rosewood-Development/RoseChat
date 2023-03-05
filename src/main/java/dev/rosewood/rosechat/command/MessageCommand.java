@@ -90,20 +90,20 @@ public class MessageCommand extends AbstractCommand {
 
         if (this.getAPI().isBungee()) {
             this.getAPI().getBungeeManager().sendUpdateReply(sender.getName(), target);
-        } else {
-            if (!targetPlayer.isOnline()) return;
-            Player player = targetPlayer.getPlayer();
-
-            PlayerData targetData = this.getAPI().getPlayerData(player.getUniqueId());
-            if (targetData == null) return;
-
-            if (targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
-                player.playSound(player.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
-            }
-
-            targetData.setReplyTo(sender.getName());
-            targetData.save();
         }
+
+        if (!targetPlayer.isOnline()) return;
+        Player player = targetPlayer.getPlayer();
+
+        PlayerData targetData = this.getAPI().getPlayerData(player.getUniqueId());
+        if (targetData == null) return;
+
+        if (targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
+            player.playSound(player.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
+        }
+
+        targetData.setReplyTo(sender.getName());
+        targetData.save();
     }
 
     @Override

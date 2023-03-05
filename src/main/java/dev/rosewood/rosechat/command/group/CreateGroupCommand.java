@@ -37,7 +37,7 @@ public class CreateGroupCommand extends AbstractCommand {
 
         String name = getAllArgs(1, args);
 
-        if (!MessageUtils.canColor(sender, name, "group")) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
         RosePlayer rosePlayer = new RosePlayer(player);
        // RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, null, name).filterLanguage();

@@ -6,8 +6,10 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -69,8 +71,14 @@ public class ChatListener implements Listener {
             channel.send(sender, event.getMessage());
 
             // Update the player's display name if the setting is enabled.
-            if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && !sender.getDisplayName().equals(data.getNickname()))
-                NicknameCommand.setDisplayName(sender.asPlayer(), data.getNickname());
+            if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
+                RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                    RoseMessage message = new RoseMessage(sender, MessageLocation.NICKNAME, data.getNickname());
+                    message.parse(sender, null);
+
+                    if (data.getNickname() != null) NicknameCommand.setDisplayName(sender, message);
+                });
+            }
         });
     }
 
