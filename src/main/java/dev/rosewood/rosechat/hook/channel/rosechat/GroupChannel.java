@@ -23,7 +23,7 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public List<UUID> getMembers(RosePlayer sender) {
+    public List<UUID> getMembers() {
         return null;
     }
 

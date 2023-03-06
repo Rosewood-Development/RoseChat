@@ -1,17 +1,13 @@
 package dev.rosewood.rosechat.hook.channel.fabledskyblock;
 
-import com.songoda.skyblock.api.SkyBlockAPI;
-import com.songoda.skyblock.api.island.Island;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
-import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class FabledSkyblockChannel extends RoseChatChannel {
 
@@ -28,15 +24,11 @@ public class FabledSkyblockChannel extends RoseChatChannel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message) {
-        for (UUID uuid : this.getMembers(sender)) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-            player.sendMessage("[Team] " + message);
-        }
+    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        return super.getVisibleAnywhereRecipients(sender, world);
     }
 
-    @Override
+    /*@Override
     public List<UUID> getMembers(RosePlayer sender) {
         Island island = SkyBlockAPI.getIslandManager().getIsland(sender.asPlayer());
         if (island == null) return new ArrayList<>();
@@ -44,9 +36,13 @@ public class FabledSkyblockChannel extends RoseChatChannel {
         return this.channelType == FabledSkyblockChannelType.TEAM ? new ArrayList<>(island.getCoopPlayers().keySet())
                 : SkyBlockAPI.getImplementation().getIslandManager().getPlayersAtIsland(island.getIsland()).stream().map(Player::getUniqueId).collect(Collectors.toList());
 
+    }*/
+
+
+    public FabledSkyblockChannelType getChannelType() {
+        return channelType;
     }
 
-    // Temporary copy for any other settings that need to be added later
     public enum FabledSkyblockChannelType {
 
         LOCAL,

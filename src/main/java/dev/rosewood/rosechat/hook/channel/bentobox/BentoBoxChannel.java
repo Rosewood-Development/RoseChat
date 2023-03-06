@@ -3,17 +3,10 @@ package dev.rosewood.rosechat.hook.channel.bentobox;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import world.bentobox.bentobox.BentoBox;
-import world.bentobox.bentobox.database.objects.Island;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BentoBoxChannel extends RoseChatChannel {
 
@@ -30,15 +23,11 @@ public class BentoBoxChannel extends RoseChatChannel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message) {
-        for (UUID uuid : this.getMembers(sender)) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-            player.sendMessage("[Team] " + message);
-        }
+    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        return super.getVisibleAnywhereRecipients(sender, world);
     }
 
-    @Override
+    /*@Override
     public List<UUID> getMembers(RosePlayer sender) {
         World world = sender.asPlayer().getWorld();
         Island island = BentoBox.getInstance().getIslandsManager().getIsland(world, sender.getUUID());
@@ -48,6 +37,10 @@ public class BentoBoxChannel extends RoseChatChannel {
         return this.channelType == BentoBoxChannelType.TEAM ?
                 new ArrayList<>(island.getMemberSet()) :
                 island.getPlayersOnIsland().stream().map(Entity::getUniqueId).collect(Collectors.toList());
+    }*/
+
+    public BentoBoxChannelType getChannelType() {
+        return channelType;
     }
 
     public enum BentoBoxChannelType {

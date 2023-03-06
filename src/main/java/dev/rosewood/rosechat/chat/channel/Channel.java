@@ -56,11 +56,11 @@ public abstract class Channel {
      * Called when the player joins the server.
      * This is used to check if the player should join the channel when logging in
      * @param player The {@link Player} who is joining the channel.
-     * @return True if the player can join.
+     * @return True, if the player can join.
      */
     public boolean onLogin(Player player) {
         // No default implementation.
-        return true;
+        return false;
     }
 
     /**
@@ -69,24 +69,24 @@ public abstract class Channel {
      * @param player The {@link Player} who is changing world.
      * @param from The {@link World} that the player was in.
      * @param to The {@link World} that the player is going to.
-     * @return True if the player should join the channel when entering the world.
+     * @return True, if the player should join the channel when entering the world.
      */
     public boolean onWorldJoin(Player player, World from, World to) {
         // No default implementation.
-        return true;
+        return false;
     }
 
     /**
      * Called when the player leaves a world.
-     * This is used to check if the player should join the channel when changing world.
+     * This is used to check if the player should leave the channel when changing world.
      * @param player The {@link Player} who is changing world.
      * @param from The {@link World} that the player was in.
      * @param to The {@link World} that the player is going to.
-     * @return True if the player should leave the channel when leaving the world.
+     * @return True, if the player should leave the channel when leaving the world.
      */
     public boolean onWorldLeave(Player player, World from, World to) {
         // No default implementation.
-        return true;
+        return false;
     }
 
     /**
@@ -144,12 +144,12 @@ public abstract class Channel {
 
     /**
      * Returns a list of members for the given channel.
+     * These are the players who have joined the channel, not all the players receiving the message.
      * Use {@link #members} if a player does not need to be specified.
      * A player should be specified when getting a team from a supported plugin.
-     * @param sender The {@link RosePlayer} sending the message.
      * @return A list of UUIDs for the members of the channel.
      */
-    public abstract List<UUID> getMembers(RosePlayer sender);
+    public abstract List<UUID> getMembers();
 
     /**
      * @return The id of the channel.
@@ -164,9 +164,16 @@ public abstract class Channel {
     /**
      * Called when a player uses a command to join the channel.
      * @param player The {@link Player} using the command.
-     * @return True if the player can join by using the command.
+     * @return True, if the player can join by using the command.
      */
     public abstract boolean canJoinByCommand(Player player);
+
+    /**
+     * @return The amount of members in the channel.
+     */
+    public int getMemberCount(RosePlayer sender) {
+        return this.members.size();
+    }
 
     /**
      * @param sender The {@link RosePlayer} getting the info.
@@ -179,8 +186,8 @@ public abstract class Channel {
         return StringPlaceholders.builder()
                 .addPlaceholder("default", this.isDefaultChannel() ? trueValue : falseValue)
                 .addPlaceholder("muted", this.isMuted() ? trueValue : falseValue)
-                .addPlaceholder("members", this.getMembers(sender).isEmpty() ? nullValue : this.getMembers(sender).size())
-                .addPlaceholder("players", this.getMembers(sender).isEmpty() ? nullValue : this.getMembers(sender).size())
+                .addPlaceholder("members", this.getMemberCount(sender))
+                .addPlaceholder("players", this.getMemberCount(sender))
                 .addPlaceholder("id", this.getId())
                 .addPlaceholder("format", this.getFormat() == null ? nullValue : this.getFormat())
                 .addPlaceholder("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());

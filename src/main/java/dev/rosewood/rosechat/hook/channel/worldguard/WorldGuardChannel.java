@@ -10,7 +10,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -18,11 +21,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class WorldGuardChannel extends RoseChatChannel {
 
-    private final WorldGuardPlatform worldGuard;
     private final RegionContainer regionContainer;
     private List<String> whitelist;
     private List<String> blacklist;
@@ -30,8 +34,8 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     public WorldGuardChannel(ChannelProvider provider) {
         super(provider);
-        this.worldGuard = WorldGuard.getInstance().getPlatform();
-        this.regionContainer = this.worldGuard.getRegionContainer();
+        WorldGuardPlatform worldGuard = WorldGuard.getInstance().getPlatform();
+        this.regionContainer = worldGuard.getRegionContainer();
     }
 
     @Override
@@ -42,8 +46,9 @@ public class WorldGuardChannel extends RoseChatChannel {
         this.useMembers = config.getBoolean("use-members") && config.getBoolean("use-members");
     }
 
-    @Override
-    public boolean onLogin(Player player) {
+    public boolean onEnterArea(Player player) {
+        if (!this.autoJoin) return false;
+
         Location location = player.getLocation();
         if (location.getWorld() == null) return false;
 
@@ -61,60 +66,113 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message) {
-        for (UUID uuid : this.getMembers(sender)) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-            player.sendMessage("[Region] " + message);
-        }
+    public boolean onLogin(Player player) {
+        return this.onEnterArea(player);
     }
 
-    // TODO: Sudo player needs a world
     @Override
-    public List<UUID> getMembers(RosePlayer sender) {
-        List<UUID> members = new ArrayList<>();
-        World world = sender.asPlayer().getWorld();
+    public boolean onWorldJoin(Player player, World from, World to) {
+        return this.onEnterArea(player);
+    }
 
-        // There can only be a whitelist OR a blacklist.
-        // The whitelist contains regions to send the message to, all other regions will not receive the message.
-        // The blacklist contains regions to NOT send the message to, all other regions will receive the message.
-        // There's no point in looping through the blacklist if there is already a whitelist.
-        boolean isBlacklist = this.whitelist.isEmpty();
-        List<ProtectedRegion> regions = new ArrayList<>();
-        for (String regionName : (isBlacklist ? this.blacklist : this.whitelist)) {
-            RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(world));
+    @Override
+    public boolean onWorldLeave(Player player, World from, World to) {
+        // Always leave the channel if auto-join is enabled.
+        return autoJoin;
+    }
 
-            if (regionManager == null) return new ArrayList<>();
-            ProtectedRegion region = regionManager.getRegion(regionName.toLowerCase());
-            if (region == null) continue;
-            else regions.add(region);
+    private Set<ProtectedRegion> getPlayerRegion(Player player) {
+        RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
+        if (regionManager == null) return null;
+
+        return regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())).getRegions();
+    }
+
+    private boolean isInWhitelistedRegion(Player player) {
+        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
+        if (regionSet == null) return false;
+
+        for (ProtectedRegion region : regionSet) {
+            if (this.whitelist.contains(region.getId())) return true;
         }
 
-        // Use the region members if the setting is enabled.
-        if (this.useMembers) {
-            for (ProtectedRegion region : regions) {
-                members.addAll(region.getMembers().getUniqueIds());
+        return false;
+    }
+
+    private boolean isInBlacklistedRegion(Player player) {
+        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
+        if (regionSet == null) return false;
+
+        for (ProtectedRegion region : regionSet) {
+            if (this.blacklist.contains(region.getId())) return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        List<Player> recipients = new ArrayList<>();
+
+        if (this.useMembers && sender.isPlayer()) {
+            Player player = sender.asPlayer();
+            if (!this.isInWhitelistedRegion(player)) return recipients;
+
+            for (String regionStr : this.whitelist) {
+                RegionManager manager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
+                if (manager == null) return recipients;
+
+                ProtectedRegion region = manager.getRegion(regionStr);
+                if (region == null) return recipients;
+
+                for (UUID memberUUID : region.getMembers().getUniqueIds()) {
+                    Player member = Bukkit.getPlayer(memberUUID);
+                    if (member != null) recipients.add(member);
+                }
             }
 
-            return members;
+            return recipients;
         }
 
-        // Loop through the players in the world, if their position is in the region - send!
-        for (Player player : world.getPlayers()) {
-            Location location = player.getLocation();
+        if (!this.whitelist.isEmpty()) {
+            // If using a whitelist, send to all players in the region.
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (this.isInWhitelistedRegion(player)) {
+                    recipients.add(player);
+                }
+            }
 
-            for (ProtectedRegion region : regions) {
-                if (isBlacklist) {
-                    if (region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) continue;
-                    members.add(player.getUniqueId());
-                } else {
-                    if (!region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) continue;
-                    members.add(player.getUniqueId());
+        } else {
+            // If using a blacklist, send to everyone EXCEPT players in the region.
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!this.isInBlacklistedRegion(player)) {
+                    recipients.add(player);
                 }
             }
         }
 
-        return members;
+        return recipients;
+    }
+
+    @Override
+    public int getMemberCount(RosePlayer sender) {
+        int count = this.whitelist.isEmpty() ? Bukkit.getOnlinePlayers().size() : 0;
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!this.whitelist.isEmpty()) {
+                if (this.isInWhitelistedRegion(player)) count++;
+            } else {
+                if (this.isInBlacklistedRegion(player)) count--;
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public boolean canJoinByCommand(Player player) {
+        return (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.isInWhitelistedRegion(player))
+                || player.hasPermission("rosechat.channelbypass");
     }
 
 }

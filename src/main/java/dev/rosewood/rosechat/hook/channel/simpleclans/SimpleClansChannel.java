@@ -1,17 +1,12 @@
 package dev.rosewood.rosechat.hook.channel.simpleclans;
 
-import com.gmail.nossr50.api.PartyAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SimpleClansChannel extends RoseChatChannel {
 
@@ -29,15 +24,11 @@ public class SimpleClansChannel extends RoseChatChannel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message) {
-        for (UUID uuid : this.getMembers(sender)) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-            player.sendMessage("[Clan] " + message);
-        }
+    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        return super.getVisibleAnywhereRecipients(sender, world);
     }
 
-    @Override
+    /*@Override
     public List<UUID> getMembers(RosePlayer sender) {
         List<UUID> members = new ArrayList<>();
         Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(sender.getUUID());
@@ -50,7 +41,7 @@ public class SimpleClansChannel extends RoseChatChannel {
         }
 
         return new ArrayList<>(PartyAPI.getMembersMap(sender.asPlayer()).keySet());
-    }
+    }*/
 
     public SimpleClansChannelType getChannelType() {
         return this.channelType;
