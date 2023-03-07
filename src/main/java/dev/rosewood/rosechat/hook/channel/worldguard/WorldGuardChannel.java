@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -44,6 +45,7 @@ public class WorldGuardChannel extends RoseChatChannel {
         this.whitelist = config.contains("whitelist") ? config.getStringList("whitelist") : new ArrayList<>();
         this.blacklist = config.contains("blacklist") ? config.getStringList("blacklist") : new ArrayList<>();
         this.useMembers = config.getBoolean("use-members") && config.getBoolean("use-members");
+        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
     }
 
     public boolean onEnterArea(Player player) {
@@ -111,7 +113,12 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     @Override
-    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+    public List<Player> getSpies(Predicate<Player> condition) {
+        return super.getSpies(condition.or(player -> ((!this.whitelist.isEmpty() && !isInWhitelistedRegion(player))
+                || (this.whitelist.isEmpty() && isInBlacklistedRegion(player)))));
+    }
+
+    public List<Player> getRecipients(RosePlayer sender, List<Player> globalRecipients) {
         List<Player> recipients = new ArrayList<>();
 
         if (this.useMembers && sender.isPlayer()) {
@@ -136,7 +143,7 @@ public class WorldGuardChannel extends RoseChatChannel {
 
         if (!this.whitelist.isEmpty()) {
             // If using a whitelist, send to all players in the region.
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : globalRecipients) {
                 if (this.isInWhitelistedRegion(player)) {
                     recipients.add(player);
                 }
@@ -144,7 +151,7 @@ public class WorldGuardChannel extends RoseChatChannel {
 
         } else {
             // If using a blacklist, send to everyone EXCEPT players in the region.
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : globalRecipients) {
                 if (!this.isInBlacklistedRegion(player)) {
                     recipients.add(player);
                 }
@@ -152,6 +159,23 @@ public class WorldGuardChannel extends RoseChatChannel {
         }
 
         return recipients;
+    }
+
+    @Override
+    public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        return this.getRecipients(sender, new ArrayList<>(Bukkit.getOnlinePlayers()));
+    }
+
+    @Override
+    public List<Player> getMemberRecipients(RosePlayer sender, World world) {
+        List<Player> players = new ArrayList<>();
+        for (UUID uuid : this.members) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+            players.add(player);
+        }
+
+        return this.getRecipients(sender, players);
     }
 
     @Override
@@ -175,4 +199,9 @@ public class WorldGuardChannel extends RoseChatChannel {
                 || player.hasPermission("rosechat.channelbypass");
     }
 
+    @Override
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
+        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+                .addPlaceholder("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString());
+    }
 }

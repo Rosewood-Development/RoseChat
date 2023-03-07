@@ -262,10 +262,18 @@ public class RoseChatChannel extends Channel {
                 currentSpies.addAll(this.getSpies(condition));
             } else {
                 // ONLY Visible Anywhere Enabled - Send to all players.
-                for (Player player : this.getVisibleAnywhereRecipients(message.getSender(), null)) {
+                List<Player> players = this.getVisibleAnywhereRecipients(message.getSender(), null);
+
+                for (Player player : players) {
                     if (message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
+                }
+
+                for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getChannelSpies()) {
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player == null) continue;
+                    if (!players.contains(player)) currentSpies.add(player);
                 }
             }
 
@@ -320,7 +328,7 @@ public class RoseChatChannel extends Channel {
                 }
 
                 Predicate<Player> condition = player -> !this.members.contains(player.getUniqueId());
-                currentSpies.addAll(this.getSpies( condition));
+                currentSpies.addAll(this.getSpies(condition));
             }
 
             // Send the message to all the spies who will not receive the message by being in the channel.

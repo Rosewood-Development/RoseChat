@@ -30,12 +30,14 @@ public class TownyChannel extends RoseChatChannel {
         super.onLoad(id, config);
         if (config.contains("channel-type")) this.channelType = TownyChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (config.contains("use-allies")) this.useAllies = config.getBoolean("use-allies");
+        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
     }
 
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
+        if (!sender.isPlayer()) return recipients;
         if (this.channelType == TownyChannelType.TOWN) {
             Town town = TownyAPI.getInstance().getTown(sender.asPlayer());
             if (town == null) return recipients;
