@@ -3,8 +3,8 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
+import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
-public class RoseChatChannel extends Channel {
+public class RoseChatChannel extends ConditionalChannel {
 
     // Channel Settings
     protected int radius;
@@ -60,7 +60,7 @@ public class RoseChatChannel extends Channel {
 
     @Override
     public boolean onLogin(Player player) {
-        return this.autoJoin && (this.worlds.isEmpty() || this.worlds.contains(player.getWorld().getName()));
+        return this.getJoinCondition(player) && (this.autoJoin && (this.worlds.isEmpty() || this.worlds.contains(player.getWorld().getName())));
     }
 
     @Override
@@ -113,10 +113,20 @@ public class RoseChatChannel extends Channel {
      * @return A {@link List<Player>} of recipients.
      */
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
+        List<Player> recipients = new ArrayList<>();
+
         if (world == null) {
-            return new ArrayList<>(Bukkit.getOnlinePlayers());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
+
+            return recipients;
         } else {
-            return world.getPlayers();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
+
+            return recipients;
         }
     }
 

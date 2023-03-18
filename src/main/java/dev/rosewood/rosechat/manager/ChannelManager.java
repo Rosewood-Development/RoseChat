@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.CustomCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
+import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
