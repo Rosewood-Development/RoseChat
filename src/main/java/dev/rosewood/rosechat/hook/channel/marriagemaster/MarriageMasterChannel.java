@@ -1,6 +1,7 @@
-package dev.rosewood.rosechat.hook.channel.mcmmo;
+package dev.rosewood.rosechat.hook.channel.marriagemaster;
 
-import com.gmail.nossr50.api.PartyAPI;
+import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriageMasterPlugin;
+import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriagePlayer;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -9,14 +10,15 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.UUID;
 
-public class McMMOChannel extends RoseChatChannel {
+public class MarriageMasterChannel extends RoseChatChannel {
 
-    public McMMOChannel(ChannelProvider provider) {
+    private final MarriageMasterPlugin marriageMaster;
+
+    public MarriageMasterChannel(ChannelProvider provider) {
         super(provider);
+        this.marriageMaster = (MarriageMasterPlugin) Bukkit.getPluginManager().getPlugin("MarriageMaster");
     }
 
     @Override
@@ -31,11 +33,9 @@ public class McMMOChannel extends RoseChatChannel {
         List<Player> recipients = new ArrayList<>();
         if (!sender.isPlayer()) return recipients;
 
-        LinkedHashMap<UUID, String> members = PartyAPI.getMembersMap(sender.asPlayer());
-        if (members == null) return recipients;
-        for (UUID member : members.keySet()) {
-            Player player = Bukkit.getPlayer(member);
-            if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+        MarriagePlayer mp = this.marriageMaster.getPlayerData(sender.getUUID());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (mp.isPartner(player) && this.getReceiveCondition(sender, player)) recipients.add(player);
         }
 
         return recipients;
@@ -43,7 +43,9 @@ public class McMMOChannel extends RoseChatChannel {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        if (!PartyAPI.inParty(player)) return false;
+        if (!this.marriageMaster.getPlayerData(player).isMarried())
+            return false;
+
         return super.canJoinByCommand(player);
     }
 

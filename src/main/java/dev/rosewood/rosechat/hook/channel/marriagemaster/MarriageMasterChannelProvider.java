@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.hook.channel.superiorskyblock;
+package dev.rosewood.rosechat.hook.channel.marriagemaster;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
@@ -7,7 +7,7 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import java.util.List;
 
-public class SuperiorSkyblockChannelProvider extends ChannelProvider {
+public class MarriageMasterChannelProvider extends ChannelProvider {
 
     @Override
     public List<Class<? extends Channel>> getChannels() {
@@ -16,7 +16,7 @@ public class SuperiorSkyblockChannelProvider extends ChannelProvider {
 
     @Override
     public Class<? extends Channel> getChannelGenerator() {
-        return SuperiorSkyblockChannel.class;
+        return MarriageMasterChannel.class;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class SuperiorSkyblockChannelProvider extends ChannelProvider {
 
     @Override
     public String getSupportedPlugin() {
-        return "SuperiorSkyblock2";
+        return "MarriageMaster";
     }
 
 }

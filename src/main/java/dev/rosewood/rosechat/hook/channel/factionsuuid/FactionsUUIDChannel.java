@@ -3,9 +3,16 @@ package dev.rosewood.rosechat.hook.channel.factionsuuid;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.FactionsAPI;
+import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.perms.Relation;
+import com.massivecraft.factions.perms.Role;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -14,6 +21,8 @@ import java.util.List;
 
 public class FactionsUUIDChannel extends RoseChatChannel {
 
+    private FactionsChannelType channelType;
+
     public FactionsUUIDChannel(ChannelProvider provider) {
         super(provider);
     }
@@ -21,7 +30,11 @@ public class FactionsUUIDChannel extends RoseChatChannel {
     @Override
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
+
+        if (config.contains("channel-type")) this.channelType = FactionsChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+
+        FactionsPlugin.getInstance().setHandlingChat(RoseChat.getInstance(), true);
     }
 
     @Override
@@ -30,14 +43,76 @@ public class FactionsUUIDChannel extends RoseChatChannel {
 
         if (!sender.isPlayer()) return recipients;
         Faction faction = FPlayers.getInstance().getByPlayer(sender.asPlayer()).getFaction();
+        if (faction == null) return recipients;
 
-        for (FPlayer fPlayer : faction.getFPlayers()) {
-            Player player = fPlayer.getPlayer();
-            if (player == null) continue;
-            recipients.add(player);
+        switch (this.channelType) {
+            case FACTION: {
+                for (FPlayer fPlayer : faction.getFPlayers()) {
+                    Player player = fPlayer.getPlayer();
+                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                }
+
+                return recipients;
+            }
+
+            case ALLY: {
+                for (FPlayer fPlayer : FPlayers.getInstance().getOnlinePlayers()) {
+                    if (faction.getRelationTo(fPlayer) != Relation.ALLY) continue;
+
+                    Player player = fPlayer.getPlayer();
+                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                }
+
+                return recipients;
+            }
+
+            case TRUCE: {
+                for (FPlayer fPlayer : FPlayers.getInstance().getOnlinePlayers()) {
+                    if (faction.getRelationTo(fPlayer) != Relation.TRUCE) continue;
+
+                    Player player = fPlayer.getPlayer();
+                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                }
+
+                return recipients;
+            }
+
+            case MOD: {
+                for (FPlayer fPlayer : faction.getFPlayers()) {
+                    if (!fPlayer.getRole().isAtLeast(Role.MODERATOR)) continue;
+
+                    Player player = fPlayer.getPlayer();
+                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                }
+
+                return recipients;
+            }
         }
 
         return recipients;
+    }
+
+    @Override
+    public boolean canJoinByCommand(Player player) {
+        Faction faction = FPlayers.getInstance().getByPlayer(player).getFaction();
+        if (faction == null) return false;
+
+        return super.canJoinByCommand(player);
+    }
+
+    @Override
+    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
+        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+                .addPlaceholder("type", this.channelType.toString().toLowerCase());
+    }
+
+    public enum FactionsChannelType {
+
+        FACTION,
+        ALLY,
+        MOD,
+        TRUCE
+
     }
 
 }

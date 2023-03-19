@@ -19,9 +19,10 @@ softdepend:
   - Factions
   - Kingdoms
   - BentoBox
-  - SuperiorSkyblock
+  - SuperiorSkyblock2
   - IridiumSkyblock
   - FabledSkyblock
+  - MarriageMaster
 commands:
   rosechat:
     aliases: [rc]

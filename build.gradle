@@ -29,7 +29,6 @@ repositories {
     maven { url = 'https://nexus.scarsz.me/content/groups/public/' }
     maven { url = 'https://m2.dv8tion.net/releases' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 
     maven { url = 'https://repo.glaremasters.me/repository/towny/' }
     maven { url = 'https://nexus.neetgames.com/repository/maven-releases/' }
@@ -40,12 +39,13 @@ repositories {
     maven { url = 'https://repo.bg-software.com/repository/api/' }
     maven { url = 'https://nexus.iridiumdevelopment.net/repository/maven-releases/' }
     maven { url = 'https://repo.songoda.com/repository/public/' }
+    maven { url = 'https://repo.pcgamingfreaks.at/repository/maven-everything/' }
 
 }
 
 dependencies {
     api 'dev.rosewood:rosegarden:1.1.0.48-SNAPSHOT'
-    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'org.apache.commons:commons-text:1.10.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.2'
@@ -67,6 +67,7 @@ dependencies {
     compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2022.9'
     compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
     compileOnly 'com.songoda:skyblock:2.3.30'
+    compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.6.13'
 }
 
 configurations.all {

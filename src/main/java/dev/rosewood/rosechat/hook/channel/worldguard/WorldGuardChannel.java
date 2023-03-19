@@ -10,10 +10,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +32,7 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     public WorldGuardChannel(ChannelProvider provider) {
         super(provider);
+
         WorldGuardPlatform worldGuard = WorldGuard.getInstance().getPlatform();
         this.regionContainer = worldGuard.getRegionContainer();
     }
@@ -42,6 +40,7 @@ public class WorldGuardChannel extends RoseChatChannel {
     @Override
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
+
         this.whitelist = config.contains("whitelist") ? config.getStringList("whitelist") : new ArrayList<>();
         this.blacklist = config.contains("blacklist") ? config.getStringList("blacklist") : new ArrayList<>();
         this.useMembers = config.getBoolean("use-members") && config.getBoolean("use-members");
@@ -49,7 +48,7 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     public boolean onEnterArea(Player player) {
-        if (!this.autoJoin) return false;
+        if (!this.getJoinCondition(player) || !this.autoJoin) return false;
 
         Location location = player.getLocation();
         if (location.getWorld() == null) return false;
@@ -80,7 +79,7 @@ public class WorldGuardChannel extends RoseChatChannel {
     @Override
     public boolean onWorldLeave(Player player, World from, World to) {
         // Always leave the channel if auto-join is enabled.
-        return autoJoin;
+        return this.autoJoin;
     }
 
     private Set<ProtectedRegion> getPlayerRegion(Player player) {
@@ -123,7 +122,6 @@ public class WorldGuardChannel extends RoseChatChannel {
 
         if (this.useMembers && sender.isPlayer()) {
             Player player = sender.asPlayer();
-            if (!this.isInWhitelistedRegion(player)) return recipients;
 
             for (String regionStr : this.whitelist) {
                 RegionManager manager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
@@ -134,7 +132,7 @@ public class WorldGuardChannel extends RoseChatChannel {
 
                 for (UUID memberUUID : region.getMembers().getUniqueIds()) {
                     Player member = Bukkit.getPlayer(memberUUID);
-                    if (member != null) recipients.add(member);
+                    if (member != null && this.getReceiveCondition(sender, member)) recipients.add(member);
                 }
             }
 
@@ -144,7 +142,7 @@ public class WorldGuardChannel extends RoseChatChannel {
         if (!this.whitelist.isEmpty()) {
             // If using a whitelist, send to all players in the region.
             for (Player player : globalRecipients) {
-                if (this.isInWhitelistedRegion(player)) {
+                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player)) {
                     recipients.add(player);
                 }
             }
@@ -152,7 +150,7 @@ public class WorldGuardChannel extends RoseChatChannel {
         } else {
             // If using a blacklist, send to everyone EXCEPT players in the region.
             for (Player player : globalRecipients) {
-                if (!this.isInBlacklistedRegion(player)) {
+                if (this.getReceiveCondition(sender, player) && !this.isInBlacklistedRegion(player)) {
                     recipients.add(player);
                 }
             }
@@ -184,9 +182,9 @@ public class WorldGuardChannel extends RoseChatChannel {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.whitelist.isEmpty()) {
-                if (this.isInWhitelistedRegion(player)) count++;
+                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player)) count++;
             } else {
-                if (this.isInBlacklistedRegion(player)) count--;
+                if (this.getReceiveCondition(sender, player) && this.isInBlacklistedRegion(player)) count--;
             }
         }
 
@@ -195,13 +193,15 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        return (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.isInWhitelistedRegion(player))
-                || player.hasPermission("rosechat.channelbypass");
+        return player.hasPermission("rosechat.channelbypass") ||
+                (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.getJoinCondition(player) && this.isInWhitelistedRegion(player));
     }
 
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString());
+                .addPlaceholder("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString())
+                .addPlaceholder("use-members", this.useMembers ? trueValue : falseValue);
     }
+
 }

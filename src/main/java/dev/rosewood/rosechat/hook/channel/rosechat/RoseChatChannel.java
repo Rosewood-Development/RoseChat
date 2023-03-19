@@ -71,7 +71,7 @@ public class RoseChatChannel extends ConditionalChannel {
         if (this.worlds.contains(from.getName()) && this.worlds.contains(to.getName())) return false;
 
         // Join the channel if the world is linked to the channel.
-        return this.worlds.contains(to.getName());
+        return this.getJoinCondition(player) && this.worlds.contains(to.getName());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
             return recipients;
         } else {
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : world.getPlayers()) {
                 if (this.getReceiveCondition(sender, player)) recipients.add(player);
             }
 
@@ -460,7 +460,8 @@ public class RoseChatChannel extends ConditionalChannel {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        return (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable) || player.hasPermission("rosechat.channelbypass");
+        return player.hasPermission("rosechat.channelbypass")
+                || (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.getJoinCondition(player));
     }
 
     @Override

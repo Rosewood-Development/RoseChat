@@ -32,12 +32,12 @@ public abstract class ConditionalChannel extends Channel {
         }
     }
 
-    public boolean getJoinCondition(Player player, StringPlaceholders placeholders) {
-        return this.joinCondition == null || this.joinCondition.parseToBoolean(new RosePlayer(player), null, placeholders);
-    }
-
     public boolean getJoinCondition(RosePlayer player, StringPlaceholders placeholders) {
         return this.joinCondition == null || this.joinCondition.parseToBoolean(player, null, placeholders);
+    }
+
+    public boolean getJoinCondition(Player player, StringPlaceholders placeholders) {
+        return this.getJoinCondition(new RosePlayer(player), placeholders);
     }
 
     public boolean getJoinCondition(Player player) {
@@ -48,12 +48,12 @@ public abstract class ConditionalChannel extends Channel {
         return this.getJoinCondition(player, StringPlaceholders.empty());
     }
 
-    public boolean getReceiveCondition(Player sender, Player viewer, StringPlaceholders placeholders) {
-        return this.receiveCondition == null || this.receiveCondition.parseToBoolean(new RosePlayer(sender), new RosePlayer(viewer), placeholders);
-    }
-
     public boolean getReceiveCondition(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return this.receiveCondition == null || this.receiveCondition.parseToBoolean(sender, viewer, placeholders);
+    }
+
+    public boolean getReceiveCondition(Player sender, Player viewer, StringPlaceholders placeholders) {
+        return this.getReceiveCondition(new RosePlayer(sender), new RosePlayer(viewer), placeholders);
     }
 
     public boolean getReceiveCondition(Player sender, Player viewer) {
