@@ -4,18 +4,21 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -130,6 +133,33 @@ public class PlayerListener implements Listener {
         }
 
         playerData.save();
+    }
+
+    @EventHandler
+    public void onCommandPreProcess(PlayerCommandPreprocessEvent event) {
+        String input = event.getMessage();
+
+        for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
+            if (channel.getOverrideCommands().isEmpty()) continue;
+            for (String command : channel.getOverrideCommands()) {
+                if (input.equalsIgnoreCase("/" + command) || input.toLowerCase().startsWith("/" + command.toLowerCase() + " ")) {
+
+                    // If the message was the same, join the channel.
+                    if (input.equalsIgnoreCase("/" + command)) {
+                        if (!ChannelCommand.processChannelSwitch(event.getPlayer(), channel.getId())) {
+                            RoseChatAPI.getInstance().getLocaleManager()
+                                    .sendComponentMessage(event.getPlayer(), "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getId()));
+                        }
+                    } else {
+                        String message = input.substring(("/" + command + " ").length());
+                        RosePlayer rosePlayer = new RosePlayer(event.getPlayer());
+                        channel.send(rosePlayer, message);
+                    }
+
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
 }
