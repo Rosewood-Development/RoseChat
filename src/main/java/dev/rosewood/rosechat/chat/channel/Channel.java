@@ -40,9 +40,6 @@ public abstract class Channel {
         if (config.contains("default") && config.getBoolean("default")) this.setDefault();
         if (config.contains("format")) this.setFormat(config.getString("format"));
         if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
-
-        for (String command : this.commands)
-            this.registerCommand(command);
     }
 
     /**
@@ -195,10 +192,6 @@ public abstract class Channel {
 
     public ChannelProvider getProvider() {
         return this.provider;
-    }
-
-    public void registerCommand(String command) {
-        RoseChat.getInstance().getManager(ChannelManager.class).registerCommand(command);
     }
 
     /**

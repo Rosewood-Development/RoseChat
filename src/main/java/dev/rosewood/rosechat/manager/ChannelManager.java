@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.CustomCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
-import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -36,6 +35,7 @@ public class ChannelManager extends Manager {
         if (!channelsFile.exists()) this.rosePlugin.saveResource("channels.yml", false);
 
         this.channelsConfig = CommentedFileConfiguration.loadConfiguration(channelsFile);
+        this.registerCommands(this.channelsConfig);
 
         // Delay generating channels until channel providers are registered.
         Bukkit.getScheduler().runTaskLater(this.rosePlugin, this::generateChannels, 0L);
@@ -132,6 +132,20 @@ public class ChannelManager extends Manager {
     }
 
     /**
+     * Searches through a config file for 'commands', and registers those commands.
+     * @param config The {@link CommentedFileConfiguration} to search through.
+     */
+    public void registerCommands(CommentedFileConfiguration config) {
+        for (String id : config.getKeys(false)) {
+            if (config.contains(id + ".commands")) {
+                for (String command : config.getStringList(id + ".commands")) {
+                    this.registerCommand(command);
+                }
+            }
+        }
+    }
+
+    /**
      * Registers a command alias for a channel.
      * @param command The command to register.
      */
@@ -139,9 +153,9 @@ public class ChannelManager extends Manager {
         try {
             Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap)bukkitCommandMap.get(Bukkit.getServer());
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
             commandMap.register(command, new CustomCommand(command));
-        } catch (ReflectiveOperationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
