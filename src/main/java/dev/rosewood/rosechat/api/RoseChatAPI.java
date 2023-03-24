@@ -5,11 +5,13 @@ import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -19,10 +21,10 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
@@ -81,6 +83,56 @@ public final class RoseChatAPI {
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, MessageLocation location) {
         return new RoseMessage(sender, location, message).parse(viewer, null);
+    }
+
+    public void sendToChannel(Player player, String message, Channel channel, boolean checkPermissions) {
+        RosePlayer sender = new RosePlayer(player);
+        PlayerData data = sender.getPlayerData();
+
+        if (checkPermissions) {
+            // Don't send the message if the player doesn't have permission.
+            if (data == null || !sender.hasPermission("rosechat.chat")) {
+                this.getLocaleManager().sendComponentMessage(player, "no-permission");
+                return;
+            }
+
+            // Check the mute expiry.
+            if (data.isMuteExpired()) {
+                data.unmute();
+                data.save();
+            }
+
+            // Check if the player is muted.
+            if (data.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
+                sender.sendLocaleMessage("command-mute-cannot-send");
+                return;
+            }
+
+            // Check if the player has permission for this channel.
+            if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
+                sender.sendLocaleMessage("no-permission");
+                return;
+            }
+        }
+
+        // Make the message isn't empty.
+        if (MessageUtils.isMessageEmpty(message)) {
+            sender.sendLocaleMessage("message-blank");
+            return;
+        }
+
+        // Send the message.
+        channel.send(sender, message);
+
+        // Update the player's display name if the setting is enabled.
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NICKNAME, data.getNickname());
+                roseMessage.parse(sender, null);
+
+                if (data.getNickname() != null) NicknameCommand.setDisplayName(sender, roseMessage);
+            });
+        }
     }
 
     /**
