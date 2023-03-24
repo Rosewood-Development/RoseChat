@@ -152,8 +152,7 @@ public class PlayerListener implements Listener {
                         }
                     } else {
                         String message = input.substring(("/" + command + " ").length());
-                        RosePlayer rosePlayer = new RosePlayer(event.getPlayer());
-                        channel.send(rosePlayer, message);
+                        RoseChatAPI.getInstance().sendToChannel(event.getPlayer(), message, channel, true);
                     }
 
                     event.setCancelled(true);

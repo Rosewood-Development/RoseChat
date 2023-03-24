@@ -26,12 +26,14 @@ public abstract class Channel {
     private String format;
     private List<String> commands;
     private List<String> overrideCommands;
+    private List<String> shoutCommands;
 
     public Channel(ChannelProvider provider) {
         this.members = new ArrayList<>();
         this.provider = provider;
         this.commands = new ArrayList<>();
         this.overrideCommands = new ArrayList<>();
+        this.shoutCommands = new ArrayList<>();
     }
 
     /**
@@ -43,6 +45,7 @@ public abstract class Channel {
         if (config.contains("format")) this.setFormat(config.getString("format"));
         if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
         if (config.contains("override-commands")) this.setOverrideCommands(config.getStringList("override-commands"));
+        if (config.contains("shout-commands")) this.setShoutCommands(config.getStringList("shout-commands"));
     }
 
     /**
@@ -255,6 +258,14 @@ public abstract class Channel {
 
     public void setOverrideCommands(List<String> overrideCommands) {
         this.overrideCommands = overrideCommands;
+    }
+
+    public List<String> getShoutCommands() {
+        return this.shoutCommands;
+    }
+
+    public void setShoutCommands(List<String> shoutCommands) {
+        this.shoutCommands = shoutCommands;
     }
 
 }
