@@ -49,7 +49,7 @@ public class ChatInfoCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.info";
+        return "rosechat.chat.info";
     }
 
     @Override

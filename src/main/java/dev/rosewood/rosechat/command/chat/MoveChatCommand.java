@@ -70,7 +70,7 @@ public class MoveChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.move";
+        return "rosechat.chat.move";
     }
 
     @Override

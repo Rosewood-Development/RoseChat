@@ -287,15 +287,15 @@ public class JapaneseLocale implements Locale {
 
             this.put("#38", "デバッグ・コマンド");
             this.put("command-debug-description", "&8 - &d/rc debug &7- デバッグモードをトグルします。");
+            this.put("command-debug-usage", "&e/rc debug");
             this.put("command-debug-on", "&eデバッグモードは今&aオン&eです。 デバッグインフォをセーブにまた&b/rc debugを使います。");
             this.put("command-debug-off", "&eデバッグモードは&cオフ&eです。 &bplugins/RoseChat/debug&eに新しいファイルをセーブしました。");
 
-            this.put("#39", "ニックネーム・カラー・コマンド");
-            this.put("command-nickcolor-description", "&8 - &d/nickcolor &7- Cあなたのニックネーム色を変更します。");
-            this.put("command-nickcolor-usage", "&e/nickcolor <装飾コード>");
-            this.put("command-nickcolor-success", "&e新しいニックネームは&f%name%&e&r。");
-            this.put("command-nickcolor-invalid", "&eこれは有効な装飾コードではありません。");
-            this.put("command-nickcolor-removed", "&eあなたのニックネームカラーは外しました。");
+            this.put("#39", "チャット・トグル・コマンド");
+            this.put("command-chat-toggle-description", "&8 - &c/chat toggle &7- チャンネルの見えるのをトグルします。");
+            this.put("command-chat-toggle-usage", "&e/chat toggle <チャンネル>");
+            this.put("command-chat-toggle-on", "&b%channel%&eチャンネルを今見れます。");
+            this.put("command-chat-toggle-off", "&b%channel%&eチャンネルを今見れません。");
         }};
     }
 

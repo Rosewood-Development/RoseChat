@@ -21,6 +21,7 @@ import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatInfoCommand;
+import dev.rosewood.rosechat.command.chat.ChatToggleCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
@@ -139,7 +140,8 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new ClearChatCommand())
                 .addSubcommand(new MoveChatCommand())
                 .addSubcommand(new SudoChatCommand())
-                .addSubcommand(new ChatInfoCommand());
+                .addSubcommand(new ChatInfoCommand())
+                .addSubcommand(new ChatToggleCommand());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)

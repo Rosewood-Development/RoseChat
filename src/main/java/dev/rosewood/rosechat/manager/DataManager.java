@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
+import dev.rosewood.rosechat.database.migrations._2_Create_Table_Hidden_Channels;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
@@ -10,7 +11,7 @@ import dev.rosewood.rosegarden.manager.AbstractDataManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,8 +27,9 @@ public class DataManager extends AbstractDataManager {
 
     @Override
     public List<Class<? extends DataMigration>> getDataMigrations() {
-        return Collections.singletonList(
-                _1_Create_Tables_Data.class
+        return Arrays.asList(
+                _1_Create_Tables_Data.class,
+                _2_Create_Table_Hidden_Channels.class
         );
     }
 
@@ -81,6 +83,16 @@ public class DataManager extends AbstractDataManager {
                     value.get().ignore(ignored);
                 }
             }
+
+            String channelsQuery = "SELECT * FROM " + this.getTablePrefix() + "hidden_channels WHERE uuid = ?";
+            try (PreparedStatement statement = connection.prepareStatement(channelsQuery)) {
+                statement.setString(1, uuid.toString());
+                ResultSet result = statement.executeQuery();
+
+                if (result.next()) {
+                    value.get().hideChannel(result.getString("channel"));
+                }
+            }
         });
 
         return value.get();
@@ -128,6 +140,29 @@ public class DataManager extends AbstractDataManager {
             try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
                 statement.setString(1, ignoring.toString());
                 statement.setString(2, ignored.toString());
+                statement.executeUpdate();
+            }
+        });
+    }
+
+    public void hideChannel(UUID uuid, String channel) {
+        this.databaseConnector.connect(connection -> {
+            String insertQuery = "INSERT INTO " + this.getTablePrefix() + "hidden_channels (uuid, channel) " +
+                    "VALUES(?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, uuid.toString());
+                statement.setString(2, channel);
+                statement.executeUpdate();
+            }
+        });
+    }
+
+    public void showChannel(UUID uuid, String channel) {
+        this.databaseConnector.connect(connection ->  {
+            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "hidden_channels WHERE uuid = ? AND channel = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+                statement.setString(1, uuid.toString());
+                statement.setString(2, channel);
                 statement.executeUpdate();
             }
         });

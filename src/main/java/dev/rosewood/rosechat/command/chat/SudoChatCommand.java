@@ -57,7 +57,7 @@ public class SudoChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.sudo";
+        return "rosechat.chat.sudo";
     }
 
     @Override

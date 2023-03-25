@@ -216,7 +216,10 @@ public abstract class Channel {
      * @return True if the receiver can receive the message.
      */
     public boolean canReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
-        return (data != null && !data.getIgnoringPlayers().contains(senderUUID) && receiver.hasPermission("rosechat.channel." + this.getId()));
+        return (data != null
+                && !data.getIgnoringPlayers().contains(senderUUID)
+                && receiver.hasPermission("rosechat.channel." + this.getId())
+                && (!data.isChannelHidden(this.getId()) || data.getUUID().equals(senderUUID)));
     }
 
     public boolean isDefaultChannel() {

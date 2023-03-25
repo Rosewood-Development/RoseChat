@@ -50,7 +50,7 @@ public class MuteChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.mute";
+        return "rosechat.chat.mute";
     }
 
     @Override

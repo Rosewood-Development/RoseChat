@@ -57,7 +57,7 @@ public class ClearChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.clear";
+        return "rosechat.chat.clear";
     }
 
     @Override

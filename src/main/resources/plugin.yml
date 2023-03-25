@@ -57,8 +57,7 @@ commands:
     permission: rosechat.channel
   chat:
     aliases: [cc, chatchannel]
-    description: Displays admin commands for chat channels.
-    permission: rosechat.admin
+    description: Displays commands for chat channels.
   color:
     aliases: [chatcolor, colour, chatcolour]
     description: Set a default chat color.
@@ -127,7 +126,6 @@ permissions:
       rosechat.unmute: true
       rosechat.channel: true
       rosechat.channelbypass: true
-      rosechat.admin: true
       rosechat.chatcolor: true
       rosechat.group: true
       rosechat.groups: true
@@ -331,20 +329,23 @@ permissions:
   rosechat.channelbypass:
     description: Allows joining an un-joinable channel.
     default: op
-  rosechat.admin.mute:
+  rosechat.chat.mute:
     description: Allows using the chat mute command.
     default: op
-  rosechat.admin.clear:
+  rosechat.chat.clear:
     description: Allows using the chat clear command.
     default: op
-  rosechat.admin.move:
+  rosechat.chat.move:
     description: Allows using the chat move command.
     default: op
-  rosechat.admin.sudo:
+  rosechat.chat.sudo:
     description: Allows using the chat sudo command.
     default: op
-  rosechat.admin.info:
+  rosechat.chat.info:
     description: Allows using the chat info command.
+    default: op
+  rosechat.chat.toggle:
+    description: Allows using the chat toggle command.
     default: op
   rosechat.chatcolor:
     description: Allows using the chatcolor command.

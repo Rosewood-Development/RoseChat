@@ -18,7 +18,7 @@ public class HelpCommand extends AbstractCommand {
         super(false, "help", "?");
         this.plugin = plugin;
         this.gcPermissions = new ArrayList<>(Arrays.asList("create", "disband", "invite", "kick", "accept", "deny", "leave", "members", "rename", "message", "admin"));
-        this.chatPermissions = new ArrayList<>(Arrays.asList("mute", "clear", "move", "sudo"));
+        this.chatPermissions = new ArrayList<>(Arrays.asList("mute", "clear", "move", "sudo", "toggle"));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class HelpCommand extends AbstractCommand {
                     }
                 } else if (label.equals("chat")) {
                     for (String perm : this.chatPermissions) {
-                        if (sender.hasPermission("rosechat.admin." + perm)) {
+                        if (sender.hasPermission("rosechat.chat." + perm)) {
                             hasPerm = true;
                             break;
                         }

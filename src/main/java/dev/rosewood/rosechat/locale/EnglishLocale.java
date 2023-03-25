@@ -287,15 +287,15 @@ public class EnglishLocale implements Locale {
 
             this.put("#38", "Debug Command");
             this.put("command-debug-description", "&8 - &d/rc debug &7- Toggles debug mode.");
+            this.put("command-debug-usage", "&e/rc debug");
             this.put("command-debug-on", "&eDebug mode is now &aon&e. Use &b/rc debug &eagain to save debug information.");
             this.put("command-debug-off", "&eDebug mode is now &coff&e. A new file has been saved in &bplugins/RoseChat/debug&e.");
 
-            this.put("#39", "Nick Color Command");
-            this.put("command-nickcolor-description", "&8 - &d/nickcolor &7- Change your nickname color.");
-            this.put("command-nickcolor-usage", "&e/nickcolor <color>");
-            this.put("command-nickcolor-success", "&eYour new nickname is: &f%name%&e.");
-            this.put("command-nickcolor-invalid", "&eThis is not a valid color!");
-            this.put("command-nickcolor-removed", "&eYour nickname color has been removed.");
+            this.put("#39", "Chat Toggle Command");
+            this.put("command-chat-toggle-description", "&8 - &c/chat toggle &7- Toggles seeing a channel.");
+            this.put("command-chat-toggle-usage", "&e/chat toggle <channel>");
+            this.put("command-chat-toggle-on", "&eYou will now see the &b%channel% &echannel.");
+            this.put("command-chat-toggle-off", "&eYou will no longer see the &b%channel% &echannel.");
         }};
     }
 

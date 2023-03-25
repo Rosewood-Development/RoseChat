@@ -114,6 +114,18 @@ public class PlayerDataManager extends Manager {
         });
     }
 
+    public void hideChannel(UUID uuid, String channel) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            this.dataManager.hideChannel(uuid, channel);
+        });
+    }
+
+    public void showChannel(UUID uuid, String channel) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            this.dataManager.showChannel(uuid, channel);
+        });
+    }
+
    public void getMutedChannels(Consumer<List<Channel>> callback) {
         if (!this.mutedChannels.isEmpty()) {
             callback.accept(this.mutedChannels);
