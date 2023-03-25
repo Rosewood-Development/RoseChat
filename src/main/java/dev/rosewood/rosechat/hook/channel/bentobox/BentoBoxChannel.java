@@ -10,6 +10,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.database.objects.Island;
+import world.bentobox.bentobox.managers.RanksManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -43,8 +45,13 @@ public class BentoBoxChannel extends RoseChatChannel {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
-        } else {
+        } else if (this.channelType == BentoBoxChannelType.LOCAL) {
             for (Player player : island.getPlayersOnIsland()) {
+                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
+        } else if (this.channelType == BentoBoxChannelType.COOP) {
+            for (UUID uuid : island.getMemberSet(RanksManager.COOP_RANK)) {
+                Player player = Bukkit.getPlayer(uuid);
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
         }
@@ -73,7 +80,8 @@ public class BentoBoxChannel extends RoseChatChannel {
     public enum BentoBoxChannelType {
 
         LOCAL,
-        TEAM
+        TEAM,
+        COOP
 
     }
 

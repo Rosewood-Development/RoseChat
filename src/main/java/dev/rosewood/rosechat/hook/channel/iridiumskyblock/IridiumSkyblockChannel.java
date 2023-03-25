@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.hook.channel.iridiumskyblock;
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.iridium.iridiumskyblock.api.IridiumSkyblockAPI;
 import com.iridium.iridiumskyblock.database.Island;
+import com.iridium.iridiumskyblock.database.IslandTrusted;
 import com.iridium.iridiumskyblock.database.User;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
@@ -48,11 +49,19 @@ public class IridiumSkyblockChannel extends RoseChatChannel {
                 Player player = Bukkit.getPlayer(member.getUuid());
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
-        } else {
+        } else if (this.channelType == IridiumSkyblockChannelType.LOCAL) {
             for (User member : IridiumSkyblock.getInstance().getIslandManager().getPlayersOnIsland(island)) {
                 if (member == null) continue;
 
                 Player player = Bukkit.getPlayer(member.getUuid());
+                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
+        } else {
+            for (IslandTrusted it : IridiumSkyblock.getInstance().getDatabaseManager().getIslandTrustedTableManager().getEntries(island)) {
+                User trusted = it.getUser();
+                if (trusted == null) continue;
+
+                Player player = Bukkit.getPlayer(trusted.getUuid());
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
         }
@@ -81,7 +90,8 @@ public class IridiumSkyblockChannel extends RoseChatChannel {
     public enum IridiumSkyblockChannelType {
 
         LOCAL,
-        TEAM
+        TEAM,
+        TRUSTED
 
     }
 

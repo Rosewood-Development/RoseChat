@@ -44,8 +44,14 @@ public class SuperiorSkyblockChannel extends RoseChatChannel {
                 Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
-        } else {
+        } else if (this.channelType == SuperiorSkyblockChannelType.COOP) {
             for (SuperiorPlayer sPlayer : island.getAllPlayersInside()) {
+                if (sPlayer == null || !sPlayer.isOnline()) continue;
+                Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
+                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
+        } else {
+            for (SuperiorPlayer sPlayer : island.getCoopPlayers()) {
                 if (sPlayer == null || !sPlayer.isOnline()) continue;
                 Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
@@ -76,7 +82,8 @@ public class SuperiorSkyblockChannel extends RoseChatChannel {
     public enum SuperiorSkyblockChannelType {
 
         LOCAL,
-        TEAM
+        TEAM,
+        COOP
 
     }
 

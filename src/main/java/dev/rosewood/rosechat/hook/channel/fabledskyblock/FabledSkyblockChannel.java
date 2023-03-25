@@ -44,12 +44,16 @@ public class FabledSkyblockChannel extends RoseChatChannel {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
-        } else {
+        } else if (this.channelType == FabledSkyblockChannelType.LOCAL) {
             for (Player player : SkyBlockAPI.getIslandManager().getPlayersAtIsland(island)) {
                 if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
             }
+        } else {
+            for (UUID uuid : island.getCoopPlayers().keySet()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+            }
         }
-
 
         return recipients;
     }
