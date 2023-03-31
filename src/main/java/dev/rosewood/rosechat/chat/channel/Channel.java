@@ -1,12 +1,14 @@
 package dev.rosewood.rosechat.chat.channel;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -98,6 +100,46 @@ public abstract class Channel {
      */
     public void onJoin(Player player) {
         this.members.add(player.getUniqueId());
+    }
+
+    /**
+     * Forces a player into the channel.
+     * @param uuid The {@link UUID} of the player.
+     */
+    public void forceJoin(UUID uuid) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        PlayerData data = api.getPlayerData(uuid);
+        data.setCurrentChannel(this);
+
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null)
+            this.onJoin(player);
+
+        api.getLocaleManager().sendMessage(player,
+                "command-channel-joined", StringPlaceholders.single("id", this.getId()));
+
+    }
+
+    /**
+     * Forces a player out of the channel.
+     * @param uuid The {@link UUID} of the player.
+     */
+    public void kick(UUID uuid) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        Player player = Bukkit.getPlayer(uuid);
+
+        // Remove the player from the channel if they leave the team.
+        PlayerData data = api.getPlayerData(uuid);
+        if (data.getCurrentChannel().equals(this)) {
+            if (player != null)
+                this.onLeave(player);
+
+            data.setCurrentChannel(api.getDefaultChannel());
+            api.getLocaleManager().sendMessage(player,
+                    "command-channel-joined", StringPlaceholders.single("id", api.getDefaultChannel().getId()));
+        }
     }
 
     /**

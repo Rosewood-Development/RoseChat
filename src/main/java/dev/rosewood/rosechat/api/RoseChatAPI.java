@@ -175,6 +175,10 @@ public final class RoseChatAPI {
         return new ArrayList<>(this.getChannelManager().getChannels().keySet());
     }
 
+    public Channel getDefaultChannel() {
+        return this.getChannelManager().getDefaultChannel();
+    }
+
     /**
      * Creates a new chat replacement.
      * @param id The ID to use.

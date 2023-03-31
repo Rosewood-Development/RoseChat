@@ -82,14 +82,14 @@ public class WorldGuardChannel extends RoseChatChannel {
         return this.autoJoin;
     }
 
-    private Set<ProtectedRegion> getPlayerRegion(Player player) {
+    public Set<ProtectedRegion> getPlayerRegion(Player player) {
         RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
         if (regionManager == null) return null;
 
         return regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())).getRegions();
     }
 
-    private boolean isInWhitelistedRegion(Player player) {
+    public boolean isInWhitelistedRegion(Player player) {
         Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
         if (regionSet == null) return false;
 
@@ -100,7 +100,7 @@ public class WorldGuardChannel extends RoseChatChannel {
         return false;
     }
 
-    private boolean isInBlacklistedRegion(Player player) {
+    public boolean isInBlacklistedRegion(Player player) {
         Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
         if (regionSet == null) return false;
 
@@ -202,6 +202,14 @@ public class WorldGuardChannel extends RoseChatChannel {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
                 .addPlaceholder("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString())
                 .addPlaceholder("use-members", this.useMembers ? trueValue : falseValue);
+    }
+
+    public List<String> getWhitelist() {
+        return this.whitelist;
+    }
+
+    public List<String> getBlacklist() {
+        return this.blacklist;
     }
 
 }

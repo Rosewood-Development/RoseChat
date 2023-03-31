@@ -21,18 +21,13 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
 
     @Override
     public String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        boolean result = false;
-        for (BooleanPlaceholderCondition condition : this.conditions)
-            result = result || condition.parseToBoolean(sender, viewer, placeholders);
-
-        return String.valueOf(result);
+        return String.valueOf(this.parseToBoolean(sender, viewer, placeholders));
     }
 
     @Override
     public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         String parsed = this.parse(sender, viewer, placeholders);
-        String result = this.combineConditionValues(parsed);
-        return this.combineConditionValues(String.valueOf(result));
+        return this.combineConditionValues(parsed);
     }
 
     public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {

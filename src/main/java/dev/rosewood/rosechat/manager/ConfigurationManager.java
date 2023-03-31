@@ -67,7 +67,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "rather than when they set their nickname."),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
-        CHAT_PREVIEW("chat-settings.chat-preview", true, "Should chat preview be enabled for 1.19 servers?",
+        CHAT_PREVIEW("chat-settings.chat-preview", true, "Should chat preview be enabled for 1.19.1 and 1.19.2 servers?",
                 "You will also need to set previews-chat=true in the server.properties file.",
                 "Enabling this setting will disable message signing from clients due to technical limitations."),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true,
@@ -88,6 +88,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "For example, using 'rosechat.red.<location>' to use &c.",
                 "More information can be found on the wiki: https://github.com/Rosewood-Development/RoseChat/wiki/Commands-%26-Permissions/",
                 "A full list of colors can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html"),
+        WORLDGUARD_CHECK_INTERVAL("chat-settings.worldguard-check-interval", 20,
+                "How often, in ticks, should the plugin check if a player is in a region associated with a WorldGuard channel?",
+                "Requires WorldGuard"),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,

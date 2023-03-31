@@ -126,7 +126,7 @@ public class PlayerDataManager extends Manager {
         });
     }
 
-   public void getMutedChannels(Consumer<List<Channel>> callback) {
+    public void getMutedChannels(Consumer<List<Channel>> callback) {
         if (!this.mutedChannels.isEmpty()) {
             callback.accept(this.mutedChannels);
             return;

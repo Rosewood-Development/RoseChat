@@ -4,29 +4,39 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.CustomCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
+import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ChannelManager extends Manager {
 
     private final LocaleManager localeManager;
     private final Map<String, ChannelProvider> channelProviders;
     private final Map<String, Channel> channels;
+    private final List<WorldGuardChannel> worldGuardChannels;
     private Channel defaultChannel;
     private CommentedFileConfiguration channelsConfig;
+    private BukkitTask worldGuardTask;
 
     public ChannelManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
         this.channelProviders = new HashMap<>();
         this.channels = new HashMap<>();
+        this.worldGuardChannels = new ArrayList<>();
     }
 
     @Override
@@ -38,12 +48,20 @@ public class ChannelManager extends Manager {
         this.registerCommands(this.channelsConfig);
 
         // Delay generating channels until channel providers are registered.
-        Bukkit.getScheduler().runTaskLater(this.rosePlugin, this::generateChannels, 0L);
+        Bukkit.getScheduler().runTaskLater(this.rosePlugin, () -> {
+            this.generateChannels();
+            if (this.channelProviders.containsKey("worldguard")) {
+                long interval = Setting.WORLDGUARD_CHECK_INTERVAL.getLong();
+                if (interval != 0) this.worldGuardTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.rosePlugin,
+                        this::updatePlayerRegions, 0, interval);
+            }
+        }, 0L);
     }
 
     @Override
     public void disable() {
-
+        if (this.worldGuardTask != null)
+            this.worldGuardTask.cancel();
     }
 
     /**
@@ -65,6 +83,9 @@ public class ChannelManager extends Manager {
                     this.channels.put(channel.getId(), channel);
                     this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                             "&eGenerated " + channelProvider.getSupportedPlugin() + " channel: " + channel.getId());
+
+                    if (channelProvider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
+                        this.worldGuardChannels.add((WorldGuardChannel) channel);
                 }
             }
         } catch (Exception e) {
@@ -121,6 +142,9 @@ public class ChannelManager extends Manager {
                 this.channels.put(id, channel);
                 this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                         "&eLoaded " + provider.getSupportedPlugin() + " channel: " + channel.getId());
+
+                if (provider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
+                    this.worldGuardChannels.add((WorldGuardChannel) channel);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -160,6 +184,27 @@ public class ChannelManager extends Manager {
         }
     }
 
+    /**
+     * Updates the region that players are located in.
+     */
+    public void updatePlayerRegions() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+
+            for (WorldGuardChannel channel : this.getWorldGuardChannels()) {
+                // If the player is in the channel and not in the region, then kick them from the channel.
+                if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(player)) {
+                    channel.kick(player.getUniqueId());
+                    break;
+                }
+
+                if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(player)) {
+                    channel.forceJoin(player.getUniqueId());
+                    break;
+                }
+            }
+        }
+    }
+
     public Map<String, ChannelProvider> getChannelProviders() {
         return this.channelProviders;
     }
@@ -182,6 +227,10 @@ public class ChannelManager extends Manager {
 
     public CommentedFileConfiguration getChannelsConfig() {
         return this.channelsConfig;
+    }
+
+    public List<WorldGuardChannel> getWorldGuardChannels() {
+        return this.worldGuardChannels;
     }
 
 }
