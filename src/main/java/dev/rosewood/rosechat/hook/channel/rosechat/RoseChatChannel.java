@@ -68,7 +68,7 @@ public class RoseChatChannel extends ConditionalChannel {
         if (this.worlds.isEmpty() || !this.autoJoin) return false;
 
         // No point in joining again if the new world is linked too.
-        if (this.worlds.contains(from.getName()) && this.worlds.contains(to.getName())) return false;
+        if ((from != null && this.worlds.contains(from.getName())) && this.worlds.contains(to.getName())) return false;
 
         // Join the channel if the world is linked to the channel.
         return this.getJoinCondition(player) && this.worlds.contains(to.getName());

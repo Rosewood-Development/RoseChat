@@ -2,9 +2,14 @@ package dev.rosewood.rosechat.hook.channel.iridiumskyblock;
 
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.iridium.iridiumskyblock.api.IridiumSkyblockAPI;
+import com.iridium.iridiumskyblock.api.IslandDeleteEvent;
+import com.iridium.iridiumskyblock.api.UserJoinEvent;
+import com.iridium.iridiumskyblock.api.UserKickEvent;
+import com.iridium.iridiumskyblock.api.UserLeaveEvent;
 import com.iridium.iridiumskyblock.database.Island;
 import com.iridium.iridiumskyblock.database.IslandTrusted;
 import com.iridium.iridiumskyblock.database.User;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -13,15 +18,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class IridiumSkyblockChannel extends RoseChatChannel {
+public class IridiumSkyblockChannel extends RoseChatChannel implements Listener {
 
     private IridiumSkyblockChannelType channelType;
 
     public IridiumSkyblockChannel(ChannelProvider provider) {
         super(provider);
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -30,6 +40,28 @@ public class IridiumSkyblockChannel extends RoseChatChannel {
 
         if (config.contains("channel-type")) this.channelType = IridiumSkyblockChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+    }
+
+    @EventHandler
+    public void onTeamDisband(IslandDeleteEvent event) {
+        for (User user : event.getIsland().getMembers())
+            this.kick(user.getUuid());
+    }
+
+    @EventHandler
+    public void onTeamKick(UserKickEvent event) {
+        this.kick(event.getUser().getUuid());
+    }
+
+    @EventHandler
+    public void onTeamLeave(UserLeaveEvent event) {
+        this.kick(event.getUser().getUuid());
+    }
+
+    @EventHandler
+    public void onTeamJoin(UserJoinEvent event) {
+        if (this.autoJoin)
+            this.forceJoin(event.getUser().getUuid());
     }
 
     @Override

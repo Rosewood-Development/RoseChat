@@ -110,6 +110,8 @@ public abstract class Channel {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         PlayerData data = api.getPlayerData(uuid);
+        if (data.getCurrentChannel() == this) return;
+
         data.setCurrentChannel(this);
 
         Player player = Bukkit.getPlayer(uuid);
@@ -128,18 +130,31 @@ public abstract class Channel {
     public void kick(UUID uuid) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        Player player = Bukkit.getPlayer(uuid);
-
         // Remove the player from the channel if they leave the team.
         PlayerData data = api.getPlayerData(uuid);
-        if (data.getCurrentChannel().equals(this)) {
-            if (player != null)
-                this.onLeave(player);
 
-            data.setCurrentChannel(api.getDefaultChannel());
-            api.getLocaleManager().sendMessage(player,
-                    "command-channel-joined", StringPlaceholders.single("id", api.getDefaultChannel().getId()));
+        // Return if the player is not in this channel.
+        if (!data.getCurrentChannel().equals(this)) return;
+
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+
+        this.onLeave(player);
+
+        // Find the correct channel for the player to go in.
+        Channel foundChannel = null;
+        for (Channel channel : api.getChannels()) {
+            if (channel.onWorldJoin(player, null, player.getWorld())) {
+                foundChannel = channel;
+            }
         }
+
+        if (foundChannel == null) foundChannel = api.getDefaultChannel();
+
+        foundChannel.onJoin(player);
+        data.setCurrentChannel(foundChannel);
+        api.getLocaleManager().sendMessage(player,
+                    "command-channel-joined", StringPlaceholders.single("id", foundChannel.getId()));
     }
 
     /**

@@ -3,9 +3,10 @@ package dev.rosewood.rosechat.hook.channel.factionsuuid;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.FactionsAPI;
 import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.event.FPlayerJoinEvent;
+import com.massivecraft.factions.event.FPlayerLeaveEvent;
+import com.massivecraft.factions.event.FactionDisbandEvent;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
 import dev.rosewood.rosechat.RoseChat;
@@ -13,18 +14,23 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FactionsUUIDChannel extends RoseChatChannel {
+public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
     private FactionsChannelType channelType;
 
     public FactionsUUIDChannel(ChannelProvider provider) {
         super(provider);
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -35,6 +41,23 @@ public class FactionsUUIDChannel extends RoseChatChannel {
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
 
         FactionsPlugin.getInstance().setHandlingChat(RoseChat.getInstance(), true);
+    }
+
+    @EventHandler
+    public void onTeamDisband(FactionDisbandEvent event) {
+        for (FPlayer player : event.getFaction().getFPlayers())
+            this.kick(player.getOfflinePlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onTeamLeave(FPlayerLeaveEvent event) {
+        this.kick(event.getfPlayer().getOfflinePlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onTeamJoin(FPlayerJoinEvent event) {
+        if (this.autoJoin)
+            this.forceJoin(event.getfPlayer().getOfflinePlayer().getUniqueId());
     }
 
     @Override

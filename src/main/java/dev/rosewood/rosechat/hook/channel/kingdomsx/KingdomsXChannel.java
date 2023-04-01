@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.hook.channel.kingdomsx;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -8,19 +9,27 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.kingdoms.constants.group.Kingdom;
 import org.kingdoms.constants.group.model.relationships.KingdomRelation;
 import org.kingdoms.constants.player.KingdomPlayer;
+import org.kingdoms.events.general.KingdomDisbandEvent;
+import org.kingdoms.events.members.KingdomJoinEvent;
+import org.kingdoms.events.members.KingdomKickEvent;
+import org.kingdoms.events.members.KingdomLeaveEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class KingdomsXChannel extends RoseChatChannel {
+public class KingdomsXChannel extends RoseChatChannel implements Listener {
 
     private KingdomsChannelType channelType;
 
     public KingdomsXChannel(ChannelProvider provider) {
         super(provider);
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -29,6 +38,28 @@ public class KingdomsXChannel extends RoseChatChannel {
 
         if (config.contains("channel-type")) this.channelType = KingdomsChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+    }
+
+    @EventHandler
+    public void onTeamDisband(KingdomDisbandEvent event) {
+        for (UUID uuid : event.getKingdom().getMembers())
+            this.kick(uuid);
+    }
+
+    @EventHandler
+    public void onTeamKick(KingdomKickEvent event) {
+        this.kick(event.getPlayer().getId());
+    }
+
+    @EventHandler
+    public void onTeamLeave(KingdomLeaveEvent event) {
+        this.kick(event.getPlayer().getId());
+    }
+
+    @EventHandler
+    public void onTeamJoin(KingdomJoinEvent event) {
+        if (this.autoJoin)
+            this.forceJoin(event.getPlayer().getId());
     }
 
     public List<Player> getRecipientsByRelation(RosePlayer sender, Kingdom kingdom, KingdomRelation relation) {

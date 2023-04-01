@@ -1,7 +1,10 @@
 package dev.rosewood.rosechat.hook.channel.marriagemaster;
 
+import at.pcgamingfreaks.MarriageMaster.Bukkit.API.Events.DivorcedEvent;
+import at.pcgamingfreaks.MarriageMaster.Bukkit.API.Events.MarriedEvent;
 import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriageMasterPlugin;
 import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriagePlayer;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -9,16 +12,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarriageMasterChannel extends RoseChatChannel {
+public class MarriageMasterChannel extends RoseChatChannel implements Listener {
 
     private final MarriageMasterPlugin marriageMaster;
 
     public MarriageMasterChannel(ChannelProvider provider) {
         super(provider);
         this.marriageMaster = (MarriageMasterPlugin) Bukkit.getPluginManager().getPlugin("MarriageMaster");
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -26,6 +33,20 @@ public class MarriageMasterChannel extends RoseChatChannel {
         super.onLoad(id, config);
 
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+    }
+
+    @EventHandler
+    public void onTeamLeave(DivorcedEvent event) {
+        if (!event.getPlayer1().isMarried()) this.kick(event.getPlayer1().getUUID());
+        if (!event.getPlayer2().isMarried()) this.kick(event.getPlayer2().getUUID());
+    }
+
+    @EventHandler
+    public void onTeamJoin(MarriedEvent event) {
+        if (this.autoJoin) {
+            this.forceJoin(event.getPlayer1().getUUID());
+            this.forceJoin(event.getPlayer2().getUUID());
+        }
     }
 
     @Override

@@ -1,9 +1,14 @@
 package dev.rosewood.rosechat.hook.channel.towny;
 
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.event.DeleteTownEvent;
+import com.palmergames.bukkit.towny.event.TownAddResidentEvent;
+import com.palmergames.bukkit.towny.event.town.TownKickEvent;
+import com.palmergames.bukkit.towny.event.town.TownLeaveEvent;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -12,16 +17,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TownyChannel extends RoseChatChannel {
+public class TownyChannel extends RoseChatChannel implements Listener {
 
     private TownyChannelType channelType;
     private boolean useAllies;
 
     public TownyChannel(ChannelProvider provider) {
         super(provider);
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -31,6 +40,36 @@ public class TownyChannel extends RoseChatChannel {
         if (config.contains("channel-type")) this.channelType = TownyChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (config.contains("use-allies")) this.useAllies = config.getBoolean("use-allies");
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+    }
+
+    // Team Disband
+    @EventHandler
+    public void onTeamDelete(DeleteTownEvent event) {
+        Town town = TownyAPI.getInstance().getTown(event.getTownUUID());
+        if (town != null && this.channelType == TownyChannelType.TOWN) {
+            for (Resident resident : town.getResidents()) {
+                this.kick(resident.getUUID());
+            }
+        }
+    }
+
+    // Team Kick
+    @EventHandler
+    public void onTeamKick(TownKickEvent event) {
+        this.kick(event.getKickedResident().getUUID());
+    }
+
+    // Team Leave
+    @EventHandler
+    public void onTeamLeave(TownLeaveEvent event) {
+        this.kick(event.getResident().getUUID());
+    }
+
+    // Team Join
+    @EventHandler
+    public void onTeamJoin(TownAddResidentEvent event) {
+        if (this.autoJoin)
+            this.forceJoin(event.getResident().getUUID());
     }
 
     @Override

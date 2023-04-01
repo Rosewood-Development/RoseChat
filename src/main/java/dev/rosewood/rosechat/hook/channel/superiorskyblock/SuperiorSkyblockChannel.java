@@ -1,8 +1,13 @@
 package dev.rosewood.rosechat.hook.channel.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -11,15 +16,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuperiorSkyblockChannel extends RoseChatChannel {
+public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener {
 
     private SuperiorSkyblockChannelType channelType;
 
     public SuperiorSkyblockChannel(ChannelProvider provider) {
         super(provider);
+
+        Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
     @Override
@@ -28,6 +37,32 @@ public class SuperiorSkyblockChannel extends RoseChatChannel {
 
         if (config.contains("channel-type")) this.channelType = SuperiorSkyblockChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+    }
+
+    // Team Disband
+    @EventHandler
+    public void onTeamDisband(IslandDisbandEvent event) {
+        for (SuperiorPlayer sPlayer : event.getIsland().getIslandMembers(true))
+            this.kick(sPlayer.getUniqueId());
+    }
+
+    // Team Kick
+    @EventHandler
+    public void onTeamKick(IslandKickEvent event) {
+        this.kick(event.getTarget().getUniqueId());
+    }
+
+    // Team Leave
+    @EventHandler
+    public void onTeamLeave(IslandQuitEvent event) {
+        this.kick(event.getPlayer().getUniqueId());
+    }
+
+    // Team Join
+    @EventHandler
+    public void onTeamJoin(IslandJoinEvent event) {
+        if (this.autoJoin)
+            this.forceJoin(event.getPlayer().getUniqueId());
     }
 
     @Override
