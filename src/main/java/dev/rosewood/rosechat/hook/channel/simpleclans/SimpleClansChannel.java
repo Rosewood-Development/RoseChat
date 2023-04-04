@@ -61,6 +61,16 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
             this.forceJoin(event.getClanPlayer().getUniqueId());
     }
 
+    private boolean hasTeam(Player player) {
+        Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(player.getUniqueId());
+        return clan != null;
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
@@ -88,10 +98,7 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(player.getUniqueId());
-        if (clan == null) return false;
-
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override

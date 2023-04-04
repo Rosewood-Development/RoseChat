@@ -66,6 +66,16 @@ public class IridiumSkyblockChannel extends RoseChatChannel implements Listener 
             this.forceJoin(event.getUser().getUuid());
     }
 
+    private boolean hasTeam(Player player) {
+        User user = IridiumSkyblockAPI.getInstance().getUser(player);
+        return user.getIsland().isPresent();
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
@@ -105,10 +115,7 @@ public class IridiumSkyblockChannel extends RoseChatChannel implements Listener 
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        User user = IridiumSkyblockAPI.getInstance().getUser(player);
-        if (!user.getIsland().isPresent()) return false;
-
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override

@@ -63,6 +63,16 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
             this.forceJoin(event.getfPlayer().getOfflinePlayer().getUniqueId());
     }
 
+    private boolean hasTeam(Player player) {
+        Faction faction = FPlayers.getInstance().getByPlayer(player).getFaction();
+        return faction != null;
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
@@ -120,10 +130,7 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        Faction faction = FPlayers.getInstance().getByPlayer(player).getFaction();
-        if (faction == null) return false;
-
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override

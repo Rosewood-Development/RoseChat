@@ -68,6 +68,16 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
             this.forceJoin(event.getPlayer().getUniqueId());
     }
 
+    private boolean hasTeam(Player player) {
+        Island island = SuperiorSkyblockAPI.getPlayer(player.getUniqueId()).getIsland();
+        return island != null;
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
@@ -101,10 +111,7 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        Island island = SuperiorSkyblockAPI.getPlayer(player.getUniqueId()).getIsland();
-        if (island == null) return false;
-
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override

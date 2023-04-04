@@ -52,6 +52,15 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
         }
     }
 
+    private boolean hasTeam(Player player) {
+        return PartyAPI.inParty(player);
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
@@ -69,8 +78,7 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        if (!PartyAPI.inParty(player)) return false;
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
 }

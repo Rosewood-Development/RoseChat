@@ -65,6 +65,16 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
             this.forceJoin(event.getPlayer().getId());
     }
 
+    private boolean hasTeam(Player player) {
+        Kingdom kingdom = KingdomPlayer.getKingdomPlayer(player.getUniqueId()).getKingdom();
+        return kingdom != null;
+    }
+
+    @Override
+    public boolean onLogin(Player player) {
+        return super.onLogin(player) && this.hasTeam(player);
+    }
+
     public List<Player> getRecipientsByRelation(RosePlayer sender, Kingdom kingdom, KingdomRelation relation) {
         List<Player> recipients = new ArrayList<>();
 
@@ -130,10 +140,7 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        Kingdom kingdom = KingdomPlayer.getKingdomPlayer(player.getUniqueId()).getKingdom();
-        if (kingdom == null) return false;
-
-        return super.canJoinByCommand(player);
+        return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
