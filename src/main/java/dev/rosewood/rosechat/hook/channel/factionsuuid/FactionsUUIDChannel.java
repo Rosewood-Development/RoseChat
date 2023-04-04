@@ -41,6 +41,9 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
 
         FactionsPlugin.getInstance().setHandlingChat(RoseChat.getInstance(), true);
+
+        if (this.channelType == null)
+            this.channelType = FactionsChannelType.FACTION;
     }
 
     @EventHandler

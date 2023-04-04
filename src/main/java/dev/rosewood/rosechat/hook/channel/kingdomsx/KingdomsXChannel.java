@@ -38,6 +38,9 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
 
         if (config.contains("channel-type")) this.channelType = KingdomsChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+
+        if (this.channelType == null)
+            this.channelType = KingdomsChannelType.KINGDOM;
     }
 
     @EventHandler

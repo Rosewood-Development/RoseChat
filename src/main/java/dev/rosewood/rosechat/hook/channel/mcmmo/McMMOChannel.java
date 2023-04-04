@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.hook.channel.mcmmo;
 
 import com.gmail.nossr50.api.PartyAPI;
 import com.gmail.nossr50.events.party.McMMOPartyChangeEvent;
-import com.gmail.nossr50.party.PartyManager;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;

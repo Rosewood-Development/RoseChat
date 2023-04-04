@@ -36,6 +36,9 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
 
         if (config.contains("channel-type")) this.channelType = SimpleClansChannelType.valueOf(config.getString("channel-type").toUpperCase());
         if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+
+        if (this.channelType == null)
+            this.channelType = SimpleClansChannelType.CLAN;
     }
 
     // Team Disband
