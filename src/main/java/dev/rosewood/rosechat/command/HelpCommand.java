@@ -23,7 +23,7 @@ public class HelpCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        this.getAPI().getLocaleManager().sendMessage(sender, "command-help-title");
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-help-title");
         for (CommandManager manager : this.plugin.getCommandManager().getCommandManagers()) {
             if (manager.getMainCommandLabel().equalsIgnoreCase("delmsg")) continue;
 
