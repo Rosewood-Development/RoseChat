@@ -286,6 +286,7 @@ public class MessageUtils {
         });
 
         // Update the player's display name if the setting is enabled.
+        if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
