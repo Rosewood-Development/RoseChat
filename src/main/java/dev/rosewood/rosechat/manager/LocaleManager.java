@@ -25,6 +25,8 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, boolean prefix) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         if (!prefix) {
             RoseSender roseSender = new RoseSender(sender);
             roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey)));
@@ -34,6 +36,8 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders, boolean prefix) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         if (!prefix) {
             RoseSender roseSender = new RoseSender(sender);
             roseSender.send(RoseChatAPI.getInstance().parse(roseSender, roseSender, this.getMessage(messageKey, stringPlaceholders)));
@@ -43,19 +47,27 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         RoseSender roseSender = new RoseSender(sender);
         this.sendComponentMessage(roseSender, messageKey, stringPlaceholders);
     }
 
     public void sendComponentMessage(RoseSender sender, String messageKey) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }
 
     public void sendComponentMessage(RoseSender sender, String messageKey, StringPlaceholders stringPlaceholders) {
+        if (this.getMessage(messageKey).isEmpty()) return;
+
         sender.send(RoseChatAPI.getInstance().parse(sender, sender, this.getMessage("prefix") + this.getMessage(messageKey, stringPlaceholders)));
     }
 
