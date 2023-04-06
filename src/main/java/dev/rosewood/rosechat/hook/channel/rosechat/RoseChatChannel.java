@@ -216,11 +216,11 @@ public class RoseChatChannel extends ConditionalChannel {
                 if (this.keepFormatOverBungee) {
                     RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                         api.getBungeeManager()
-                                .sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(),
+                                .sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), true,
                                         ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormat())));
                     });
                 } else {
-                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), message.getMessage());
+                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), false, message.getMessage());
                 }
             }
         }
@@ -408,7 +408,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Flood the channel on the linked servers.
         if (api.isBungee()) {
             for (String server : this.servers)
-                api.getBungeeManager().sendChannelMessage(new RosePlayer("", ""), server, this.getId(), null, message);
+                api.getBungeeManager().sendChannelMessage(new RosePlayer("", ""), server, this.getId(), null, false, message);
         }
 
         // Send to all players who can see the channel.

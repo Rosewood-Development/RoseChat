@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -110,7 +111,7 @@ public class BungeeManager extends Manager {
      * @param messageId The {@link UUID} of the message that should be sent.
      * @param message The unformatted message that should be sent.
      */
-    public void sendChannelMessage(RosePlayer sender, String server, String channel, UUID messageId, String message) {
+    public void sendChannelMessage(RosePlayer sender, String server, String channel, UUID messageId, boolean isJson, String message) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
@@ -121,6 +122,7 @@ public class BungeeManager extends Manager {
             out.writeUTF(sender.getGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
             out.writeUTF(messageId.toString());
+            out.writeBoolean(isJson);
             out.writeUTF(PlaceholderAPIHook.applyPlaceholders(sender.isPlayer() ? sender.asPlayer() : null, message));
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,14 +140,22 @@ public class BungeeManager extends Manager {
      * @param messageId The {@link UUID} of the message.
      * @param message The unformatted message received.
      */
-    public void receiveChannelMessage(String channelStr, String senderStr, UUID senderUUID, String senderGroup, List<String> permissions, UUID messageId, String message) {
-        //ChatChannel channel = null;//this.rosePlugin.getManager(ChannelManager.class).getChannel(channelStr);
+    public void receiveChannelMessage(String channelStr, String senderStr, UUID senderUUID, String senderGroup, List<String> permissions,
+                                      UUID messageId, boolean isJson, String message) {
+        Channel channel = this.rosePlugin.getManager(ChannelManager.class).getChannel(channelStr);
 
-      //  if (channel == null) return;
+        if (channel == null) return;
         RosePlayer sender = new RosePlayer(senderUUID, senderStr, senderGroup);
         sender.setIgnoredPermissions(permissions);
 
-        //channel.sendJson(sender, messageId, message);
+        // Must be done asynchronously for LuckPerms & Vault.
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            if (isJson) {
+                channel.sendJson(sender, message, messageId);
+            } else {
+                channel.send(sender, message, messageId);
+            }
+        });
     }
 
     //

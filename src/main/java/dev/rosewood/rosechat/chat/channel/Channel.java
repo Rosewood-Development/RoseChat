@@ -199,7 +199,7 @@ public abstract class Channel {
      * @param messageId The {@link UUID} of the message sent from the other server.
      */
     public void sendJson(RosePlayer sender, String message, UUID messageId) {
-
+        // No default implementation
     }
 
     /**

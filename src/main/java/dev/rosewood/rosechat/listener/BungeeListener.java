@@ -51,8 +51,9 @@ public class BungeeListener implements PluginMessageListener {
                     String group = data.readUTF();
                     List<String> permissions = Arrays.asList(data.readUTF().split(","));
                     UUID messageId = UUID.fromString(data.readUTF());
+                    boolean isJson = data.readBoolean();
                     String rcMessage = data.readUTF();
-                    this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, rcMessage);
+                    this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);
                     return;
                 }
                 case "direct_message": {
