@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -22,27 +23,24 @@ public class MessageListener implements Listener {
     public void onPostParseMessage(PostParseMessageEvent event) {
         if (event.getMessageDirection() == MessageDirection.TO_DISCORD || event.getMessageDirection() == MessageDirection.TO_BUNGEE_SERVER) return;
 
-        // Private messages already have the delete button applied via packets.
-        //if (event.getMessage().isPrivateMessage()) return;
-
         // If the sender is the same as the viewer (player looking at their own message)
         if (event.getMessage().getSender().isPlayer() && event.getMessage().getSender().getUUID() == event.getViewer().getUUID()) {
             if (!event.getViewer().hasPermission("rosechat.deletemessages.self")) return;
-           // BaseComponent[] components = event.getMessage().toComponents();
-          //  if (components == null || components.length == 0) return;
+            BaseComponent[] components = event.getMessage().toComponents();
+            if (components == null || components.length == 0) return;
 
             ComponentBuilder componentBuilder = new ComponentBuilder();
             String placeholder = Setting.DELETE_OWN_MESSAGE_FORMAT.getString();
-           // this.appendButton(event, components, componentBuilder, placeholder);
+            this.appendButton(event, components, componentBuilder, placeholder);
         } else {
             if (!event.getViewer().hasPermission("rosechat.deletemessages.others")) return;
 
-           // BaseComponent[] components = event.getMessage().toComponents();
-          //  if (components == null || components.length == 0) return;
+            BaseComponent[] components = event.getMessage().toComponents();
+            if (components == null || components.length == 0) return;
 
             ComponentBuilder componentBuilder = new ComponentBuilder();
             String placeholder = Setting.DELETE_OTHER_MESSAGE_FORMAT.getString();
-           // this.appendButton(event, components, componentBuilder, placeholder);
+            this.appendButton(event, components, componentBuilder, placeholder);
         }
     }
 
@@ -56,7 +54,8 @@ public class MessageListener implements Listener {
             if (deleteButton != null) componentBuilder.append(deleteButton);
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
         }
-//        event.getMessage().setComponents(componentBuilder.create());
+
+        event.getMessage().setComponents(componentBuilder.create());
     }
 
     private boolean shouldSuffixButton(PostParseMessageEvent event, String placeholderId) {
@@ -64,25 +63,23 @@ public class MessageListener implements Listener {
         RoseChatPlaceholder placeholder = this.api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return false;
 
-       /* String text = placeholder.getText().parseToString(event.getMessage().getSender(), event.getViewer(),
+       String text = placeholder.getText().parseToString(event.getMessage().getSender(), event.getViewer(),
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
-                        .addPlaceholder("id", event.getMessage().getId())
+                        .addPlaceholder("id", event.getMessage().getUUID())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getGroup().getLocationPermission()).build());
-        return text.trim().startsWith("%message%");*/
-        return true;
+                        .addPlaceholder("channel", event.getMessage().getLocationPermission()).build());
+        return text.trim().startsWith("%message%");
     }
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {
         placeholder = placeholder.replace("%message%", "");
 
-        /*return RoseChatAPI.getInstance().parse(event.getMessage().getSender(), event.getViewer(), placeholder,
+        return RoseChatAPI.getInstance().parse(event.getMessage().getSender(), event.getViewer(), placeholder,
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
-                        .addPlaceholder("id", event.getMessage().getId())
+                        .addPlaceholder("id", event.getMessage().getUUID())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getGroup().getLocationPermission())
-                        .addPlaceholder("message", "").build());*/
-        return null;
+                        .addPlaceholder("channel", event.getMessage().getLocationPermission())
+                        .addPlaceholder("message", "").build());
     }
 
 }

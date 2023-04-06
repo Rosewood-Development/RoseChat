@@ -42,6 +42,7 @@ public class RoseMessage {
     private String message;
     private Channel channel;
     private MessageRules messageRules;
+    private StringPlaceholders placeholders;
 
     // Out Values
     private final List<UUID> taggedPlayers;
@@ -147,8 +148,12 @@ public class RoseMessage {
         if (preParseMessageEvent.isCancelled()) return null;;
         this.tokenized = parser.parse(this, this.sender, viewer, format);
 
-        PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
-        Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+        // Only call the PostParseMessageEvent if the message has a format.
+        // This prevents non-chat messages from having delete buttons.
+        if (format != null) {
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+            Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+        }
 
         if (viewer != null) {
             PlayerData viewerData = viewer.getPlayerData();
@@ -367,6 +372,21 @@ public class RoseMessage {
      */
     public DeletableMessage getDeletableMessage() {
         return this.deletableMessage;
+    }
+
+    /**
+     * Sets the placeholders for this message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     */
+    public void setPlaceholders(StringPlaceholders placeholders) {
+        this.placeholders = placeholders;
+    }
+
+    /**
+     * @return The {@link StringPlaceholders} that this message should use.
+     */
+    public StringPlaceholders getPlaceholders() {
+        return this.placeholders;
     }
 
 }

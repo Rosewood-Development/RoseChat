@@ -64,7 +64,7 @@ public class DeleteMessageCommand extends AbstractCommand {
             // Handle private messages differently.
             if (message.getPrivateMessageInfo() != null) {
                 PrivateMessageInfo info = message.getPrivateMessageInfo();
-                if (info.getSender() == info.getReceiver()) {
+                if (info.getSender() == info.getReceiver() || info.getSender().isConsole()) {
                     deleteMessageForPlayer(player, message);
                 }
 
@@ -103,7 +103,7 @@ public class DeleteMessageCommand extends AbstractCommand {
                     deleteMessageForPlayer(player, message);
                 }
 
-                return;
+                continue;
             }
 
             if (message.isClient()) {

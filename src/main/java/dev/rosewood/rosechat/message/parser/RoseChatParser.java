@@ -28,7 +28,7 @@ public class RoseChatParser implements MessageParser {
         if (format == null || !format.contains("{message}")) {
             if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), false,
+                        new MessageTokenizer(message, receiver, message.getMessage(), sender.isConsole(),
                                 Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
@@ -37,7 +37,7 @@ public class RoseChatParser implements MessageParser {
                 ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), false,
+                        new MessageTokenizer(message, receiver, message.getMessage(), sender.isConsole(),
                                 Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.DEFAULT_BUNDLE)
                                 .toComponents(),
@@ -77,7 +77,7 @@ public class RoseChatParser implements MessageParser {
 
             if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
-                  new MessageTokenizer(message, receiver, formatColor + message.getMessage(),
+                  new MessageTokenizer(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
                           Tokenizers.DISCORD_EMOJI_BUNDLE,
                           Tokenizers.MARKDOWN_BUNDLE,
                           Tokenizers.DISCORD_FORMATTING_BUNDLE,
@@ -86,7 +86,7 @@ public class RoseChatParser implements MessageParser {
                         ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
-                        new MessageTokenizer(message, receiver, formatColor + message.getMessage(),
+                        new MessageTokenizer(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
                                 Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.DEFAULT_BUNDLE)
                                 .toComponents(),

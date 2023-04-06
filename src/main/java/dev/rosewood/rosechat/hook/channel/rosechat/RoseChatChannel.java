@@ -2,10 +2,12 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -176,12 +178,12 @@ public class RoseChatChannel extends ConditionalChannel {
                 BaseComponent[] parsedMessage = ComponentSerializer.parse(receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), jsonMessage) : jsonMessage);
                 message.setComponents(parsedMessage);
 
-                // TODO: Update message deletion
-                // Call the post parse message event for the correct viewer if the message was sent over bungee
-                //PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.FROM_BUNGEE_SERVER);
-                //Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+                //Call the post parse message event for the correct viewer if the message was sent over bungee
+                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.PLAYER_TO_SERVER);
+                Bukkit.getPluginManager().callEvent(postParseMessageEvent);
                 receiver.send(message.toComponents());
-                //receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(message.toComponents()), false, discordId));
+                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(message.toComponents()),
+                        false, discordId));
             }
 
             // Play the tag sound to the player.

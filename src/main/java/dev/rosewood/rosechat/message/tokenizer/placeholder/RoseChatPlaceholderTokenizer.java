@@ -33,7 +33,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
             RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(originalContent.substring(1, originalContent.length() - 1));
             if (roseChatPlaceholder == null) return null;
 
-            StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(messageWrapper.getSender(), viewer, messageWrapper.getChannel(), StringPlaceholders.empty()).build();
+            StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(messageWrapper.getSender(), viewer, messageWrapper.getChannel(), messageWrapper.getPlaceholders()).build();
             String content = placeholders.apply(roseChatPlaceholder.getText().parseToString(messageWrapper.getSender(), viewer, placeholders));
             String hover = roseChatPlaceholder.getHover() == null ? null : placeholders.apply(roseChatPlaceholder.getHover().parseToString(messageWrapper.getSender(), viewer, placeholders));
             String click = roseChatPlaceholder.getClick() == null ? null : placeholders.apply(roseChatPlaceholder.getClick().parseToString(messageWrapper.getSender(), viewer, placeholders));

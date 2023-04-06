@@ -169,11 +169,11 @@ public class PacketListener {
     public static BaseComponent[] appendButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-        BaseComponent[] deleteClientButton = null;/*RoseChatAPI.getInstance().parse(sender, sender, placeholder,
+        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
                         .addPlaceholder("id", messageId)
                         .addPlaceholder("type", "client")
-                        .addPlaceholder("message", "").build());*/
+                        .addPlaceholder("message", "").build());
 
         if (deleteClientButton == null) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));

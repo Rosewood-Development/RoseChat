@@ -25,6 +25,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
@@ -60,6 +61,21 @@ public final class RoseChatAPI {
      */
     public String getVersion() {
         return this.plugin.getDescription().getVersion();
+    }
+
+    /**
+     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * @param sender The person sending the message.
+     * @param viewer The person receiving the message.
+     * @param message The string to parse.
+     * @param placeholders A set of {@link StringPlaceholders} to be parsed in the message.
+     * @return A {@link BaseComponent} consisting of the parsed message.
+     */
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, StringPlaceholders placeholders) {
+        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NONE, message);
+        roseMessage.setPlaceholders(placeholders);
+
+        return roseMessage.parse(viewer, null);
     }
 
     /**
