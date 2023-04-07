@@ -232,7 +232,7 @@ public class MessageUtils {
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         // The tokens will always be generated before even if this message is not sent.
-        if (target != null && !targetName.equalsIgnoreCase("Console") && !sender.isConsole())
+        if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
             Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
 
         // Parse for the channel spies.
@@ -268,7 +268,7 @@ public class MessageUtils {
                     RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (success) -> {
                         if (success) {
                             // If the message was received successfully, send the sent message to the sender.
-                            sender.send(parsedMessage);
+                            sender.send(parsedSentMessage);
                         } else {
                             // If the message was not received successfully, then the player is assumed to not be online.
                             RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");

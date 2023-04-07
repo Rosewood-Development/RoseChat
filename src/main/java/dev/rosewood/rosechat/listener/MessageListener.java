@@ -5,9 +5,11 @@ import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -63,22 +65,22 @@ public class MessageListener implements Listener {
         RoseChatPlaceholder placeholder = this.api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return false;
 
-       String text = placeholder.getText().parseToString(event.getMessage().getSender(), event.getViewer(),
+       String text = placeholder.getText().parseToString(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(),
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getUUID())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getLocationPermission()).build());
+                        .addPlaceholder("channel", event.getMessage().getLocationPermission().replace("channel.", "")).build());
         return text.trim().startsWith("%message%");
     }
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {
         placeholder = placeholder.replace("%message%", "");
 
-        return RoseChatAPI.getInstance().parse(event.getMessage().getSender(), event.getViewer(), placeholder,
+        return RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(), placeholder,
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .addPlaceholder("id", event.getMessage().getUUID())
                         .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getLocationPermission())
+                        .addPlaceholder("channel", event.getMessage().getLocationPermission().replace("channel.", ""))
                         .addPlaceholder("message", "").build());
     }
 

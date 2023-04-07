@@ -36,7 +36,8 @@ public class MessageCommand extends AbstractCommand {
 
         String target = args[0];
 
-        if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
+        if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()
+                && this.getAPI().isBungee()) {
             this.getAPI().getBungeeManager().getPlayers("ALL");
             if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
@@ -66,7 +67,8 @@ public class MessageCommand extends AbstractCommand {
         if (targetPlayer != null) {
             this.getAPI().getPlayerDataManager().getPlayerData(targetPlayer.getUniqueId(), data -> {
                 if (data != null) {
-                    if ((!sender.hasPermission("rosechat.togglemessage.bypass")) && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
+                    if ((!sender.hasPermission("rosechat.togglemessage.bypass"))
+                            && (!data.canBeMessaged() || ((sender instanceof Player) && !((Player) sender).canSee(targetPlayer)))) {
                         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglemessage-cannot-message");
                         canBeMessaged.set(false);
                     }
@@ -92,7 +94,7 @@ public class MessageCommand extends AbstractCommand {
             this.getAPI().getBungeeManager().sendUpdateReply(sender.getName(), target);
         }
 
-        if (!targetPlayer.isOnline()) return;
+        if (targetPlayer == null || !targetPlayer.isOnline()) return;
         Player player = targetPlayer.getPlayer();
 
         PlayerData targetData = this.getAPI().getPlayerData(player.getUniqueId());

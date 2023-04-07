@@ -88,13 +88,13 @@ public class BungeeManager extends Manager {
     //
 
     private String getPlayerPermissions(RosePlayer sender) {
+        if ((sender.isPlayer() && sender.asPlayer().isOp())) return "*";
+
         StringBuilder stringBuilder = new StringBuilder();
         for (String permission : sender.getPermissions()) {
             if (stringBuilder.length() != 0) stringBuilder.append(",");
             stringBuilder.append(permission);
         }
-
-        if ((sender.isPlayer() && sender.asPlayer().isOp())) stringBuilder.append(",*");
 
         return stringBuilder.toString();
     }

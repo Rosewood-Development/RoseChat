@@ -70,7 +70,7 @@ public class DeleteMessageCommand extends AbstractCommand {
 
                 else if (info.getSender().getUUID().equals(player.getUniqueId())) {
                     deleteMessageForPlayer(player, message);
-                    if (info.getReceiver().isPlayer()) {
+                    if (info.getReceiver().isPlayer() && !info.getReceiver().getUUID().equals(player.getUniqueId())) {
                         Player receiver = info.getReceiver().asPlayer();
                         for (DeletableMessage deletableMessage : api.getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(receiver, deletableMessage);
