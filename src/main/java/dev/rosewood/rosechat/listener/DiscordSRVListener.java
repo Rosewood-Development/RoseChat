@@ -5,16 +5,29 @@ import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
+import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,19 +58,19 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             }
         }));
 
-        //this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
+        this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
     }
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
         event.setCancelled(true);
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
-            //this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
+            this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
         });
     }
 
-    /*public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
-        for (ChatChannel channel : this.api.getChannels()) {
+    public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
+        for (Channel channel : this.api.getChannels()) {
             if (channel.getDiscordChannel() == null) continue;
             if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel))) continue;
             if (channel.isMuted()) return;
@@ -100,7 +113,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                        if (data.getNickname() != null) return data.getNickname();
                        return Bukkit.getOfflinePlayer(uuid).getName();
                     });
-                } catch (ExecutionException e) {
+                } catch (Exception e) {
                     name = member.getEffectiveName();
                 }
 
@@ -109,11 +122,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             return;
         }
-    }*/
+    }
 
-    /*private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, ChatChannel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
+    private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, Channel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
-        RoseSender sender = (offlinePlayer == null ? new RoseSender(name, "default") : new RoseSender(offlinePlayer));
+        RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, "default") : new RosePlayer(offlinePlayer));
 
         // Add all attachments.
         for (Message.Attachment attachment : message.getAttachments())
@@ -126,16 +139,18 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt()) return;
             if (!MessageUtils.isMessageEmpty(line)) {
-                MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.CHANNEL, channel, line, placeholders
-                        .addPlaceholder("user_nickname", name).build());
+                RoseMessage messageWrapper = new RoseMessage(sender, channel, line);
+                messageWrapper.setPlaceholders(placeholders.addPlaceholder("user_nickname", name).build());
 
+                MessageRules rules = new MessageRules();
                 if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {
                     // Don't count the message as spam if the message is being edited.
-                    if (update) messageWrapper.filterCaps().filterURLs().filterLanguage();
-                    else messageWrapper.filter().applyDefaultColor();
+                    if (update) rules.applyCapsFilter().applyURLFilter().applyLanguageFilter().applySenderChatColor();
+                    else rules.applyAllFilters().applySenderChatColor();
                 }
 
-                if (!messageWrapper.canBeSent() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                messageWrapper.applyRules(rules);
+                if (messageWrapper.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
                     message.delete().queue();
                     return;
                 }
@@ -145,11 +160,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         Player player = Bukkit.getPlayer(playerData.getUUID());
                         if (player == null) continue;
 
-                        messageWrapper.setShouldLogMessages(false);
+                        rules.ignoreMessageLogging();
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId())) continue;
-                            messageWrapper.setId(deletableMessage.getUUID());
-                            BaseComponent[] components = messageWrapper.parseFromDiscord(message.getId(), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), new RoseSender(player));
+                            messageWrapper.setUUID(deletableMessage.getUUID());
+                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId());
                             deletableMessage.setJson(ComponentSerializer.toString(components));
                             break;
                         }
@@ -159,13 +174,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                             player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
                     }
                 } else {
-                    channel.sendFromDiscord(message.getId(), messageWrapper);
+                    channel.send(messageWrapper, message.getId());
                     BaseComponent[] messageComponents = messageWrapper.toComponents();
                     if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
                 }
             }
         }
-    }*/
+    }
 
     public static String getColor(Member member) {
         if (member.getColor() != null) return Integer.toHexString(member.getColorRaw());

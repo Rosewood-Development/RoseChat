@@ -33,7 +33,6 @@ public class RoseChatChannel extends ConditionalChannel {
 
     // Channel Settings
     protected int radius;
-    protected String discordChannel;
     protected boolean autoJoin;
     protected boolean visibleAnywhere;
     protected boolean joinable;
@@ -51,7 +50,6 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Set settings specifically for RoseChat Channels
         this.radius = config.contains("radius") ? config.getInt("radius") : -1;
-        this.discordChannel = config.contains("discord") ? config.getString("discord") : null;
         this.autoJoin = config.contains("auto-join") && config.getBoolean("auto-join");
         this.visibleAnywhere = config.contains("visible-anywhere") && config.getBoolean("visible-anywhere");
         this.joinable = config.contains("joinable") && config.getBoolean("joinable");
@@ -150,9 +148,6 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     protected void sendToPlayer(RoseMessage message, RosePlayer receiver, MessageDirection direction, String format, String discordId) {
-        // Don't send the message to the sender if it was sent from discord.
-        if (receiver.getUUID().equals(message.getSender().getUUID()) && direction == MessageDirection.FROM_DISCORD) return;
-
         PlayerData receiverData = RoseChatAPI.getInstance().getPlayerData(receiver.getUUID());
         // Don't send the message if the receiver can't receive it.
         if (!this.canReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
@@ -201,8 +196,8 @@ public class RoseChatChannel extends ConditionalChannel {
         // Send the message to discord, if not sent from discord.
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD) {
-            if (direction != MessageDirection.FROM_BUNGEE_RAW && api.getDiscord() != null && this.discordChannel != null) {
-                MessageUtils.sendDiscordMessage(message, this, this.discordChannel);
+            if (direction != MessageDirection.FROM_BUNGEE_RAW && api.getDiscord() != null && this.getDiscordChannel() != null) {
+                MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel());
             }
         }
     }
@@ -211,7 +206,7 @@ public class RoseChatChannel extends ConditionalChannel {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Send the message over bungee, if the message was not sent from bungee.
-        if (direction != MessageDirection.FROM_BUNGEE_SERVER && direction != MessageDirection.FROM_BUNGEE_RAW && api.isBungee()) {
+        if (direction != MessageDirection.FROM_BUNGEE_SERVER && direction != MessageDirection.FROM_BUNGEE_RAW && api.isBungee() && direction != MessageDirection.FROM_DISCORD) {
             for (String server : this.servers) {
                 if (this.keepFormatOverBungee) {
                     RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
@@ -470,7 +465,7 @@ public class RoseChatChannel extends ConditionalChannel {
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
                 .addPlaceholder("radius", this.radius == -1 ? nullValue : this.radius)
-                .addPlaceholder("discord", this.discordChannel == null ? nullValue : this.discordChannel)
+                .addPlaceholder("discord", this.getDiscordChannel() == null ? nullValue : this.getDiscordChannel())
                 .addPlaceholder("auto-join", this.autoJoin ? trueValue : falseValue)
                 .addPlaceholder("visible-anywhere", this.visibleAnywhere ? trueValue : falseValue)
                 .addPlaceholder("joinable", this.joinable ? trueValue : falseValue)

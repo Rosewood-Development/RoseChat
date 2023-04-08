@@ -26,6 +26,7 @@ public abstract class Channel {
 
     // Settings
     private String format;
+    private String discordChannel;
     private List<String> commands;
     private List<String> overrideCommands;
     private List<String> shoutCommands;
@@ -45,6 +46,7 @@ public abstract class Channel {
         this.id = id;
         if (config.contains("default") && config.getBoolean("default")) this.setDefault();
         if (config.contains("format")) this.setFormat(config.getString("format"));
+        if (config.contains("discord")) this.setDiscordChannel(config.getString("discord"));
         if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
         if (config.contains("override-commands")) this.setOverrideCommands(config.getStringList("override-commands"));
         if (config.contains("shout-commands")) this.setShoutCommands(config.getStringList("shout-commands"));
@@ -302,6 +304,14 @@ public abstract class Channel {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getDiscordChannel() {
+        return this.discordChannel;
+    }
+
+    public void setDiscordChannel(String discordChannel) {
+        this.discordChannel = discordChannel;
     }
 
     public List<String> getCommands() {
