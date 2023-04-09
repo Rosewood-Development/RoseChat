@@ -237,6 +237,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Send message to Bungee
         RoseMessage bungeeMessage = new RoseMessage(message);
+        bungeeMessage.getMessageRules().ignoreMessageLogging();
         this.sendToBungee(bungeeMessage, direction);
 
         List<Player> currentSpies = new ArrayList<>();

@@ -90,7 +90,7 @@ public class RoseMessage {
         this.location = other.location;
         this.message = other.message;
         this.channel = other.channel;
-        this.messageRules = other.messageRules;
+        this.messageRules = new MessageRules(other.messageRules);
         this.placeholders = other.placeholders;
         this.taggedPlayers = new ArrayList<>();
         this.tagSound = null;

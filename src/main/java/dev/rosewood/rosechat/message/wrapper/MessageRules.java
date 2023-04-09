@@ -22,6 +22,21 @@ public class MessageRules {
     }
 
     /**
+     * Copy constructor to prevent asynchronous editing issues.
+     * @param other The {@link MessageRules} to copy.
+     */
+    public MessageRules(MessageRules other) {
+        this.filterCaps = other.filterCaps;
+        this.filterSpam = other.filterSpam;
+        this.filterURLs = other.filterURLs;
+        this.filterLanguage = other.filterLanguage;
+        this.applySenderChatColor = other.applySenderChatColor;
+        this.ignoreMessageLogging = other.ignoreMessageLogging;
+        this.privateMessage = other.privateMessage;
+        this.privateMessageInfo = other.privateMessageInfo;
+    }
+
+    /**
      * Checks if the sender has permission, and applies a capital letter filter if not.
      */
     public MessageRules applyCapsFilter() {
@@ -207,6 +222,13 @@ public class MessageRules {
      */
     public PrivateMessageInfo getPrivateMessageInfo() {
         return this.privateMessageInfo;
+    }
+
+    /**
+     * @param ignoreMessageLogging Whether to ignore message logging.
+     */
+    public void setIgnoreMessageLogging(boolean ignoreMessageLogging) {
+        this.ignoreMessageLogging = ignoreMessageLogging;
     }
 
 }

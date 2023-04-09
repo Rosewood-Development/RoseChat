@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public class MessageLog {
 
-    private UUID sender;
+    private UUID owner;
     private List<String> messages;
     private final LinkedList<DeletableMessage> deletableMessages;
     private int cleanupAmount;
 
     public MessageLog(UUID sender) {
-        this.sender = sender;
+        this.owner = sender;
         this.messages = new ArrayList<>();
         this.deletableMessages = new LinkedList<>();
     }
@@ -61,12 +61,12 @@ public class MessageLog {
         this.messages.add(message);
     }
 
-    public UUID getSender() {
-        return this.sender;
+    public UUID getOwner() {
+        return this.owner;
     }
 
-    public void setSender(UUID sender) {
-        this.sender = sender;
+    public void setOwner(UUID owner) {
+        this.owner = owner;
     }
 
     public List<String> getMessages() {
