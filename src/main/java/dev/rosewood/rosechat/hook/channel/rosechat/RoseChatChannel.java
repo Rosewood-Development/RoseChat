@@ -148,20 +148,23 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     protected void sendToPlayer(RoseMessage message, RosePlayer receiver, MessageDirection direction, String format, String discordId) {
+        message = new RoseMessage(message);
+
         PlayerData receiverData = RoseChatAPI.getInstance().getPlayerData(receiver.getUUID());
         // Don't send the message if the receiver can't receive it.
         if (!this.canReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
 
         // Send the message to the player asynchronously.
+        RoseMessage finalMessage = message;
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             // If the message is not a json message, parse normally or parse from discord if an id is available.
             if (direction != MessageDirection.FROM_BUNGEE_RAW) {
-                receiver.send(discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId));
+                receiver.send(discordId == null ? finalMessage.parse(receiver, format) : finalMessage.parseMessageFromDiscord(receiver, format, discordId));
             } else {
                 // Parse the json message.
 
                 // Replace %other placeholders.
-                String jsonMessage = message.getMessage();
+                String jsonMessage = finalMessage.getMessage();
                 if (PlaceholderAPIHook.enabled()) {
                     Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(jsonMessage);
                     while (matcher.find()) {
@@ -171,21 +174,21 @@ public class RoseChatChannel extends ConditionalChannel {
 
                 // Serialize the json message and set the components.
                 BaseComponent[] parsedMessage = ComponentSerializer.parse(receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), jsonMessage) : jsonMessage);
-                message.setComponents(parsedMessage);
+                finalMessage.setComponents(parsedMessage);
 
                 //Call the post parse message event for the correct viewer if the message was sent over bungee
-                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.PLAYER_TO_SERVER);
+                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(finalMessage, finalMessage.getSender(), MessageDirection.PLAYER_TO_SERVER);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
-                receiver.send(message.toComponents());
-                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(message.toComponents()),
+                receiver.send(finalMessage.toComponents());
+                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(finalMessage.getUUID(), ComponentSerializer.toString(finalMessage.toComponents()),
                         false, discordId));
             }
 
             // Play the tag sound to the player.
-            if (receiver.isPlayer() && message.getTaggedPlayers().contains(receiver.getUUID())) {
+            if (receiver.isPlayer() && finalMessage.getTaggedPlayers().contains(receiver.getUUID())) {
                 Player player = receiver.asPlayer();
-                if (message.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
-                    player.playSound(player.getLocation(), message.getTagSound(), 1.0f, 1.0f);
+                if (finalMessage.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
+                    player.playSound(player.getLocation(), finalMessage.getTagSound(), 1.0f, 1.0f);
             }
         });
     }
@@ -195,9 +198,11 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Send the message to discord, if not sent from discord.
         // Json messages are unsupported
-        if (direction != MessageDirection.FROM_DISCORD) {
-            if (direction != MessageDirection.FROM_BUNGEE_RAW && api.getDiscord() != null && this.getDiscordChannel() != null) {
-                MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel());
+        if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
+            if (api.getDiscord() != null && this.getDiscordChannel() != null) {
+                RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                    MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel());
+                });
             }
         }
     }
@@ -222,9 +227,16 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     private void send(RoseMessage message, MessageDirection direction, String format, String discordId) {
+        // Send message to the player
         this.sendToPlayer(message, message.getSender(), direction, format, discordId);
-        this.sendToDiscord(message, direction);
-        this.sendToBungee(message, direction);
+
+        // Send message to Discord
+        RoseMessage discordMessage = new RoseMessage(message);
+        this.sendToDiscord(discordMessage, direction);
+
+        // Send message to Bungee
+        RoseMessage bungeeMessage = new RoseMessage(message);
+        this.sendToBungee(bungeeMessage, direction);
 
         List<Player> currentSpies = new ArrayList<>();
 

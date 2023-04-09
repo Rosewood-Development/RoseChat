@@ -90,7 +90,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
-    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(2, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;

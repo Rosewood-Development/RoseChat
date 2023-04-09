@@ -80,6 +80,26 @@ public class RoseMessage {
     }
 
     /**
+     * Copy constructor to prevent asynchronously editing the tokenized value.
+     * @param other The {@link RoseMessage} to copy.
+     */
+    public RoseMessage(RoseMessage other) {
+        this.uuid = other.uuid;
+        this.deletableMessage = other.deletableMessage;
+        this.sender = other.sender;
+        this.location = other.location;
+        this.message = other.message;
+        this.channel = other.channel;
+        this.messageRules = other.messageRules;
+        this.placeholders = other.placeholders;
+        this.taggedPlayers = new ArrayList<>();
+        this.tagSound = null;
+        this.filterType = null;
+        this.isBlocked = false;
+        this.tokenized = null;
+    }
+
+    /**
      * Applies the given message rules to this message.
      * @param messageRules The {@link MessageRules} to be applied.
      */
