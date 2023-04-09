@@ -171,7 +171,7 @@ public class RoseMessage {
         // Only call the PostParseMessageEvent if the message has a format.
         // This prevents non-chat messages from having delete buttons.
         if (format != null) {
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer);
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, parser.getMessageDirection());
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
         }
 

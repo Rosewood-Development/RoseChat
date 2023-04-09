@@ -108,7 +108,7 @@ public class NicknameCommand extends AbstractCommand {
         RosePlayer roseSender = new RosePlayer(sender);
         RosePlayer roseTarget = new RosePlayer(target);
 
-        MessageRules rules = new MessageRules().applyAllFilters();
+        MessageRules rules = new MessageRules().applyAllFilters().ignoreMessageLogging();
 
         RoseMessage message = new RoseMessage(roseSender, MessageLocation.NICKNAME, nickname);
         message.applyRules(rules);

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.parser;
 
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
@@ -16,5 +17,10 @@ public interface MessageParser {
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     BaseComponent[] parse(RoseMessage message, RosePlayer sender, RosePlayer viewer, String format);
+
+    /**
+     * @return The direction of the parsed message.
+     */
+    MessageDirection getMessageDirection();
 
 }

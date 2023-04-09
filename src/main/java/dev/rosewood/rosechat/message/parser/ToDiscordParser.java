@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.parser;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
@@ -113,6 +114,11 @@ public class ToDiscordParser implements MessageParser {
         }
 
         return componentBuilder.create();
+    }
+
+    @Override
+    public MessageDirection getMessageDirection() {
+        return MessageDirection.TO_DISCORD;
     }
 
 }

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.parser;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
@@ -115,6 +116,11 @@ public class RoseChatParser implements MessageParser {
         }
 
         return componentBuilder.create();
+    }
+
+    @Override
+    public MessageDirection getMessageDirection() {
+        return MessageDirection.PLAYER_TO_SERVER;
     }
 
 }

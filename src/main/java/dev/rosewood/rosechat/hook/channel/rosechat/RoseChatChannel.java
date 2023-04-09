@@ -232,6 +232,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Send message to Discord
         RoseMessage discordMessage = new RoseMessage(message);
+        discordMessage.getMessageRules().ignoreMessageLogging();
         this.sendToDiscord(discordMessage, direction);
 
         // Send message to Bungee
