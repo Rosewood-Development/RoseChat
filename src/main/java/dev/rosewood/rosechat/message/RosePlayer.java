@@ -112,7 +112,8 @@ public class RosePlayer {
 
             // Otherwise, check their offline permissions if Vault is available
             if (this.api.getVault() != null)
-                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.api.getVault().playerHas(null, this.player, permission);
+                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.player.isOp()
+                        || this.api.getVault().playerHas(null, this.player, permission);
         }
 
         // If the player is not available, check the group permissions as long as we have Vault

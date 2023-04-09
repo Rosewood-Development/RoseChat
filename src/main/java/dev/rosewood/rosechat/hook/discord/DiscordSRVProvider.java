@@ -2,22 +2,26 @@ package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Emote;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.GuildChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-
+import org.bukkit.ChatColor;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,32 +44,35 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         BaseComponent[] message;
         boolean hasMessagePlaceholder = false;
-        //StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
+        StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
         DiscordPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordPlaceholder();
 
         PlaceholderCondition textPlaceholder = placeholder.getPlaceholder("text");
-        //String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
-       // if (text != null && text.contains("{message}")) {
-           // message = roseMessage.parseToDiscord(text, roseMessage.getSender());
-           // text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
-      //  }
+        String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
+        if (text != null && text.contains("{message}")) {
+            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text);
+            text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+        }
 
         PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
-        //String url = urlPlaceholder != null ? ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) : null;
+        String url = urlPlaceholder != null ?
+                ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) : null;
 
         PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
-        //String title = titlePlaceholder != null ? placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
-        //if (title != null && title.contains("{message}")) {
-            //message = roseMessage.parseToDiscord(title, roseMessage.getSender());
-           // title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
-        //    hasMessagePlaceholder = true;
-       // }
-/*
+        String title = titlePlaceholder != null ?
+                placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
+        if (title != null && title.contains("{message}")) {
+            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title);
+            title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            hasMessagePlaceholder = true;
+        }
+
         PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
-        String description = descriptionPlaceholder != null ? placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
+        String description = descriptionPlaceholder != null ?
+                placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (description != null && description.contains("{message}")) {
-           // message = roseMessage.parseToDiscord(description, roseMessage.getSender());
-           // description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description);
+            description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
             hasMessagePlaceholder = true;
         }
 
@@ -100,13 +107,13 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                     null);
             // Unfortunately, may not always be able to be deleted.
             textChannel.sendMessageEmbeds(messageEmbed).queue((m) -> {
-               // if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
+                if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
             });
         } else {
             if (text != null) textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
-              //  if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
+                if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
             });
-        }*/
+        }
     }
 
     @Override
