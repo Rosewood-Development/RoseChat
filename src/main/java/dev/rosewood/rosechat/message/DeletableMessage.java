@@ -11,8 +11,12 @@ public class DeletableMessage {
     private boolean isClient;
     private PrivateMessageInfo privateMessageInfo;
 
-    public DeletableMessage(UUID uuid, String json, boolean isClient) {
+    public DeletableMessage(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public DeletableMessage(UUID uuid, String json, boolean isClient) {
+        this(uuid);
         this.json = json;
         this.isClient = isClient;
     }
