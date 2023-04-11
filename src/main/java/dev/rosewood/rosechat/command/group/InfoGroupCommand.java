@@ -1,12 +1,16 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class InfoGroupCommand extends AbstractCommand {
 
@@ -22,7 +26,7 @@ public class InfoGroupCommand extends AbstractCommand {
         }
 
         GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
-        /*if (groupChat == null) {
+        if (groupChat == null) {
             GroupManager groupManager = this.getAPI().getGroupManager();
             groupManager.getGroupInfo(args[0], info -> {
                 if (info != null) {
@@ -39,7 +43,7 @@ public class InfoGroupCommand extends AbstractCommand {
                             this.sendInfoMessage(sender, info.getId(), info.getName(), owner, info.getMembers());
                         } else {
                             boolean isInGroup = false;
-                            for (GroupChat gc : this.getAPI().getGroupChats(player.getUniqueId()))    {
+                            for (GroupChannel gc : this.getAPI().getGroupChats(player.getUniqueId()))    {
                                 if (gc.getId().equalsIgnoreCase(info.getId())) {
                                     this.sendInfoMessage(sender, info.getId(), info.getName(), owner, info.getMembers());
                                     isInGroup = true;
@@ -69,7 +73,7 @@ public class InfoGroupCommand extends AbstractCommand {
                     Bukkit.getOfflinePlayer(groupChat.getOwner()).getName() : nickname;
 
             this.sendInfoMessage(sender, groupChat.getId(), groupChat.getName(), ownerName, groupChat.getMembers().size());
-        }*/
+        }
     }
 
     public void sendInfoMessage(CommandSender sender, String id, String name, String owner, int members) {

@@ -26,10 +26,10 @@ public class LeaveGroupCommand extends AbstractCommand {
 
         Player player = (Player) sender;
         GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
-        /*if (groupChat == null || !groupChat.getMembers().contains(player.getUniqueId())) {
+        if (groupChat == null || !groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }*/
+        }
 
         if (groupChat.getOwner() == player.getUniqueId()) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-own");
@@ -41,10 +41,10 @@ public class LeaveGroupCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.single("name", groupChat.getName()));
 
-       // groupChat.removeMember(player);
-        //this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
+        groupChat.removeMember(player.getUniqueId());
+        this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
 
-        /*for (UUID uuid : groupChat.getMembers()) {
+        for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
@@ -52,7 +52,7 @@ public class LeaveGroupCommand extends AbstractCommand {
                                 .addPlaceholder("name", groupChat.getName())
                                 .build());
             }
-        }*/
+        }
     }
 
     @Override

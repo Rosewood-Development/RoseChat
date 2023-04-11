@@ -36,10 +36,10 @@ public class MessageGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        /*if (!groupChat.getMembers().contains(player.getUniqueId())) {
+        if (!groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }*/
+        }
 
         String message = getAllArgs(1, args);
 
@@ -49,8 +49,7 @@ public class MessageGroupCommand extends AbstractCommand {
         }
 
         RosePlayer messageSender = new RosePlayer((Player) sender);
-       // RoseMessage roseMessage = new RoseMessage(messageSender, MessageLocation.GROUP, groupChat, message).filter().applyDefaultColor();
-      //  groupChat.send(roseMessage);
+        groupChat.send(messageSender, message);
     }
 
     @Override

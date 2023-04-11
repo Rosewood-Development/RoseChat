@@ -103,7 +103,7 @@ public class GroupManager extends Manager {
 
     public void addGroupChat(GroupChannel groupChat) {
         this.groupChats.put(groupChat.getId(), groupChat);
-        //groupChat.save();
+        groupChat.save();
     }
 
     public void removeGroupChat(GroupChannel groupChat) {
@@ -116,6 +116,10 @@ public class GroupManager extends Manager {
 
     public List<String> getGroupChatNames() {
         return this.groupChatNames;
+    }
+
+    public GroupChannelProvider getChannelProvider() {
+        return this.channelProvider;
     }
 
     public static class GroupInfo {

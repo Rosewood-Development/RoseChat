@@ -26,7 +26,7 @@ public class MembersGroupCommand extends AbstractCommand {
         }
 
         GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
-        /*if (groupChat == null
+        if (groupChat == null
                 || (sender instanceof Player && !groupChat.getMembers().contains(((Player) sender).getUniqueId()) && !sender.hasPermission("rosechat.group.admin"))) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
@@ -41,7 +41,7 @@ public class MembersGroupCommand extends AbstractCommand {
 
             this.getAPI().getLocaleManager().sendComponentMessage(sender,
                     uuid.equals(groupChat.getOwner()) ? "command-gc-members-owner" : "command-gc-members-member", StringPlaceholders.single("player", name));
-        }*/
+        }
     }
 
     @Override

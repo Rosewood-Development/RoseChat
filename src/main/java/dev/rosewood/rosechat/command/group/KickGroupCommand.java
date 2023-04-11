@@ -38,10 +38,10 @@ public class KickGroupCommand extends AbstractCommand {
             return;
         }
 
-        /*if (target == null || !groupChat.getMembers().contains(target.getUniqueId())) {
+        if (target == null || !groupChat.getMembers().contains(target.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-kick-invalid-player");
             return;
-        }*/
+        }
 
         PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
         String name = data.getNickname() == null ? target.getName() : data.getNickname();
@@ -53,10 +53,10 @@ public class KickGroupCommand extends AbstractCommand {
             }
         }
 
-        //groupChat.removeMember(target.getUniqueId());
-        //this.getAPI().getGroupManager().removeMember(groupChat, target.getUniqueId());
+        groupChat.removeMember(target.getUniqueId());
+        this.getAPI().getGroupManager().removeMember(groupChat, target.getUniqueId());
 
-       /* for (UUID uuid : groupChat.getMembers()) {
+        for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null){
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-kick-success",
@@ -64,7 +64,7 @@ public class KickGroupCommand extends AbstractCommand {
                                 .addPlaceholder("name", groupChat.getName())
                                 .build());
             }
-        }*/
+        }
     }
 
     @Override
@@ -74,10 +74,10 @@ public class KickGroupCommand extends AbstractCommand {
         if (args.length == 1) {
             GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
             if (groupChat != null) {
-                /*for (UUID uuid : groupChat.getMembers()) {
+                for (UUID uuid : groupChat.getMembers()) {
                     Player member = Bukkit.getPlayer(uuid);
                     if (member != null && member != sender) tab.add(member.getName());
-                }*/
+                }
             }
         }
 

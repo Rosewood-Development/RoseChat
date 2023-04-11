@@ -31,12 +31,12 @@ public class DisbandGroupCommand extends AbstractCommand {
                 return;
             }
 
-            /*for (UUID uuid : groupChat.getMembers()) {
+            for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
                 }
-            }*/
+            }
 
             this.getAPI().deleteGroupChat(groupChat);
             return;
@@ -49,12 +49,12 @@ public class DisbandGroupCommand extends AbstractCommand {
                 return;
             }
 
-            /*for (UUID uuid : groupChat.getMembers()) {
+            for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
                 }
-            }*/
+            }
 
             this.getAPI().deleteGroupChat(groupChat);
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.single("name", groupChat.getName()));

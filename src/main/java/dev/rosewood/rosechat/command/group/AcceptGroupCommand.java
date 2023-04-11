@@ -72,7 +72,7 @@ public class AcceptGroupCommand extends AbstractCommand {
     }
 
     private void accept(PlayerData data, Player player, GroupChannel groupChat) {
-        int currentGroups = 0;//(int) this.getAPI().getGroupChats().stream().filter(gc -> (gc.getMembers().contains(player.getUniqueId()))).count();
+        int currentGroups = (int) this.getAPI().getGroupChats().stream().filter(gc -> (gc.getMembers().contains(player.getUniqueId()))).count();
 
         int amount = 1;
         for (PermissionAttachmentInfo info : player.getEffectivePermissions()) {
@@ -93,12 +93,12 @@ public class AcceptGroupCommand extends AbstractCommand {
 
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
-        /*for (UUID uuid : groupChat.getMembers()) {
+        for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null)
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-accept-accepted",
                             StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
-        }*/
+        }
 
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-success",
                 StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());

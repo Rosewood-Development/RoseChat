@@ -2,8 +2,11 @@ package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,27 +27,32 @@ public class RenameGroupCommand extends AbstractCommand {
         }
 
         GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
-        /*if (groupChat == null
+        if (groupChat == null
                 || (sender instanceof Player && !groupChat.getMembers().contains(((Player) sender).getUniqueId()) && !sender.hasPermission("rosechat.group.admin"))) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
-        }*/
+        }
 
         String name = getAllArgs(1, args);
         if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
-        RosePlayer rosePlayer = new RosePlayer(sender);
-       // RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();
+        // Reset colour & formatting so uncoloured names don't take colour from previous words.
+        name = "&f&r" + name + "&f&r";
 
-        //i//f (!message.canBeSent()) {
-           // if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
-           // return;
-       // }
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
+        MessageRules messageRules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyURLFilter();
+        message.applyRules(messageRules);
+
+        if (message.isBlocked()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+            return;
+        }
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-      //  name = message.getMessage();
-        //groupChat.setName(name);
-       // groupChat.save();
+        name = message.getMessage();
+        groupChat.setName(name);
+        groupChat.save();
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));
     }
 

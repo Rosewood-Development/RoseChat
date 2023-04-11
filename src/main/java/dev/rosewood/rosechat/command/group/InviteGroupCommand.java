@@ -40,10 +40,10 @@ public class InviteGroupCommand extends AbstractCommand {
             return;
         }
 
-        /*if (groupChat.getMembers().contains(target.getUniqueId())) {
+        if (groupChat.getMembers().contains(target.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-invite-member");
             return;
-        }*/
+        }
 
         PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
         PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());

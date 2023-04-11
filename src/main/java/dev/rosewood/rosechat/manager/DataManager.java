@@ -226,14 +226,14 @@ public class DataManager extends AbstractDataManager {
                         current = null;
                     }
 
-                    /*if (current == null) {
+                    if (current == null) {
                         current = new GroupChannel(id);
                         current.setName(result.getString(2));
                         current.setOwner(UUID.fromString(result.getString(3)));
                     }
 
                     current.addMember(UUID.fromString(result.getString(4)));
-                    previousId = id;*/
+                    previousId = id;
                 }
 
                 if (current != null)

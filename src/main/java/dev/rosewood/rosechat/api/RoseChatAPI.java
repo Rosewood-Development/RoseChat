@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The API for the RoseChat plugin.
@@ -290,16 +291,15 @@ public final class RoseChatAPI {
      * @param owner The owner of the group chat.
      * @return The new group chat.
      */
-    public GroupChannel createGroupChat(String id, UUID owner) {
-       // ChannelProvider provider = this.getGroupManager()
+    public GroupChannel createGroupChat(String id, Player owner) {
+        GroupChannel groupChat = new GroupChannel(id);
+        groupChat.setOwner(owner.getUniqueId());
+        groupChat.onJoin(owner);
 
-        //GroupChannel groupChat = new GroupChannel(id);
-        //groupChat.setOwner(owner);
-       // groupChat.addMember(owner);
-       // this.getGroupManager().addGroupChat(groupChat);
-       // this.getGroupManager().addMember(groupChat, owner);
-        //return groupChat;
-        return null;
+        this.getGroupManager().addGroupChat(groupChat);
+        this.getGroupManager().addMember(groupChat, owner.getUniqueId());
+
+        return groupChat;
     }
 
     /**
@@ -307,8 +307,8 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to delete.
      */
     public void deleteGroupChat(GroupChannel groupChat) {
-       // this.getGroupManager().removeGroupChat(groupChat);
-       // this.getGroupManager().deleteGroupChat(groupChat);
+        this.getGroupManager().removeGroupChat(groupChat);
+        this.getGroupManager().deleteGroupChat(groupChat);
     }
 
     /**
@@ -317,8 +317,8 @@ public final class RoseChatAPI {
      * @param member The player to be added.
      */
     public void addGroupChatMember(GroupChannel groupChat, Player member) {
-        //groupChat.addMember(member);
-        //this.getGroupManager().addMember(groupChat, member.getUniqueId());
+        groupChat.onJoin(member);
+        this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -327,8 +327,8 @@ public final class RoseChatAPI {
      * @param member The player to be removed.
      */
     public void removeGroupChatMember(GroupChannel groupChat, Player member) {
-       // groupChat.removeMember(member);
-        //this.getGroupManager().removeMember(groupChat, member.getUniqueId());
+        groupChat.onLeave(member);
+        this.getGroupManager().removeMember(groupChat, member.getUniqueId());
     }
 
     /**
@@ -351,7 +351,7 @@ public final class RoseChatAPI {
      * @return A list of all group chats.
      */
     public List<GroupChannel> getGroupChats() {
-        return null;//new ArrayList<>(this.getGroupManager().getGroupChats().values());
+        return new ArrayList<>(this.getGroupManager().getGroupChats().values());
     }
 
     /**
@@ -359,14 +359,14 @@ public final class RoseChatAPI {
      * @return A list of all group chats that the player is in.
      */
     public List<GroupChannel> getGroupChats(UUID player) {
-        return null;//this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
+        return this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
     }
 
     /**
      * @return A list of all group chat IDs.
      */
     public List<String> getGroupChatIDs() {
-        return null;//new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
+        return new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
     }
 
     /**
