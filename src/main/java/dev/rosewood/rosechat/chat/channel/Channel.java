@@ -278,7 +278,7 @@ public abstract class Channel {
         return (data != null
                 && !data.getIgnoringPlayers().contains(senderUUID)
                 && receiver.hasPermission("rosechat.channel." + this.getId())
-                && (!data.isChannelHidden(this.getId()) || data.getUUID().equals(senderUUID)));
+                && (!data.isChannelHidden(this.getId()) || senderUUID == null || data.getUUID().equals(senderUUID)));
     }
 
     public boolean isDefaultChannel() {
