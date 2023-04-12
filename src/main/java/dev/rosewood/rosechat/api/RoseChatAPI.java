@@ -138,6 +138,11 @@ public final class RoseChatAPI {
             return;
         }
 
+        if (channel.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
+            sender.sendLocaleMessage("channel-muted");
+            return;
+        }
+
         // Send the message.
         channel.send(sender, message);
 
