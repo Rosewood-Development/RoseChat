@@ -136,8 +136,8 @@ public class EnglishLocale implements Locale {
             this.put("command-chat-info-description", "&8 - &c/chat info &7- View information about a chat channel.");
             this.put("command-chat-info-usage", "&e/chat info <channel>");
             this.put("command-chat-info-title", "&7[&c%id% Info&7]");
-            this.put("command-chat-info-format", "&eDefault: &b%default% &7| &eMuted: &b%muted% &7| &eCommand: &c%command%\n" +
-                    "&eWorld: &a%worlds% &7| &eJoinable: &b%joinable% &7| &eDiscord: &b%discord%\n" +
+            this.put("command-chat-info-format", "&eDefault: &b%default% &7| &eMuted: &b%muted% &7| &eCommands: &c%commands%\n" +
+                    "&eWorlds: &a%worlds% &7| &eJoinable: &b%joinable% &7| &eDiscord: &b%discord%\n" +
                     "&ePlayers: &b%players% &7| &eServers: &b%servers%");
             this.put("command-chat-info-true", "true");
             this.put("command-chat-info-false", "false");

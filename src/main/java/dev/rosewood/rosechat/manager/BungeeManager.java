@@ -118,10 +118,10 @@ public class BungeeManager extends Manager {
         try {
             out.writeUTF(channel);
             out.writeUTF(sender.getName());
-            out.writeUTF(sender.getUUID().toString());
+            out.writeUTF(sender.getUUID() == null ? "null" : sender.getUUID().toString());
             out.writeUTF(sender.getGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
-            out.writeUTF(messageId.toString());
+            out.writeUTF(messageId == null ? "null" : messageId.toString());
             out.writeBoolean(isJson);
             out.writeUTF(PlaceholderAPIHook.applyPlaceholders(sender.isPlayer() ? sender.asPlayer() : null, message));
         } catch (IOException e) {

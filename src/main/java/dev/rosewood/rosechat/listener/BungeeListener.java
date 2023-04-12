@@ -47,10 +47,12 @@ public class BungeeListener implements PluginMessageListener {
                 case "channel_message": {
                     String rcChannel = data.readUTF();
                     String sender = data.readUTF();
-                    UUID senderUUID = UUID.fromString(data.readUTF());
+                    String uuidStr = data.readUTF();
+                    UUID senderUUID = uuidStr.equalsIgnoreCase("null") ? null : UUID.fromString(data.readUTF());
                     String group = data.readUTF();
                     List<String> permissions = Arrays.asList(data.readUTF().split(","));
-                    UUID messageId = UUID.fromString(data.readUTF());
+                    String messageIdStr = data.readUTF();
+                    UUID messageId = messageIdStr.equalsIgnoreCase("null") ? null : UUID.fromString(data.readUTF());
                     boolean isJson = data.readBoolean();
                     String rcMessage = data.readUTF();
                     this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);

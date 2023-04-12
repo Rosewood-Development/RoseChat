@@ -136,7 +136,7 @@ public class JapaneseLocale implements Locale {
             this.put("command-chat-info-description", "&8 - &c/chat info &7- チャットチャンネルのインフォメーションを見せます。");
             this.put("command-chat-info-usage", "&e/chat info <チャンネル>");
             this.put("command-chat-info-title", "&7[&c%id% インフォ&7]");
-            this.put("command-chat-info-format", "&eデフォルト： &b%default% &7| &eミュート： &b%muted% &7| &eコマンド： &c%command%\n" +
+            this.put("command-chat-info-format", "&eデフォルト： &b%default% &7| &eミュート： &b%muted% &7| &eコマンド： &c%commands%\n" +
                     "&eワールド： &a%worlds% &7| &e参加できる： &b%joinable% &7| &eディスコード： &b%discord%\n" +
                     "&eプレイヤー： &b%players% &7| &eサーバー： &b%servers%");
             this.put("command-chat-info-true", "真");
