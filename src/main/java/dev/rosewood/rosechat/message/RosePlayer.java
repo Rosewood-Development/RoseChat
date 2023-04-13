@@ -100,7 +100,7 @@ public class RosePlayer {
      */
     public boolean hasPermission(String permission) {
         // If the permission is ignored, return true
-        if (permission.equalsIgnoreCase("*") || this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length())))
+        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length())))
             return true;
 
         // If the player is available, try to use their permissions

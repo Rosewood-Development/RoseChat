@@ -3,8 +3,10 @@ package dev.rosewood.rosechat.command.chat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,7 +34,11 @@ public class SudoChatCommand extends AbstractCommand {
             return;
         }
 
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerStr);
+        // Parse and remove the colour to get the player.
+        String playerStrParsed = HexUtils.colorify(playerStr);
+        playerStrParsed = ChatColor.stripColor(playerStrParsed);
+
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerStrParsed);
         RosePlayer sudoSender = (player == null || !player.isOnline()) ? new RosePlayer(playerStr, "default") : new RosePlayer(player.getPlayer());
 
         channel.send(sudoSender, getAllArgs(2, args));
