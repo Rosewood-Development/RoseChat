@@ -81,8 +81,6 @@ public class ChannelManager extends Manager {
                     channel.onLoad();
                     if (channel.isDefaultChannel()) this.defaultChannel = channel;
                     this.channels.put(channel.getId(), channel);
-                    this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
-                            "&eGenerated " + channelProvider.getSupportedPlugin() + " channel: " + channel.getId());
 
                     if (channelProvider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
                         this.worldGuardChannels.add((WorldGuardChannel) channel);
@@ -120,9 +118,24 @@ public class ChannelManager extends Manager {
             this.generateChannel(provider, id);
         }
 
+        Map<String, List<String>> loadedChannels = new HashMap<>();
+
         // If a channel does not have a format, set the format to the same as the default channel.
         for (Channel channel : this.channels.values()) {
             if (channel.getFormat() == null) channel.setFormat(this.defaultChannel.getFormat());
+
+            if (!loadedChannels.containsKey(channel.getProvider().getSupportedPlugin()))
+                loadedChannels.put(channel.getProvider().getSupportedPlugin(), new ArrayList<>());
+
+            loadedChannels.get(channel.getProvider().getSupportedPlugin()).add(channel.getId());
+        }
+
+        // Output the loaded channels
+        for (String provider : loadedChannels.keySet()) {
+            String channels = loadedChannels.get(provider).toString();
+
+            this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
+                    "&eLoaded " + provider + " channels: " + channels.substring(1, channels.length() - 1));
         }
     }
 
@@ -140,8 +153,6 @@ public class ChannelManager extends Manager {
                 channel.onLoad(id, this.channelsConfig.getConfigurationSection(id));
                 if (channel.isDefaultChannel()) this.defaultChannel = channel;
                 this.channels.put(id, channel);
-                this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
-                        "&eLoaded " + provider.getSupportedPlugin() + " channel: " + channel.getId());
 
                 if (provider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
                     this.worldGuardChannels.add((WorldGuardChannel) channel);
