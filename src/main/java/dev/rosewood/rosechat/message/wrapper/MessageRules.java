@@ -157,7 +157,7 @@ public class MessageRules {
         if (!hasURL) return;
         if (Setting.WARN_ON_URL_SENT.getBoolean()) message.setFilterType(FilterType.URL);
 
-        message.setBlocked(Setting.URL_CENSORING_ENABLED.getBoolean());
+        message.setBlocked(!Setting.URL_CENSORING_ENABLED.getBoolean());
     }
 
     private void filterLanguage(RoseMessage message) {
@@ -165,12 +165,10 @@ public class MessageRules {
         if (message.getSender().hasPermission("rosechat.language." + message.getLocationPermission())) return;
         String strippedMessage = MessageUtils.stripAccents(message.getMessage().toLowerCase());
 
-        // Split by a space to avoid things like 'grass' being caught.
-        // This is an impossible problem to fix.
         for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
             for (String word : strippedMessage.split(" ")) {
-                double similiarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similiarity >= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100)) {
+                double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
+                if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
                     if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) message.setFilterType(FilterType.SWEAR);
                     message.setBlocked(true);
                     return;
@@ -183,8 +181,8 @@ public class MessageRules {
             String swear = swearReplacement[0];
             String replacement = swearReplacement[1];
             for (String word : message.getMessage().split(" ")) {
-                double similarity = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if (similarity >= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100)) {
+                double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
+                if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
                     message.setMessage(message.getMessage().replace(word, replacement));
                 }
             }

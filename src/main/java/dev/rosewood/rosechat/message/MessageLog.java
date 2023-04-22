@@ -40,9 +40,9 @@ public class MessageLog {
         if (this.messages.size() > this.cleanupAmount - 1) {
             for (int i = 0; i < this.cleanupAmount; i++) {
                 String message = this.messages.get((this.messages.size() - 1) - i);
-                double similarity = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
+                double difference = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if (similarity >= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
+                if ((1 - difference) <= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
                     similarMessages++;
                 }
             }
