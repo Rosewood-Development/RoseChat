@@ -122,7 +122,7 @@ channel-prefix:
   text:
     condition: "%channel%"
     staff: "&8[&cStaff&8] &f"
-    local: "&8[&7&oLocal&8] &f"
+    local: "&8[&7Local&8] &f"
     skyblock: "&8[&aSkyblock&8] &f"
   hover:
     condition: "%channel%"

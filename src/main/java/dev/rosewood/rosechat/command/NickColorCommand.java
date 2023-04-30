@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -39,9 +40,13 @@ public class NickColorCommand extends AbstractCommand {
                     ((Player) sender).setDisplayName(null);
                 } else {
                     // Remove only colours from the nickname.
-                    String nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname())) + "&r";
+                    String nickname = ChatColor.stripColor(HexUtils.colorify(player.getNickname())) + "&r";
                     playerData.setNickname(nickname);
-                    NicknameCommand.setDisplayName((Player) sender, nickname);
+
+                    RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
+                    nicknameMessage.parse(player, null);
+
+                    NicknameCommand.setDisplayName(player, nicknameMessage);
                 }
 
                 playerData.save();

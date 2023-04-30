@@ -52,7 +52,7 @@ public class RoseChatChannel extends ConditionalChannel {
         this.radius = config.contains("radius") ? config.getInt("radius") : -1;
         this.autoJoin = config.contains("auto-join") && config.getBoolean("auto-join");
         this.visibleAnywhere = config.contains("visible-anywhere") && config.getBoolean("visible-anywhere");
-        this.joinable = config.contains("joinable") && config.getBoolean("joinable");
+        this.joinable = !config.contains("joinable") || config.getBoolean("joinable");
         this.keepFormatOverBungee = config.contains("keep-format") && config.getBoolean("keep-format");
         this.worlds = config.contains("worlds") ? config.getStringList("worlds") : new ArrayList<>();
         this.servers = config.contains("servers") ? config.getStringList("servers") : new ArrayList<>();
