@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -20,6 +21,7 @@ import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.TagManager;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -27,7 +29,10 @@ import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -154,6 +159,60 @@ public final class RoseChatAPI {
 
                 if (data.getNickname() != null) NicknameCommand.setDisplayName(sender, roseMessage);
             });
+        }
+    }
+
+    public void deleteMessage(RosePlayer player, UUID uuid) {
+        DeletableMessage messageToDelete = null;
+
+        // Find the message.
+        for (DeletableMessage message : player.getPlayerData().getMessageLog().getDeletableMessages()) {
+            if (message.getUUID().equals(uuid)) messageToDelete = message;
+        }
+
+        if (messageToDelete == null) return;
+
+        // Get the deleted message placeholder.
+        BaseComponent[] deletedMessageFormat = MessageUtils.parseDeletedMessagePlaceholder(player, player,
+                MessageUtils.getSenderViewerPlaceholders(player, player)
+                        .addPlaceholder("id", uuid.toString())
+                        .addPlaceholder("type", messageToDelete.isClient() ? "client" : "server").build(), messageToDelete);
+
+        boolean updated = false;
+        if (deletedMessageFormat != null && !TextComponent.toPlainText(deletedMessageFormat).isEmpty()) {
+            String json = ComponentSerializer.toString(deletedMessageFormat);
+            if (player.hasPermission("rosechat.deletemessages.client")) {
+                BaseComponent[] withDeleteButton = PacketListener.appendButton(player, player.getPlayerData(), uuid.toString(), json);
+                if (withDeleteButton != null) {
+                    messageToDelete.setJson(ComponentSerializer.toString(withDeleteButton));
+                } else {
+                    // If the delete button doesn't exist, just use the 'Deleted Message' message.
+                    messageToDelete.setJson(json);
+                }
+            } else {
+                // If the player doesn't have permission, just use the 'Deleted Message' message.
+                messageToDelete.setJson(json);
+            }
+
+            updated = true;
+        }
+
+        // Remove the original message if it was not changed.
+        if (!updated) player.getPlayerData().getMessageLog().getDeletableMessages().remove(messageToDelete);
+
+        // Send blank lines to clear the chat.
+        for (int i = 0; i < 100; i++) player.send("\n");
+
+        // Resend the messages!
+        for (DeletableMessage message : player.getPlayerData().getMessageLog().getDeletableMessages())
+            player.send(ComponentSerializer.parse(message.getJson()));
+
+        // If the message is not a client message, delete it from Discord too.
+        if (!messageToDelete.isClient()) {
+            if (updated) messageToDelete.setClient(true);
+            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
+            if (this.getDiscord() != null && messageToDelete.getDiscordId() != null)
+                this.getDiscord().deleteMessage(messageToDelete.getDiscordId());
         }
     }
 

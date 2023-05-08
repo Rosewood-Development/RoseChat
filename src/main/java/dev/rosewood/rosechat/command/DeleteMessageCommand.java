@@ -39,7 +39,24 @@ public class DeleteMessageCommand extends AbstractCommand {
 
         Player player = (Player) sender;
         UUID uuid = UUID.fromString(args[0]);
-        handleMessageDeletion(player, uuid);
+
+        // Check if the message is a client message.
+        boolean isClient = false;
+        PlayerData playerData = this.getAPI().getPlayerData(player.getUniqueId());
+        for (DeletableMessage message : playerData.getMessageLog().getDeletableMessages()) {
+            if (message.getUUID().equals(uuid) && message.isClient()) {
+                isClient = true;
+                break;
+            }
+        }
+
+        if (isClient) {
+            this.getAPI().deleteMessage(new RosePlayer(player), uuid);
+        } else {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                this.getAPI().deleteMessage(new RosePlayer(onlinePlayer), uuid);
+            }
+        }
 
         if (args.length > 1) {
             Channel channel = this.getAPI().getChannelById(args[1]);
@@ -48,164 +65,6 @@ public class DeleteMessageCommand extends AbstractCommand {
                 this.getAPI().getBungeeManager().sendMessageDeletion(server,  uuid);
             }
         }
-    }
-
-    public static void handleMessageDeletion(Player player, UUID uuid) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-        List<DeletableMessage> messages = new ArrayList<>();
-
-        PlayerData senderData = RoseChatAPI.getInstance().getPlayerData(player.getUniqueId());
-        for (DeletableMessage deletableMessage : senderData.getMessageLog().getDeletableMessages()) {
-            if (!deletableMessage.getUUID().equals(uuid)) continue;
-            messages.add(deletableMessage);
-        }
-
-        for (DeletableMessage message : messages) {
-            // Handle private messages differently.
-            if (message.getPrivateMessageInfo() != null) {
-                PrivateMessageInfo info = message.getPrivateMessageInfo();
-                if (info.getSender() == info.getReceiver() || info.getSender().isConsole()) {
-                    deleteMessageForPlayer(player, message);
-                }
-
-                else if (info.getSender().getUUID().equals(player.getUniqueId())) {
-                    deleteMessageForPlayer(player, message);
-                    if (info.getReceiver().isPlayer() && !info.getReceiver().getUUID().equals(player.getUniqueId())) {
-                        Player receiver = info.getReceiver().asPlayer();
-                        for (DeletableMessage deletableMessage : api.getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                            if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(receiver, deletableMessage);
-                        }
-                    }
-                }
-
-                else if (info.getReceiver().getUUID().equals(player.getUniqueId())) {
-                    if (info.getReceiver().isPlayer()) {
-                        Player receiver = info.getReceiver().asPlayer();
-                        for (DeletableMessage deletableMessage : api.getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                            if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(receiver, deletableMessage);
-                        }
-                    }
-                }
-
-                else if (info.getSpies().contains(player.getUniqueId())) {
-                    if (info.getSender().isPlayer()) {
-                        Player pmSender = info.getSender().asPlayer();
-                        for (DeletableMessage deletableMessage : api.getPlayerData(pmSender.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                            if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(pmSender, deletableMessage);
-                        }
-                    }
-                    if (info.getReceiver().isPlayer()) {
-                        Player receiver = info.getReceiver().asPlayer();
-                        for (DeletableMessage deletableMessage : api.getPlayerData(receiver.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                            if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(receiver, deletableMessage);
-                        }
-                    }
-                    deleteMessageForPlayer(player, message);
-                }
-
-                continue;
-            }
-
-            if (message.isClient()) {
-                deleteMessageForPlayer(player, message);
-            } else {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    for (DeletableMessage deletableMessage : api.getPlayerData(onlinePlayer.getUniqueId()).getMessageLog().getDeletableMessages()) {
-                        if (deletableMessage.getUUID().equals(uuid)) deleteMessageForPlayer(onlinePlayer, deletableMessage);
-                    }
-                }
-            }
-        }
-    }
-
-    public static void deleteMessageForPlayer(Player player, DeletableMessage message) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        // Get the deleted message placeholder.
-        RosePlayer rosePlayer = new RosePlayer(player);
-        BaseComponent[] deletedMessage = parseDeletedMessagePlaceholder(rosePlayer, rosePlayer,
-                MessageUtils.getSenderViewerPlaceholders(rosePlayer, rosePlayer)
-                        .addPlaceholder("id", message.getUUID())
-                        .addPlaceholder("type", message.isClient() ? "client" : "server").build(), message);
-
-        // Append the delete button to the 'Deleted Message' message.
-        boolean updated = false;
-        if (deletedMessage != null && !TextComponent.toPlainText(deletedMessage).isEmpty()) {
-            String json = ComponentSerializer.toString(deletedMessage);
-            if (player.hasPermission("rosechat.deletemessages.client")) {
-                BaseComponent[] withDeleteButton = PacketListener.appendButton(rosePlayer, rosePlayer.getPlayerData(), message.getUUID().toString(), json);
-                if (withDeleteButton != null) {
-                    message.setJson(ComponentSerializer.toString(withDeleteButton));
-                } else {
-                    // If the delete button doesn't exist, use the 'Deleted Message' message.
-                    message.setJson(json);
-                }
-            } else {
-                // If the player doesn't have permission, use the 'Deleted Message' message.
-                message.setJson(json);
-            }
-
-            updated = true;
-        }
-
-        // Remove the original message.
-        if (!updated) rosePlayer.getPlayerData().getMessageLog().getDeletableMessages().remove(message);
-        // Send blank lines to remove the old messages.
-        for (int i = 0; i < 100; i++) player.sendMessage("\n");
-        // Resend the messages!
-        for (DeletableMessage deletableMessage : rosePlayer.getPlayerData().getMessageLog().getDeletableMessages())
-            player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
-
-        // Delete this message from Discord too.
-        if (message.isClient()) return;
-
-        if (updated) message.setClient(true);
-        if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
-        if (api.getDiscord() != null && message.getDiscordId() != null)
-            api.getDiscord().deleteMessage(message.getDiscordId());
-    }
-
-    private static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
-        RoseChatPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-        if (placeholder == null) return null;
-
-        BaseComponent[] components;
-        HoverEvent hoverEvent = null;
-        ClickEvent clickEvent = null;
-
-        if (placeholder.getText() == null) return null;
-        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
-        if (text == null) return null;
-        components = api.parse(sender, viewer, text);
-
-        if (placeholder.getHover() != null) {
-            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
-            if (hover != null) {
-                if (hover.equalsIgnoreCase("%original%")) {
-                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
-                } else {
-                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover));
-                }
-            }
-        }
-
-        if (placeholder.getClick() != null) {
-            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
-            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
-            if (click != null && action != null) {
-                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
-            }
-        }
-
-        for (BaseComponent component : components) {
-            component.setHoverEvent(hoverEvent);
-            component.setClickEvent(clickEvent);
-        }
-
-        return components;
     }
 
     @Override

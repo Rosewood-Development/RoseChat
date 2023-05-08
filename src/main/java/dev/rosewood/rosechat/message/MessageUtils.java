@@ -10,10 +10,15 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -507,6 +512,49 @@ public class MessageUtils {
         return message.getSender().hasPermission(extendedPermission)
                 || message.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
                 || message.getSender().getIgnoredPermissions().contains("*");
+    }
+
+    public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
+        RoseChatPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        if (placeholder == null) return null;
+
+        BaseComponent[] components;
+        HoverEvent hoverEvent = null;
+        ClickEvent clickEvent = null;
+
+        if (placeholder.getText() == null) return null;
+        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
+        if (text == null) return null;
+        components = api.parse(sender, viewer, text);
+
+        if (placeholder.getHover() != null) {
+            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
+            if (hover != null) {
+                if (hover.equalsIgnoreCase("%original%")) {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
+                } else {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover));
+                }
+            }
+        }
+
+        if (placeholder.getClick() != null) {
+            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
+            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
+            if (click != null && action != null) {
+                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
+            }
+        }
+
+        for (BaseComponent component : components) {
+            component.setHoverEvent(hoverEvent);
+            component.setClickEvent(clickEvent);
+        }
+
+        return components;
     }
 
 }

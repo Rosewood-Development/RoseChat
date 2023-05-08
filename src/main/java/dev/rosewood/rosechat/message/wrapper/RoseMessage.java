@@ -77,8 +77,6 @@ public class RoseMessage {
 
         this.uuid = UUID.randomUUID();
         this.taggedPlayers = new ArrayList<>();
-
-        this.deletableMessage = new DeletableMessage(this.uuid);
     }
 
     /**
@@ -87,7 +85,7 @@ public class RoseMessage {
      */
     public RoseMessage(RoseMessage other) {
         this.uuid = other.uuid;
-        this.deletableMessage = other.deletableMessage;
+        this.deletableMessage = null;
         this.sender = other.sender;
         this.location = other.location;
         this.message = other.message;
@@ -113,6 +111,7 @@ public class RoseMessage {
     private void logMessage(MessageLog log, String discordId) {
         if (this.messageRules == null || this.messageRules.isIgnoringMessageLogging()) return;
 
+        this.deletableMessage = new DeletableMessage(this.uuid);
         this.deletableMessage.setJson(ComponentSerializer.toString(this.tokenized));
         this.deletableMessage.setClient(false);
         this.deletableMessage.setDiscordId(discordId);

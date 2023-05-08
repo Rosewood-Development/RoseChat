@@ -1,9 +1,11 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
+import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
@@ -21,6 +23,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,12 +110,21 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                     null);
             // Unfortunately, may not always be able to be deleted.
             textChannel.sendMessageEmbeds(messageEmbed).queue((m) -> {
-                if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
+                this.updateMessageLogs(roseMessage.getUUID(), m.getId());
             });
         } else {
             if (text != null) textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
-                if (roseMessage.getDeletableMessage() != null) roseMessage.getDeletableMessage().setDiscordId(m.getId());
+                this.updateMessageLogs(roseMessage.getUUID(), m.getId());
             });
+        }
+    }
+
+    private void updateMessageLogs(UUID minecraftId, String discordId) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerData data = RoseChatAPI.getInstance().getPlayerData(player.getUniqueId());
+            for (DeletableMessage message : data.getMessageLog().getDeletableMessages()) {
+                if (message.getUUID().equals(minecraftId)) message.setDiscordId(discordId);
+            }
         }
     }
 
