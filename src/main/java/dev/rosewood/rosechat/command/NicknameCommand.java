@@ -57,7 +57,7 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        if (args.length == 1 && (args[0].equalsIgnoreCase("off") || target == sender)) {
+        if ((args.length == 1 && (args[0].equalsIgnoreCase("off")) || (args.length == 2 && (args[1].equals("off"))) || target == sender)) {
             Player player = target == null ? (Player) sender : target;
             PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
             data.setNickname(null);
