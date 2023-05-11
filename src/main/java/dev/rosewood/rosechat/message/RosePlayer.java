@@ -10,7 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,10 +25,12 @@ public class RosePlayer {
     private String group;
     private OfflinePlayer player;
     private List<String> ignoredPermissions;
+    private Map<String, Boolean> cachedPermissions;
 
     private RosePlayer() {
         this.api = RoseChatAPI.getInstance();
         this.ignoredPermissions = new ArrayList<>();
+        this.cachedPermissions = new HashMap<>();
     }
 
     /**
@@ -100,27 +104,39 @@ public class RosePlayer {
      */
     public boolean hasPermission(String permission) {
         // If the permission is ignored, return true
-        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length())))
+        if (this.ignoredPermissions.contains(permission.toLowerCase().substring("rosechat.".length()))) {
+            this.cachedPermissions.put(permission, true);
             return true;
+        }
 
         // If the player is available, try to use their permissions
         if (this.player != null) {
             // Is the player online?
             Player onlinePlayer = this.player.getPlayer();
-            if (onlinePlayer != null)
-                return onlinePlayer.hasPermission(permission);
+            if (onlinePlayer != null) {
+                boolean hasPerm = onlinePlayer.hasPermission(permission);
+                this.cachedPermissions.put(permission, hasPerm);
+                return hasPerm;
+            }
 
             // Otherwise, check their offline permissions if Vault is available
-            if (this.api.getVault() != null)
-                return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.player.isOp()
+            if (this.api.getVault() != null) {
+                boolean hasPerm = !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.player.isOp()
                         || this.api.getVault().playerHas(null, this.player, permission);
+                this.cachedPermissions.put(permission, hasPerm);
+                return hasPerm;
+            }
         }
 
         // If the player is not available, check the group permissions as long as we have Vault
-        if (this.group != null && this.api.getVault() != null)
-            return this.api.getVault().groupHas((String) null, this.group, permission);
+        if (this.group != null && this.api.getVault() != null) {
+            boolean hasPerm = this.api.getVault().groupHas((String) null, this.group, permission);
+            this.cachedPermissions.put(permission, hasPerm);
+            return hasPerm;
+        }
 
         // If none of the above worked, just allow it
+        this.cachedPermissions.put(permission, true);
         return true;
     }
 
@@ -136,6 +152,13 @@ public class RosePlayer {
                     permissions.add(permission.getPermission().substring("rosechat.".length()));
 
         return permissions;
+    }
+
+    /**
+     * @return A list of permissions that were previously checked.
+     */
+    public Map<String, Boolean> getCachedPermissions() {
+        return cachedPermissions;
     }
 
     public void setIgnoredPermissions(List<String> permissions) {

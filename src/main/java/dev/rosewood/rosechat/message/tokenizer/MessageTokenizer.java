@@ -15,7 +15,9 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -78,8 +80,14 @@ public class MessageTokenizer {
         // Check cache first
         TokenKey tokenKey = new TokenKey(content, parent == null ? null : parent.clone());
         List<Token> cachedResult = TOKEN_CACHE.getIfPresent(tokenKey);
-        if (cachedResult != null)
-            return cachedResult;
+        if (cachedResult != null) {
+            RosePlayer player = this.roseMessage.getSender();
+
+            for (String permission : tokenKey.getPermissions().keySet()) {
+                if (player.hasPermission(permission) == tokenKey.getPermissions().get(permission))
+                    return cachedResult;
+            }
+        }
 
         List<Token> added = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
@@ -123,8 +131,11 @@ public class MessageTokenizer {
         }
 
         // Cache the result if allowed
-        if (added.stream().allMatch(Token::allowsCaching))
+        if (added.stream().allMatch(Token::allowsCaching)) {
+            tokenKey.permissions = this.roseMessage.getSender().getCachedPermissions();
+            this.roseMessage.getSender().getCachedPermissions().clear();
             TOKEN_CACHE.put(tokenKey, added.stream().map(Token::clone).collect(Collectors.toList()));
+        }
 
         return added;
     }
@@ -221,10 +232,16 @@ public class MessageTokenizer {
     private static class TokenKey {
         private final String content;
         private final Token parent;
+        private Map<String, Boolean> permissions;
 
         public TokenKey(String content, Token parent) {
             this.content = content;
             this.parent = parent;
+            this.permissions = new HashMap<>();
+        }
+
+        public Map<String, Boolean> getPermissions() {
+            return this.permissions;
         }
 
         @Override
