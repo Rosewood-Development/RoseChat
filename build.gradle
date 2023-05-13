@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    api 'dev.rosewood:rosegarden:1.1.0.48-SNAPSHOT'
+    api 'dev.rosewood:rosegarden:1.2.1'
     implementation 'org.apache.commons:commons-text:1.10.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT'
