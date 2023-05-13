@@ -168,7 +168,7 @@ public class RoseMessage {
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
-        if (preParseMessageEvent.isCancelled()) return null;;
+        if (preParseMessageEvent.isCancelled()) return null;
         this.tokenized = parser.parse(this, this.sender, viewer, format);
 
         // Only call the PostParseMessageEvent if the message has a format.

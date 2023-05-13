@@ -20,19 +20,16 @@ public class ToDiscordParser implements MessageParser {
             if (ConfigurationManager.Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             }
@@ -49,19 +46,16 @@ public class ToDiscordParser implements MessageParser {
             if (ConfigurationManager.Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, before, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, before, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             }
@@ -73,19 +67,16 @@ public class ToDiscordParser implements MessageParser {
             if (ConfigurationManager.Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, formatColor + message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, formatColor + message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             }
@@ -95,19 +86,16 @@ public class ToDiscordParser implements MessageParser {
             if (ConfigurationManager.Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, after, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
                                 Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             } else {
                 componentBuilder.append(
                         new MessageTokenizer(message, viewer, after, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
                                 Tokenizers.TO_DISCORD_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
+                                Tokenizers.DEFAULT_DISCORD_BUNDLE)
                                 .toComponents(),
                         ComponentBuilder.FormatRetention.FORMATTING);
             }
