@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.placeholders.condition;
 
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,19 +20,19 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public String parse(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         return String.valueOf(this.parseToBoolean(sender, viewer, placeholders));
     }
 
     @Override
-    public String parseToString(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         String parsed = this.parse(sender, viewer, placeholders);
         String result = this.combineConditionValues(parsed);
         return result == null || result.isEmpty() ? this.combineConditionValues("default") : result;
     }
 
     @Override
-    public boolean parseToBoolean(RoseSender sender, RoseSender viewer, StringPlaceholders placeholders) {
+    public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         Player singlePlayer = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String singleCondition = this.condition.replace("other_", "");
         String singleParsed = this.parsePlaceholders(singlePlayer, singleCondition, placeholders);

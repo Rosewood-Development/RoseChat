@@ -2,8 +2,10 @@ package dev.rosewood.rosechat.manager;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class PlayerDataManager extends Manager {
     private final DataManager dataManager;
     private final Map<UUID, PlayerData> playerData;
     private final Multimap<String, String> bungeePlayers;
-    private final List<ChatChannel> mutedChannels;
+    private final List<Channel> mutedChannels;
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -35,8 +37,21 @@ public class PlayerDataManager extends Manager {
 
     @Override
     public void reload() {
-        Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> { }));
-        this.getMutedChannels((channels) -> {});
+        // Delay to make sure channels are loaded first.
+        Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
+            Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> {
+                // Put the player in the right channel when the plugin is reloaded.
+                if (data.getCurrentChannel() != null) {
+                    data.getCurrentChannel().onJoin(player);
+                } else {
+                    Channel defaultChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
+                    defaultChannel.onJoin(player);
+                    data.setCurrentChannel(defaultChannel);
+                    data.save();
+                }
+            }));
+            this.getMutedChannels((channels) -> {});
+        }, 5L);
     }
 
     @Override
@@ -99,25 +114,37 @@ public class PlayerDataManager extends Manager {
         });
     }
 
-    public void getMutedChannels(Consumer<List<ChatChannel>> callback) {
+    public void hideChannel(UUID uuid, String channel) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            this.dataManager.hideChannel(uuid, channel);
+        });
+    }
+
+    public void showChannel(UUID uuid, String channel) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            this.dataManager.showChannel(uuid, channel);
+        });
+    }
+
+    public void getMutedChannels(Consumer<List<Channel>> callback) {
         if (!this.mutedChannels.isEmpty()) {
             callback.accept(this.mutedChannels);
             return;
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
-            List<ChatChannel> mutedChannels = this.dataManager.getMutedChannels();
+            List<Channel> mutedChannels = this.dataManager.getMutedChannels();
             this.mutedChannels.addAll(mutedChannels);
             callback.accept(mutedChannels);
         });
     }
 
-    public void addMutedChannel(ChatChannel channel) {
+    public void addMutedChannel(Channel channel) {
         this.mutedChannels.add(channel);
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.addMutedChannel(channel));
     }
 
-    public void removeMutedChannel(ChatChannel channel) {
+    public void removeMutedChannel(Channel channel) {
         this.mutedChannels.remove(channel);
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.removeMutedChannel(channel));
     }

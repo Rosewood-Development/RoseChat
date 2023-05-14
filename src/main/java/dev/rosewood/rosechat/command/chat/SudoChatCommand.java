@@ -1,12 +1,12 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,18 +27,21 @@ public class SudoChatCommand extends AbstractCommand {
         }
 
         String playerStr = args[0];
-        ChatChannel channel = this.getAPI().getChannelById(args[1]);
+        Channel channel = this.getAPI().getChannelById(args[1]);
 
         if (channel == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
         }
 
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerStr);
-        RoseSender sudoSender = (player == null || !player.isOnline()) ? new RoseSender(playerStr, "default") : new RoseSender(player.getPlayer());
-        MessageWrapper message = new MessageWrapper(sudoSender, MessageLocation.CHANNEL, channel, getAllArgs(2, args));
+        // Parse and remove the colour to get the player.
+        String playerStrParsed = HexUtils.colorify(playerStr);
+        playerStrParsed = ChatColor.stripColor(playerStrParsed);
 
-        channel.send(message);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerStrParsed);
+        RosePlayer sudoSender = (player == null || !player.isOnline()) ? new RosePlayer(playerStr, "default") : new RosePlayer(player.getPlayer());
+
+        channel.send(sudoSender, getAllArgs(2, args));
     }
 
     @Override
@@ -60,7 +63,7 @@ public class SudoChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.sudo";
+        return "rosechat.chat.sudo";
     }
 
     @Override

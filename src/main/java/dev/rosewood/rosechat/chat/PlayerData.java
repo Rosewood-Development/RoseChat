@@ -2,6 +2,8 @@ package dev.rosewood.rosechat.chat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLog;
 import org.bukkit.entity.Player;
@@ -10,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerData {
+
+    private final RoseChatAPI api;
 
     private final UUID uuid;
     private final MessageLog messageLog;
@@ -21,11 +25,12 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
-    private ChatChannel currentChannel;
+    private Channel currentChannel;
     private String color;
     private String nickname;
-    private final List<GroupChat> groupInvites;
+    private final List<GroupChannel> groupInvites;
     private final List<UUID> ignoringPlayers;
+    private final List<String> hiddenChannels;
 
     private long muteTime;
     private MuteTask activeMuteTask;
@@ -35,6 +40,8 @@ public class PlayerData {
      * @param uuid The UUID of the player.
      */
     public PlayerData(UUID uuid) {
+        this.api = RoseChatAPI.getInstance();
+
         this.uuid = uuid;
         this.messageLog = new MessageLog(uuid);
         this.canBeMessaged = true;
@@ -45,6 +52,7 @@ public class PlayerData {
         this.currentChannel = RoseChatAPI.getInstance().getChannelManager().getDefaultChannel();
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();
+        this.hiddenChannels = new ArrayList<>();
     }
 
     /**
@@ -184,7 +192,7 @@ public class PlayerData {
     /**
      * @return The current channel the player is in.
      */
-    public ChatChannel getCurrentChannel() {
+    public Channel getCurrentChannel() {
         return this.currentChannel;
     }
 
@@ -192,8 +200,8 @@ public class PlayerData {
      * Sets the current channel that the player is in.
      * @param currentChannel The channel to use.
      */
-    public void setCurrentChannel(ChatChannel currentChannel) {
-        this.currentChannel = currentChannel;
+    public void setCurrentChannel(Channel currentChannel) {
+          this.currentChannel = currentChannel;
     }
 
     /**
@@ -233,7 +241,7 @@ public class PlayerData {
     /**
      * @return The invites the player has received.
      */
-    public List<GroupChat> getGroupInvites() {
+    public List<GroupChannel> getGroupInvites() {
         return this.groupInvites;
     }
 
@@ -241,7 +249,7 @@ public class PlayerData {
      * Adds to the group invites list.
      * @param groupChat The group chat to add.
      */
-    public void inviteToGroup(GroupChat groupChat) {
+    public void inviteToGroup(GroupChannel groupChat) {
         this.groupInvites.add(groupChat);
     }
 
@@ -257,9 +265,8 @@ public class PlayerData {
      * @param target The player to ignore.
      */
     public void ignore(UUID target) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.add(target);
-        api.getPlayerDataManager().addIgnore(this.getUUID(), target);
+        this.api.getPlayerDataManager().addIgnore(this.getUUID(), target);
     }
 
     /**
@@ -267,9 +274,8 @@ public class PlayerData {
      * @param target The player to stop ignoring.
      */
     public void unignore(UUID target) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
         this.ignoringPlayers.remove(target);
-        api.getPlayerDataManager().removeIgnore(this.getUUID(), target);
+        this.api.getPlayerDataManager().removeIgnore(this.getUUID(), target);
     }
 
     /**
@@ -315,6 +321,24 @@ public class PlayerData {
      */
     public long getMuteExpirationTime() {
         return this.muteTime;
+    }
+
+    public List<String> getHiddenChannels() {
+        return this.hiddenChannels;
+    }
+
+    public void hideChannel(String channel) {
+        this.hiddenChannels.add(channel);
+        this.api.getPlayerDataManager().hideChannel(this.getUUID(), channel);
+    }
+
+    public void showChannel(String channel) {
+        this.hiddenChannels.remove(channel);
+        this.api.getPlayerDataManager().showChannel(this.getUUID(), channel);
+    }
+
+    public boolean isChannelHidden(String channel) {
+        return this.hiddenChannels.contains(channel);
     }
 
 }

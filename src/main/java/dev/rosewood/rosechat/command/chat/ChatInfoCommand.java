@@ -1,7 +1,8 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class ChatInfoCommand extends AbstractCommand {
             return;
         }
 
-        ChatChannel channel = this.getAPI().getChannelById(args[0]);
+        Channel channel = this.getAPI().getChannelById(args[0]);
         if (channel == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
@@ -31,15 +32,8 @@ public class ChatInfoCommand extends AbstractCommand {
         String localeNone = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-none");
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-title", StringPlaceholders.single("id", channel.getId()), false);
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-format", StringPlaceholders.builder()
-                .addPlaceholder("default", channel.isDefaultChannel() ? localeTrue : localeFalse)
-                .addPlaceholder("muted", channel.isMuted() ? localeTrue : localeFalse)
-                .addPlaceholder("command", channel.getCommand() == null ? localeNone : "/" + channel.getCommand())
-                .addPlaceholder("world", channel.getWorld() == null ? localeNone : channel.getWorld())
-                .addPlaceholder("joinable", channel.isJoinable() ? localeTrue : localeFalse)
-                .addPlaceholder("discord", channel.getDiscordChannel() == null ? localeNone : channel.getDiscordChannel())
-                .addPlaceholder("players", channel.getMembers().size())
-                .addPlaceholder("servers", channel.getServers().isEmpty() ? localeNone: channel.getServers().toString()).build(), false);
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-format",
+                channel.getInfoPlaceholders(new RosePlayer(sender), localeTrue, localeFalse, localeNone).build(), false);
     }
 
     @Override
@@ -55,7 +49,7 @@ public class ChatInfoCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.info";
+        return "rosechat.chat.info";
     }
 
     @Override

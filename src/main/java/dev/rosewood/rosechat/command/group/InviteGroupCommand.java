@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -28,7 +28,7 @@ public class InviteGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
+        GroupChannel groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
         if (groupChat == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-gc");
             return;
@@ -84,7 +84,7 @@ public class InviteGroupCommand extends AbstractCommand {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gc-invite-usage");
     }
 
-    private void sendAcceptMessage(Player player, GroupChat groupChat) {
+    private void sendAcceptMessage(Player player, GroupChannel groupChat) {
         ComponentBuilder componentBuilder = new ComponentBuilder();
         componentBuilder.append("          ");
         componentBuilder.append(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-accept"))

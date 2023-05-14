@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -38,7 +39,7 @@ public class ChatColorCommand extends AbstractCommand {
             return;
         }
 
-        if (!MessageUtils.canColor(sender, color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {

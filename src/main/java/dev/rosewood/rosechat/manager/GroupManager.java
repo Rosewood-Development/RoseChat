@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.GroupChat;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannelProvider;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
 import java.util.ArrayList;
@@ -13,12 +14,14 @@ import org.bukkit.Bukkit;
 
 public class GroupManager extends Manager {
 
+    private final GroupChannelProvider channelProvider;
     private final DataManager dataManager;
-    private final Map<String, GroupChat> groupChats;
+    private final Map<String, GroupChannel> groupChats;
     private final List<String> groupChatNames;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+        this.channelProvider = new GroupChannelProvider();
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
         this.groupChatNames = new ArrayList<>();
@@ -36,12 +39,12 @@ public class GroupManager extends Manager {
         this.groupChatNames.clear();
     }
 
-    public GroupChat getGroupChatById(String id) {
+    public GroupChannel getGroupChatById(String id) {
         return this.groupChats.get(id);
     }
 
-    public GroupChat getGroupChatByOwner(UUID owner) {
-        for (GroupChat groupChat : this.groupChats.values()) {
+    public GroupChannel getGroupChatByOwner(UUID owner) {
+        for (GroupChannel groupChat : this.groupChats.values()) {
             if (groupChat.getOwner().equals(owner)) return groupChat;
         }
 
@@ -50,8 +53,8 @@ public class GroupManager extends Manager {
 
     public void loadMemberGroupChats(UUID member) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
-            List<GroupChat> groupChats = this.dataManager.getMemberGroupChats(member);
-            for (GroupChat groupChat : groupChats) {
+            List<GroupChannel> groupChats = this.dataManager.getMemberGroupChats(member);
+            for (GroupChannel groupChat : groupChats) {
                 if (!this.groupChats.containsKey(groupChat.getId()))
                     this.groupChats.put(groupChat.getId(), groupChat);
             }
@@ -65,11 +68,11 @@ public class GroupManager extends Manager {
         });
     }
 
-    public void addMember(GroupChat groupChat, UUID member) {
+    public void addMember(GroupChannel groupChat, UUID member) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.addGroupChatMember(groupChat, member));
     }
 
-    public void removeMember(GroupChat groupChat, UUID member) {
+    public void removeMember(GroupChannel groupChat, UUID member) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.removeGroupChatMember(groupChat, member));
     }
 
@@ -80,11 +83,11 @@ public class GroupManager extends Manager {
         });
     }
 
-    public void createOrUpdateGroupChat(GroupChat groupChat) {
+    public void createOrUpdateGroupChat(GroupChannel groupChat) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.createOrUpdateGroupChat(groupChat));
     }
 
-    public void deleteGroupChat(GroupChat groupChat) {
+    public void deleteGroupChat(GroupChannel groupChat) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             this.dataManager.deleteGroupChat(groupChat);
             this.groupChats.remove(groupChat.getId());
@@ -98,21 +101,25 @@ public class GroupManager extends Manager {
         });
     }
 
-    public void addGroupChat(GroupChat groupChat) {
+    public void addGroupChat(GroupChannel groupChat) {
         this.groupChats.put(groupChat.getId(), groupChat);
         groupChat.save();
     }
 
-    public void removeGroupChat(GroupChat groupChat) {
+    public void removeGroupChat(GroupChannel groupChat) {
         this.groupChats.remove(groupChat.getId());
     }
 
-    public Map<String, GroupChat> getGroupChats() {
+    public Map<String, GroupChannel> getGroupChats() {
         return this.groupChats;
     }
 
     public List<String> getGroupChatNames() {
         return this.groupChatNames;
+    }
+
+    public GroupChannelProvider getChannelProvider() {
+        return this.channelProvider;
     }
 
     public static class GroupInfo {

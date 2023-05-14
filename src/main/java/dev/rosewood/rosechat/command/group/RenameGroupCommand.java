@@ -1,11 +1,12 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class RenameGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
         if (groupChat == null
                 || (sender instanceof Player && !groupChat.getMembers().contains(((Player) sender).getUniqueId()) && !sender.hasPermission("rosechat.group.admin"))) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
@@ -33,13 +34,18 @@ public class RenameGroupCommand extends AbstractCommand {
         }
 
         String name = getAllArgs(1, args);
-        if (!MessageUtils.canColor(sender, name, "group")) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
-        RoseSender roseSender = new RoseSender(sender);
-        MessageWrapper message = new MessageWrapper(roseSender, MessageLocation.GROUP, groupChat, name).filterLanguage().filterCaps().filterURLs();
+        // Reset colour & formatting so uncoloured names don't take colour from previous words.
+        name = "&f&r" + name + "&f&r";
 
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(roseSender);
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
+        MessageRules messageRules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyURLFilter();
+        message.applyRules(messageRules);
+
+        if (message.isBlocked()) {
+            if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
             return;
         }
 
@@ -56,11 +62,11 @@ public class RenameGroupCommand extends AbstractCommand {
 
         if (args.length == 1) {
             if (sender.hasPermission("rosechat.group.admin")) {
-                for (GroupChat groupChat : this.getAPI().getGroupChats()) {
+                for (GroupChannel groupChat : this.getAPI().getGroupChats()) {
                     tab.add(groupChat.getId());
                 }
             } else {
-                GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
+                GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
                 if (groupChat != null) tab.add(groupChat.getId());
             }
         }

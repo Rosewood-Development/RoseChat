@@ -1,12 +1,9 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RoseSender;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -40,11 +37,11 @@ public class MoveChatCommand extends AbstractCommand {
             return;
         }
 
-        ChatChannel oldChannel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
-        ChatChannel channel = this.getAPI().getChannelById(channelStr);
+        Channel oldChannel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
+        Channel channel = this.getAPI().getChannelById(channelStr);
 
-        oldChannel.remove(player);
-        channel.add(player);
+        oldChannel.onLeave(player);
+        channel.onJoin(player);
         data.setCurrentChannel(channel);
         data.save();
 
@@ -73,7 +70,7 @@ public class MoveChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.move";
+        return "rosechat.chat.move";
     }
 
     @Override

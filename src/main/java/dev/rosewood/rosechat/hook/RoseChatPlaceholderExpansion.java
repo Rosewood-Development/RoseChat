@@ -2,12 +2,12 @@ package dev.rosewood.rosechat.hook;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -60,13 +60,13 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
                 case "is_group_leader":
                     return groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
                 case "group":
-                    GroupChat group = groupManager.getGroupChatByOwner(playerData.getUUID());
+                    GroupChannel group = groupManager.getGroupChatByOwner(playerData.getUUID());
                     return group != null ? group.getId() : null;
             }
 
             if (placeholder.startsWith("placeholder_")) {
                 String rcPlaceholderId = placeholder.substring("placeholder_".length());
-                RoseSender sender = new RoseSender(player);
+                RosePlayer sender = new RosePlayer(player);
                 RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
                 if (rcPlaceholder == null) return null;
 
@@ -83,7 +83,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
 
             if (placeholder.endsWith("_name")) {
                 String gc = placeholder.substring("group_".length(), placeholder.indexOf("_name"));
-                GroupChat groupChat = groupManager.getGroupChatById(gc);
+                GroupChannel groupChat = groupManager.getGroupChatById(gc);
                 return groupChat == null ? null : groupChat.getName();
             }
         }

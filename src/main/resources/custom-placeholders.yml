@@ -83,6 +83,10 @@ message-received:
       action: SUGGEST_COMMAND
       value: "/r "
 
+console-message:
+  text:
+    default: "&8[&f%player_nickname% &6-> &e%other_player_nickname%&7] &f"
+
 # These custom placeholders are used in the group format.
 group-prefix:
   text:
@@ -118,7 +122,7 @@ channel-prefix:
   text:
     condition: "%channel%"
     staff: "&8[&cStaff&8] &f"
-    local: "&8[&7&oLocal&8] &f"
+    local: "&8[&7Local&8] &f"
     skyblock: "&8[&aSkyblock&8] &f"
   hover:
     condition: "%channel%"

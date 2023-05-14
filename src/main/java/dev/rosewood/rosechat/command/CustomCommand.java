@@ -1,14 +1,10 @@
 package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import java.util.Collections;
@@ -22,8 +18,8 @@ public class CustomCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String cmd, String[] args) {
-        for (ChatChannel channel : RoseChatAPI.getInstance().getChannels()) {
-            if (channel.getCommand() != null && channel.getCommand().equalsIgnoreCase(cmd)) {
+        for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
+            if (channel.getCommands().contains(cmd.toLowerCase())) {
                 if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
                     RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "no-permission");
                     return false;
@@ -32,24 +28,14 @@ public class CustomCommand extends Command {
                 if (args.length == 0) {
                     if (!ChannelCommand.processChannelSwitch(sender, channel.getId())) {
                         RoseChatAPI.getInstance().getLocaleManager()
-                                .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getCommand()));
+                                .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", cmd.toLowerCase()));
                     }
                 } else {
                     String message = AbstractCommand.getAllArgs(0, args);
-
-                    RoseSender roseSender = new RoseSender(sender);
-                    if (!channel.canSendMessage(roseSender, message)) return false;
-
-                    MessageWrapper messageWrapper = new MessageWrapper(roseSender, MessageLocation.CHANNEL, channel, message).filter().applyDefaultColor();
-                    if (!messageWrapper.canBeSent()) {
-                        if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(roseSender);
-                        return true;
-                    }
-
-                    channel.send(messageWrapper);
-                    BaseComponent[] messageComponents = messageWrapper.toComponents();
-                    if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+                    RosePlayer rosePlayer = new RosePlayer(sender);
+                    channel.send(rosePlayer, message);
                 }
+
                 return true;
             }
         }

@@ -21,6 +21,7 @@ import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatInfoCommand;
+import dev.rosewood.rosechat.command.chat.ChatToggleCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
@@ -38,6 +39,18 @@ import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
+import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
+import dev.rosewood.rosechat.hook.channel.fabledskyblock.FabledSkyblockChannelProvider;
+import dev.rosewood.rosechat.hook.channel.factionsuuid.FactionsUUIDChannelProvider;
+import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
+import dev.rosewood.rosechat.hook.channel.kingdomsx.KingdomsXChannelProvider;
+import dev.rosewood.rosechat.hook.channel.marriagemaster.MarriageMasterChannelProvider;
+import dev.rosewood.rosechat.hook.channel.mcmmo.McMMOChannelProvider;
+import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannelProvider;
+import dev.rosewood.rosechat.hook.channel.simpleclans.SimpleClansChannelProvider;
+import dev.rosewood.rosechat.hook.channel.superiorskyblock.SuperiorSkyblockChannelProvider;
+import dev.rosewood.rosechat.hook.channel.towny.TownyChannelProvider;
+import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
@@ -70,9 +83,14 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
+    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
@@ -122,7 +140,8 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new ClearChatCommand())
                 .addSubcommand(new MoveChatCommand())
                 .addSubcommand(new SudoChatCommand())
-                .addSubcommand(new ChatInfoCommand());
+                .addSubcommand(new ChatInfoCommand())
+                .addSubcommand(new ChatToggleCommand());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)
@@ -206,6 +225,42 @@ public class RoseChat extends RosePlugin {
             new PacketListener(this);
             pluginManager.registerEvents(new MessageListener(), this);
         }
+
+        // Channel Hooks
+        new RoseChatChannelProvider().register();
+
+        if (pluginManager.getPlugin("Towny") != null)
+            new TownyChannelProvider().register();
+
+        if (pluginManager.getPlugin("mcMMO") != null)
+            new McMMOChannelProvider().register();
+
+        if (pluginManager.getPlugin("WorldGuard") != null)
+            new WorldGuardChannelProvider().register();
+
+        if (pluginManager.getPlugin("SimpleClans") != null)
+            new SimpleClansChannelProvider().register();
+
+        if (pluginManager.getPlugin("Factions") != null)
+            new FactionsUUIDChannelProvider().register();
+
+        if (pluginManager.getPlugin("Kingdoms") != null)
+            new KingdomsXChannelProvider().register();
+
+        if (pluginManager.getPlugin("BentoBox") != null)
+            new BentoBoxChannelProvider().register();
+
+        if (pluginManager.getPlugin("SuperiorSkyblock2") != null)
+            new SuperiorSkyblockChannelProvider().register();
+
+        if (pluginManager.getPlugin("IridiumSkyblock") != null)
+            new IridiumSkyblockChannelProvider().register();
+
+        if (pluginManager.getPlugin("FabledSkyblock") != null)
+            new FabledSkyblockChannelProvider().register();
+
+        if (pluginManager.getPlugin("MarriageMaster") != null)
+            new MarriageMasterChannelProvider().register();
     }
 
     public Permission getVault() {

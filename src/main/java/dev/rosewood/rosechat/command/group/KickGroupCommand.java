@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -26,7 +26,7 @@ public class KickGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
+        GroupChannel groupChat = this.getAPI().getGroupChatByOwner(player.getUniqueId());
         if (groupChat == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-gc");
             return;
@@ -72,7 +72,7 @@ public class KickGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            GroupChat groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
+            GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
             if (groupChat != null) {
                 for (UUID uuid : groupChat.getMembers()) {
                     Player member = Bukkit.getPlayer(uuid);

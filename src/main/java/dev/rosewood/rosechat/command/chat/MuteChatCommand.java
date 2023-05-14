@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.command.chat;
 
-import dev.rosewood.rosechat.chat.ChatChannel;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.command.CommandSender;
@@ -20,7 +20,7 @@ public class MuteChatCommand extends AbstractCommand {
             return;
         }
 
-        ChatChannel channel = this.getAPI().getChannelById(args[0]);
+        Channel channel = this.getAPI().getChannelById(args[0]);
         if (channel == null) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
             return;
@@ -50,7 +50,7 @@ public class MuteChatCommand extends AbstractCommand {
 
     @Override
     public String getPermission() {
-        return "rosechat.admin.mute";
+        return "rosechat.chat.mute";
     }
 
     @Override

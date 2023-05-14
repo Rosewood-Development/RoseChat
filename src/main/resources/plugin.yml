@@ -12,6 +12,17 @@ softdepend:
   - Essentials
   - LuckPerms
   - Towny
+  - mcMMO
+  - WorldGuard
+  - WorldEdit
+  - SimpleClans
+  - Factions
+  - Kingdoms
+  - BentoBox
+  - SuperiorSkyblock2
+  - IridiumSkyblock
+  - FabledSkyblock
+  - MarriageMaster
 commands:
   rosechat:
     aliases: [rc]
@@ -46,8 +57,7 @@ commands:
     permission: rosechat.channel
   chat:
     aliases: [cc, chatchannel]
-    description: Displays admin commands for chat channels.
-    permission: rosechat.admin
+    description: Displays commands for chat channels.
   color:
     aliases: [chatcolor, colour, chatcolour]
     description: Set a default chat color.
@@ -116,13 +126,20 @@ permissions:
       rosechat.unmute: true
       rosechat.channel: true
       rosechat.channelbypass: true
-      rosechat.admin: true
       rosechat.chatcolor: true
       rosechat.group: true
       rosechat.groups: true
       rosechat.nickname: true
       rosechat.ignore: true
       rosechat.deletemessages: true
+      rosechat.discordchannel: true
+      rosechat.code: true
+      rosechat.multicode: true
+      rosechat.quote: true
+      rosechat.bold: true
+      rosechat.italic: true
+      rosechat.strikethrough: true
+      rosechat.underline: true
   rosechat.basecommand:
     description: Allows using the rc command.
     default: true
@@ -312,20 +329,23 @@ permissions:
   rosechat.channelbypass:
     description: Allows joining an un-joinable channel.
     default: op
-  rosechat.admin.mute:
+  rosechat.chat.mute:
     description: Allows using the chat mute command.
     default: op
-  rosechat.admin.clear:
+  rosechat.chat.clear:
     description: Allows using the chat clear command.
     default: op
-  rosechat.admin.move:
+  rosechat.chat.move:
     description: Allows using the chat move command.
     default: op
-  rosechat.admin.sudo:
+  rosechat.chat.sudo:
     description: Allows using the chat sudo command.
     default: op
-  rosechat.admin.info:
+  rosechat.chat.info:
     description: Allows using the chat info command.
+    default: op
+  rosechat.chat.toggle:
+    description: Allows using the chat toggle command.
     default: op
   rosechat.chatcolor:
     description: Allows using the chatcolor command.
@@ -389,3 +409,27 @@ permissions:
       rosechat.deletemessages.self: true
       rosechat.deletemessages.others: true
       rosechat.deletemessages.see: true
+    rosechat.discordchannel:
+      description: Allows linking to discord channels.
+      default: op
+    rosechat.code:
+      description: Allows using code markdown.
+      default: op
+    rosechat.multicode:
+      description: Allows using multicode markdown.
+      default: op
+    rosechat.quote:
+      description: Allows using quote markdown.
+      default: op
+    rosechat.bold:
+      description: Allows using bold markdown.
+      default: op
+    rosechat.italic:
+      description: Allows using italic markdown.
+      default: op
+    rosechat.strikethrough:
+      description: Allows using strikethrough markdown.
+      default: op
+    rosechat.underline:
+      description: Allows using underline markdown.
+      default: op

@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.BungeeManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.ByteArrayInputStream;
@@ -48,12 +47,15 @@ public class BungeeListener implements PluginMessageListener {
                 case "channel_message": {
                     String rcChannel = data.readUTF();
                     String sender = data.readUTF();
-                    UUID senderUUID = UUID.fromString(data.readUTF());
+                    String uuidStr = data.readUTF();
+                    UUID senderUUID = uuidStr.equalsIgnoreCase("null") ? null : UUID.fromString(uuidStr);
                     String group = data.readUTF();
                     List<String> permissions = Arrays.asList(data.readUTF().split(","));
-                    UUID messageId = UUID.fromString(data.readUTF());
+                    String messageIdStr = data.readUTF();
+                    UUID messageId = messageIdStr.equalsIgnoreCase("null") ? null : UUID.fromString(messageIdStr);
+                    boolean isJson = data.readBoolean();
                     String rcMessage = data.readUTF();
-                    this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, rcMessage);
+                    this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);
                     return;
                 }
                 case "direct_message": {

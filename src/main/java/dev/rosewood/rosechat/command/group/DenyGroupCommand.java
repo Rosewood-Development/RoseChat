@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -28,12 +28,12 @@ public class DenyGroupCommand extends AbstractCommand {
         }
 
         if (args.length == 0) {
-            GroupChat invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
+            GroupChannel invite = playerData.getGroupInvites().get(playerData.getGroupInvites().size() - 1);
             this.deny(playerData, player, invite);
         } else {
             String id = args[0];
 
-            for (GroupChat invite : playerData.getGroupInvites()) {
+            for (GroupChannel invite : playerData.getGroupInvites()) {
                 if (invite.getId().equalsIgnoreCase(id)) {
                     this.deny(playerData, player, invite);
                     return;
@@ -48,7 +48,7 @@ public class DenyGroupCommand extends AbstractCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         List<String> tab = new ArrayList<>();
         if (args.length == 1) {
-            for (GroupChat groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
+            for (GroupChannel groupChat : this.getAPI().getPlayerData(((Player) sender).getUniqueId()).getGroupInvites()) {
                 tab.add(groupChat.getId());
             }
 
@@ -68,7 +68,7 @@ public class DenyGroupCommand extends AbstractCommand {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-group-deny-usage");
     }
 
-    private void deny(PlayerData data, Player player, GroupChat groupChat) {
+    private void deny(PlayerData data, Player player, GroupChannel groupChat) {
         OfflinePlayer owner = Bukkit.getOfflinePlayer(groupChat.getOwner());
         data.getGroupInvites().remove(groupChat);
 

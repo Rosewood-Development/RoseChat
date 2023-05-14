@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
+import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +23,13 @@ public class DebugManager extends Manager {
         this.messages = new LinkedList<>();
     }
 
-    public void addMessage(String message) {
+    public void addMessage(Supplier<String> message) {
+        if (!this.enabled)
+            return;
+
         LocalDateTime now = LocalDateTime.now();
         String prefix = "[" + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond() + ":" + System.currentTimeMillis() + "]";
-        this.messages.add(prefix + " " + message + "\n");
+        this.messages.add(prefix + " " + message.get() + "\n");
     }
 
     @Override
@@ -39,6 +43,9 @@ public class DebugManager extends Manager {
     }
 
     public void save() {
+        if (!this.enabled)
+            return;
+
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
             long time = System.currentTimeMillis();
             File debugFolder = new File(this.rosePlugin.getDataFolder(), "debug");

@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -25,7 +25,7 @@ public class LeaveGroupCommand extends AbstractCommand {
         }
 
         Player player = (Player) sender;
-        GroupChat groupChat = this.getAPI().getGroupChatById(args[0]);
+        GroupChannel groupChat = this.getAPI().getGroupChatById(args[0]);
         if (groupChat == null || !groupChat.getMembers().contains(player.getUniqueId())) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-invalid");
             return;
@@ -41,7 +41,7 @@ public class LeaveGroupCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.single("name", groupChat.getName()));
 
-        groupChat.removeMember(player);
+        groupChat.removeMember(player.getUniqueId());
         this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
 
         for (UUID uuid : groupChat.getMembers()) {
@@ -60,7 +60,7 @@ public class LeaveGroupCommand extends AbstractCommand {
         List<String> tab = new ArrayList<>();
 
         if (args.length == 1) {
-            for (GroupChat groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
+            for (GroupChannel groupChat : this.getAPI().getGroupChats(((Player) sender).getUniqueId())) {
                 tab.add(groupChat.getId());
             }
         }

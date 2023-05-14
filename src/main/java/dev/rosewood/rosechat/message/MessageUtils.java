@@ -1,23 +1,29 @@
 package dev.rosewood.rosechat.message;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
-import dev.rosewood.rosechat.chat.Group;
-import dev.rosewood.rosechat.chat.GroupChat;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
-import dev.rosewood.rosechat.listener.BungeeListener;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
 import java.util.ArrayDeque;
@@ -116,11 +122,11 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
                 .addPlaceholder("player_name", sender.getName())
                 .addPlaceholder("player_displayname", sender.getDisplayName())
@@ -138,42 +144,43 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param group The {@link Group} that these placeholders will be sent in.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
+     * @param channel The {@link Channel} that these placeholders will be sent in.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group) {
-        if (group == null) return getSenderViewerPlaceholders(sender, viewer);
-        else if (group instanceof GroupChat) return getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
-        else if (group instanceof ChatChannel) return getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
-        else return getSenderViewerPlaceholders(sender, viewer);
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel) {
+        if (channel == null) return getSenderViewerPlaceholders(sender, viewer);
+        else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
+
+        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
+        builder.addPlaceholder("channel", channel.getId());;
+        return builder;
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param group The {@link Group} that these placeholders will be sent in.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
+     * @param channel The {@link Channel} that these placeholders will be sent in.
      * @param extra More {@link StringPlaceholders} to use.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, Group group, StringPlaceholders extra) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel, StringPlaceholders extra) {
         StringPlaceholders.Builder builder;
-        if (group == null) builder =  getSenderViewerPlaceholders(sender, viewer);
-        else if (group instanceof GroupChat) builder = getSenderViewerPlaceholders(sender, viewer, (GroupChat) group);
-        else if (group instanceof ChatChannel) builder = getSenderViewerPlaceholders(sender, viewer, (ChatChannel) group);
-        else builder = getSenderViewerPlaceholders(sender, viewer);
+        if (channel == null) builder =  getSenderViewerPlaceholders(sender, viewer);
+        else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
+        else builder = getSenderViewerPlaceholders(sender, viewer, channel);
 
         return extra == null ? builder : builder.addAll(extra);
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param group The {@link GroupChat} that these placeholders will be sent in.
+     * @param sender The {@link RosePlayer} who will send these placeholders.
+     * @param viewer The {@link RosePlayer} who will view these placeholders.
+     * @param group The {@link GroupChannel} that these placeholders will be sent in.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, GroupChat group) {
+    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
         builder.addPlaceholder("group", group.getId())
                 .addPlaceholder("group_name", group.getName())
@@ -183,46 +190,39 @@ public class MessageUtils {
     }
 
     /**
-     * @param sender The {@link RoseSender} who will send these placeholders.
-     * @param viewer The {@link RoseSender} who will view these placeholders.
-     * @param channel The {@link ChatChannel} that these placeholders will be sent in.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RoseSender sender, RoseSender viewer, ChatChannel channel) {
-        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("channel", channel.getId());;
-        return builder;
-    }
-
-    /**
      * Sends a message to a Discord channel.
      * @param message The message to send.
-     * @param group The {@link Group} that the message was sent from.
-     * @param channel The channel to send the message to.
+     * @param channel The {@link Channel} that the message was sent from.
+     * @param discordChannel The channel to send the message to.
      */
-    public static void sendDiscordMessage(MessageWrapper message, Group group, String channel) {
-        RoseChatAPI.getInstance().getDiscord().sendMessage(message, group, channel);
+    public static void sendDiscordMessage(RoseMessage message, Channel channel, String discordChannel) {
+        RoseChatAPI.getInstance().getDiscord().sendMessage(message, channel, discordChannel);
     }
 
     /**
      * Sends a private message from one player to another.
-     * @param sender The {@link RoseSender} who sent the message.
+     * @param sender The {@link RosePlayer} who sent the message.
      * @param targetName The name of the player receiving the message.
      * @param message The message to send.
      */
-    public static void sendPrivateMessage(RoseSender sender, String targetName, String message) {
+    public static void sendPrivateMessage(RosePlayer sender, String targetName, String message) {
         Player target = Bukkit.getPlayer(targetName);
-        RoseSender messageTarget = target == null ? new RoseSender(targetName, "default") : new RoseSender(target);
+        RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
-        PrivateMessageInfo info = new PrivateMessageInfo(sender, messageTarget);
-        MessageWrapper messageWrapper = new MessageWrapper(sender, MessageLocation.MESSAGE, null, message).filter().applyDefaultColor()
-                .setPrivateMessage().setPrivateMessageInfo(info);
+        // Create the private message info, rules, and the message, then apply the rules.
+        PrivateMessageInfo privateMessageInfo = new PrivateMessageInfo(sender, messageTarget);
+        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor().setPrivateMessageInfo(privateMessageInfo);
 
-        if (!messageWrapper.canBeSent()) {
-            if (messageWrapper.getFilterType() != null) messageWrapper.getFilterType().sendWarning(sender);
+        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, message);
+        roseMessage.applyRules(rules);
+
+        // If the message is blocked, send a warning to the player.
+        if (roseMessage.isBlocked()) {
+            if (roseMessage.getFilterType() != null) roseMessage.getFilterType().sendWarning(sender);
             return;
         }
 
+        // If the message was sent by a player, check if the receiver is ignoring them.
         if (sender.isPlayer()) {
             OfflinePlayer offlineTarget = Bukkit.getOfflinePlayer(targetName);
             PlayerData targetData = RoseChatAPI.getInstance().getPlayerData(offlineTarget.getUniqueId());
@@ -232,43 +232,73 @@ public class MessageUtils {
             }
         }
 
-        // Parse for spies first.
-        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
-            boolean isSpySender = sender.isPlayer() && uuid.equals(sender.asPlayer().getUniqueId());
-            boolean isSpyTarget = messageTarget.isPlayer() && uuid.equals(messageTarget.asPlayer().getUniqueId());
-            if (isSpySender || isSpyTarget) continue;
+        // Parse the message for the console to generate the tokens
+        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString());
 
+        // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
+        // The tokens will always be generated before even if this message is not sent.
+        if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
+            Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
+
+        // Parse for the channel spies.
+        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
+            // Don't send the spy message if the spy is the sender or receiver.
+            if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID())) continue;
+
+            // If the spy isn't valid, continue.
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
-            info.addSpy(new RoseSender(spy));
-            BaseComponent[] spyMessage = messageWrapper.parse(Setting.MESSAGE_SPY_FORMAT.getString(), new RoseSender(spy));
-            spy.spigot().sendMessage(spyMessage);
+
+            // Adds the spy to the private message info.
+            privateMessageInfo.addSpy(new RosePlayer(spy));
+
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
+                spy.spigot().sendMessage(parsedSpyMessage);
+            });
         }
 
-        BaseComponent[] sentMessage = messageWrapper.parse(Setting.MESSAGE_SENT_FORMAT.getString(), sender);
-        BaseComponent[] receivedMessage = messageWrapper.parse(Setting.MESSAGE_RECEIVED_FORMAT.getString(), messageTarget);
+        // Parse the message for the sender and the receiver.
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
+            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
 
-        if (target == null) {
-            if (targetName.equalsIgnoreCase("Console")) {
-                Bukkit.getConsoleSender().spigot().sendMessage(receivedMessage);
+            if (target == null) {
+                // If the target is not valid and the name is "Console", then send the message to the console.
+                if (targetName.equalsIgnoreCase("Console")) {
+                    sender.send(parsedSentMessage);
+                    Bukkit.getConsoleSender().spigot().sendMessage(parsedReceivedMessage);
+                } else {
+                    // If the target is not valid, but the name isn't console, we should see if it is a bungee player.
+                    RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (success) -> {
+                        if (success) {
+                            // If the message was received successfully, send the sent message to the sender.
+                            sender.send(parsedSentMessage);
+                        } else {
+                            // If the message was not received successfully, then the player is assumed to not be online.
+                            RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
+                        }
+                    });
+                }
             } else {
-                RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (sent) -> {
-                    if (sent) {
-                        sender.send(sentMessage);
-                    } else {
-                        RoseChatAPI.getInstance().getLocaleManager().sendComponentMessage(sender, "player-not-found");
-                    }
-                });
-                return;
+                // The sender should receive the message first.
+                sender.send(parsedSentMessage);
+
+                // If the target is online, send the message.
+                messageTarget.send(parsedReceivedMessage);
             }
-        } else {
-            target.spigot().sendMessage(receivedMessage);
+        });
+
+        // Update the player's display name if the setting is enabled.
+        if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
+                nickname.parse(sender, null);
+
+                if (sender.getPlayerData().getNickname() != null) NicknameCommand.setDisplayName(sender, nickname);
+            });
         }
-
-        sender.send(sentMessage);
-
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.isPlayer()
-                && !sender.getDisplayName().equals(sender.getNickname())) NicknameCommand.setDisplayName(sender.asPlayer(), sender.getNickname());
     }
 
     /**
@@ -303,12 +333,12 @@ public class MessageUtils {
 
     /**
      * Checks if a message can be coloured by the given sender.
-     * @param sender The {@link CommandSender} sender who is sending the string.
+     * @param sender The {@link RosePlayer} who is sending the string.
      * @param str The string to check.
      * @param permissionArea The location, from a {@link MessageLocation} as a string.
      * @return True if the message can be colored.
      */
-    public static boolean canColor(CommandSender sender, String str, String permissionArea) {
+    public static boolean canColor(RosePlayer sender, String str, String permissionArea) {
         Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
         Matcher formatMatcher = VALID_LEGACY_REGEX_FORMATTING.matcher(str);
         Matcher hexMatcher = HEX_REGEX.matcher(str);
@@ -327,7 +357,7 @@ public class MessageUtils {
         boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + permissionArea);
 
         if (!(canColor && canMagic && canFormat && canHex && canGradient && canRainbow)) {
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(sender, "no-permission");
+            sender.sendLocaleMessage("no-permission");
             return false;
         }
 
@@ -336,14 +366,14 @@ public class MessageUtils {
 
     /**
      * @param input The string to check.
-     * @param messageWrapper The {@link MessageWrapper} containing the message.
+     * @param roseMessage The {@link RoseMessage} containing the message.
      * @return True if this message starts with a saved /chatcolor.
      */
-    public static boolean hasDefaultColor(String input, MessageWrapper messageWrapper) {
-        if (messageWrapper == null || messageWrapper.getSenderData() == null || messageWrapper.getSenderData().getColor() == null) return false;
+    public static boolean hasDefaultColor(String input, RoseMessage roseMessage) {
+        if (roseMessage == null || roseMessage.getSenderData() == null || roseMessage.getSenderData().getColor() == null) return false;
 
-        String message = messageWrapper.getMessage();
-        String color = messageWrapper.getSenderData().getColor();
+        String message = roseMessage.getMessage();
+        String color = roseMessage.getSenderData().getColor();
         if (color.isEmpty() || color.length() >= message.length()) return false;
 
         String start = message.substring(0, color.length());
@@ -449,15 +479,82 @@ public class MessageUtils {
         }
     }
 
-    public static void sendMessageWrapper(RoseSender sender, ChatChannel channel, MessageWrapper message) {
-        if (!message.canBeSent()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(sender);
-            return;
+    /**
+     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'.
+     * @return True if the sender has the permission
+     */
+    public static boolean hasTokenPermission(RoseMessage message, String permission) {
+        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
+        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE || message.getSender().isConsole()) return true;
+
+        // Gets the full permission, e.g. rosechat.emoji.channel.global
+        String fullPermission = permission + "." + message.getLocationPermission();
+
+        return message.getSender().hasPermission(fullPermission)
+                || message.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
+                || message.getSender().getIgnoredPermissions().contains("*");
+    }
+
+    /**
+     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * Checks against the first permission, for example, 'rosechat.emojis', and extended permissions such as 'rosechat.emoji.smile'.
+     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'
+     * @param extendedPermission The extended permission, should not contain the location information. For example, 'rosechat.emoji.smile'.
+     * @return True if the sender has permission.
+     */
+    public static boolean hasExtendedTokenPermission(RoseMessage message, String permission, String extendedPermission) {
+        // The sender will not have an extended permission if they do not have the base permission.
+        if (!hasTokenPermission(message, permission)) return false;
+
+        return message.getSender().hasPermission(extendedPermission)
+                || message.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
+                || message.getSender().getIgnoredPermissions().contains("*");
+    }
+
+    public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
+        RoseChatPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        if (placeholder == null) return null;
+
+        BaseComponent[] components;
+        HoverEvent hoverEvent = null;
+        ClickEvent clickEvent = null;
+
+        if (placeholder.getText() == null) return null;
+        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
+        if (text == null) return null;
+        components = api.parse(sender, viewer, text);
+
+        if (placeholder.getHover() != null) {
+            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
+            if (hover != null) {
+                if (hover.equalsIgnoreCase("%original%")) {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
+                } else {
+                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover));
+                }
+            }
         }
 
-        channel.send(message);
-        BaseComponent[] messageComponents = message.toComponents();
-        if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
+        if (placeholder.getClick() != null) {
+            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
+            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
+            if (click != null && action != null) {
+                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
+            }
+        }
+
+        for (BaseComponent component : components) {
+            component.setHoverEvent(hoverEvent);
+            component.setClickEvent(clickEvent);
+        }
+
+        return components;
     }
 
 }

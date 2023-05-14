@@ -3,12 +3,12 @@ package dev.rosewood.rosechat.manager;
 import com.google.common.collect.Iterables;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatChannel;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.DeleteMessageCommand;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class BungeeManager extends Manager {
 
@@ -88,14 +87,14 @@ public class BungeeManager extends Manager {
     // Channel Messages
     //
 
-    private String getPlayerPermissions(RoseSender sender) {
+    private String getPlayerPermissions(RosePlayer sender) {
+        if ((sender.isPlayer() && sender.asPlayer().isOp())) return "*";
+
         StringBuilder stringBuilder = new StringBuilder();
         for (String permission : sender.getPermissions()) {
             if (stringBuilder.length() != 0) stringBuilder.append(",");
             stringBuilder.append(permission);
         }
-
-        if ((sender.isPlayer() && sender.asPlayer().isOp())) stringBuilder.append(",*");
 
         return stringBuilder.toString();
     }
@@ -106,23 +105,24 @@ public class BungeeManager extends Manager {
      * Each server parses the message independently.
      * This means that permissions and placeholders are sent to the receiving server.
      * Due to this, any custom Tokenizers should start their permission with 'rosechat.', to avoid sending every single permission over the network.
-     * @param sender The {@link RoseSender} who sent the message.
+     * @param sender The {@link RosePlayer} who sent the message.
      * @param server The server that should receive the message.
      * @param channel The channel that should receive the message.
      * @param messageId The {@link UUID} of the message that should be sent.
      * @param message The unformatted message that should be sent.
      */
-    public void sendChannelMessage(RoseSender sender, String server, String channel, UUID messageId, String message) {
+    public void sendChannelMessage(RosePlayer sender, String server, String channel, UUID messageId, boolean isJson, String message) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
             out.writeUTF(channel);
             out.writeUTF(sender.getName());
-            out.writeUTF(sender.getUUID().toString());
+            out.writeUTF(sender.getUUID() == null ? "null" : sender.getUUID().toString());
             out.writeUTF(sender.getGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
-            out.writeUTF(messageId.toString());
+            out.writeUTF(messageId == null ? "null" : messageId.toString());
+            out.writeBoolean(isJson);
             out.writeUTF(PlaceholderAPIHook.applyPlaceholders(sender.isPlayer() ? sender.asPlayer() : null, message));
         } catch (IOException e) {
             e.printStackTrace();
@@ -133,7 +133,6 @@ public class BungeeManager extends Manager {
 
     /**
      * Called when the server receives a "channel_message" message.
-     * @param channelStr The id of the {@link ChatChannel}.
      * @param senderStr The name of the sender.
      * @param senderUUID The {@link UUID} of the sender.
      * @param senderGroup The permission group of the sender.
@@ -141,14 +140,22 @@ public class BungeeManager extends Manager {
      * @param messageId The {@link UUID} of the message.
      * @param message The unformatted message received.
      */
-    public void receiveChannelMessage(String channelStr, String senderStr, UUID senderUUID, String senderGroup, List<String> permissions, UUID messageId, String message) {
-        ChatChannel channel = this.rosePlugin.getManager(ChannelManager.class).getChannel(channelStr);
+    public void receiveChannelMessage(String channelStr, String senderStr, UUID senderUUID, String senderGroup, List<String> permissions,
+                                      UUID messageId, boolean isJson, String message) {
+        Channel channel = this.rosePlugin.getManager(ChannelManager.class).getChannel(channelStr);
 
         if (channel == null) return;
-        RoseSender sender = new RoseSender(senderUUID, senderStr, senderGroup);
+        RosePlayer sender = new RosePlayer(senderUUID, senderStr, senderGroup);
         sender.setIgnoredPermissions(permissions);
 
-        channel.sendJson(sender, messageId, message);
+        // Must be done asynchronously for LuckPerms & Vault.
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            if (isJson) {
+                channel.sendJson(sender, message, messageId);
+            } else {
+                channel.send(sender, message, messageId);
+            }
+        });
     }
 
     //
@@ -157,12 +164,12 @@ public class BungeeManager extends Manager {
 
     /**
      * Sends a BungeeCord message to a specific player.
-     * @param sender The {@link RoseSender} who sent the message.
+     * @param sender The {@link RosePlayer} who sent the message.
      * @param receiver The name of the player who received the message.
      * @param message The unformatted message to be sent.
      * @param callback A callback to check if the message was received.
      */
-    public void sendDirectMessage(RoseSender sender, String receiver, String message, Consumer<Boolean> callback) {
+    public void sendDirectMessage(RosePlayer sender, String receiver, String message, Consumer<Boolean> callback) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
@@ -197,7 +204,7 @@ public class BungeeManager extends Manager {
         PlayerData playerData = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
         if (playerData.getIgnoringPlayers().contains(senderUUID)) return;
 
-        RoseSender sender = new RoseSender(senderStr, group);
+        RosePlayer sender = new RosePlayer(senderStr, group);
         sender.setIgnoredPermissions(permissions);
         MessageUtils.sendPrivateMessage(sender, player.getName(), message);
     }
@@ -342,13 +349,7 @@ public class BungeeManager extends Manager {
      */
     public void receiveMessageDeletion(UUID messageId) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData data = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
-            for (DeletableMessage message : data.getMessageLog().getDeletableMessages()) {
-                if (message.getUUID().equals(messageId)) {
-                    DeleteMessageCommand.deleteMessageForPlayer(player, message);
-                    break;
-                }
-            }
+            RoseChatAPI.getInstance().deleteMessage(new RosePlayer(player), messageId);
         }
     }
 

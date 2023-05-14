@@ -5,9 +5,12 @@ import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -30,6 +33,8 @@ public class NickColorCommand extends AbstractCommand {
             return;
         }
 
+        RosePlayer player = new RosePlayer(sender);
+
         String color = args[0];
         if (color.equalsIgnoreCase("remove")) {
             if (playerData.getNickname() != null) {
@@ -39,9 +44,13 @@ public class NickColorCommand extends AbstractCommand {
                     ((Player) sender).setDisplayName(null);
                 } else {
                     // Remove only colours from the nickname.
-                    String nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname())) + "&r";
+                    String nickname = ChatColor.stripColor(HexUtils.colorify(player.getNickname())) + "&r";
                     playerData.setNickname(nickname);
-                    NicknameCommand.setDisplayName((Player) sender, nickname);
+
+                    RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
+                    nicknameMessage.parse(player, null);
+
+                    NicknameCommand.setDisplayName(player, nicknameMessage);
                 }
 
                 playerData.save();
@@ -50,7 +59,7 @@ public class NickColorCommand extends AbstractCommand {
             return;
         }
 
-        if (!MessageUtils.canColor(sender, color, MessageLocation.NICKNAME.toString().toLowerCase())) return;
+        if (!MessageUtils.canColor(player, color, MessageLocation.NICKNAME.toString().toLowerCase())) return;
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {
@@ -59,17 +68,22 @@ public class NickColorCommand extends AbstractCommand {
         }
 
         String nickname;
+
         // Apply the colour to the player's name if they do not have a nickname.
         if (playerData.getNickname() == null) {
             nickname = color + sender.getName() + "&r";
             playerData.setNickname(nickname);
-            NicknameCommand.setDisplayName((Player) sender, nickname);
+            RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
+            nicknameMessage.parse(player, null);
+            NicknameCommand.setDisplayName(player, nicknameMessage);
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             nickname = color + nickname + "&r";
             playerData.setNickname(nickname);
-            NicknameCommand.setDisplayName((Player) sender, nickname);
+            RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
+            nicknameMessage.parse(player, null);
+            NicknameCommand.setDisplayName(player, nicknameMessage);
         }
 
         playerData.save();

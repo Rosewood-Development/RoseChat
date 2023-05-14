@@ -2,13 +2,10 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.MessageWrapper;
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -75,8 +72,8 @@ public class ReplyCommand extends AbstractCommand {
 
         if (!canBeMessaged.get()) return;
 
-        RoseSender roseSender = new RoseSender(sender);
-        MessageUtils.sendPrivateMessage(roseSender, target, message);
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        MessageUtils.sendPrivateMessage(rosePlayer, target, message);
 
         PlayerData targetData = this.getAPI().getPlayerData(targetPlayer.getUniqueId());
         if (targetData == null) return;

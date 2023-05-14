@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public class MessageLog {
 
-    private UUID sender;
+    private UUID owner;
     private List<String> messages;
     private final LinkedList<DeletableMessage> deletableMessages;
     private int cleanupAmount;
 
     public MessageLog(UUID sender) {
-        this.sender = sender;
+        this.owner = sender;
         this.messages = new ArrayList<>();
         this.deletableMessages = new LinkedList<>();
     }
@@ -40,9 +40,9 @@ public class MessageLog {
         if (this.messages.size() > this.cleanupAmount - 1) {
             for (int i = 0; i < this.cleanupAmount; i++) {
                 String message = this.messages.get((this.messages.size() - 1) - i);
-                double similarity = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
+                double difference = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if (similarity >= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
+                if ((1 - difference) <= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
                     similarMessages++;
                 }
             }
@@ -61,12 +61,12 @@ public class MessageLog {
         this.messages.add(message);
     }
 
-    public UUID getSender() {
-        return this.sender;
+    public UUID getOwner() {
+        return this.owner;
     }
 
-    public void setSender(UUID sender) {
-        this.sender = sender;
+    public void setOwner(UUID owner) {
+        this.owner = owner;
     }
 
     public List<String> getMessages() {

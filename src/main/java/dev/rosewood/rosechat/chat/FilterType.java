@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.chat;
 
-import dev.rosewood.rosechat.message.RoseSender;
+import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.entity.Player;
 
 public enum FilterType {
@@ -20,7 +20,7 @@ public enum FilterType {
      * Sends a warning message, defined in the language file, to the sender.
      * @param sender The person to receive the message.
      */
-    public void sendWarning(RoseSender sender) {
+    public void sendWarning(RosePlayer sender) {
         sender.sendLocaleMessage(this.warning);
     }
 
@@ -29,7 +29,7 @@ public enum FilterType {
      * @param player The person to receive the message.
      */
     public void sendWarning(Player player) {
-        this.sendWarning(new RoseSender(player));
+        this.sendWarning(new RosePlayer(player));
     }
 
 }
