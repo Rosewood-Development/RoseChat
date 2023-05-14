@@ -38,7 +38,6 @@ repositories {
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
     maven { url = 'https://repo.bg-software.com/repository/api/' }
     maven { url = 'https://nexus.iridiumdevelopment.net/repository/maven-releases/' }
-    maven { url = 'https://repo.songoda.com/repository/public/' }
     maven { url = 'https://repo.pcgamingfreaks.at/repository/maven-everything/' }
 
 }
@@ -66,7 +65,7 @@ dependencies {
     compileOnly 'world.bentobox:bentobox:1.20.0-SNAPSHOT'
     compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2022.9'
     compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
-    compileOnly 'com.songoda:skyblock:2.3.30'
+    compileOnly 'com.songoda:skyblock:2.5.0'
     compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.6.13'
 }
 
