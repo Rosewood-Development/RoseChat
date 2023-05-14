@@ -33,7 +33,7 @@ public class ChatInfoCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-title", StringPlaceholders.single("id", channel.getId()), false);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-format",
-                channel.getInfoPlaceholders(new RosePlayer(sender), localeTrue, localeFalse, localeNone).build());
+                channel.getInfoPlaceholders(new RosePlayer(sender), localeTrue, localeFalse, localeNone).build(), false);
     }
 
     @Override

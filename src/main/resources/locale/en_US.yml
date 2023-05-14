@@ -116,13 +116,10 @@ command-chat-sudo-usage: '&e/chat sudo <player> <channel> <message>'
 command-chat-info-description: '&8 - &c/chat info &7- View information about a chat channel.'
 command-chat-info-usage: '&e/chat info <channel>'
 command-chat-info-title: '&7[&c%id% Info&7]'
-command-chat-info-format: |-
-  &eDefault: &b%default% &7| &eMuted: &b%muted% &7| &eCommands: &c%commands%
-  &eWorlds: &a%worlds% &7| &eJoinable: &b%joinable% &7| &eDiscord: &b%discord%
-  &ePlayers: &b%players% &7| &eServers: &b%servers%
+command-chat-info-format: '&7| &eDefault: &b%default% &7| &eMuted: &b%muted% &7| &eCommands: &c%commands% &7| &eWorlds: &a%worlds% &7| &eJoinable: &b%joinable% &7| &eDiscord: &b%discord% &7| &eMembers: &b%players% &7| &eServers: &b%servers%'
 command-chat-info-true: 'true'
 command-chat-info-false: 'false'
-command-chat-info-none: None
+command-chat-info-none: 'None'
 
 # Group Chat Command
 command-gc-description: '&8 - &d/gc &7- Displays the group chat help menu.'
@@ -219,8 +216,8 @@ command-color-usage: '&e/color <color>'
 command-color-success: '&eYour new chat color is &f%color%&e.'
 command-color-invalid: '&eThis is not a valid color!'
 command-color-removed: '&eYour chat color has been removed.'
-command-color-gradient: Gradient
-command-color-rainbow: Rainbow
+command-color-gradient: 'Gradient'
+command-color-rainbow: 'Rainbow'
 
 # Mute Command
 command-mute-description: '&8 - &d/mute &7- Mute a player.'
@@ -231,16 +228,16 @@ command-mute-muted: '&eYou have been muted.'
 command-mute-cannot-be-muted: '&cYou cannot mute this player!'
 command-mute-cannot-send: '&cYou can not send a message while you are muted!'
 command-mute-unmuted: '&eYou are no longer muted.'
-command-mute-second: second
-command-mute-minute: minute
-command-mute-hour: hour
-command-mute-month: month
-command-mute-year: year
-command-mute-seconds: seconds
-command-mute-minutes: minutes
-command-mute-hours: hours
-command-mute-months: months
-command-mute-years: years
+command-mute-second: 'second'
+command-mute-minute: 'minute'
+command-mute-hour: 'hour'
+command-mute-month: 'month'
+command-mute-year: 'year'
+command-mute-seconds: 'seconds'
+command-mute-minutes: 'minutes'
+command-mute-hours: 'hours'
+command-mute-months: 'months'
+command-mute-years: 'years'
 
 # Unmute Command
 command-unmute-description: '&8 - &d/unmute &7- Removes a player''s mute.'
