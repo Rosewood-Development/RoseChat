@@ -18,10 +18,13 @@ import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +132,10 @@ public class RoseMessage {
 
         if (!colorPlaceholder.endsWith("}")) colorPlaceholder = colorPlaceholder.substring(0, colorPlaceholder.lastIndexOf("}") + 1);
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(colorPlaceholder.substring(0, colorPlaceholder.length() - 1));
-        String value = placeholder.getText().parseToString(this.sender, viewer, StringPlaceholders.empty());
+        String value = placeholder.getText().parseToString(this.sender, viewer, MessageUtils.getSenderViewerPlaceholders(this.sender, viewer, this.channel).build());
+
+        if (this.sender.isPlayer())
+            value = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), value).replace(ChatColor.COLOR_CHAR, '&');
 
         Matcher colorMatcher = MessageUtils.STOP.matcher(value);
         while (colorMatcher.find())
@@ -138,6 +144,10 @@ public class RoseMessage {
         Matcher formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(value);
         while (formatMatcher.find())
             lastFormat = formatMatcher.group();
+
+        // Applies Placeholders in order to get any colour within them.
+        if (this.sender.isPlayer())
+            format = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), format).replace(ChatColor.COLOR_CHAR, '&');
 
         // Check the format string for colours after, e.g. {player}:&c{message}
         colorMatcher = MessageUtils.STOP.matcher(format);
@@ -150,7 +160,7 @@ public class RoseMessage {
             if (format.indexOf(formatMatcher.group()) > format.indexOf(colorPlaceholder)) lastFormat = formatMatcher.group();
         }
 
-        return lastFormat + lastColor;
+        return HexUtils.colorify(lastFormat + lastColor);
     }
 
     /**
