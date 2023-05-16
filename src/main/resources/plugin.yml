@@ -71,7 +71,6 @@ commands:
   gc:
     aliases: [group, groupchat]
     description: Displays group chat commands.
-    permission: rosechat.group
   gcm:
     aliases: [gcm, gcmsg, gmsg]
     description: Send a message in a group chat.
@@ -142,6 +141,9 @@ permissions:
       rosechat.underline: true
   rosechat.basecommand:
     description: Allows using the rc command.
+    default: true
+  rosechat.group:
+    description: Allows using the gc command.
     default: true
   rosechat.reload:
     description: Allows using the reload command.
