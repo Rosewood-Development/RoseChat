@@ -66,6 +66,11 @@ public class MuteCommand extends AbstractCommand {
                         outScale = outTime == 1 ? "hour" : "hours";
                         muteTime = outTime * 3600;
                         break;
+                    case "day":
+                    case "days":
+                        outScale = outTime == 1 ? "day" : "days";
+                        muteTime = outTime * (3600 * 24);
+                        break;
                     case "month":
                     case "months":
                         outScale = outTime == 1 ? "month" : "months";
