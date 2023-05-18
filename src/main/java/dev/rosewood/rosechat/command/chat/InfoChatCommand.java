@@ -8,9 +8,9 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatInfoCommand extends AbstractCommand {
+public class InfoChatCommand extends AbstractCommand {
 
-    public ChatInfoCommand() {
+    public InfoChatCommand() {
         super(false, "info");
     }
 

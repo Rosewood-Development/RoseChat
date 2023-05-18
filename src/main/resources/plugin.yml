@@ -388,6 +388,9 @@ permissions:
   rosechat.group.info:
     description: Allows using the group info command.
     default: op
+  rosechat.group.list:
+    description: Allows using the group list command.
+    default: op
   rosechat.groups:
     description: Limits the amount of groups a player can be in.
     default: op

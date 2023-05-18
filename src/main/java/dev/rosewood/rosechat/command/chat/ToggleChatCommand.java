@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatToggleCommand extends AbstractCommand {
+public class ToggleChatCommand extends AbstractCommand {
 
-    public ChatToggleCommand() {
+    public ToggleChatCommand() {
         super(true, "toggle");
     }
 

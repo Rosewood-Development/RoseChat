@@ -20,8 +20,8 @@ import dev.rosewood.rosechat.command.UnmuteCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
-import dev.rosewood.rosechat.command.chat.ChatInfoCommand;
-import dev.rosewood.rosechat.command.chat.ChatToggleCommand;
+import dev.rosewood.rosechat.command.chat.InfoChatCommand;
+import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
@@ -35,6 +35,7 @@ import dev.rosewood.rosechat.command.group.InfoGroupCommand;
 import dev.rosewood.rosechat.command.group.InviteGroupCommand;
 import dev.rosewood.rosechat.command.group.KickGroupCommand;
 import dev.rosewood.rosechat.command.group.LeaveGroupCommand;
+import dev.rosewood.rosechat.command.group.ListGroupCommand;
 import dev.rosewood.rosechat.command.group.MembersGroupCommand;
 import dev.rosewood.rosechat.command.group.MessageGroupCommand;
 import dev.rosewood.rosechat.command.group.RenameGroupCommand;
@@ -133,15 +134,16 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new DisbandGroupCommand())
                 .addSubcommand(new MembersGroupCommand())
                 .addSubcommand(new RenameGroupCommand())
-                .addSubcommand(new InfoGroupCommand());
+                .addSubcommand(new InfoGroupCommand())
+                .addSubcommand(new ListGroupCommand());
 
         ChatCommandManager chatCommand = (ChatCommandManager) new ChatCommandManager("chat", "/chat help")
                 .addSubcommand(new MuteChatCommand())
                 .addSubcommand(new ClearChatCommand())
                 .addSubcommand(new MoveChatCommand())
                 .addSubcommand(new SudoChatCommand())
-                .addSubcommand(new ChatInfoCommand())
-                .addSubcommand(new ChatToggleCommand());
+                .addSubcommand(new InfoChatCommand())
+                .addSubcommand(new ToggleChatCommand());
 
         this.commandManager = (SeniorCommandManager) new SeniorCommandManager("rosechat", "/rosechat help")
                 .addCommandManager(messageCommand)

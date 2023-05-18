@@ -205,6 +205,12 @@ command-gc-info-usage: '&e/gc info <group>'
 command-gc-info-title: '&7[&b%group% &bInfo&7]'
 command-gc-info-format: '&eID: &b%id% &7| &eOwner: &b%owner% &7| &eMembers: &b%members%'
 
+# Group Chat List Command
+command-gc-list-description: '&8 - &b/gc list &7- View a list of all group chats.'
+command-gc-list-usage: '&e/gc list'
+command-gc-list-title: '&7[&bGroups&7]'
+command-gc-list-format: "&8- &8[%group%&8] &eOwner: &b%owner% &7| &eMembers: &b%members%"
+
 # Group Chat Message Command
 command-gcm-description: '&8 - &d/gcm &7- Sends a message in a group chat.'
 command-gcm-usage: '&e/gcm <group> <message>'
