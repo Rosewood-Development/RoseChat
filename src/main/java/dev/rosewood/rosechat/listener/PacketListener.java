@@ -17,6 +17,7 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -45,7 +46,10 @@ public class PacketListener {
         this.groupCache = CacheBuilder.newBuilder()
                         .expireAfterWrite(5, TimeUnit.SECONDS).build();
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT) {
+        PacketType[] legacyTypes = new PacketType[]{ PacketType.Play.Server.CHAT };
+        PacketType[] types = new PacketType[]{ PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT };
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
             final RoseChatAPI api = RoseChatAPI.getInstance();
 
             @Override
