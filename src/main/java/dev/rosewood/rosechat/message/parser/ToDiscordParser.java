@@ -39,7 +39,7 @@ public class ToDiscordParser implements MessageParser {
 
         // Split the format to get the placeholders before and after the message.
         String[] formatSplit = format.split("\\{message\\}");
-        String before = formatSplit[0];
+        String before = formatSplit.length > 0 ? formatSplit[0] : null;
         String after = formatSplit.length > 1 ? formatSplit[1] : null;
 
         if (before != null && !before.isEmpty()) {

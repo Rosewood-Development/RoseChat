@@ -124,6 +124,8 @@ public class RoseMessage {
     }
 
     public String getChatColorFromFormat(RosePlayer viewer, String format) {
+        if (format.equalsIgnoreCase("{message}")) return "";
+
         String lastColor = "";
         String lastFormat = "";
 
