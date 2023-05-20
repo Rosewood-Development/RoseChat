@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
@@ -24,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +54,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         PlaceholderCondition textPlaceholder = placeholder.getPlaceholder("text");
         String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
-        if (text != null && text.contains("{message}")) {
-            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text);
-            text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+        if (text != null) {
+            if (text.contains("{message}")) {
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text);
+                text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            } else {
+                // Apply PAPI placeholders if the text isn't a chat message.
+                text = PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), text);
+            }
         }
 
         PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
@@ -64,26 +71,43 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
         String title = titlePlaceholder != null ?
                 placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
-        if (title != null && title.contains("{message}")) {
-            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title);
-            title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
-            hasMessagePlaceholder = true;
+        if (title != null) {
+            if (title.contains("{message}")) {
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title);
+                title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+                hasMessagePlaceholder = true;
+            } else {
+                title = PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), title);
+            }
         }
 
         PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
         String description = descriptionPlaceholder != null ?
                 placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
-        if (description != null && description.contains("{message}")) {
-            message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description);
-            description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
-            hasMessagePlaceholder = true;
+        if (description != null) {
+            if (description.contains("{message}")) {
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description);
+                description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+                hasMessagePlaceholder = true;
+            } else {
+                description = PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), description);
+            }
         }
 
         PlaceholderCondition timestampPlaceholder = placeholder.getPlaceholder("timestamp");
         boolean timestamp = timestampPlaceholder != null && Boolean.parseBoolean(timestampPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders));
 
         PlaceholderCondition colorPlaceholder = placeholder.getPlaceholder("color");
-        int color = colorPlaceholder != null ? Integer.parseInt(colorPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : 0;
+        int color = 16777215; // #FFFFFF
+        if (colorPlaceholder != null) {
+            String colorStr = colorPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
+            if (colorStr.startsWith("#")) {
+                Color c = Color.decode(colorStr);
+                color = (c.getRed() << 16) + (c.getGreen() << 8) + c.getBlue();
+            } else {
+                color = Integer.parseInt(colorStr);
+            }
+        }
 
         PlaceholderCondition thumbnailPlaceholder = placeholder.getPlaceholder("thumbnail");
         String thumbnail = thumbnailPlaceholder != null? placeholders.apply(thumbnailPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
