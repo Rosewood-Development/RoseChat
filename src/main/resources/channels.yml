@@ -37,15 +37,15 @@ staff:
 
 
 # Local Channel - /c local
-# If no format is given, then the format of the default channel will be used.
 local:
+  format: '{channel-prefix}{player}{separator}{message}'
 
   # The radius is the distance, in blocks, between players that can read the messages that are sent.
   radius: 200
 
 # Skyblock Channel - /c skyblock
+# If no format is given, then the format of the default channel will be used.
 skyblock:
-  format: '{channel-prefix}{player}{separator}{message}'
 
   # This option makes messages only able to be sent and received when the player is in this world.
   worlds:
