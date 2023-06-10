@@ -46,8 +46,8 @@ dependencies {
     api 'dev.rosewood:rosegarden:1.2.3'
     implementation 'org.apache.commons:commons-text:1.10.0'
 
-    compileOnly 'org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT'
-    compileOnly 'me.clip:placeholderapi:2.11.2'
+    compileOnly 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.11.3'
     compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
     compileOnly 'com.discordsrv:discordsrv:1.26.0'
     compileOnly 'net.dv8tion:JDA:4.3.0_349'
@@ -55,18 +55,18 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'
 
     // Plugin Support
-    compileOnly 'com.palmergames.bukkit.towny:towny:0.98.5.0'
+    compileOnly 'com.palmergames.bukkit.towny:towny:0.99.1.0'
     compileOnly 'com.gmail.nossr50.mcMMO:mcMMO:2.1.210'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.13'
     compileOnly 'net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.18.1'
-    compileOnly 'com.massivecraft:Factions:1.6.9.5-U0.6.21'
+    compileOnly 'com.massivecraft:Factions:1.6.9.5-U0.6.29'
     compileOnly 'com.github.cryptomorin:kingdoms:1.16.3.3'
     compileOnly 'world.bentobox:bentobox:1.20.0-SNAPSHOT'
-    compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2022.9'
+    compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2023.1'
     compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
     compileOnly 'com.songoda:skyblock:2.5.0'
-    compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.6.13'
+    compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.7.0.1'
 }
 
 configurations.all {
