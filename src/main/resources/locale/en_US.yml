@@ -45,10 +45,10 @@ command-socialspy-description: '&8 - &d/socialspy &7- Toggles the ability to see
 command-socialspy-usage: '&e/socialspy <type>'
 command-socialspy-enabled: '&eYou have &aenabled &b%type% &espy.'
 command-socialspy-disabled: '&eYou have &cdisabled &b%type% &espy.'
-command-socialspy-message: message
-command-socialspy-channel: channel
-command-socialspy-group: group
-command-socialspy-all: message, channel, and group
+command-socialspy-message: 'message'
+command-socialspy-channel: 'channel'
+command-socialspy-group: 'group'
+command-socialspy-all: 'message, channel, and group'
 
 # ToggleMessage Command
 command-togglemessage-description: '&8 - &d/togglemessage &7- Toggles the ability to receive messages.'
@@ -62,9 +62,9 @@ command-togglesound-description: '&8 - &d/togglesound &7- Toggles message and ta
 command-togglesound-usage: '&e/togglesound <messages/tags/all>'
 command-togglesound-on: '&eYou have &aenabled &esounds when receiving &b%type%&e.'
 command-togglesound-off: '&eYou have &cdisabled &esounds when receiving &b%type%&e.'
-command-togglesound-messages: messages
-command-togglesound-tags: tags
-command-togglesound-all: all
+command-togglesound-messages: 'messages'
+command-togglesound-tags: 'tags'
+command-togglesound-all: 'all'
 
 # ToggleEmoji Command
 command-toggleemoji-description: '&8 - &d/toggleemoji &7- Toggles formatting emojis.'
