@@ -223,7 +223,7 @@ public class RoseChat extends RosePlugin {
             }, 60L);
         }
 
-        if (pluginManager.getPlugin("ProtocolLib") != null) {
+        if (pluginManager.getPlugin("ProtocolLib") != null && NMSUtil.getVersionNumber() >= 17) {
             new PacketListener(this);
             pluginManager.registerEvents(new MessageListener(), this);
         }
