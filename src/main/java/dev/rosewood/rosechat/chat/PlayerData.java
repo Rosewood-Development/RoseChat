@@ -25,6 +25,7 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
+    private boolean isCurrentChannelGroupChannel;
     private Channel currentChannel;
     private String color;
     private String nickname;
@@ -323,22 +324,51 @@ public class PlayerData {
         return this.muteTime;
     }
 
+    /**
+     * @return A list of channels that the player has hidden.
+     */
     public List<String> getHiddenChannels() {
         return this.hiddenChannels;
     }
 
+    /**
+     * Hides a channel from the player.
+     * @param channel The channel to hide.
+     */
     public void hideChannel(String channel) {
         this.hiddenChannels.add(channel);
         this.api.getPlayerDataManager().hideChannel(this.getUUID(), channel);
     }
 
+    /**
+     * Shows a channel to the player.
+     * @param channel The channel to show.
+     */
     public void showChannel(String channel) {
         this.hiddenChannels.remove(channel);
         this.api.getPlayerDataManager().showChannel(this.getUUID(), channel);
     }
 
+    /**
+     * @param channel The channel to check.
+     * @return True if the player has hidden the channel.
+     */
     public boolean isChannelHidden(String channel) {
         return this.hiddenChannels.contains(channel);
+    }
+
+    /**
+     * @return True if the current channel is a group channel.
+     */
+    public boolean isCurrentChannelGroupChannel() {
+        return this.isCurrentChannelGroupChannel;
+    }
+
+    /**
+     * @param isInGroupChannel Whether the current channel is a group channel.
+     */
+    public void setIsInGroupChannel(boolean isInGroupChannel) {
+        this.isCurrentChannelGroupChannel = isInGroupChannel;
     }
 
 }

@@ -97,6 +97,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         WORLDGUARD_CHECK_INTERVAL("chat-settings.worldguard-check-interval", 20,
                 "How often, in ticks, should the plugin check if a player is in a region associated with a WorldGuard channel?",
                 "Requires WorldGuard"),
+        CAN_JOIN_GROUP_CHANNELS("chat-settings.can-join-group-channels", true,
+                "Should players be allowed to join group channels, like normal channels?",
+                "A player can use /gcmsg <channel> without a message to join the channel."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,

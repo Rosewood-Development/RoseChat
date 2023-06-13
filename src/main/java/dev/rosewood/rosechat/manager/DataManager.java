@@ -1,9 +1,11 @@
 package dev.rosewood.rosechat.manager;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.database.migrations._2_Create_Table_Hidden_Channels;
+import dev.rosewood.rosechat.database.migrations._3_Add_Data_Is_Group_Chat_Column;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
@@ -29,7 +31,8 @@ public class DataManager extends AbstractDataManager {
     public List<Class<? extends DataMigration>> getDataMigrations() {
         return Arrays.asList(
                 _1_Create_Tables_Data.class,
-                _2_Create_Table_Hidden_Channels.class
+                _2_Create_Table_Hidden_Channels.class,
+                _3_Add_Data_Is_Group_Chat_Column.class
         );
     }
 
@@ -53,7 +56,9 @@ public class DataManager extends AbstractDataManager {
                     String color = result.getString("chat_color");
                     long muteTime = result.getLong("mute_time");
                     String nickname = result.getString("nickname");
-                    Channel channel = this.channelManager.getChannel(currentChannel);
+                    boolean isCurrentlyChannelGroupChannel = result.getBoolean("is_currently_in_gc");
+                    Channel channel = isCurrentlyChannelGroupChannel ?
+                            RoseChatAPI.getInstance().getGroupChatById(currentChannel) : this.channelManager.getChannel(currentChannel);
 
                     PlayerData playerData = new PlayerData(uuid);
                     playerData.setMessageSpy(messageSpy);
@@ -66,6 +71,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setCurrentChannel(channel);
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
+                    playerData.setIsInGroupChannel(isCurrentlyChannelGroupChannel);
                     if (muteTime > 0) playerData.mute(muteTime);
                     value.set(playerData);
                 } else {
@@ -102,8 +108,8 @@ public class DataManager extends AbstractDataManager {
         this.databaseConnector.connect(connection -> {
 
             String query = "REPLACE INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                    "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname, is_currently_in_gc) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, playerData.getUUID().toString());
                 statement.setBoolean(2, playerData.hasMessageSpy());
@@ -117,6 +123,7 @@ public class DataManager extends AbstractDataManager {
                 statement.setString(10, playerData.getColor());
                 statement.setLong(11, playerData.getMuteExpirationTime());
                 statement.setString(12, playerData.getNickname());
+                statement.setBoolean(13, playerData.isCurrentChannelGroupChannel());
                 statement.executeUpdate();
             }
         });

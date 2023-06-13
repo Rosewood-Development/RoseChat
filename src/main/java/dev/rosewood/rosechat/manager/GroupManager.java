@@ -29,7 +29,7 @@ public class GroupManager extends Manager {
 
     @Override
     public void reload() {
-        Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId()));
+        Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId(), (gcs) -> {}));
         this.loadNames();
     }
 
@@ -51,13 +51,15 @@ public class GroupManager extends Manager {
         return null;
     }
 
-    public void loadMemberGroupChats(UUID member) {
+    public void loadMemberGroupChats(UUID member, Consumer<List<GroupChannel>> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             List<GroupChannel> groupChats = this.dataManager.getMemberGroupChats(member);
             for (GroupChannel groupChat : groupChats) {
                 if (!this.groupChats.containsKey(groupChat.getId()))
                     this.groupChats.put(groupChat.getId(), groupChat);
             }
+
+            callback.accept(groupChats);
         });
     }
 

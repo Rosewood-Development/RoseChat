@@ -67,16 +67,16 @@ public class ChannelCommand extends AbstractCommand {
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
-             Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
-             Channel newChannel = api.getChannelById(channel);
+            Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
+            Channel newChannel = api.getChannelById(channel);
 
             if (newChannel == null) {
-                api.getLocaleManager().sendMessage(sender, "command-channel-not-found");
+                api.getLocaleManager().sendComponentMessage(sender, "command-channel-not-found");
                 return true;
             }
 
             if (!sender.hasPermission("rosechat.channel." + newChannel.getId())) {
-                api.getLocaleManager().sendMessage(sender, "no-permission");
+                api.getLocaleManager().sendComponentMessage(sender, "no-permission");
                 return true;
             }
 
@@ -90,6 +90,7 @@ public class ChannelCommand extends AbstractCommand {
 
             PlayerData playerData = api.getPlayerData(player.getUniqueId());
             playerData.setCurrentChannel(newChannel);
+            playerData.setIsInGroupChannel(false);
             playerData.save();
 
             api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", newChannel.getId()));

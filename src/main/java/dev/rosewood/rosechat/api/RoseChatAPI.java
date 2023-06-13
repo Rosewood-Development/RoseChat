@@ -130,10 +130,13 @@ public final class RoseChatAPI {
                 return;
             }
 
-            // Check if the player has permission for this channel.
-            if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
-                sender.sendLocaleMessage("no-permission");
-                return;
+            // Only check channel permission if the player is not in a group channel.
+            if (!data.isCurrentChannelGroupChannel()) {
+                // Check if the player has permission for this channel.
+                if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
+                    sender.sendLocaleMessage("no-permission");
+                    return;
+                }
             }
         }
 
@@ -358,7 +361,7 @@ public final class RoseChatAPI {
     public GroupChannel createGroupChat(String id, Player owner) {
         GroupChannel groupChat = new GroupChannel(id);
         groupChat.setOwner(owner.getUniqueId());
-        groupChat.onJoin(owner);
+        groupChat.addMember(owner.getUniqueId());
 
         this.getGroupManager().addGroupChat(groupChat);
         this.getGroupManager().addMember(groupChat, owner.getUniqueId());
@@ -381,7 +384,7 @@ public final class RoseChatAPI {
      * @param member The player to be added.
      */
     public void addGroupChatMember(GroupChannel groupChat, Player member) {
-        groupChat.onJoin(member);
+        groupChat.addMember(member.getUniqueId());
         this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
 
@@ -391,7 +394,7 @@ public final class RoseChatAPI {
      * @param member The player to be removed.
      */
     public void removeGroupChatMember(GroupChannel groupChat, Player member) {
-        groupChat.onLeave(member);
+        groupChat.removeMember(member.getUniqueId());
         this.getGroupManager().removeMember(groupChat, member.getUniqueId());
     }
 

@@ -191,8 +191,8 @@ public class RoseChat extends RosePlugin {
                 ReplacementManager.class,
                 TagManager.class,
                 PlaceholderManager.class,
-                GroupManager.class,
                 PlayerDataManager.class,
+                GroupManager.class,
                 DiscordEmojiManager.class,
                 BungeeManager.class
         );

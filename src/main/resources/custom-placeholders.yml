@@ -104,7 +104,7 @@ group-member-prefix:
   text:
     condition: "%group_owner%=%player_name%"
     default: ""
-    true: "&e:star: "
+    true: "&e:star: &7"
   hover:
     default:
       - "&7This person owns the group chat."

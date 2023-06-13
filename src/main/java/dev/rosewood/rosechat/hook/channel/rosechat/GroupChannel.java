@@ -129,6 +129,16 @@ public class GroupChannel extends Channel {
                 && !data.getIgnoringPlayers().contains(senderUUID));
     }
 
+    @Override
+    public void onJoin(Player player) {
+        // No implementation
+    }
+
+    @Override
+    public void onLeave(Player player) {
+        // No implementation
+    }
+
     public void addMember(UUID uuid) {
         this.members.add(uuid);
     }
@@ -154,7 +164,7 @@ public class GroupChannel extends Channel {
 
     @Override
     public boolean canJoinByCommand(Player player) {
-        return false;
+        return Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean();
     }
 
     @Override

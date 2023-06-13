@@ -37,38 +37,44 @@ public class PlayerListener implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUniqueId());
+        // Ensure group chats are loaded first.
+        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId(), (gcs) -> {
+            PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUniqueId());
 
-        // Place the player in the correct channel.
-        for (Channel channel : this.channelManager.getChannels().values()) {
-            if (channel.onLogin(player)) {
-                playerData.setCurrentChannel(channel);
-                break;
+            // If the current channel is not a group channel, put the player in the right channel.
+            if (!playerData.isCurrentChannelGroupChannel() || playerData.getCurrentChannel() == null) {
+                playerData.setIsInGroupChannel(false);
+
+                // Place the player in the correct channel.
+                for (Channel channel : this.channelManager.getChannels().values()) {
+                    if (channel.onLogin(player)) {
+                        playerData.setCurrentChannel(channel);
+                        break;
+                    }
+                }
+
+                // If no channel was found, force put player in the default channel.
+                if (playerData.getCurrentChannel() == null) {
+                    Channel defaultChannel = this.channelManager.getDefaultChannel();
+                    defaultChannel.onJoin(player);
+                    playerData.setCurrentChannel(defaultChannel);
+                } else {
+                    Channel channel = playerData.getCurrentChannel();
+                    channel.onJoin(player);
+                }
+
+                playerData.save();
             }
-        }
 
-        // If no channel was found, force put player in the default channel.
-        if (playerData.getCurrentChannel() == null) {
-            Channel defaultChannel = this.channelManager.getDefaultChannel();
-            defaultChannel.onJoin(player);
-            playerData.setCurrentChannel(defaultChannel);
-        } else {
-            Channel channel = playerData.getCurrentChannel();
-            channel.onJoin(player);
-        }
+            // Set the display name when the player logs in
+            if (playerData.getNickname() != null) {
+                RosePlayer rosePlayer = new RosePlayer(player);
+                RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, playerData.getNickname());
+                message.parse(rosePlayer, null);
 
-        playerData.save();
-
-        // Set the display name when the player logs in
-        if (playerData.getNickname() != null) {
-            RosePlayer rosePlayer = new RosePlayer(player);
-            RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, playerData.getNickname());
-            message.parse(rosePlayer, null);
-
-            NicknameCommand.setDisplayName(rosePlayer, message);
-        }
-
-        RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId());
+                NicknameCommand.setDisplayName(rosePlayer, message);
+            }
+        });
     }
 
     @EventHandler

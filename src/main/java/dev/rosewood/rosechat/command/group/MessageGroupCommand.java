@@ -1,7 +1,12 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -24,6 +29,13 @@ public class MessageGroupCommand extends AbstractCommand {
         }
 
         if (args.length == 1) {
+            if (Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean()) {
+                if (!processChannelSwitch(sender, args[0])) {
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                }
+                return;
+            }
+
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-message-enter-message");
             return;
         }
@@ -75,6 +87,39 @@ public class MessageGroupCommand extends AbstractCommand {
     @Override
     public String getSyntax() {
         return this.getAPI().getLocaleManager().getLocaleMessage("command-gcm-usage");
+    }
+
+    public static boolean processChannelSwitch(CommandSender sender, String group) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
+            GroupChannel newChannel = api.getGroupChatById(group);
+
+            if (newChannel == null) {
+                api.getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
+                return true;
+            }
+
+            if (!newChannel.getMembers().contains(player.getUniqueId())) {
+                api.getLocaleManager().sendComponentMessage(sender, "gc-invalid");
+                return true;
+            }
+
+            oldChannel.onLeave(player);
+            // Don't join the channel if it is a group channel, as the player is already in it.
+
+            PlayerData playerData = api.getPlayerData(player.getUniqueId());
+            playerData.setCurrentChannel(newChannel);
+            playerData.setIsInGroupChannel(true);
+            playerData.save();
+
+            api.getLocaleManager().sendComponentMessage(sender, "command-channel-joined", StringPlaceholders.single("id", newChannel.getName()));
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
