@@ -209,7 +209,8 @@ command-gc-info-format: '&eАйди: &b%id% &7| &eВладелец: &b%owner% &7
 command-gc-list-description: '&8 - &b/gc list &7- Просмотреть список всех групповых чатов.'
 command-gc-list-usage: '&e/gc list'
 command-gc-list-title: '&7[&bГруппы&7]'
-command-gc-list-format: '&8- &8[%group%&8] &eВладелец: &b%owner% &7| &eУчастники: &b%members%'
+command-gc-list-format: '&8- &8[%group%&8] &eID: &b%id%'
+command-gc-list-more: '&eИспользуйте &b/gc info <группа> &eдля получения дополнительной информации.'
 
 # Группы
 command-gcm-description: '&8 - &d/gcm &7- Отправляет сообщение в групповом чате.'

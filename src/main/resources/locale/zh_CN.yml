@@ -209,7 +209,8 @@ command-gc-info-format: '&eID: &b%id% &7| &e群主: &b%owner% &7| &e群员人数
 command-gc-list-description: '&8 - &b/gc list &7- 查看所有群聊的列表.'
 command-gc-list-usage: '&e/gc list'
 command-gc-list-title: '&7[&b群&7]'
-command-gc-list-format: "&8- &8[%group%&8] &eOwner: &b%owner% &7| &eMembers: &b%members%"
+command-gc-list-format: "&8- &8[%group%&8] &eID: &b%owner%"
+command-gc-list-more: '&e使用 &b/gc info <group> &e获取更多信息。'
 
 # 群聊发消息命令
 command-gcm-description: '&8 - &d/gcm &7- 在群聊中发消息.'

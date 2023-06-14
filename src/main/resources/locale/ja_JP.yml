@@ -209,7 +209,8 @@ command-gc-info-format: '&eID: &b%id% &7| &eオーナー: &b%owner% &7| &eメン
 command-gc-list-description: '&8 - &b/gc list &7- すべてグループチャットを見せます。'
 command-gc-list-usage: '&e/gc list'
 command-gc-list-title: '&7[&bグループ&7]'
-command-gc-list-format: "&8- &8[%group%&8] &eオーナー: &b%owner% &7| &eメンバー: &b%members%"
+command-gc-list-format: '&8- &8[%group%&8] &eID: &b%id%'
+command-gc-list-more: '&eもっとインフォに&b/gc info <group>&eを使います。'
 
 # グループチャット・メッセージ・コマンド
 command-gcm-description: '&8 - &d/gcm &7- グループチャットにメッセージをセンドします。'

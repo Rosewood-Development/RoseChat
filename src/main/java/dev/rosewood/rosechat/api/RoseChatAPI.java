@@ -415,6 +415,13 @@ public final class RoseChatAPI {
     }
 
     /**
+     * @return A list of all group chat names.
+     */
+    public List<String> getGroupChatNames() {
+        return this.getGroupManager().getGroupChatNames();
+    }
+
+    /**
      * @return A list of all group chats.
      */
     public List<GroupChannel> getGroupChats() {

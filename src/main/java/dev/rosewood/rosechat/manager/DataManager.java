@@ -257,7 +257,7 @@ public class DataManager extends AbstractDataManager {
             String getQuery = "SELECT id FROM " + this.getTablePrefix() + "group_chat";
             try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
                 ResultSet result = statement.executeQuery();
-                if (result.next())
+                while (result.next())
                     groupChatNames.add(result.getString("id"));
             }
         });
@@ -373,6 +373,24 @@ public class DataManager extends AbstractDataManager {
         });
 
         return groupInfo.get();
+    }
+
+    public List<GroupManager.GroupInfo> getAllGroupInfo() {
+        List<GroupManager.GroupInfo> groupInfo = new ArrayList<>();
+        this.getDatabaseConnector().connect(connection -> {
+            String getQuery = "SELECT * FROM " + this.getTablePrefix() + "group_chat";
+            try (PreparedStatement statement = connection.prepareStatement(getQuery)) {
+                ResultSet result = statement.executeQuery();
+                while (result.next()) {
+                    String id = result.getString("id");
+                    String name = result.getString("name");
+                    String owner = result.getString("owner");
+                    groupInfo.add(new GroupManager.GroupInfo(id, name, owner, 0));
+                }
+            }
+        });
+
+        return groupInfo;
     }
 
 }

@@ -103,6 +103,13 @@ public class GroupManager extends Manager {
         });
     }
 
+    public void getAllGroupInfo(Consumer<List<GroupInfo>> callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            List<GroupInfo> groupInfo = this.dataManager.getAllGroupInfo();
+            callback.accept(groupInfo);
+        });
+    }
+
     public void addGroupChat(GroupChannel groupChat) {
         this.groupChats.put(groupChat.getId(), groupChat);
         groupChat.save();

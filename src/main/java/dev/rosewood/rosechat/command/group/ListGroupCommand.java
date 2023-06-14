@@ -1,9 +1,8 @@
 package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
@@ -17,13 +16,17 @@ public class ListGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-title", false);
-        for (GroupChannel group : this.getAPI().getGroupChats()) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-format",
-                    StringPlaceholders.builder("group", group.getName())
-                            .addPlaceholder("id", group.getId())
-                            .addPlaceholder("owner", Bukkit.getOfflinePlayer(group.getOwner()).getName())
-                            .addPlaceholder("members", group.getMembers().size()).build(), false);
-        }
+
+        GroupManager groupManager = this.getAPI().getGroupManager();
+        groupManager.getAllGroupInfo((infoList) -> {
+            for (GroupManager.GroupInfo info : infoList) {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-format",
+                        StringPlaceholders.builder("group", info.getName())
+                                .addPlaceholder("id",info.getId()).build(), false);
+            }
+
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-more", false);
+        });
     }
 
     @Override

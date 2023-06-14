@@ -93,6 +93,7 @@ public class InfoGroupCommand extends AbstractCommand {
                 for (GroupChannel groupChat : this.getAPI().getGroupChats()) {
                     tab.add(groupChat.getId());
                 }
+                tab.addAll(this.getAPI().getGroupChatNames());
             } else {
                 GroupChannel groupChat = this.getAPI().getGroupChatByOwner(((Player) sender).getUniqueId());
                 if (groupChat != null) tab.add(groupChat.getId());
