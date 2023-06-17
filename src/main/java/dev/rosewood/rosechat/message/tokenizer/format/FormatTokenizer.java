@@ -11,10 +11,12 @@ public class FormatTokenizer implements Tokenizer<FormatToken> {
 
     @Override
     public FormatToken tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+        if (!input.startsWith("&")) return null;
+
         Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(input);
         if (matcher.find()) {
             if (matcher.start() != 0) return null;
-            String content = input.substring(0, matcher.end());
+            String content = matcher.group();
             char formatCharacter = content.charAt(1);
             char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
             boolean hasPermission = ignorePermissions || MessageUtils.hasTokenPermission(roseMessage, this.getPermissionForFormat(formatCharacterLowercase));

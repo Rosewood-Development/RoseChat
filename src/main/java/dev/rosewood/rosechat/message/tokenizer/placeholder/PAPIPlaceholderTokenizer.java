@@ -32,7 +32,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
                     && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
                 return null;
 
-            String originalContent = input.substring(matcher.start(), matcher.end());
+            String originalContent = matcher.group();
 
             String content;
             if (originalContent.startsWith("%other_") && !this.isBungee) {
@@ -47,6 +47,7 @@ public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
             Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).noCaching();
             if (originalContent.equals(content))
                 tokenSettings.ignoreTokenizer(this);
+
             return new Token(tokenSettings);
         }
 

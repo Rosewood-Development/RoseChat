@@ -3,10 +3,10 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 
 public class ReplacementTokenizer implements Tokenizer<Token> {
 
@@ -17,11 +17,13 @@ public class ReplacementTokenizer implements Tokenizer<Token> {
             if (!ignorePermissions
                     && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
-            String originalContent = input.substring(0, replacement.getText().length());
+
+            String originalContent = replacement.getText();
             String content = replacement.getReplacement();
 
             return new Token(new Token.TokenSettings(originalContent).content(content).placeholder("message", originalContent).ignoreTokenizer(this));
         }
+
         return null;
     }
 

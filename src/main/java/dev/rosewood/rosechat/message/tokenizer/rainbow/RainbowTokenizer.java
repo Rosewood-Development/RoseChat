@@ -10,6 +10,9 @@ public class RainbowTokenizer implements Tokenizer<RainbowToken> {
 
     @Override
     public RainbowToken tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+        if (!input.startsWith("<"))
+            return null;
+
         // Check if the content contains the rainbow pattern.
         Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(input);
         if (matcher.find()) {

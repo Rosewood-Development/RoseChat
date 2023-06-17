@@ -21,8 +21,9 @@ public class EmojiTokenizer implements Tokenizer<Token> {
                 PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(roseMessage.getSender().getUUID());
                 if (playerData != null && !playerData.hasEmojis()) continue;
 
-                String originalContent = input.substring(0, emoji.getText().length());
+                String originalContent = emoji.getText();
                 String content = emoji.getReplacement();
+
                 return new Token(new Token.TokenSettings(originalContent).content(content).hover(emoji.getHoverText()).font(emoji.getFont()).ignoreTokenizer(this));
             }
         }

@@ -14,6 +14,9 @@ public class GradientTokenizer implements Tokenizer<GradientToken> {
 
     @Override
     public GradientToken tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+        if (!input.startsWith("<"))
+            return null;
+
         Matcher matcher = MessageUtils.GRADIENT_PATTERN.matcher(input);
         if (matcher.find()) {
             if (matcher.start() != 0) return null;

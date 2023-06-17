@@ -276,7 +276,7 @@ command-ignore-list-separator: '&7, &e'
 command-debug-description: '&8 - &d/rc debug &7- Переключает режим отладки.'
 command-debug-usage: '&e/rc debug'
 command-debug-on: '&eРежим отладки теперь включен. Используйте &b/rc debug &еще раз, чтобы сохранить отладочную информацию.'
-command-debug-off: '&eРежим отладки теперь &coff&e. Новый файл был сохранен в &b plugins/RoseChat/debug&e.'
+command-debug-off: '&eРежим отладки теперь &coff&e.'
 
 # Цветной ник
 command-nickcolor-description: '&8 - &d/nickcolor &7- Изменить цвет никнейма.'

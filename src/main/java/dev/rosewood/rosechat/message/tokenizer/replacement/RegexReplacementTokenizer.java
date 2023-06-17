@@ -22,7 +22,7 @@ public class RegexReplacementTokenizer implements Tokenizer<Token> {
 
             Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
             if (matcher.find()) {
-                String originalContent = input.substring(matcher.start(), matcher.end());
+                String originalContent = matcher.group();
                 if (!input.startsWith(originalContent)) return null;
 
                 String content = replacement.getReplacement();

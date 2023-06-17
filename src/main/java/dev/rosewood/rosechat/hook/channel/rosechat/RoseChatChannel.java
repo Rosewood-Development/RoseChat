@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.hook.channel.rosechat;
 
+import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
@@ -7,6 +8,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -14,6 +16,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -26,6 +29,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
@@ -157,6 +161,15 @@ public class RoseChatChannel extends ConditionalChannel {
         // Send the message to the player asynchronously.
         RoseMessage finalMessage = message;
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
+
+            Stopwatch messageTimer;
+            if (debugManager.isEnabled())
+                messageTimer = Stopwatch.createStarted();
+            else {
+                messageTimer = null;
+            }
+
             // If the message is not a json message, parse normally or parse from discord if an id is available.
             if (direction != MessageDirection.FROM_BUNGEE_RAW) {
                 receiver.send(discordId == null ? finalMessage.parse(receiver, format) : finalMessage.parseMessageFromDiscord(receiver, format, discordId));
@@ -189,6 +202,21 @@ public class RoseChatChannel extends ConditionalChannel {
                 Player player = receiver.asPlayer();
                 if (finalMessage.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
                     player.playSound(player.getLocation(), finalMessage.getTagSound(), 1.0f, 1.0f);
+            }
+
+            if (debugManager.isEnabled() && debugManager.isTimerEnabled() && messageTimer != null && messageTimer.isRunning()) {
+                messageTimer.stop();
+                long time = messageTimer.elapsed(TimeUnit.MILLISECONDS);
+                debugManager.addMessage(() -> "Parsed Message in: " + time + "ms");
+                Bukkit.getConsoleSender().sendMessage(HexUtils.colorify("&eParsed Message in: &c" + time + "&ems"));
+
+                if (debugManager.doOnce()) {
+                    debugManager.save();
+                    debugManager.setEnabled(false);
+                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(Bukkit.getConsoleSender(), "command-debug-off");
+                } else {
+                    debugManager.addMessage(() -> "\n\n\n");
+                }
             }
         });
     }

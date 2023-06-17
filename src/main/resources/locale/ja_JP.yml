@@ -276,7 +276,7 @@ command-ignore-list-separator: '&7、 &e'
 command-debug-description: '&8 - &d/rc debug &7- デバッグモードをトグルします。'
 command-debug-usage: '&e/rc debug'
 command-debug-on: '&eデバッグモードは今&aオン&eです。 デバッグインフォをセーブにまた&b/rc debugを使います。'
-command-debug-off: '&eデバッグモードは&cオフ&eです。 &bplugins/RoseChat/debug&eに新しいファイルをセーブしました。'
+command-debug-off: '&eデバッグモードは&cオフ&eです。'
 
 # ニックネーム・カラー・コマンド
 command-nickcolor-description: '&8 - &d/nickcolor &7- Cあなたのニックネーム色を変更します。'

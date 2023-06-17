@@ -276,7 +276,7 @@ command-ignore-list-separator: '&7, &e'
 command-debug-description: '&8 - &d/rc debug &7- Toggles debug mode.'
 command-debug-usage: '&e/rc debug'
 command-debug-on: '&eDebug mode is now &aon&e. Use &b/rc debug &eagain to save debug information.'
-command-debug-off: '&eDebug mode is now &coff&e. A new file has been saved in &bplugins/RoseChat/debug&e.'
+command-debug-off: '&eDebug mode is now &coff&e.'
 
 # Nick Color Command
 command-nickcolor-description: '&8 - &d/nickcolor &7- Change your nickname color.'

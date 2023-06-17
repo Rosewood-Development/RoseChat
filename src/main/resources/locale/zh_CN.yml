@@ -276,7 +276,7 @@ command-ignore-list-separator: '&7, &e'
 command-debug-description: '&8 - &d/rc debug &7- 切换调试模式.'
 command-debug-usage: '&e/rc debug'
 command-debug-on: '&e调试模式已开启。使用 &b/rc debug &e再次开启调试信息保存.'
-command-debug-off: '&e调试模式已关闭。新文件已保存在 &bplugins/RoseChat/debug &e目录下.'
+command-debug-off: '&e调试模式已关闭。'
 
 # 昵称颜色命令
 command-nickcolor-description: '&8 - &d/nickcolor &7- 更改昵称颜色.'

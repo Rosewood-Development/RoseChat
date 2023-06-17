@@ -58,11 +58,12 @@ public class MessageTokenizer {
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
         this.debugManager.addMessage(() -> "Tokenizing New Message: " + message);
         this.tokens.addAll(this.tokenizeContent(parseReplacements(message, ignorePermissions), true, 0, null));
+        this.debugManager.addMessage(() -> "Completed Tokenizing: " + message + "\n\n\n");
     }
 
     // Parse replacements before the tokenizing to allow some replacements, such as custom colours, to work properly.
     private String parseReplacements(String message, boolean ignorePermissions) {
-        this.debugManager.addMessage(() -> "Parsing Replacements...");
+        this.debugManager.addMessage(() -> "    Parsing Replacements...");
         for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
             if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
@@ -75,7 +76,7 @@ public class MessageTokenizer {
 
     private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
         content = this.parseReplacements(content, parent != null);
-        this.debugManager.addMessage(() -> "Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
+        this.debugManager.addMessage(() -> "    Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
 
         // Check cache first
         TokenKey tokenKey = new TokenKey(content, parent == null ? null : parent.clone());
@@ -97,11 +98,12 @@ public class MessageTokenizer {
                 if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
-                this.debugManager.addMessage(() -> "Starting Tokenizing " + tokenizer.toString() + "...");
+                this.debugManager.addMessage(() -> "        Starting Tokenizing " + tokenizer.getClass().getSimpleName() + "...");
 
-                Token token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);;
+                Token token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);
                 if (token != null) {
-                    this.debugManager.addMessage(() -> "Completed Tokenizing " + tokenizer + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
+                    this.debugManager.addMessage(() -> "        Completed Tokenizing " + tokenizer.getClass().getSimpleName() + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
+
 
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {
