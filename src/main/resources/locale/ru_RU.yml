@@ -290,3 +290,8 @@ command-chat-toggle-description: '&8 - &c/chat toggle &7- Переключает
 command-chat-toggle-usage: '&e/chat toggle <channel>'
 command-chat-toggle-on: '&eТеперь вы увидите &b%channel% &канал.'
 command-chat-toggle-off: '&eВы больше не будете видеть канал &b%% &channel.'
+
+# настоящего имени
+command-realname-description: "&8 - &d/realname &7- Просмотр настоящего имени игрока."
+command-realname-usage: '&e/realname <игрок>'
+command-realname-success: "&eНастоящее имя игрока %name%: &b%player%&e."

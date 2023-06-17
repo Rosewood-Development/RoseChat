@@ -89,6 +89,9 @@ commands:
   delmsg:
     description: Delete a message.
     permission: rosechat.deletemessage
+  realname:
+    description: See a player's real name.
+    permission: rosechat.realname
 
 permissions:
   rosechat.*:
@@ -139,6 +142,7 @@ permissions:
       rosechat.italic: true
       rosechat.strikethrough: true
       rosechat.underline: true
+      rosechat.realname: true
   rosechat.basecommand:
     description: Allows using the rc command.
     default: true
@@ -437,4 +441,7 @@ permissions:
       default: op
     rosechat.underline:
       description: Allows using underline markdown.
+      default: op
+    rosechat.realname:
+      description: Allows using the realname command.
       default: op

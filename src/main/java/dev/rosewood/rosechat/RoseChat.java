@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.command.MessageCommand;
 import dev.rosewood.rosechat.command.MuteCommand;
 import dev.rosewood.rosechat.command.NickColorCommand;
 import dev.rosewood.rosechat.command.NicknameCommand;
+import dev.rosewood.rosechat.command.RealnameCommand;
 import dev.rosewood.rosechat.command.ReloadCommand;
 import dev.rosewood.rosechat.command.ReplyCommand;
 import dev.rosewood.rosechat.command.SocialSpyCommand;
@@ -123,6 +124,7 @@ public class RoseChat extends RosePlugin {
         CommandManager nickColorCommand = new CommandManager(new NickColorCommand());
         CommandManager ignoreCommand = new CommandManager(new IgnoreCommand());
         CommandManager deleteMessageCommand = new CommandManager(new DeleteMessageCommand());
+        CommandManager realnameCommand = new CommandManager(new RealnameCommand());
 
         GroupCommandManager groupCommand = (GroupCommandManager) new GroupCommandManager("gc", "/gc help")
                 .addSubcommand(new CreateGroupCommand())

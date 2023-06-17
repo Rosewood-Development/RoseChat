@@ -290,3 +290,8 @@ command-chat-toggle-description: '&8 - &c/chat toggle &7- 切换频道可见性.
 command-chat-toggle-usage: '&e/chat toggle <channel>'
 command-chat-toggle-on: '&e你现在可以看到 &b%channel% &e频道.'
 command-chat-toggle-off: '&e你将不再看到 &b%channel% &e频道.'
+
+# 真实姓名
+command-realname-description: "&8 - &d/realname &7- 查看玩家的真实姓名."
+command-realname-usage: '&e/realname <玩家名>'
+command-realname-success: "&e玩家%name%的真实姓名是: &b%player%&e."

@@ -290,3 +290,8 @@ command-chat-toggle-description: '&8 - &c/chat toggle &7- Toggles seeing a chann
 command-chat-toggle-usage: '&e/chat toggle <channel>'
 command-chat-toggle-on: '&eYou will now see the &b%channel% &echannel.'
 command-chat-toggle-off: '&eYou will no longer see the &b%channel% &echannel.'
+
+# Realname Command
+command-realname-description: "&8 - &d/realname &7- View a player's real name."
+command-realname-usage: '&e/realname <player>'
+command-realname-success: "&e%name%&r&e's real name is: &b%player%&e."

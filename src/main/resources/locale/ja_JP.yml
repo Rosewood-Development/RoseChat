@@ -290,3 +290,8 @@ command-chat-toggle-description: '&8 - &c/chat toggle &7- チャンネルの見�
 command-chat-toggle-usage: '&e/chat toggle <チャンネル>'
 command-chat-toggle-on: '&b%channel%&eチャンネルを今見れます。'
 command-chat-toggle-off: '&b%channel%&eチャンネルを今見れません。'
+
+# リアルネーム・コマンド
+command-realname-description: "&8 - &d/realname &7- プレイヤーのリアルネームを見せます。"
+command-realname-usage: '&e/realname <プレイヤー>'
+command-realname-success: "&e%name%&r&eのリアルネームは&b%player%&e。"
