@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.hook;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -85,6 +86,14 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
                 String gc = placeholder.substring("group_".length(), placeholder.indexOf("_name"));
                 GroupChannel groupChat = groupManager.getGroupChatById(gc);
                 return groupChat == null ? null : groupChat.getName();
+            }
+        }
+
+        if (placeholder.startsWith("emoji_")) {
+            for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
+                if (placeholder.equalsIgnoreCase("emoji_" + emoji.getId())) {
+                    return emoji.getReplacement();
+                }
             }
         }
 
