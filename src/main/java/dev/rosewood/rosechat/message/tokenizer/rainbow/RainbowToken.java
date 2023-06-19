@@ -10,7 +10,7 @@ public class RainbowToken extends Token {
     private final int speed;
 
     public RainbowToken(String originalText, float saturation, float brightness, int speed) {
-        super(new TokenSettings(originalText).content(""));
+        super(new TokenSettings(originalText).content("").requiresTokenizing(false));
 
         this.saturation = saturation;
         this.brightness = brightness;

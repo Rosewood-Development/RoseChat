@@ -12,7 +12,7 @@ public class ColorToken extends Token {
     private final ChatColor color;
 
     public ColorToken(String originalText, ChatColor color) {
-        super(new TokenSettings(originalText).ignoreTokenizer(Tokenizers.COLOR).content(""));
+        super(new TokenSettings(originalText).ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.TAG).content("").requiresTokenizing(false));
 
         this.color = color;
     }

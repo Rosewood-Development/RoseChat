@@ -20,7 +20,7 @@ public class ShaderTokenizer implements Tokenizer<Token> {
                 if (!Setting.CORE_SHADER_COLORS.getStringList().contains(match)) return null;
                 String freeHex = findFreeHex(match.substring(1));
 
-                return new Token(new Token.TokenSettings(match).content("#" + freeHex).ignoreTokenizer(this));
+                return new Token(new Token.TokenSettings(match).content("#" + freeHex).ignoreTokenizer(this).requiresTokenizing(false));
             }
         }
 

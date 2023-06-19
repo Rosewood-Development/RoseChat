@@ -13,9 +13,10 @@ public class DiscordQuoteTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.quote")) return null;
         if (!ChatColor.stripColor(HexUtils.colorify(roseMessage.getMessage())).startsWith("> ")) return null;
         if (!input.startsWith("> ")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.quote")) return null;
+
         String content = input.substring(2);
 
         String format = Setting.MARKDOWN_FORMAT_BLOCK_QUOTES.getString();

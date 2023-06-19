@@ -16,6 +16,7 @@ public class DiscordEmojiTokenizer implements Tokenizer<Token> {
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
         if (!input.startsWith("<")) return null;
+        
         Matcher matcher = MessageUtils.DISCORD_EMOJI_PATTERN.matcher(input);
         if (matcher.find()) {
             if (matcher.start() != 0) return null;

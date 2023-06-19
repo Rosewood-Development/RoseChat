@@ -14,16 +14,16 @@ public class ToDiscordTagTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.tag")) return null;
         if (!Setting.CAN_TAG_MEMBERS.getBoolean()) return null;
         if (!input.startsWith("@")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.tag")) return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
         DiscordChatProvider.DetectedMention member = discord.matchPartialMember(input.substring(1));
         if (member == null) return null;
 
         return new Token(new Token.TokenSettings(input.substring(0, member.getConsumedTextLength() + 1)).content(member.getMention()).ignoreTokenizer(this)
-                .ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT));
+                .ignoreTokenizer(Tokenizers.COLOR).ignoreTokenizer(Tokenizers.FORMAT).requiresTokenizing(false));
     }
 
 }

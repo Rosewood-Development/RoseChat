@@ -39,7 +39,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer<Token> {
             String click = roseChatPlaceholder.getClick() == null ? null : placeholders.apply(roseChatPlaceholder.getClick().parseToString(messageWrapper.getSender(), viewer, placeholders));
             ClickEvent.Action clickAction = roseChatPlaceholder.getClick() == null ? null : roseChatPlaceholder.getClick().parseToAction(messageWrapper.getSender(), viewer, placeholders);
 
-            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).hover(hover).hoverAction(HoverEvent.Action.SHOW_TEXT).click(click).clickAction(clickAction).noCaching();
+            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).hover(hover).click(click).clickAction(clickAction).noCaching();
             if (originalContent.equals(content))
                 tokenSettings.ignoreTokenizer(this);
             tokenSettings.retainColour(true);

@@ -11,7 +11,7 @@ public class GradientToken extends Token {
     private final int speed;
 
     public GradientToken(String originalText, List<Color> colors, int speed) {
-        super(new TokenSettings(originalText).content(""));
+        super(new TokenSettings(originalText).content("").requiresTokenizing(false));
 
         this.colors = colors;
         this.speed = speed;

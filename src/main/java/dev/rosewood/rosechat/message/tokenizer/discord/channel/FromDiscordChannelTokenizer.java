@@ -17,8 +17,8 @@ public class FromDiscordChannelTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.discordchannel"))
         if (!input.startsWith("<")) return null;
+        if (!ignorePermissions && !MessageUtils.hasTokenPermission(roseMessage, "rosechat.discordchannel")) return null;
 
         Matcher matcher = MessageUtils.DISCORD_CHANNEL_PATTERN.matcher(input);
         if (matcher.find()) {
@@ -32,7 +32,9 @@ public class FromDiscordChannelTokenizer implements Tokenizer<Token> {
             String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();
 
             return new Token(new Token.TokenSettings(originalContent).content(content).hoverAction(HoverEvent.Action.SHOW_TEXT).clickAction(ClickEvent.Action.OPEN_URL)
-                    .placeholder("server_id", serverId).placeholder("channel_id", matcher.group(1)).placeholder("channel_name", channelName).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG));
+                    .placeholder("server_id", serverId).placeholder("channel_id", matcher.group(1))
+                    .placeholder("channel_name", channelName).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.TAG)
+                    .requiresTokenizing(false));
         }
 
         return null;

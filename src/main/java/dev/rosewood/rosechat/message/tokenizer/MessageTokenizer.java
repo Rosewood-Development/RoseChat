@@ -56,9 +56,9 @@ public class MessageTokenizer {
         this.tokens = new ArrayList<>();
         this.ignorePermissions = ignorePermissions;
         this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.debugManager.addMessage(() -> "Tokenizing New Message: " + message);
+        this.debugManager.addMessage(() -> "Tokenizing New Message: " + message + " for " + viewer.getName());
         this.tokens.addAll(this.tokenizeContent(parseReplacements(message, ignorePermissions), true, 0, null));
-        this.debugManager.addMessage(() -> "Completed Tokenizing: " + message + "\n\n\n");
+        this.debugManager.addMessage(() -> "Completed Tokenizing: " + message + " for " + viewer.getName() + "\n\n\n");
     }
 
     // Parse replacements before the tokenizing to allow some replacements, such as custom colours, to work properly.
