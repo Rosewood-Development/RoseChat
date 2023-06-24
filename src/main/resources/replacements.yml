@@ -11,6 +11,10 @@ heart:
   text: "<3"
   replacement: "\u2764"
 
+item:
+  text: "[item]"
+  replacement: "{item}"
+
 # The '%message%' placeholder can be used to get what was replaced.
 # For example, this regex matches URLs. The replacement uses a placeholder (defined in custom-placeholders.yml) to make it hoverable and clickable.
 regex-example:

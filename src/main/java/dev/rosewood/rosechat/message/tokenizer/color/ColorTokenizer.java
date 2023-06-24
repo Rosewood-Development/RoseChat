@@ -69,7 +69,7 @@ public class ColorTokenizer implements Tokenizer<ColorToken> {
     private ChatColor fromString(String string) {
         String lower = string.toLowerCase();
         if (lower.startsWith("&x") || lower.startsWith(ChatColor.COLOR_CHAR + "x"))
-            return ChatColor.of("#" + string.substring(2).replace("&", "").replace("ยง", ""));
+            return ChatColor.of("#" + string.substring(2).replace("&", "").replace(ChatColor.COLOR_CHAR + "", ""));
 
         int hashIndex = string.indexOf('#');
         if (hashIndex == -1)

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat;
 
+import dev.rosewood.rosechat.api.example.HeldItemTokenizer;
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.DebugCommand;
@@ -177,6 +178,8 @@ public class RoseChat extends RosePlugin {
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
+
+        new HeldItemTokenizer();
     }
 
     @Override

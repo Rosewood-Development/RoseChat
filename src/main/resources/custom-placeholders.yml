@@ -243,6 +243,16 @@ url:
       action: OPEN_URL
       value: "%extra%"
 
+# This placeholder allows an item to be shown in chat.
+# The %item_name% placeholder is used for the name of the item.
+# The %item% placeholder is used for the item itself.
+item:
+  text:
+    default: "&7» &e%item_name% &7«"
+  hover:
+    default:
+      - "%item%"
+
 # Discord placeholders:
 # %user_nickname% - The user's nickname.
 # %user_name% - The user's name.
