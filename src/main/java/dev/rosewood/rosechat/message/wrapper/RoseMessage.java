@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
-import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
+import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.message.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.FilterType;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;

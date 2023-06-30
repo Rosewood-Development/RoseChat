@@ -3,7 +3,11 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.channel.ChannelEvent;
+import dev.rosewood.rosechat.api.event.channel.ChannelJoinEvent;
+import dev.rosewood.rosechat.api.event.channel.ChannelLeaveEvent;
+import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.player.PlayerTagEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
@@ -27,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -172,7 +177,10 @@ public class RoseChatChannel extends ConditionalChannel {
 
             // If the message is not a json message, parse normally or parse from discord if an id is available.
             if (direction != MessageDirection.FROM_BUNGEE_RAW) {
-                receiver.send(discordId == null ? finalMessage.parse(receiver, format) : finalMessage.parseMessageFromDiscord(receiver, format, discordId));
+                BaseComponent[] parsed = discordId == null ? finalMessage.parse(receiver, format) : finalMessage.parseMessageFromDiscord(receiver, format, discordId);
+
+                if (parsed == null) return;
+                receiver.send(parsed);
             } else {
                 // Parse the json message.
 
@@ -199,6 +207,12 @@ public class RoseChatChannel extends ConditionalChannel {
 
             // Play the tag sound to the player.
             if (receiver.isPlayer() && finalMessage.getTaggedPlayers().contains(receiver.getUUID())) {
+                PlayerTagEvent playerTagEvent = new PlayerTagEvent(receiver, finalMessage.getSender());
+                Bukkit.getPluginManager().callEvent(playerTagEvent);
+
+                if (playerTagEvent.isCancelled())
+                    return;
+
                 Player player = receiver.asPlayer();
                 if (finalMessage.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
                     player.playSound(player.getLocation(), finalMessage.getTagSound(), 1.0f, 1.0f);
@@ -407,6 +421,7 @@ public class RoseChatChannel extends ConditionalChannel {
         }
 
         BaseComponent[] parsedConsoleMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
+        if (parsedConsoleMessage == null) return;
 
         // Send the parsed message to the console
         Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
@@ -480,6 +495,25 @@ public class RoseChatChannel extends ConditionalChannel {
                 player.sendMessage(message);
             }
         }
+    }
+
+    @Override
+    public void onJoin(Player player) {
+        ChannelJoinEvent channelJoinEvent = new ChannelJoinEvent(this, new RosePlayer(player));
+        Bukkit.getPluginManager().callEvent(channelJoinEvent);
+
+        if (!channelJoinEvent.isCancelled())
+            super.onJoin(player);
+
+    }
+
+    @Override
+    public void onLeave(Player player) {
+        ChannelLeaveEvent channelLeaveEvent = new ChannelLeaveEvent(this, new RosePlayer(player));
+        Bukkit.getPluginManager().callEvent(channelLeaveEvent);
+
+        if (!channelLeaveEvent.isCancelled())
+            super.onLeave(player);
     }
 
     @Override

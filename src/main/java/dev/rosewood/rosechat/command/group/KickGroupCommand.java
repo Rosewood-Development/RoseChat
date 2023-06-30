@@ -53,8 +53,7 @@ public class KickGroupCommand extends AbstractCommand {
             }
         }
 
-        groupChat.removeMember(target.getUniqueId());
-        this.getAPI().getGroupManager().removeMember(groupChat, target.getUniqueId());
+        this.getAPI().removeGroupChatMember(groupChat, target.getUniqueId());
 
         for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);

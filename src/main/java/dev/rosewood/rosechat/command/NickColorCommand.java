@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,8 +49,9 @@ public class NickColorCommand extends AbstractCommand {
                     playerData.setNickname(nickname);
 
                     RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-                    nicknameMessage.parse(player, null);
+                    BaseComponent[] parsed = nicknameMessage.parse(player, null);
 
+                    if (parsed == null) return;
                     NicknameCommand.setDisplayName(player, nicknameMessage);
                 }
 
@@ -74,7 +76,9 @@ public class NickColorCommand extends AbstractCommand {
             nickname = color + sender.getName() + "&r";
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-            nicknameMessage.parse(player, null);
+            BaseComponent[] parsed = nicknameMessage.parse(player, null);
+
+            if (parsed == null) return;
             NicknameCommand.setDisplayName(player, nicknameMessage);
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
@@ -82,7 +86,9 @@ public class NickColorCommand extends AbstractCommand {
             nickname = color + nickname + "&r";
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-            nicknameMessage.parse(player, null);
+            BaseComponent[] parsed = nicknameMessage.parse(player, null);
+
+            if (parsed == null) return;
             NicknameCommand.setDisplayName(player, nicknameMessage);
         }
 

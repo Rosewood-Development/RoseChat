@@ -234,6 +234,7 @@ public class MessageUtils {
 
         // Parse the message for the console to generate the tokens
         BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString());
+        if (parsedMessage == null) return;
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         // The tokens will always be generated before even if this message is not sent.
@@ -254,6 +255,8 @@ public class MessageUtils {
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
+
+                if (parsedSpyMessage == null) return;
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
@@ -262,6 +265,8 @@ public class MessageUtils {
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
             BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
+
+            if (parsedSentMessage == null || parsedReceivedMessage == null) return;
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
@@ -294,8 +299,9 @@ public class MessageUtils {
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
-                nickname.parse(sender, null);
+                BaseComponent[] parsed = nickname.parse(sender, null);
 
+                if (parsed == null) return;
                 if (sender.getPlayerData().getNickname() != null) NicknameCommand.setDisplayName(sender, nickname);
             });
         }

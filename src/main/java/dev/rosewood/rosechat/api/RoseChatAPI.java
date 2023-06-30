@@ -1,6 +1,13 @@
 package dev.rosewood.rosechat.api;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.event.group.GroupCreateEvent;
+import dev.rosewood.rosechat.api.event.group.GroupDisbandEvent;
+import dev.rosewood.rosechat.api.event.group.GroupJoinEvent;
+import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
+import dev.rosewood.rosechat.api.event.group.GroupNameChangedEvent;
+import dev.rosewood.rosechat.api.event.message.MessageDeleteEvent;
+import dev.rosewood.rosechat.api.event.message.MessageDeletedEvent;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
@@ -158,8 +165,9 @@ public final class RoseChatAPI {
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NICKNAME, data.getNickname());
-                roseMessage.parse(sender, null);
+                BaseComponent[] parsed = roseMessage.parse(sender, null);
 
+                if (parsed == null) return;
                 if (data.getNickname() != null) NicknameCommand.setDisplayName(sender, roseMessage);
             });
         }
@@ -174,6 +182,12 @@ public final class RoseChatAPI {
         }
 
         if (messageToDelete == null) return;
+
+        MessageDeleteEvent messageDeleteEvent = new MessageDeleteEvent(messageToDelete, player);
+        Bukkit.getPluginManager().callEvent(messageDeleteEvent);
+
+        if (messageDeleteEvent.isCancelled())
+            return;
 
         // Get the deleted message placeholder.
         BaseComponent[] deletedMessageFormat = MessageUtils.parseDeletedMessagePlaceholder(player, player,
@@ -202,6 +216,13 @@ public final class RoseChatAPI {
 
         // Remove the original message if it was not changed.
         if (!updated) player.getPlayerData().getMessageLog().getDeletableMessages().remove(messageToDelete);
+
+        MessageDeletedEvent messageDeletedEvent = new MessageDeletedEvent(messageToDelete, player);
+        Bukkit.getPluginManager().callEvent(messageDeletedEvent);
+
+        // If the event is cancelled, the message will still have been deleted but the messages will not be resent.
+        if (messageDeletedEvent.isCancelled())
+            return;
 
         // Send blank lines to clear the chat.
         for (int i = 0; i < 100; i++) player.send("\n");
@@ -359,6 +380,12 @@ public final class RoseChatAPI {
      * @return The new group chat.
      */
     public GroupChannel createGroupChat(String id, Player owner) {
+        GroupCreateEvent groupCreateEvent = new GroupCreateEvent(id, owner);
+        Bukkit.getPluginManager().callEvent(groupCreateEvent);
+
+        if (groupCreateEvent.isCancelled())
+            return null;
+
         GroupChannel groupChat = new GroupChannel(id);
         groupChat.setOwner(owner.getUniqueId());
         groupChat.addMember(owner.getUniqueId());
@@ -374,6 +401,12 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to delete.
      */
     public void deleteGroupChat(GroupChannel groupChat) {
+        GroupDisbandEvent groupDisbandEvent = new GroupDisbandEvent(groupChat);
+        Bukkit.getPluginManager().callEvent(groupDisbandEvent);
+
+        if (groupDisbandEvent.isCancelled())
+            return;
+
         this.getGroupManager().removeGroupChat(groupChat);
         this.getGroupManager().deleteGroupChat(groupChat);
     }
@@ -384,6 +417,12 @@ public final class RoseChatAPI {
      * @param member The player to be added.
      */
     public void addGroupChatMember(GroupChannel groupChat, Player member) {
+        GroupJoinEvent groupJoinEvent = new GroupJoinEvent(groupChat, member);
+        Bukkit.getPluginManager().callEvent(groupJoinEvent);
+
+        if (groupJoinEvent.isCancelled())
+            return;
+
         groupChat.addMember(member.getUniqueId());
         this.getGroupManager().addMember(groupChat, member.getUniqueId());
     }
@@ -393,9 +432,31 @@ public final class RoseChatAPI {
      * @param groupChat The group chat to be removed from.
      * @param member The player to be removed.
      */
-    public void removeGroupChatMember(GroupChannel groupChat, Player member) {
-        groupChat.removeMember(member.getUniqueId());
-        this.getGroupManager().removeMember(groupChat, member.getUniqueId());
+    public void removeGroupChatMember(GroupChannel groupChat, UUID member) {
+        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, member);
+        Bukkit.getPluginManager().callEvent(groupLeaveEvent);
+
+        if (groupLeaveEvent.isCancelled())
+            return;
+
+        groupChat.removeMember(member);
+        this.getGroupManager().removeMember(groupChat, member);
+    }
+
+    /**
+     * Sets the name of a group chat.
+     * @param groupChat The group chat to be renamed.
+     * @param name The new name, before formatting.
+     */
+    public void setGroupChatName(GroupChannel groupChat, String name) {
+        GroupNameChangedEvent groupNameChangedEvent = new GroupNameChangedEvent(groupChat, name);
+        Bukkit.getPluginManager().callEvent(groupNameChangedEvent);
+
+        if (groupNameChangedEvent.isCancelled())
+            return;
+
+        groupChat.setName(name);
+        groupChat.save();
     }
 
     /**

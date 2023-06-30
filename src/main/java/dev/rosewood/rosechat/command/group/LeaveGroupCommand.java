@@ -41,8 +41,7 @@ public class LeaveGroupCommand extends AbstractCommand {
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.single("name", groupChat.getName()));
 
-        groupChat.removeMember(player.getUniqueId());
-        this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
+        this.getAPI().removeGroupChatMember(groupChat, player.getUniqueId());
 
         for (UUID uuid : groupChat.getMembers()) {
             Player member = Bukkit.getPlayer(uuid);
