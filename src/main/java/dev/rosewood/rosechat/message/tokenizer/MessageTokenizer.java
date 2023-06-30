@@ -104,6 +104,7 @@ public class MessageTokenizer {
                 if (token != null) {
                     this.debugManager.addMessage(() -> "        Completed Tokenizing " + tokenizer.getClass().getSimpleName() + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
 
+
                     i += token.getOriginalContent().length() - 1;
                     if (depth > 15) {
                         RoseChat.getInstance().getLogger().warning("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.roseMessage.getMessage());

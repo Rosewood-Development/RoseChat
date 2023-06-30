@@ -1,29 +1,32 @@
-package dev.rosewood.rosechat.api.event.group;
+package dev.rosewood.rosechat.api.event;
 
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GroupEvent extends Event implements Cancellable {
+public class MessageEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private GroupChannel group;
+    private final RoseMessage message;
+    private final RosePlayer viewer;
     private boolean cancelled;
 
-    public GroupEvent(GroupChannel group) {
+    public MessageEvent(RoseMessage message, RosePlayer viewer) {
         super(!Bukkit.isPrimaryThread());
-        this.group = group;
+        this.message = message;
+        this.viewer = viewer;
     }
 
-    public GroupChannel getGroup() {
-        return this.group;
+    public RoseMessage getMessage() {
+        return this.message;
     }
 
-    protected void setGroup(GroupChannel group) {
-        this.group = group;
+    public RosePlayer getViewer() {
+        return this.viewer;
     }
 
     @Override

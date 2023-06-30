@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;

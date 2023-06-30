@@ -1,10 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import dev.rosewood.rosechat.api.event.message.MessageBlockedEvent;
 import dev.rosewood.rosechat.chat.FilterType;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
-import org.bukkit.Bukkit;
 import java.util.regex.Matcher;
 
 public class MessageRules {
@@ -130,12 +128,6 @@ public class MessageRules {
             return;
         }
 
-        MessageBlockedEvent messageBlockedEvent = new MessageBlockedEvent(message);
-        Bukkit.getPluginManager().callEvent(messageBlockedEvent);
-
-        if (messageBlockedEvent.isCancelled())
-            return;
-
         message.setBlocked(true);
     }
 
@@ -146,12 +138,6 @@ public class MessageRules {
 
         if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(message.getMessage())) return;
         if (Setting.WARN_ON_SPAM_SENT.getBoolean()) message.setFilterType(FilterType.SPAM);
-
-        MessageBlockedEvent messageBlockedEvent = new MessageBlockedEvent(message);
-        Bukkit.getPluginManager().callEvent(messageBlockedEvent);
-
-        if (messageBlockedEvent.isCancelled())
-            return;
 
         message.setBlocked(true);
     }
@@ -171,18 +157,7 @@ public class MessageRules {
         if (!hasURL) return;
         if (Setting.WARN_ON_URL_SENT.getBoolean()) message.setFilterType(FilterType.URL);
 
-        boolean isBlocked = !Setting.URL_CENSORING_ENABLED.getBoolean();
-
-        if (!isBlocked)
-            return;
-
-        MessageBlockedEvent messageBlockedEvent = new MessageBlockedEvent(message);
-        Bukkit.getPluginManager().callEvent(messageBlockedEvent);
-
-        if (messageBlockedEvent.isCancelled())
-            return;
-
-        message.setBlocked(true);
+        message.setBlocked(!Setting.URL_CENSORING_ENABLED.getBoolean());
     }
 
     private void filterLanguage(RoseMessage message) {
@@ -195,13 +170,6 @@ public class MessageRules {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
                     if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) message.setFilterType(FilterType.SWEAR);
-
-                    MessageBlockedEvent messageBlockedEvent = new MessageBlockedEvent(message);
-                    Bukkit.getPluginManager().callEvent(messageBlockedEvent);
-
-                    if (messageBlockedEvent.isCancelled())
-                        return;
-
                     message.setBlocked(true);
                     return;
                 }

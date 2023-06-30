@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.player.PlayerNicknameChangedEvent;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
@@ -21,7 +20,6 @@ import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -45,7 +43,7 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         Player target = Bukkit.getPlayerExact(args[0]);
-        String nickname = null;
+        String nickname;
 
         // If the target exists and isn't the player, make sure they have permission.
         if (target != null && target != sender && !sender.hasPermission("rosechat.nickname.others")) {
@@ -59,55 +57,39 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        boolean isNicknameReset = false;
         if ((args.length == 1 && (args[0].equalsIgnoreCase("off")) || (args.length == 2 && (args[1].equals("off"))) || target == sender)) {
-            PlayerNicknameChangedEvent playerNicknameChangedEvent = new PlayerNicknameChangedEvent(new RosePlayer(sender), null);
-            Bukkit.getPluginManager().callEvent(playerNicknameChangedEvent);
+            Player player = target == null ? (Player) sender : target;
+            PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
+            data.setNickname(null);
+            player.setDisplayName(null);
+            data.save();
 
-            if (playerNicknameChangedEvent.isCancelled())
-                return;
-
-            nickname = playerNicknameChangedEvent.getNewNickname();
-
-            if (nickname == null) {
-                Player player = target == null ? (Player) sender : target;
-                PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
-                data.setNickname(null);
-                player.setDisplayName(null);
-                data.save();
-
-                if (player == sender) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
-                } else {
-                    this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
-                            StringPlaceholders.builder("name", player.getName()).addPlaceholder("player", player.getName()).build());
-                }
-
-                return;
+            if (player == sender) {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+            } else {
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
+                        StringPlaceholders.builder("name", player.getName()).addPlaceholder("player", player.getName()).build());
             }
 
-            isNicknameReset = true;
+            return;
         }
 
-        if (!isNicknameReset) {
-            nickname = getAllArgs(1, args);
-
+        nickname = getAllArgs(1, args);
+        if (target == null) {
+            // Try to get partial name first.
+            target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                // Try to get partial name first.
-                target = Bukkit.getPlayer(args[0]);
-                if (target == null) {
-                    if (sender instanceof Player) {
-                        target = (Player) sender;
-                        nickname = getAllArgs(0, args);
-                    }
-                    else {
-                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found", StringPlaceholders.single("syntax", getSyntax()));
-                        return;
-                    }
-                } else {
-                    nickname = getAllArgs(1, args);
+                if (sender instanceof Player) {
+                    target = (Player) sender;
+                    nickname = getAllArgs(0, args);
                 }
+                else {
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found", StringPlaceholders.single("syntax", getSyntax()));
+                    return;
+                }
+            } else {
+                nickname = getAllArgs(1, args);
             }
         }
 
@@ -123,16 +105,8 @@ public class NicknameCommand extends AbstractCommand {
             }
         }
 
-        PlayerNicknameChangedEvent playerNicknameChangedEvent = new PlayerNicknameChangedEvent(new RosePlayer(sender), nickname);
-        Bukkit.getPluginManager().callEvent(playerNicknameChangedEvent);
-
-        if (playerNicknameChangedEvent.isCancelled())
-            return;
-
-        nickname = playerNicknameChangedEvent.getNewNickname();
-
         RosePlayer roseSender = new RosePlayer(sender);
-        RosePlayer roseTarget = new RosePlayer(target == null ? sender : target);
+        RosePlayer roseTarget = new RosePlayer(target);
 
         MessageRules rules = new MessageRules().applyAllFilters().ignoreMessageLogging();
 
@@ -148,10 +122,7 @@ public class NicknameCommand extends AbstractCommand {
 
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             if (roseSender.isConsole() || this.isNicknameAllowed(roseSender, roseTarget, message)) {
-                BaseComponent[] parsed = message.parse(roseTarget, null);
-                if (parsed == null) return;
-
-                String finalNickname = TextComponent.toLegacyText(parsed);
+                String finalNickname = TextComponent.toLegacyText(message.parse(roseTarget, null));
 
                 PlayerData data = this.getAPI().getPlayerData(roseTarget.getUUID());
 

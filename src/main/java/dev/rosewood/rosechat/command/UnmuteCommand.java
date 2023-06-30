@@ -1,9 +1,7 @@
 package dev.rosewood.rosechat.command;
 
-import dev.rosewood.rosechat.api.event.player.PlayerUnmuteEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -29,12 +27,6 @@ public class UnmuteCommand extends AbstractCommand {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
             return;
         }
-
-        PlayerUnmuteEvent playerUnmuteEvent = new PlayerUnmuteEvent(new RosePlayer(target));
-        Bukkit.getPluginManager().callEvent(playerUnmuteEvent);
-
-        if (playerUnmuteEvent.isCancelled())
-            return;
 
         PlayerData targetData = this.getAPI().getPlayerData(target.getUniqueId());
         targetData.unmute();

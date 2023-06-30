@@ -67,7 +67,6 @@ public class GroupChannel extends Channel {
         }
 
         BaseComponent[] parsedConsoleMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
-        if (parsedConsoleMessage == null) return;
 
         // Send the parsed message to the console
         Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
@@ -85,10 +84,7 @@ public class GroupChannel extends Channel {
             if (!this.canReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                BaseComponent[] parsed = playerMessage.parse(rosePlayer, this.getFormat());
-
-                if (parsed == null) return;
-                rosePlayer.send(parsed);
+               rosePlayer.send(playerMessage.parse(rosePlayer, this.getFormat()));
             });
         }
 
@@ -107,10 +103,7 @@ public class GroupChannel extends Channel {
             if (!this.canReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                BaseComponent[] parsed = playerMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString());
-
-                if (parsed == null) return;
-                rosePlayer.send(parsed);
+                rosePlayer.send(playerMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()));
             });
         }
     }

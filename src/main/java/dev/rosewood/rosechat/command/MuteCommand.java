@@ -1,9 +1,7 @@
 package dev.rosewood.rosechat.command;
 
-import dev.rosewood.rosechat.api.event.player.PlayerMuteEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -41,12 +39,6 @@ public class MuteCommand extends AbstractCommand {
         String outScale = "";
         int muteTime = -1;
         if (args.length == 1) {
-            PlayerMuteEvent playerMuteEvent = new PlayerMuteEvent(new RosePlayer(target), -1);
-            Bukkit.getPluginManager().callEvent(playerMuteEvent);
-            
-            if (playerMuteEvent.isCancelled())
-                return;
-
             String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", name));
             this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
@@ -102,12 +94,6 @@ public class MuteCommand extends AbstractCommand {
                 return;
             }
         }
-
-        PlayerMuteEvent playerMuteEvent = new PlayerMuteEvent(new RosePlayer(target), muteTime);
-        Bukkit.getPluginManager().callEvent(playerMuteEvent);
-
-        if (playerMuteEvent.isCancelled())
-            return;
 
         String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
 
