@@ -163,7 +163,7 @@ public final class RoseChatAPI {
 
         // Update the player's display name if the setting is enabled.
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            Channel.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NICKNAME, data.getNickname());
                 BaseComponent[] parsed = roseMessage.parse(sender, null);
 
@@ -238,6 +238,16 @@ public final class RoseChatAPI {
             if (this.getDiscord() != null && messageToDelete.getDiscordId() != null)
                 this.getDiscord().deleteMessage(messageToDelete.getDiscordId());
         }
+    }
+
+    /**
+     * Sends a message to a Discord channel.
+     * @param message The message to send.
+     * @param channel The {@link Channel} that the message was sent from.
+     * @param discordChannel The channel to send the message to.
+     */
+    public void sendDiscordMessage(RoseMessage message, Channel channel, String discordChannel) {
+        RoseChatAPI.getInstance().getDiscord().sendMessage(message, channel, discordChannel);
     }
 
     /**

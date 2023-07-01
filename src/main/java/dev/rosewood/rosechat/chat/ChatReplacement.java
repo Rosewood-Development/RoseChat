@@ -87,7 +87,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Note: Fonts *are* possible, but they cannot be shown in the chat preview.
      * @return The font.
      */
     public String getFont() {
@@ -95,7 +94,6 @@ public class ChatReplacement {
     }
 
     /**
-     * Note: Fonts *are* possible, but they cannot be shown in the chat preview.
      * @param font The font to be used.
      */
     public void setFont(String font) {

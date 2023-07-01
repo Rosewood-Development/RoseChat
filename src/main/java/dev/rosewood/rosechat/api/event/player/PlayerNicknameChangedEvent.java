@@ -1,11 +1,8 @@
 package dev.rosewood.rosechat.api.event.player;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import org.bukkit.event.HandlerList;
 
 public class PlayerNicknameChangedEvent extends RosePlayerEvent {
-
-    private static final HandlerList HANDLERS = new HandlerList();
 
     private String newNickname;
 
@@ -18,25 +15,26 @@ public class PlayerNicknameChangedEvent extends RosePlayerEvent {
         this.newNickname = newNickname;
     }
 
+    /**
+     * @return The new nickname of the player.
+     */
     public String getNewNickname() {
         return this.newNickname;
     }
 
+    /**
+     * Sets the new nickname of the player.
+     * @param newNickname The new nickname of the player.
+     */
     public void setNewNickname(String newNickname) {
         this.newNickname = newNickname;
     }
 
+    /**
+     * @return The old nickname of the player.
+     */
     public String getNickname() {
         return this.getPlayer().getNickname();
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
     }
 
 }

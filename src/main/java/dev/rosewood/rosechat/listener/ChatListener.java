@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.listener;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
@@ -12,11 +11,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
 
-    private final RoseChat plugin;
     private final RoseChatAPI api;
 
-    public ChatListener(RoseChat plugin) {
-        this.plugin = plugin;
+    public ChatListener() {
         this.api = RoseChatAPI.getInstance();
     }
 

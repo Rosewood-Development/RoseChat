@@ -6,11 +6,11 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GroupEvent extends Event implements Cancellable {
+public abstract class GroupEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private GroupChannel group;
+    private final GroupChannel group;
     private boolean cancelled;
 
     public GroupEvent(GroupChannel group) {
@@ -18,12 +18,11 @@ public class GroupEvent extends Event implements Cancellable {
         this.group = group;
     }
 
+    /**
+     * @return The {@link GroupChannel} involved in this event
+     */
     public GroupChannel getGroup() {
         return this.group;
-    }
-
-    protected void setGroup(GroupChannel group) {
-        this.group = group;
     }
 
     @Override

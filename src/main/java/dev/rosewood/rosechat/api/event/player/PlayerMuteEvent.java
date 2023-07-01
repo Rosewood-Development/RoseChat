@@ -1,13 +1,10 @@
 package dev.rosewood.rosechat.api.event.player;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import org.bukkit.event.HandlerList;
 
 public class PlayerMuteEvent extends RosePlayerEvent {
 
-    private static final HandlerList HANDLERS = new HandlerList();
-
-    private final int muteTime;
+    private int muteTime;
 
     /**
      * Called when a player is muted.
@@ -19,17 +16,19 @@ public class PlayerMuteEvent extends RosePlayerEvent {
         this.muteTime = muteTime;
     }
 
+    /**
+     * @return The time the player is being muted for, in seconds.
+     */
     public int getMuteTime() {
         return this.muteTime;
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
+    /**
+     * Sets the time the player is being muted for, in seconds.
+     * @param muteTime The time the player is being muted for.
+     */
+    public void setMuteTime(int muteTime) {
+        this.muteTime = muteTime;
     }
 
 }

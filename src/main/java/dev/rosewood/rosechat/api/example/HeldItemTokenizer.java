@@ -29,6 +29,7 @@ public class HeldItemTokenizer implements Tokenizer<Token> {
     private final RoseChatAPI api;
 
     public HeldItemTokenizer() {
+        // Registers this tokenizer before the rosechat tokenizer, as it should have a higher priority.
         HELD_ITEM_TOKENIZER = Tokenizers.registerBefore("rosechat", "held_item", this, Tokenizers.DEFAULT_BUNDLE);
         this.initialiseNMSClasses();
 
@@ -45,6 +46,8 @@ public class HeldItemTokenizer implements Tokenizer<Token> {
 
     @Override
     public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+        // Make sure the input is related to what we are looking for.
+        // For example, if the input doesn't start with "[" it definitely isn't a held item tag.
         ChatReplacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());
         if (replacement == null) return null;
 
@@ -54,6 +57,8 @@ public class HeldItemTokenizer implements Tokenizer<Token> {
         if (roseMessage.getSender().asPlayer().getEquipment() == null) return null;
 
         try {
+            // Tokenizer specific code.
+            // Gets the json for the item in the player's hand.
             ItemStack item = roseMessage.getSender().asPlayer().getEquipment().getItemInMainHand();
             Object nmsItemStack = this.obcItemStackAsNMSCopy.invoke(null, item);
 
@@ -67,6 +72,7 @@ public class HeldItemTokenizer implements Tokenizer<Token> {
             String itemName = item.hasItemMeta() && itemMeta.hasDisplayName() ?
                     itemMeta.getDisplayName() : WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
 
+            // Return a token with the settings needed.
             return new Token(new Token.TokenSettings(replacement.getText())
                     .content(replacement.getReplacement())
                     .hover(json)

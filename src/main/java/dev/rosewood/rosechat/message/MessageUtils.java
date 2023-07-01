@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.message;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
@@ -31,6 +30,7 @@ import java.util.Deque;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static dev.rosewood.rosechat.chat.channel.Channel.MESSAGE_THREAD_POOL;
 
 public class MessageUtils {
 
@@ -128,18 +128,18 @@ public class MessageUtils {
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .addPlaceholder("player_name", sender.getName())
-                .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname());
+                .add("player_name", sender.getName())
+                .add("player_displayname", sender.getDisplayName())
+                .add("player_nickname", sender.getNickname());
 
         if (viewer != null) {
-            builder.addPlaceholder("other_player_name", viewer.getName())
-                    .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                    .addPlaceholder("other_player_nickname", viewer.getNickname());
+            builder.add("other_player_name", viewer.getName())
+                    .add("other_player_displayname", viewer.getDisplayName())
+                    .add("other_player_nickname", viewer.getNickname());
         }
 
         Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
+        if (vault != null) builder.add("vault_rank", sender.getGroup());
         return builder;
     }
 
@@ -189,16 +189,7 @@ public class MessageUtils {
         return builder;
     }
 
-    /**
-     * Sends a message to a Discord channel.
-     * @param message The message to send.
-     * @param channel The {@link Channel} that the message was sent from.
-     * @param discordChannel The channel to send the message to.
-     */
-    public static void sendDiscordMessage(RoseMessage message, Channel channel, String discordChannel) {
-        RoseChatAPI.getInstance().getDiscord().sendMessage(message, channel, discordChannel);
-    }
-
+    // TODO: Make private messages into channels.
     /**
      * Sends a private message from one player to another.
      * @param sender The {@link RosePlayer} who sent the message.
@@ -253,7 +244,7 @@ public class MessageUtils {
             // Adds the spy to the private message info.
             privateMessageInfo.addSpy(new RosePlayer(spy));
 
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            MESSAGE_THREAD_POOL.submit(() -> {
                 BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
 
                 if (parsedSpyMessage == null) return;
@@ -262,7 +253,7 @@ public class MessageUtils {
         }
 
         // Parse the message for the sender and the receiver.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        MESSAGE_THREAD_POOL.submit(() -> {
             BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
             BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
 
@@ -297,7 +288,7 @@ public class MessageUtils {
         // Update the player's display name if the setting is enabled.
         if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
                 BaseComponent[] parsed = nickname.parse(sender, null);
 
@@ -326,15 +317,6 @@ public class MessageUtils {
         }
 
         return null;
-    }
-
-    /**
-     * Parses a given format.
-     * @param id The id of the format.
-     * @param format The format.
-     */
-    public static void parseFormat(String id, String format) {
-        RoseChatAPI.getInstance().getPlaceholderManager().parseFormat(id, format);
     }
 
     /**

@@ -5,8 +5,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.command.DeleteMessageCommand;
-import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -149,7 +147,7 @@ public class BungeeManager extends Manager {
         sender.setIgnoredPermissions(permissions);
 
         // Must be done asynchronously for LuckPerms & Vault.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        Channel.MESSAGE_THREAD_POOL.submit(() -> {
             if (isJson) {
                 channel.sendJson(sender, message, messageId);
             } else {

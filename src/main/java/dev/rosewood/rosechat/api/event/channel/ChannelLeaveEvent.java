@@ -17,6 +17,9 @@ public class ChannelLeaveEvent extends ChannelEvent {
         this.player = player;
     }
 
+    /**
+     * @return The {@link RosePlayer} for the person leaving the channel.
+     */
     public RosePlayer getPlayer() {
         return this.player;
     }

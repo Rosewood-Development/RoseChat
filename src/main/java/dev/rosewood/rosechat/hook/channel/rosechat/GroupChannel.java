@@ -84,7 +84,7 @@ public class GroupChannel extends Channel {
             // Don't send the message if the receiver can't receive it.
             if (!this.canReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            MESSAGE_THREAD_POOL.submit(() -> {
                 BaseComponent[] parsed = playerMessage.parse(rosePlayer, this.getFormat());
 
                 if (parsed == null) return;
@@ -106,7 +106,7 @@ public class GroupChannel extends Channel {
             // Don't send the message if the receiver can't receive it.
             if (!this.canReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            MESSAGE_THREAD_POOL.submit(() -> {
                 BaseComponent[] parsed = playerMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString());
 
                 if (parsed == null) return;

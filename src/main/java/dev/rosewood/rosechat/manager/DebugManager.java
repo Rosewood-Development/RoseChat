@@ -30,7 +30,6 @@ public class DebugManager extends Manager {
         if (!this.enabled || !this.writeToFile)
             return;
 
-        LocalDateTime now = LocalDateTime.now();
         String prefix = "[" + System.currentTimeMillis() + "]";
         this.messages.add(prefix + " " + message.get() + "\n");
     }

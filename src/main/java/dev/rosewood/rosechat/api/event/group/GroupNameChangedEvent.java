@@ -1,13 +1,10 @@
 package dev.rosewood.rosechat.api.event.group;
 
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import org.bukkit.event.HandlerList;
 
 public class GroupNameChangedEvent extends GroupEvent {
 
-    private static final HandlerList HANDLERS = new HandlerList();
-
-    private final String newName;
+    private String newName;
 
     /**
      * Called when a group name is changed.
@@ -19,17 +16,19 @@ public class GroupNameChangedEvent extends GroupEvent {
         this.newName = newName;
     }
 
+    /**
+     * @return The new name for the group.
+     */
     public String getNewName() {
         return this.newName;
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
+    /**
+     * Sets the new name for the group.
+     * @param newName The new name for the group.
+     */
+    public void setNewName(String newName) {
+        this.newName = newName;
     }
 
 }
