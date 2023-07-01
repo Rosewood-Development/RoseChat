@@ -7,7 +7,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public abstract class MessageEvent extends Event implements Cancellable {
+public class MessageEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -21,16 +21,10 @@ public abstract class MessageEvent extends Event implements Cancellable {
         this.viewer = viewer;
     }
 
-    /**
-     * @return The {@link RoseMessage} that was sent.
-     */
     public RoseMessage getMessage() {
         return this.message;
     }
 
-    /**
-     * @return The {@link RosePlayer} that is viewing the message.
-     */
     public RosePlayer getViewer() {
         return this.viewer;
     }

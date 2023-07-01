@@ -1,11 +1,11 @@
 package dev.rosewood.rosechat.api.event.group;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 
 public class GroupCreateEvent extends GroupEvent {
 
-    private final String id;
-    private final Player owner;
+    private static final HandlerList HANDLERS = new HandlerList();
 
     /**
      * Called when a group is created.
@@ -14,22 +14,15 @@ public class GroupCreateEvent extends GroupEvent {
      */
     public GroupCreateEvent(String id, Player owner) {
         super(null);
-        this.id = id;
-        this.owner = owner;
     }
 
-    /**
-     * @return The ID of the group.
-     */
-    public String getId() {
-        return this.id;
+    @Override
+    public HandlerList getHandlers() {
+        return HANDLERS;
     }
 
-    /**
-     * @return The owner of the group.
-     */
-    public Player getOwner() {
-        return this.owner;
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 
 }

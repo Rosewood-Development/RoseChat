@@ -165,7 +165,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Send the message to the player asynchronously.
         RoseMessage finalMessage = message;
-        MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
 
             Stopwatch messageTimer;
@@ -242,8 +242,8 @@ public class RoseChatChannel extends ConditionalChannel {
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
             if (api.getDiscord() != null && this.getDiscordChannel() != null) {
-                MESSAGE_THREAD_POOL.submit(() -> {
-                    api.sendDiscordMessage(message, this, this.getDiscordChannel());
+                RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                    MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel());
                 });
             }
         }
@@ -256,7 +256,7 @@ public class RoseChatChannel extends ConditionalChannel {
         if (direction != MessageDirection.FROM_BUNGEE_SERVER && direction != MessageDirection.FROM_BUNGEE_RAW && api.isBungee() && direction != MessageDirection.FROM_DISCORD) {
             for (String server : this.servers) {
                 if (this.keepFormatOverBungee) {
-                    MESSAGE_THREAD_POOL.submit(() -> {
+                    RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                         api.getBungeeManager()
                                 .sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), true,
                                         ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormat())));
@@ -495,6 +495,25 @@ public class RoseChatChannel extends ConditionalChannel {
                 player.sendMessage(message);
             }
         }
+    }
+
+    @Override
+    public void onJoin(Player player) {
+        ChannelJoinEvent channelJoinEvent = new ChannelJoinEvent(this, new RosePlayer(player));
+        Bukkit.getPluginManager().callEvent(channelJoinEvent);
+
+        if (!channelJoinEvent.isCancelled())
+            super.onJoin(player);
+
+    }
+
+    @Override
+    public void onLeave(Player player) {
+        ChannelLeaveEvent channelLeaveEvent = new ChannelLeaveEvent(this, new RosePlayer(player));
+        Bukkit.getPluginManager().callEvent(channelLeaveEvent);
+
+        if (!channelLeaveEvent.isCancelled())
+            super.onLeave(player);
     }
 
     @Override

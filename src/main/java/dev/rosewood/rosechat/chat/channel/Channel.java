@@ -2,8 +2,6 @@ package dev.rosewood.rosechat.chat.channel;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.channel.ChannelJoinEvent;
-import dev.rosewood.rosechat.api.event.channel.ChannelLeaveEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -17,15 +15,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public abstract class Channel {
-
-    public static final ExecutorService MESSAGE_THREAD_POOL =
-            new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
     private final ChannelProvider provider;
     protected String id;
@@ -106,23 +97,6 @@ public abstract class Channel {
     }
 
     /**
-     * Attempts to join the channel.
-     * @param player The {@link Player} who is joining the channel.
-     */
-    public boolean tryJoin(Player player) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        ChannelJoinEvent channelJoinEvent = new ChannelJoinEvent(this, new RosePlayer(player));
-        Bukkit.getPluginManager().callEvent(channelJoinEvent);
-
-        if (channelJoinEvent.isCancelled()) return false;
-
-        this.onJoin(player);
-
-        return true;
-    }
-
-    /**
      * Called when a player joins the channel.
      * @param player The {@link Player} who is joining the channel.
      */
@@ -183,21 +157,6 @@ public abstract class Channel {
         data.setCurrentChannel(foundChannel);
         api.getLocaleManager().sendMessage(player,
                     "command-channel-joined", StringPlaceholders.single("id", foundChannel.getId()));
-    }
-
-    /**
-     * Attempts to leave the channel.
-     * Checks for permissions and events.
-     * @param player The {@link Player} who is joining the channel.
-     */
-    public boolean tryLeave(Player player) {
-        ChannelLeaveEvent channelLeaveEvent = new ChannelLeaveEvent(this, new RosePlayer(player));
-        Bukkit.getPluginManager().callEvent(channelLeaveEvent);
-
-        if (channelLeaveEvent.isCancelled()) return false;
-
-        this.onLeave(player);
-        return true;
     }
 
     /**
@@ -287,13 +246,13 @@ public abstract class Channel {
      */
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return StringPlaceholders.builder()
-                .add("default", this.isDefaultChannel() ? trueValue : falseValue)
-                .add("muted", this.isMuted() ? trueValue : falseValue)
-                .add("members", this.getMemberCount(sender))
-                .add("players", this.getMemberCount(sender))
-                .add("id", this.getId())
-                .add("format", this.getFormat() == null ? nullValue : this.getFormat())
-                .add("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
+                .addPlaceholder("default", this.isDefaultChannel() ? trueValue : falseValue)
+                .addPlaceholder("muted", this.isMuted() ? trueValue : falseValue)
+                .addPlaceholder("members", this.getMemberCount(sender))
+                .addPlaceholder("players", this.getMemberCount(sender))
+                .addPlaceholder("id", this.getId())
+                .addPlaceholder("format", this.getFormat() == null ? nullValue : this.getFormat())
+                .addPlaceholder("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
     }
 
     public ChannelProvider getProvider() {

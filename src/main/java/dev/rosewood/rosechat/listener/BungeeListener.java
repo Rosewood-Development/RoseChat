@@ -13,9 +13,11 @@ import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
 
+    private final RoseChat plugin;
     private final BungeeManager bungeeManager;
 
     public BungeeListener(RoseChat plugin) {
+        this.plugin = plugin;
         this.bungeeManager = plugin.getManager(BungeeManager.class);
     }
 

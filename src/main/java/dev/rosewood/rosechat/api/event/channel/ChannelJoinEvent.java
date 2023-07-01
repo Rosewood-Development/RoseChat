@@ -17,9 +17,6 @@ public class ChannelJoinEvent extends ChannelEvent {
         this.player = player;
     }
 
-    /**
-     * @return The {@link RosePlayer} for the person joining the channel.
-     */
     public RosePlayer getPlayer() {
         return this.player;
     }

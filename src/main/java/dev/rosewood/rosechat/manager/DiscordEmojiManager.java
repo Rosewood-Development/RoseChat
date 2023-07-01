@@ -35,7 +35,8 @@ public class DiscordEmojiManager extends Manager {
 
         try {
             Reader reader = Files.newBufferedReader(Paths.get(emojiFile.getAbsolutePath()));
-            JsonElement root = JsonParser.parseReader(reader);
+            JsonParser parser = new JsonParser();
+            JsonElement root = parser.parse(reader);
 
             JsonObject categories = root.getAsJsonObject();
             Set<Map.Entry<String, JsonElement>> categoryEntries = categories.entrySet();

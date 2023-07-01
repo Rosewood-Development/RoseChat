@@ -25,14 +25,13 @@ public class PlayerData {
     private boolean tagSounds;
     private boolean messageSounds;
     private boolean emojis;
+    private boolean isCurrentChannelGroupChannel;
+    private Channel currentChannel;
     private String color;
     private String nickname;
     private final List<GroupChannel> groupInvites;
     private final List<UUID> ignoringPlayers;
     private final List<String> hiddenChannels;
-
-    private boolean isCurrentChannelGroupChannel;
-    private Channel currentChannel;
 
     private long muteTime;
     private MuteTask activeMuteTask;

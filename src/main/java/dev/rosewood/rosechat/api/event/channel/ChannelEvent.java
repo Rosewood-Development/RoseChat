@@ -6,7 +6,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public abstract class ChannelEvent extends Event implements Cancellable {
+public class ChannelEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -18,9 +18,6 @@ public abstract class ChannelEvent extends Event implements Cancellable {
         this.channel = channel;
     }
 
-    /**
-     * @return The {@link Channel} for this event.
-     */
     public Channel getChannel() {
         return this.channel;
     }

@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameChangedEvent;
 import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
-import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
@@ -147,7 +146,7 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        Channel.MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             if (roseSender.isConsole() || this.isNicknameAllowed(roseSender, roseTarget, message)) {
                 BaseComponent[] parsed = message.parse(roseTarget, null);
                 if (parsed == null) return;

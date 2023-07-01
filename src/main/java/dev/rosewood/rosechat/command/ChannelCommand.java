@@ -85,11 +85,8 @@ public class ChannelCommand extends AbstractCommand {
                 return true;
             }
 
-            if (!oldChannel.tryLeave(player))
-                return false;
-
-            if (!newChannel.tryJoin(player))
-                return false;
+            oldChannel.onLeave(player);
+            newChannel.onJoin(player);
 
             PlayerData playerData = api.getPlayerData(player.getUniqueId());
             playerData.setCurrentChannel(newChannel);

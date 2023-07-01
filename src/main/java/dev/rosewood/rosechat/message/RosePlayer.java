@@ -25,7 +25,7 @@ public class RosePlayer {
     private String group;
     private OfflinePlayer player;
     private List<String> ignoredPermissions;
-    private final Map<String, Boolean> cachedPermissions;
+    private Map<String, Boolean> cachedPermissions;
 
     private RosePlayer() {
         this.api = RoseChatAPI.getInstance();

@@ -22,12 +22,12 @@ import dev.rosewood.rosechat.command.UnmuteCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
-import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.InfoChatCommand;
+import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
+import dev.rosewood.rosechat.command.chat.ClearChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
-import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
@@ -58,6 +58,7 @@ import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
+import dev.rosewood.rosechat.listener.ChatPreviewListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
@@ -85,9 +86,14 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
+    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
@@ -160,19 +166,19 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
                 .addCommandManager(deleteMessageCommand)
-                .addCommandManager(realnameCommand)
                 .addSubcommand(new DebugCommand(this))
                 .addSubcommand(new ReloadCommand())
                 .addSubcommand(new HelpCommand(this));
 
         // Register Listeners
-        pluginManager.registerEvents(new ChatListener(), this);
+        pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
+        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean())
+            pluginManager.registerEvents(new ChatPreviewListener(), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
 
-        // This tokenizer is registered in its constructor, so we just need to instantiate it.
         new HeldItemTokenizer();
     }
 
@@ -200,7 +206,6 @@ public class RoseChat extends RosePlugin {
     private void initHooks(PluginManager pluginManager) {
         LocaleManager localeManager = this.getManager(LocaleManager.class);
 
-        // Set up Vault
         if (pluginManager.getPlugin("Vault") != null) {
             RegisteredServiceProvider<Permission> provider = this.getServer().getServicesManager().getRegistration(Permission.class);
             if (provider != null && provider.getProvider().hasGroupSupport()) this.vault = provider.getProvider();
@@ -209,14 +214,11 @@ public class RoseChat extends RosePlugin {
                     "&eVault was not found! Group placeholders will be disabled.");
         }
 
-        // Set up PlaceholderAPI expansion.
         if (!PlaceholderAPIHook.enabled())
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
         else new RoseChatPlaceholderExpansion().register();
 
-        // Set up DiscordSRV
-        // Wait a bit to make sure DiscordSRV is loaded before adding an event listener.
         if (pluginManager.getPlugin("DiscordSRV") != null) {
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 this.discord = new DiscordSRVProvider();
@@ -226,7 +228,6 @@ public class RoseChat extends RosePlugin {
             }, 60L);
         }
 
-        // Set up ProtocolLib
         if (pluginManager.getPlugin("ProtocolLib") != null && NMSUtil.getVersionNumber() >= 17) {
             new PacketListener(this);
             pluginManager.registerEvents(new MessageListener(), this);
