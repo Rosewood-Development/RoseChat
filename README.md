@@ -13,3 +13,7 @@ If there's anything we left out, you have a question, you want to report a bug, 
 RoseChat is compatible with Spigot and any forks. We recommend using [Paper](https://papermc.io/) to run your server.  CraftBukkit servers will not be compatible with the plugin.
 
 We support Minecraft versions **1.16.5** and newer.
+
+### Development Builds
+
+You can find the latest stable development builds of this plugin [here](https://jenkins.rosewooddev.io/job/Rosewood%20Development/job/RoseChat/lastStableBuild/).
