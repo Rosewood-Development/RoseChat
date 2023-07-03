@@ -1,35 +1,21 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
-import dev.rosewood.rosechat.chat.FilterType;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageLog;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.BungeeParser;
-import dev.rosewood.rosechat.message.parser.FromDiscordParser;
 import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.parser.RoseChatParser;
-import dev.rosewood.rosechat.message.parser.ToDiscordParser;
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.UUID;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
 
 /**
  * Wrapper to turn regular messages into BaseComponent[]'s with colour, emoji, tags, etc.
@@ -48,11 +34,8 @@ public class RoseMessage {
     private StringPlaceholders placeholders;
 
     // Out Values
-    private final List<UUID> taggedPlayers;
-    private Sound tagSound;
-    private FilterType filterType;
-    private boolean isBlocked;
-    private BaseComponent[] tokenized;
+    private final MessageOutputs outputs = new MessageOutputs();
+    private BaseComponent[] components;
 
     /**
      * Creates a new RoseMessage to be parsed later.
@@ -79,7 +62,6 @@ public class RoseMessage {
         this.message = message;
 
         this.uuid = UUID.randomUUID();
-        this.taggedPlayers = new ArrayList<>();
     }
 
     /**
@@ -95,11 +77,6 @@ public class RoseMessage {
         this.channel = other.channel;
         this.messageRules = new MessageRules(other.messageRules);
         this.placeholders = other.placeholders;
-        this.taggedPlayers = new ArrayList<>();
-        this.tagSound = null;
-        this.filterType = null;
-        this.isBlocked = false;
-        this.tokenized = null;
     }
 
     /**
@@ -115,7 +92,7 @@ public class RoseMessage {
         if (this.messageRules == null || this.messageRules.isIgnoringMessageLogging()) return;
 
         this.deletableMessage = new DeletableMessage(this.uuid);
-        this.deletableMessage.setJson(ComponentSerializer.toString(this.tokenized));
+        this.deletableMessage.setJson(ComponentSerializer.toString(this.components));
         this.deletableMessage.setClient(false);
         this.deletableMessage.setDiscordId(discordId);
         this.deletableMessage.setPrivateMessageInfo(this.messageRules.getPrivateMessageInfo());
@@ -123,50 +100,8 @@ public class RoseMessage {
         log.addDeletableMessage(this.deletableMessage);
     }
 
-    public String getChatColorFromFormat(RosePlayer viewer, String format) {
-        if (format.equalsIgnoreCase("{message}")) return "";
-
-        String lastColor = "";
-        String lastFormat = "";
-
-        String[] placeholders = format.split("\\{");
-        String colorPlaceholder = placeholders.length > 2 ? placeholders[placeholders.length - 2] : placeholders[0];
-
-        if (!colorPlaceholder.endsWith("}")) colorPlaceholder = colorPlaceholder.substring(0, colorPlaceholder.lastIndexOf("}") + 1);
-        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(colorPlaceholder.substring(0, colorPlaceholder.length() - 1));
-        String value = placeholder.getText().parseToString(this.sender, viewer, MessageUtils.getSenderViewerPlaceholders(this.sender, viewer, this.channel).build());
-
-        if (this.sender.isPlayer())
-            value = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), value).replace(ChatColor.COLOR_CHAR, '&');
-
-        Matcher colorMatcher = MessageUtils.STOP.matcher(value);
-        while (colorMatcher.find())
-            lastColor = colorMatcher.group();
-
-        Matcher formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(value);
-        while (formatMatcher.find())
-            lastFormat = formatMatcher.group();
-
-        // Applies Placeholders in order to get any colour within them.
-        if (this.sender.isPlayer())
-            format = PlaceholderAPIHook.applyPlaceholders(this.sender.asPlayer(), format).replace(ChatColor.COLOR_CHAR, '&');
-
-        // Check the format string for colours after, e.g. {player}:&c{message}
-        colorMatcher = MessageUtils.STOP.matcher(format);
-        while (colorMatcher.find()) {
-            if (format.indexOf(colorMatcher.group()) > format.indexOf(colorPlaceholder)) lastColor = colorMatcher.group();
-        }
-
-        formatMatcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(format);
-        while (formatMatcher.find()) {
-            if (format.indexOf(formatMatcher.group()) > format.indexOf(colorPlaceholder)) lastFormat = formatMatcher.group();
-        }
-
-        return HexUtils.colorify(lastFormat + lastColor);
-    }
-
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message.
      * This allows for the message to gain hover and click events, along with emojis and other features.
      * @param parser A {@link MessageParser} which will handle how the message gets parsed.
      *               Use {@link #parse(RosePlayer, String)} to parse without a {@link MessageParser}.
@@ -181,7 +116,7 @@ public class RoseMessage {
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (preParseMessageEvent.isCancelled()) return null;
-        this.tokenized = parser.parse(this, this.sender, viewer, format);
+        this.components = parser.parse(this, this.sender, viewer, format);
 
         // Only call the PostParseMessageEvent if the message has a format.
         // This prevents non-chat messages from having delete buttons.
@@ -195,11 +130,11 @@ public class RoseMessage {
             if (viewerData != null) this.logMessage(viewerData.getMessageLog(), discordId);
         }
 
-        return this.tokenized;
+        return this.components;
     }
 
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message.
      * This allows for the message to gain hover and click events, along with emojis and other features.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
@@ -211,43 +146,46 @@ public class RoseMessage {
     }
 
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message.
      * This allows for the message to gain hover and click events, along with emojis and other features.
-     * This applies a {@link FromDiscordParser} to parse with specific settings for discord messages.
+     * This applies a parser to parse with specific settings for discord messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The id of the discord message. Used for deleting discord messages.
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
-        FromDiscordParser parser = new FromDiscordParser();
-        return this.parse(parser, viewer, format, discordId);
+//        FromDiscordParser parser = new FromDiscordParser();
+//        return this.parse(parser, viewer, format, discordId);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message.
      * This allows for the message to gain hover and click events, along with emojis and other features.
-     * This applies a {@link ToDiscordParser} to parse with specific settings for discord messages.
+     * This applies a parser to parse with specific settings for discord messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseMessageToDiscord(RosePlayer viewer, String format) {
-        ToDiscordParser parser = new ToDiscordParser();
-        return this.parse(parser, viewer, format, null);
+//        ToDiscordParser parser = new ToDiscordParser();
+//        return this.parse(parser, viewer, format, null);
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message.
      * This allows for the message to gain hover and click events, along with emojis and other features.
-     * This applies a {@link BungeeParser} to parse with specific settings for bungee messages.
+     * This applies a parser to parse with specific settings for bungee messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseBungeeMessage(RosePlayer viewer, String format) {
-        BungeeParser parser = new BungeeParser();
-        return this.parse(parser, viewer, format, null);
+//        BungeeParser parser = new BungeeParser();
+//        return this.parse(parser, viewer, format, null);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -255,7 +193,7 @@ public class RoseMessage {
      * This will be null if the message as not been parsed.
      */
     public BaseComponent[] toComponents() {
-        return this.tokenized;
+        return this.components;
     }
 
     /**
@@ -264,7 +202,7 @@ public class RoseMessage {
      * @param components The components to use.
      */
     public void setComponents(BaseComponent[] components) {
-        this.tokenized = components;
+        this.components = components;
     }
 
     /**
@@ -351,55 +289,10 @@ public class RoseMessage {
     }
 
     /**
-     * @return The {@link FilterType} for the message.
+     * @return The {@link MessageOutputs} for this message.
      */
-    public FilterType getFilterType() {
-        return this.filterType;
-    }
-
-    /**
-     * Sets the {@link FilterType} of the message.
-     * This is used when deciding what to message the player.
-     * @param filterType The {@link FilterType} for the message.
-     */
-    public void setFilterType(FilterType filterType) {
-        this.filterType = filterType;
-    }
-
-    /**
-     * @return True if the message should not be sent.
-     */
-    public boolean isBlocked() {
-        return this.isBlocked;
-    }
-
-    /**
-     * Sets whether this message should be blocked, and not sent later.
-     * @param blocked True if the message should not be sent.
-     */
-    public void setBlocked(boolean blocked) {
-        this.isBlocked = blocked;
-    }
-
-    /**
-     * @return A list of players who have been tagged in the parsed message.
-     */
-    public List<UUID> getTaggedPlayers() {
-        return this.taggedPlayers;
-    }
-
-    /**
-     * @param tagSound The sound that should be played to the players who were tagged in the parsed message.
-     */
-    public void setTagSound(Sound tagSound) {
-        this.tagSound = tagSound;
-    }
-
-    /**
-     * @return The sound that should be played to the players who were tagged in the parsed message.
-     */
-    public Sound getTagSound() {
-        return this.tagSound;
+    public MessageOutputs getOutputs() {
+        return this.outputs;
     }
 
     /**

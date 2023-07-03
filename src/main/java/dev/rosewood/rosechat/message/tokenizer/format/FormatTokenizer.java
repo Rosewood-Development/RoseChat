@@ -1,26 +1,31 @@
 package dev.rosewood.rosechat.message.tokenizer.format;
 
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 
-public class FormatTokenizer implements Tokenizer<FormatToken> {
+public class FormatTokenizer implements Tokenizer {
 
     @Override
-    public FormatToken tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
-        if (!input.startsWith("&")) return null;
+    public TokenizerResult tokenize(TokenizerParams params) {
+        if (!params.getInput().startsWith("&")) return null;
 
-        Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(input);
+        Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(params.getInput());
         if (matcher.find()) {
             if (matcher.start() != 0) return null;
             String content = matcher.group();
             char formatCharacter = content.charAt(1);
             char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
-            boolean hasPermission = ignorePermissions || MessageUtils.hasTokenPermission(roseMessage, this.getPermissionForFormat(formatCharacterLowercase));
-            return hasPermission ? new FormatToken(content, ChatColor.getByChar(formatCharacterLowercase), Character.isLowerCase(formatCharacter)) : new FormatToken(content, null);
+            boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
+            ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
+            boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
+            return hasPermission
+                    ? new TokenizerResult(Token.builder().build(), content.length()) // TODO: Format decorator
+                    : new TokenizerResult(Token.builder().content(content).build(), content.length());
         }
         return null;
     }

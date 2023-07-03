@@ -23,99 +23,111 @@ public class RoseChatParser implements MessageParser {
             receiver = viewer;
         }
 
-        ComponentBuilder componentBuilder = new ComponentBuilder();
-
-        // If there is no format, or the format does not contain "{message}", then parse without the format.
-        if (format == null || !format.contains("{message}")) {
-            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
-                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                ComponentBuilder.FormatRetention.FORMATTING);
-            } else {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            }
-
-            return componentBuilder.create();
+        if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+            return MessageTokenizer.from(message, receiver, format, sender.isConsole(),
+                            Tokenizers.DISCORD_EMOJI_BUNDLE,
+                            Tokenizers.MARKDOWN_BUNDLE,
+                            Tokenizers.DISCORD_FORMATTING_BUNDLE,
+                            Tokenizers.DEFAULT_BUNDLE).toComponents();
+        } else {
+            return MessageTokenizer.from(message, receiver, format, sender.isConsole(),
+                            Tokenizers.DISCORD_EMOJI_BUNDLE,
+                            Tokenizers.DEFAULT_BUNDLE).toComponents();
         }
 
-        // Split the format to get the placeholders before and after the message.
-        String[] formatSplit = format.split("\\{message\\}");
-        String before = formatSplit.length > 0 ? formatSplit[0] : null;
-        String after = formatSplit.length > 1 ? formatSplit[1] : null;
-
-        if (before != null && !before.isEmpty()) {
-            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, before, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
-                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            } else {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, before, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            }
-        }
-
-        if (format.contains("{message}")) {
-            String formatColor = message.getChatColorFromFormat(receiver, format);
-
-            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                componentBuilder.append(
-                  new MessageTokenizer(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
-                          Tokenizers.DISCORD_EMOJI_BUNDLE,
-                          Tokenizers.MARKDOWN_BUNDLE,
-                          Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                          Tokenizers.DEFAULT_BUNDLE)
-                          .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            } else {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            }
-        }
-
-        if (after != null && !after.isEmpty()) {
-            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, after, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.MARKDOWN_BUNDLE,
-                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            } else {
-                componentBuilder.append(
-                        new MessageTokenizer(message, receiver, after, true,
-                                Tokenizers.DISCORD_EMOJI_BUNDLE,
-                                Tokenizers.DEFAULT_BUNDLE)
-                                .toComponents(),
-                        ComponentBuilder.FormatRetention.FORMATTING);
-            }
-        }
-
-        return componentBuilder.create();
+//        ComponentBuilder componentBuilder = new ComponentBuilder();
+//
+//        // If there is no format, or the format does not contain "{message}", then parse without the format.
+//        if (format == null || !format.contains("{message}")) {
+//            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, message.getMessage(), sender.isConsole(),
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.MARKDOWN_BUNDLE,
+//                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                ComponentBuilder.FormatRetention.FORMATTING);
+//            } else {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, message.getMessage(), sender.isConsole(),
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            }
+//
+//            return componentBuilder.create();
+//        }
+//
+//        // Split the format to get the placeholders before and after the message.
+//        String[] formatSplit = format.split("\\{message\\}");
+//        String before = formatSplit.length > 0 ? formatSplit[0] : null;
+//        String after = formatSplit.length > 1 ? formatSplit[1] : null;
+//
+//        if (before != null && !before.isEmpty()) {
+//            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, before, true,
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.MARKDOWN_BUNDLE,
+//                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            } else {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, before, true,
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            }
+//        }
+//
+//        if (format.contains("{message}")) {
+//            String formatColor = message.getChatColorFromFormat(receiver, format);
+//
+//            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
+//                          Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                          Tokenizers.MARKDOWN_BUNDLE,
+//                          Tokenizers.DISCORD_FORMATTING_BUNDLE,
+//                          Tokenizers.DEFAULT_BUNDLE)
+//                          .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            } else {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, formatColor + message.getMessage(), sender.isConsole(),
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            }
+//        }
+//
+//        if (after != null && !after.isEmpty()) {
+//            if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, after, true,
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.MARKDOWN_BUNDLE,
+//                                Tokenizers.DISCORD_FORMATTING_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            } else {
+//                componentBuilder.append(
+//                        MessageTokenizer.from(message, receiver, after, true,
+//                                Tokenizers.DISCORD_EMOJI_BUNDLE,
+//                                Tokenizers.DEFAULT_BUNDLE)
+//                                .toComponents(),
+//                        ComponentBuilder.FormatRetention.FORMATTING);
+//            }
+//        }
+//
+//        return componentBuilder.create();
     }
 
     @Override

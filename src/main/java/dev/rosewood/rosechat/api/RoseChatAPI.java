@@ -25,14 +25,12 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -70,7 +68,7 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
@@ -85,7 +83,7 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.
@@ -96,7 +94,7 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Parses a string into the RoseChat {@link RoseMessage} and {@link MessageTokenizer}, allowing for hex color, tags and emoji in other text.
+     * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
      * @param message The string to parse.

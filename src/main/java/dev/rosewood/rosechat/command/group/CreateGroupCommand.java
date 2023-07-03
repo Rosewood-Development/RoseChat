@@ -48,8 +48,8 @@ public class CreateGroupCommand extends AbstractCommand {
         MessageRules messageRules = new MessageRules().applyAllFilters();
         message.applyRules(messageRules);
 
-        if (message.isBlocked()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+        if (message.getOutputs().isBlocked()) {
+            if (message.getOutputs().getFilterType() != null) message.getOutputs().getFilterType().sendWarning(rosePlayer);
             return;
         }
 

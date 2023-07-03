@@ -122,13 +122,13 @@ public class MessageRules {
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return;
         if (!this.isCaps(message)) return;
 
-        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) message.setFilterType(FilterType.CAPS);
+        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) message.getOutputs().setFilterType(FilterType.CAPS);
         if (Setting.LOWERCASE_CAPS_ENABLED.getBoolean()) {
             message.setMessage(message.getMessage().toLowerCase());
             return;
         }
 
-        message.setBlocked(true);
+        message.getOutputs().setBlocked();
     }
 
     private void filterSpam(RoseMessage message) {
@@ -137,9 +137,9 @@ public class MessageRules {
                 || message.getSender().getPlayerData() == null) return;
 
         if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(message.getMessage())) return;
-        if (Setting.WARN_ON_SPAM_SENT.getBoolean()) message.setFilterType(FilterType.SPAM);
+        if (Setting.WARN_ON_SPAM_SENT.getBoolean()) message.getOutputs().setFilterType(FilterType.SPAM);
 
-        message.setBlocked(true);
+        message.getOutputs().setBlocked();
     }
 
     private void filterURLs(RoseMessage message) {
@@ -155,9 +155,10 @@ public class MessageRules {
         }
 
         if (!hasURL) return;
-        if (Setting.WARN_ON_URL_SENT.getBoolean()) message.setFilterType(FilterType.URL);
+        if (Setting.WARN_ON_URL_SENT.getBoolean()) message.getOutputs().setFilterType(FilterType.URL);
 
-        message.setBlocked(!Setting.URL_CENSORING_ENABLED.getBoolean());
+        if (!Setting.URL_CENSORING_ENABLED.getBoolean())
+            message.getOutputs().setBlocked();
     }
 
     private void filterLanguage(RoseMessage message) {
@@ -169,8 +170,8 @@ public class MessageRules {
             for (String word : strippedMessage.split(" ")) {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
-                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) message.setFilterType(FilterType.SWEAR);
-                    message.setBlocked(true);
+                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) message.getOutputs().setFilterType(FilterType.SWEAR);
+                    message.getOutputs().setBlocked();
                     return;
                 }
             }

@@ -60,9 +60,9 @@ public class GroupChannel extends Channel {
         roseMessage.applyRules(rules);
 
         // Check if the message is allowed to be sent.
-        if (roseMessage.isBlocked()) {
-            if (roseMessage.getFilterType() != null)
-                roseMessage.getFilterType().sendWarning(sender);
+        if (roseMessage.getOutputs().isBlocked()) {
+            if (roseMessage.getOutputs().getFilterType() != null)
+                roseMessage.getOutputs().getFilterType().sendWarning(sender);
             return;
         }
 

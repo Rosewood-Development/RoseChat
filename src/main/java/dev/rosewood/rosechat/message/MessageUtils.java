@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
@@ -47,7 +48,9 @@ public class MessageUtils {
     public static final Pattern ITALIC_MARKDOWN_PATTERN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
     public static final Pattern STRIKETHROUGH_MARKDOWN_PATTERN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
+    public static final Pattern VALID_LEGACY_REGEX_PARSED = Pattern.compile("§[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
+    public static final Pattern VALID_LEGACY_REGEX_FORMATTING_PARSED = Pattern.compile("§[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX = Pattern.compile("&x(&[A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX_PARSED = Pattern.compile("#(§[A-Fa-f0-9]){6}|§x(§[A-Fa-f0-9]){6}");
@@ -217,8 +220,8 @@ public class MessageUtils {
         roseMessage.applyRules(rules);
 
         // If the message is blocked, send a warning to the player.
-        if (roseMessage.isBlocked()) {
-            if (roseMessage.getFilterType() != null) roseMessage.getFilterType().sendWarning(sender);
+        if (roseMessage.getOutputs().isBlocked()) {
+            if (roseMessage.getOutputs().getFilterType() != null) roseMessage.getOutputs().getFilterType().sendWarning(sender);
             return;
         }
 
@@ -480,38 +483,38 @@ public class MessageUtils {
     }
 
     /**
-     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
-     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * Checks if the sender of a message has the specified permission.
+     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
      * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'.
      * @return True if the sender has the permission
      */
-    public static boolean hasTokenPermission(RoseMessage message, String permission) {
+    public static boolean hasTokenPermission(TokenizerParams params, String permission) {
         // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE || message.getSender().isConsole()) return true;
+        if (params == null || params.getSender() == null || params.getLocation() == MessageLocation.NONE || params.getSender().isConsole()) return true;
 
         // Gets the full permission, e.g. rosechat.emoji.channel.global
-        String fullPermission = permission + "." + message.getLocationPermission();
+        String fullPermission = permission + "." + params.getLocationPermission();
 
-        return message.getSender().hasPermission(fullPermission)
-                || message.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
-                || message.getSender().getIgnoredPermissions().contains("*");
+        return params.getSender().hasPermission(fullPermission)
+                || params.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*");
     }
 
     /**
-     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * Checks if the sender of a message has the specified permission.
      * Checks against the first permission, for example, 'rosechat.emojis', and extended permissions such as 'rosechat.emoji.smile'.
-     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
      * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'
      * @param extendedPermission The extended permission, should not contain the location information. For example, 'rosechat.emoji.smile'.
      * @return True if the sender has permission.
      */
-    public static boolean hasExtendedTokenPermission(RoseMessage message, String permission, String extendedPermission) {
+    public static boolean hasExtendedTokenPermission(TokenizerParams params, String permission, String extendedPermission) {
         // The sender will not have an extended permission if they do not have the base permission.
-        if (!hasTokenPermission(message, permission)) return false;
+        if (!hasTokenPermission(params, permission)) return false;
 
-        return message.getSender().hasPermission(extendedPermission)
-                || message.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
-                || message.getSender().getIgnoredPermissions().contains("*");
+        return params.getSender().hasPermission(extendedPermission)
+                || params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*");
     }
 
     public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {

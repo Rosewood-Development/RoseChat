@@ -12,7 +12,6 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -94,16 +93,17 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         // Ignore shader colours in the nickname.
-        if (nickname.contains("#")) {
-            Matcher matcher = MessageUtils.HEX_REGEX.matcher(nickname);
-            if (matcher.find()) {
-                String match = nickname.substring(matcher.start(), matcher.end());
-                if (ConfigurationManager.Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
-                    String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
-                    nickname = nickname.replace(match, "#" + freeHex);
-                }
-            }
-        }
+        // TODO
+//        if (nickname.contains("#")) {
+//            Matcher matcher = MessageUtils.HEX_REGEX.matcher(nickname);
+//            if (matcher.find()) {
+//                String match = nickname.substring(matcher.start(), matcher.end());
+//                if (ConfigurationManager.Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
+//                    String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
+//                    nickname = nickname.replace(match, "#" + freeHex);
+//                }
+//            }
+//        }
 
         RosePlayer roseSender = new RosePlayer(sender);
         RosePlayer roseTarget = new RosePlayer(target);
@@ -114,9 +114,9 @@ public class NicknameCommand extends AbstractCommand {
         message.applyRules(rules);
 
         // Block the message if it breaks the rules.
-        if (message.isBlocked()) {
-            if (message.getFilterType() != null)
-                message.getFilterType().sendWarning(roseSender);
+        if (message.getOutputs().isBlocked()) {
+            if (message.getOutputs().getFilterType() != null)
+                message.getOutputs().getFilterType().sendWarning(roseSender);
             return;
         }
 
@@ -185,178 +185,179 @@ public class NicknameCommand extends AbstractCommand {
     }
 
     private boolean isNicknameAllowed(RosePlayer sender, RosePlayer target, RoseMessage message) {
-        String nickname = message.getMessage();
-
-        if (!MessageUtils.canColor(sender, nickname, "nickname")) return false;
-
-        String formattedNickname = ChatColor.stripColor(HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(target.asPlayer(), nickname)));
-
-        if (formattedNickname.length() < ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt()) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-too-short");
-            return false;
-        }
-
-        if (formattedNickname.length() > ConfigurationManager.Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-too-long");
-            return false;
-        }
-
-        String colorified = HexUtils.colorify(nickname);
-        if ((formattedNickname.contains(" ") && !ConfigurationManager.Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean())
-                || (!MessageUtils.isAlphanumericSpace(formattedNickname) && !ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean())
-                || ChatColor.stripColor(colorified).isEmpty()) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-            return false;
-        }
-
-        // Check every permission.
-        if (nickname.contains("[")) {
-            Matcher matcher = MessageUtils.URL_MARKDOWN_PATTERN.matcher(nickname);
-            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.url")) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        for (ChatReplacement emoji : this.getAPI().getEmojis()) {
-            if (nickname.contains(emoji.getText())
-                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        for (ChatReplacement replacement : this.getAPI().getReplacements()) {
-            if (!replacement.isRegex()) continue;
-            Matcher matcher = Pattern.compile(replacement.getText()).matcher(nickname);
-            if (matcher.find()
-                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        for (ChatReplacement replacement : this.getAPI().getReplacements()) {
-            if (replacement.isRegex()) continue;
-            if (nickname.contains(replacement.getText())
-                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        if (nickname.contains("%")) {
-            Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(nickname);
-            if (matcher.find()) {
-                String placeholder = matcher.group().replaceFirst("_", "");
-                if (!MessageUtils.hasExtendedTokenPermission(message, "rosechat.placeholders", "rosechat.placeholder." + placeholder)) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-        }
-
-        if (nickname.contains("{")) {
-            Matcher matcher = RoseChatPlaceholderTokenizer.RC_PATTERN.matcher(nickname);
-            if (matcher.find()) {
-                String placeholder = matcher.group();
-                if (!MessageUtils.hasExtendedTokenPermission(message, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-        }
-
-        if (nickname.contains("__")) {
-            Matcher matcher = MessageUtils.UNDERLINE_MARKDOWN_PATTERN.matcher(nickname);
-            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.underline")) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        if (nickname.contains("~~")) {
-            Matcher matcher = MessageUtils.STRIKETHROUGH_MARKDOWN_PATTERN.matcher(nickname);
-            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.strikethrough")) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        if (nickname.contains("**")) {
-            Matcher matcher = MessageUtils.BOLD_MARKDOWN_PATTERN.matcher(nickname);
-            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.bold")) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        if (nickname.contains("*")) {
-            Matcher matcher = MessageUtils.ITALIC_MARKDOWN_PATTERN.matcher(nickname);
-            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.italic")) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                return false;
-            }
-        }
-
-        if (nickname.startsWith("> ") && !MessageUtils.hasTokenPermission(message, "rosechat.quote")) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-            return false;
-        }
-
-        DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
-        for (int i = 0; i < nickname.length(); i++) {
-            String substring = nickname.substring(i);
-            for (Tag tag : this.getAPI().getTags()) {
-                if (substring.startsWith(tag.getPrefix())
-                        && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.tags", "rosechat.tag." + tag.getId())) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-
-            if (substring.startsWith("```")) {
-                if (substring.substring(3).contains("```") && !MessageUtils.hasTokenPermission(message, "rosechat.multicode")) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-
-            if (substring.startsWith("`")) {
-                if (substring.substring(1).contains("`") && !MessageUtils.hasTokenPermission(message, "rosechat.code")) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-
-            String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();
-            String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
-            String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
-            if (suffix.startsWith(prefix)) {
-                if (suffix.substring(prefix.length()).contains(suffix) && !MessageUtils.hasTokenPermission(message, "rosechat.spoiler")) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                    return false;
-                }
-            }
-
-            if (discord != null) {
-                if (substring.startsWith("@") && ConfigurationManager.Setting.CAN_TAG_MEMBERS.getBoolean()) {
-                    DiscordChatProvider.DetectedMention member = discord.matchPartialMember(substring.substring(1));
-                    if (member != null && !MessageUtils.hasTokenPermission(message, "rosechat.tag")) {
-                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                        return false;
-                    }
-                }
-
-                if (substring.startsWith("#")) {
-                    DiscordChatProvider.DetectedMention channel = discord.matchPartialChannel(substring.substring(1));
-                    if (channel != null && !MessageUtils.hasTokenPermission(message, "rosechat.discordchannel")) {
-                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
-                        return false;
-                    }
-                }
-            }
-        }
+        // TODO
+//        String nickname = message.getMessage();
+//
+//        if (!MessageUtils.canColor(sender, nickname, "nickname")) return false;
+//
+//        String formattedNickname = ChatColor.stripColor(HexUtils.colorify(PlaceholderAPIHook.applyPlaceholders(target.asPlayer(), nickname)));
+//
+//        if (formattedNickname.length() < ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt()) {
+//            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-too-short");
+//            return false;
+//        }
+//
+//        if (formattedNickname.length() > ConfigurationManager.Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
+//            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-too-long");
+//            return false;
+//        }
+//
+//        String colorified = HexUtils.colorify(nickname);
+//        if ((formattedNickname.contains(" ") && !ConfigurationManager.Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean())
+//                || (!MessageUtils.isAlphanumericSpace(formattedNickname) && !ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean())
+//                || ChatColor.stripColor(colorified).isEmpty()) {
+//            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//            return false;
+//        }
+//
+//        // Check every permission.
+//        if (nickname.contains("[")) {
+//            Matcher matcher = MessageUtils.URL_MARKDOWN_PATTERN.matcher(nickname);
+//            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.url")) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        for (ChatReplacement emoji : this.getAPI().getEmojis()) {
+//            if (nickname.contains(emoji.getText())
+//                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.emojis", "rosechat.emoji." + emoji.getId())) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        for (ChatReplacement replacement : this.getAPI().getReplacements()) {
+//            if (!replacement.isRegex()) continue;
+//            Matcher matcher = Pattern.compile(replacement.getText()).matcher(nickname);
+//            if (matcher.find()
+//                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        for (ChatReplacement replacement : this.getAPI().getReplacements()) {
+//            if (replacement.isRegex()) continue;
+//            if (nickname.contains(replacement.getText())
+//                    && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        if (nickname.contains("%")) {
+//            Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(nickname);
+//            if (matcher.find()) {
+//                String placeholder = matcher.group().replaceFirst("_", "");
+//                if (!MessageUtils.hasExtendedTokenPermission(message, "rosechat.placeholders", "rosechat.placeholder." + placeholder)) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        if (nickname.contains("{")) {
+//            Matcher matcher = RoseChatPlaceholderTokenizer.RC_PATTERN.matcher(nickname);
+//            if (matcher.find()) {
+//                String placeholder = matcher.group();
+//                if (!MessageUtils.hasExtendedTokenPermission(message, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder)) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        if (nickname.contains("__")) {
+//            Matcher matcher = MessageUtils.UNDERLINE_MARKDOWN_PATTERN.matcher(nickname);
+//            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.underline")) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        if (nickname.contains("~~")) {
+//            Matcher matcher = MessageUtils.STRIKETHROUGH_MARKDOWN_PATTERN.matcher(nickname);
+//            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.strikethrough")) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        if (nickname.contains("**")) {
+//            Matcher matcher = MessageUtils.BOLD_MARKDOWN_PATTERN.matcher(nickname);
+//            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.bold")) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        if (nickname.contains("*")) {
+//            Matcher matcher = MessageUtils.ITALIC_MARKDOWN_PATTERN.matcher(nickname);
+//            if (matcher.find() && !MessageUtils.hasTokenPermission(message, "rosechat.italic")) {
+//                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                return false;
+//            }
+//        }
+//
+//        if (nickname.startsWith("> ") && !MessageUtils.hasTokenPermission(message, "rosechat.quote")) {
+//            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//            return false;
+//        }
+//
+//        DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
+//        for (int i = 0; i < nickname.length(); i++) {
+//            String substring = nickname.substring(i);
+//            for (Tag tag : this.getAPI().getTags()) {
+//                if (substring.startsWith(tag.getPrefix())
+//                        && !MessageUtils.hasExtendedTokenPermission(message, "rosechat.tags", "rosechat.tag." + tag.getId())) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//
+//            if (substring.startsWith("```")) {
+//                if (substring.substring(3).contains("```") && !MessageUtils.hasTokenPermission(message, "rosechat.multicode")) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//
+//            if (substring.startsWith("`")) {
+//                if (substring.substring(1).contains("`") && !MessageUtils.hasTokenPermission(message, "rosechat.code")) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//
+//            String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();
+//            String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
+//            String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
+//            if (suffix.startsWith(prefix)) {
+//                if (suffix.substring(prefix.length()).contains(suffix) && !MessageUtils.hasTokenPermission(message, "rosechat.spoiler")) {
+//                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                    return false;
+//                }
+//            }
+//
+//            if (discord != null) {
+//                if (substring.startsWith("@") && ConfigurationManager.Setting.CAN_TAG_MEMBERS.getBoolean()) {
+//                    DiscordChatProvider.DetectedMention member = discord.matchPartialMember(substring.substring(1));
+//                    if (member != null && !MessageUtils.hasTokenPermission(message, "rosechat.tag")) {
+//                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                        return false;
+//                    }
+//                }
+//
+//                if (substring.startsWith("#")) {
+//                    DiscordChatProvider.DetectedMention channel = discord.matchPartialChannel(substring.substring(1));
+//                    if (channel != null && !MessageUtils.hasTokenPermission(message, "rosechat.discordchannel")) {
+//                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-not-allowed");
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
 
         return true;
     }

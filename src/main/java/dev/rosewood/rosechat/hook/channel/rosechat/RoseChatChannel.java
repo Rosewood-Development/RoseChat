@@ -198,10 +198,10 @@ public class RoseChatChannel extends ConditionalChannel {
             }
 
             // Play the tag sound to the player.
-            if (receiver.isPlayer() && finalMessage.getTaggedPlayers().contains(receiver.getUUID())) {
+            if (receiver.isPlayer() && finalMessage.getOutputs().getTaggedPlayers().contains(receiver.getUUID())) {
                 Player player = receiver.asPlayer();
-                if (finalMessage.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
-                    player.playSound(player.getLocation(), finalMessage.getTagSound(), 1.0f, 1.0f);
+                if (finalMessage.getOutputs().getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
+                    player.playSound(player.getLocation(), finalMessage.getOutputs().getTagSound(), 1.0f, 1.0f);
             }
 
             if (debugManager.isEnabled() && debugManager.isTimerEnabled() && messageTimer != null && messageTimer.isRunning()) {
@@ -400,9 +400,9 @@ public class RoseChatChannel extends ConditionalChannel {
         roseMessage.applyRules(rules);
 
         // Check if the message is allowed to be sent.
-        if (roseMessage.isBlocked()) {
-            if (roseMessage.getFilterType() != null)
-                roseMessage.getFilterType().sendWarning(sender);
+        if (roseMessage.getOutputs().isBlocked()) {
+            if (roseMessage.getOutputs().getFilterType() != null)
+                roseMessage.getOutputs().getFilterType().sendWarning(sender);
             return;
         }
 

@@ -150,7 +150,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 }
 
                 messageWrapper.applyRules(rules);
-                if (messageWrapper.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                if (messageWrapper.getOutputs().isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
                     message.delete().queue();
                     return;
                 }
