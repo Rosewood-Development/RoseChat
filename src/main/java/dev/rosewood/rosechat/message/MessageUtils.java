@@ -490,7 +490,7 @@ public class MessageUtils {
      */
     public static boolean hasTokenPermission(TokenizerParams params, String permission) {
         // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (params == null || params.getSender() == null || params.getLocation() == MessageLocation.NONE || params.getSender().isConsole()) return true;
+        if (params == null || params.getSender() == null || params.getLocation() == MessageLocation.NONE || params.getSender().isConsole() || !params.containsPlayerInput()) return true;
 
         // Gets the full permission, e.g. rosechat.emoji.channel.global
         String fullPermission = permission + "." + params.getLocationPermission();
@@ -511,6 +511,7 @@ public class MessageUtils {
     public static boolean hasExtendedTokenPermission(TokenizerParams params, String permission, String extendedPermission) {
         // The sender will not have an extended permission if they do not have the base permission.
         if (!hasTokenPermission(params, permission)) return false;
+        if (!params.containsPlayerInput()) return true;
 
         return params.getSender().hasPermission(extendedPermission)
                 || params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))

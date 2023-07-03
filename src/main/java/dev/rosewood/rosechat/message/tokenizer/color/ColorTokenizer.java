@@ -28,8 +28,8 @@ public class ColorTokenizer implements Tokenizer {
         if (spigotHexToken != null) {
             int length = spigotHexToken.getContent().length();
             return (MessageUtils.hasTokenPermission(params, "rosechat.color"))
-                    ? new TokenizerResult(Token.builder().build(), length) // TODO: Color decorator
-                    : new TokenizerResult(Token.builder().content(spigotHexToken.getContent()).build(), length);
+                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    : new TokenizerResult(Token.builder().content(spigotHexToken.getContent()).resolve().build(), length);
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
@@ -41,27 +41,27 @@ public class ColorTokenizer implements Tokenizer {
                     || MessageUtils.hasTokenPermission(params, "rosechat." + ChatColor.getByChar(Character.toLowerCase(colorCode)).getName().toLowerCase());
 
             return canUseColors && hasColorPerm
-                    ? new TokenizerResult(Token.builder().build(), length) // TODO: Color decorator
-                    : new TokenizerResult(Token.builder().content(legacyToken.getContent()).build(), length);
+                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    : new TokenizerResult(Token.builder().content(legacyToken.getContent()).resolve().build(), length);
         }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
         if (hexToken != null) {
             int length = hexToken.getContent().length();
             return MessageUtils.hasTokenPermission(params, "rosechat.hex")
-                    ? new TokenizerResult(Token.builder().build(), length) // TODO: Color decorator
-                    : new TokenizerResult(Token.builder().content(hexToken.getContent()).build(), length);
+                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    : new TokenizerResult(Token.builder().content(hexToken.getContent()).resolve().build(), length);
         }
 
         // Handle color codes that are already parsed
         ColorToken legacyTokenParsed = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX_PARSED, input);
         if (legacyTokenParsed != null)
-            return new TokenizerResult(Token.builder().build(), legacyTokenParsed.getContent().length());
+            return new TokenizerResult(Token.builder().resolve().build(), legacyTokenParsed.getContent().length());
 
         // Handle hex codes that are already parsed
         ColorToken spigotHexTokenParsed = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX_PARSED, input);
         if (spigotHexTokenParsed != null)
-            return new TokenizerResult(Token.builder().build(), spigotHexTokenParsed.getContent().length());
+            return new TokenizerResult(Token.builder().resolve().build(), spigotHexTokenParsed.getContent().length());
 
         return null;
     }

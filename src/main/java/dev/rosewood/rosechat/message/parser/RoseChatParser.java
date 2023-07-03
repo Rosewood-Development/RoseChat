@@ -24,15 +24,15 @@ public class RoseChatParser implements MessageParser {
         }
 
         if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-            return MessageTokenizer.from(message, receiver, format, sender.isConsole(),
+            return MessageTokenizer.from(message, receiver, format,
                             Tokenizers.DISCORD_EMOJI_BUNDLE,
                             Tokenizers.MARKDOWN_BUNDLE,
                             Tokenizers.DISCORD_FORMATTING_BUNDLE,
                             Tokenizers.DEFAULT_BUNDLE).toComponents();
         } else {
-            return MessageTokenizer.from(message, receiver, format, sender.isConsole(),
-                            Tokenizers.DISCORD_EMOJI_BUNDLE,
-                            Tokenizers.DEFAULT_BUNDLE).toComponents();
+            return MessageTokenizer.from(message, receiver, format,
+                    Tokenizers.DISCORD_EMOJI_BUNDLE,
+                    Tokenizers.DEFAULT_BUNDLE).toComponents();
         }
 
 //        ComponentBuilder componentBuilder = new ComponentBuilder();

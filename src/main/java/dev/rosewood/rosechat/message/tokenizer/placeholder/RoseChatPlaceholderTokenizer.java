@@ -1,14 +1,11 @@
 package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
-import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
-import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.regex.Matcher;
@@ -28,7 +25,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer {
 
             // Hardcoded special {message} placeholder to inject the player's message
             if (placeholder.equals("message"))
-                return new TokenizerResult(Token.builder().content(params.getPlayerInput()).build(), matcher.group(1).length());
+                return new TokenizerResult(Token.builder().content(params.getPlayerInput()).containsPlayerInput().build(), matcher.group(1).length());
 
             RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder);
             if (roseChatPlaceholder == null)

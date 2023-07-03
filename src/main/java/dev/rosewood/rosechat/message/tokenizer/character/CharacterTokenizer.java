@@ -11,7 +11,7 @@ public class CharacterTokenizer implements Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        return new TokenizerResult(Token.builder().content(String.valueOf(params.getInput().charAt(0))).build(), 1);
+        return new TokenizerResult(Token.builder().content(String.valueOf(params.getInput().charAt(0))).resolve().build(), 1);
     }
 
 }

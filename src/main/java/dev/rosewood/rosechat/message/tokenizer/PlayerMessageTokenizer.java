@@ -16,7 +16,7 @@ public class PlayerMessageTokenizer implements MessageTokenizer {
     private final RosePlayer viewer;
     private final Token rootToken;
 
-    public PlayerMessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
+    public PlayerMessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).collect(Collectors.toList()));
@@ -52,7 +52,7 @@ public class PlayerMessageTokenizer implements MessageTokenizer {
         outer:
         while (!content.isEmpty()) {
             for (Tokenizer tokenizer : this.tokenizers) {
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content);
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result != null) {
                     token.addChild(result.getToken());
@@ -64,7 +64,8 @@ public class PlayerMessageTokenizer implements MessageTokenizer {
         }
 
         for (Token child : token.getChildren())
-            this.tokenizeContent(child, depth + 1);
+            if (!child.isResolved() || child.getChildren().isEmpty())
+                this.tokenizeContent(child, depth + 1);
     }
 
     @Override

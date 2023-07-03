@@ -8,12 +8,12 @@ public interface MessageTokenizer {
 
     BaseComponent[] toComponents();
 
-    static MessageTokenizer from(RoseMessage roseMessage, RosePlayer viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
+    static MessageTokenizer from(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
         if (viewer.isPlayer()) {
-            return new PlayerMessageTokenizer(roseMessage, viewer, message, ignorePermissions, tokenizerBundles);
+            return new PlayerMessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
         } else {
             // TODO: Implement console message tokenizer which ignores hovers and clicks
-            return new PlayerMessageTokenizer(roseMessage, viewer, message, ignorePermissions, tokenizerBundles);
+            return new PlayerMessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
         }
     }
 

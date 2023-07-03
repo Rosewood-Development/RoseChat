@@ -12,17 +12,19 @@ public class TokenizerParams {
     private final RosePlayer sender;
     private final RosePlayer receiver;
     private final String input;
+    private final boolean containsPlayerInput;
     private final String playerInput;
     private final MessageLocation location;
     private final String locationPermission;
     private final Channel channel;
     private final StringPlaceholders placeholders;
 
-    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input) {
+    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput) {
         this.outputs = new MessageOutputs();
         this.sender = message.getSender();
         this.receiver = receiver;
         this.input = input;
+        this.containsPlayerInput = containsPlayerInput;
         this.playerInput = message.getMessage();
         this.location = message.getLocation();
         this.locationPermission = message.getLocationPermission();
@@ -44,6 +46,10 @@ public class TokenizerParams {
 
     public String getInput() {
         return this.input;
+    }
+
+    public boolean containsPlayerInput() {
+        return this.containsPlayerInput;
     }
 
     public String getPlayerInput() {

@@ -7,12 +7,14 @@ public class Token {
 
     private final String content;
     private final List<Token> children;
+    private final boolean resolved;
     private final List<TokenDecorator> decorators;
     private final boolean containsPlayerInput;
 
-    private Token(String content, List<Token> children, List<TokenDecorator> decorators, boolean containsPlayerInput) {
+    private Token(String content, boolean resolved, List<TokenDecorator> decorators, boolean containsPlayerInput) {
         this.content = content;
-        this.children = children;
+        this.children = new ArrayList<>();
+        this.resolved = resolved;
         this.decorators = decorators;
         this.containsPlayerInput = containsPlayerInput;
     }
@@ -30,15 +32,15 @@ public class Token {
     }
 
     public boolean isResolved() {
-        return this.children.isEmpty();
-    }
-
-    public boolean containsPlayerInput() {
-        return this.containsPlayerInput;
+        return this.resolved;
     }
 
     public List<TokenDecorator> getDecorators() {
         return this.decorators;
+    }
+
+    public boolean containsPlayerInput() {
+        return this.containsPlayerInput;
     }
 
     public static Builder builder() {
@@ -48,13 +50,13 @@ public class Token {
     public static class Builder {
 
         private String content;
-        private final List<Token> children;
+        private boolean resolved;
         private final List<TokenDecorator> decorators;
         private boolean containsPlayerInput;
 
         private Builder() {
             this.content = "";
-            this.children = new ArrayList<>();
+            this.resolved = false;
             this.decorators = new ArrayList<>();
             this.containsPlayerInput = false;
         }
@@ -64,8 +66,8 @@ public class Token {
             return this;
         }
 
-        public Builder containsPlayerInput(boolean containsPlayerInput) {
-            this.containsPlayerInput = containsPlayerInput;
+        public Builder resolve() {
+            this.resolved = true;
             return this;
         }
 
@@ -74,8 +76,13 @@ public class Token {
             return this;
         }
 
+        public Builder containsPlayerInput() {
+            this.containsPlayerInput = true;
+            return this;
+        }
+
         public Token build() {
-            return new Token(this.content, this.children, this.decorators, this.containsPlayerInput);
+            return new Token(this.content, this.resolved, this.decorators, this.containsPlayerInput);
         }
 
     }
