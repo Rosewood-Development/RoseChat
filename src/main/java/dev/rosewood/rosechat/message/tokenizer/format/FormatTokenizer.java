@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 
@@ -24,9 +25,10 @@ public class FormatTokenizer implements Tokenizer {
             ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
             boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
             return hasPermission
-                    ? new TokenizerResult(Token.builder().resolve().build(), content.length()) // TODO: Format decorator
+                    ? new TokenizerResult(Token.builder().addDecorator(FormatDecorator.of(formatCode, value)).resolve().build(), content.length())
                     : new TokenizerResult(Token.builder().content(content).resolve().build(), content.length());
         }
+
         return null;
     }
 

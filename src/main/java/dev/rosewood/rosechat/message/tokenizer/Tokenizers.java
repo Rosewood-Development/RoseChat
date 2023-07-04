@@ -5,6 +5,7 @@ import com.google.common.collect.MultimapBuilder;
 import dev.rosewood.rosechat.message.tokenizer.character.CharacterTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.format.FormatTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import java.util.Collections;
 import java.util.List;
@@ -46,8 +47,8 @@ public class Tokenizers {
     public static final Tokenizer FORMAT = register("format", new FormatTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer URL = register("url", new URLTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
-//    public static final Tokenizer PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(false), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
-//    public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = register("bungee_papi", new PAPIPlaceholderTokenizer(true), BUNGEE_BUNDLE);
+    public static final Tokenizer PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(false), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
+    public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = register("bungee_papi", new PAPIPlaceholderTokenizer(true), BUNGEE_BUNDLE);
 //    public static final Tokenizer EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);

@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.Arrays;
 import java.util.List;
@@ -28,20 +29,19 @@ public class ColorTokenizer implements Tokenizer {
         if (spigotHexToken != null) {
             int length = spigotHexToken.getContent().length();
             return (MessageUtils.hasTokenPermission(params, "rosechat.color"))
-                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    ? new TokenizerResult(Token.builder().addDecorator(ColorDecorator.of(spigotHexToken.getColor())).resolve().build(), length)
                     : new TokenizerResult(Token.builder().content(spigotHexToken.getContent()).resolve().build(), length);
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) {
             int length = legacyToken.getContent().length();
-            char colorCode = legacyToken.getContent().charAt(1);
             boolean canUseColors = MessageUtils.hasTokenPermission(params, "rosechat.color");
             boolean hasColorPerm = !Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()
-                    || MessageUtils.hasTokenPermission(params, "rosechat." + ChatColor.getByChar(Character.toLowerCase(colorCode)).getName().toLowerCase());
+                    || MessageUtils.hasTokenPermission(params, "rosechat." + legacyToken.getColor().getName().toLowerCase());
 
             return canUseColors && hasColorPerm
-                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    ? new TokenizerResult(Token.builder().addDecorator(ColorDecorator.of(legacyToken.getColor())).resolve().build(), length)
                     : new TokenizerResult(Token.builder().content(legacyToken.getContent()).resolve().build(), length);
         }
 
@@ -49,19 +49,19 @@ public class ColorTokenizer implements Tokenizer {
         if (hexToken != null) {
             int length = hexToken.getContent().length();
             return MessageUtils.hasTokenPermission(params, "rosechat.hex")
-                    ? new TokenizerResult(Token.builder().resolve().build(), length) // TODO: Color decorator
+                    ? new TokenizerResult(Token.builder().addDecorator(ColorDecorator.of(hexToken.getColor())).resolve().build(), length)
                     : new TokenizerResult(Token.builder().content(hexToken.getContent()).resolve().build(), length);
         }
 
         // Handle color codes that are already parsed
         ColorToken legacyTokenParsed = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX_PARSED, input);
         if (legacyTokenParsed != null)
-            return new TokenizerResult(Token.builder().resolve().build(), legacyTokenParsed.getContent().length());
+            return new TokenizerResult(Token.builder().addDecorator(ColorDecorator.of(legacyTokenParsed.getColor())).resolve().build(), legacyTokenParsed.getContent().length());
 
         // Handle hex codes that are already parsed
         ColorToken spigotHexTokenParsed = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX_PARSED, input);
         if (spigotHexTokenParsed != null)
-            return new TokenizerResult(Token.builder().resolve().build(), spigotHexTokenParsed.getContent().length());
+            return new TokenizerResult(Token.builder().addDecorator(ColorDecorator.of(spigotHexTokenParsed.getColor())).resolve().build(), spigotHexTokenParsed.getContent().length());
 
         return null;
     }

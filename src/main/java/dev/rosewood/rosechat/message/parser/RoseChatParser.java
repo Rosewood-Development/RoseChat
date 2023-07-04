@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class RoseChatParser implements MessageParser {
 
@@ -24,13 +23,13 @@ public class RoseChatParser implements MessageParser {
         }
 
         if (Setting.USE_MARKDOWN_FORMATTING.getBoolean()) {
-            return MessageTokenizer.from(message, receiver, format,
+            return new MessageTokenizer(message, receiver, format,
                             Tokenizers.DISCORD_EMOJI_BUNDLE,
                             Tokenizers.MARKDOWN_BUNDLE,
                             Tokenizers.DISCORD_FORMATTING_BUNDLE,
                             Tokenizers.DEFAULT_BUNDLE).toComponents();
         } else {
-            return MessageTokenizer.from(message, receiver, format,
+            return new MessageTokenizer(message, receiver, format,
                     Tokenizers.DISCORD_EMOJI_BUNDLE,
                     Tokenizers.DEFAULT_BUNDLE).toComponents();
         }
