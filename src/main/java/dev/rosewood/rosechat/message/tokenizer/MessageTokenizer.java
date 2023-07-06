@@ -2,10 +2,12 @@ package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -20,11 +22,11 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final Token rootToken;
 
-    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, String... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).collect(Collectors.toList()));
-        this.rootToken = Token.group(message).build();
+        this.rootToken = Token.group(format == null ? "{message}" : format).build();
 
         this.tokenizeContent(this.rootToken, 0);
     }
@@ -45,7 +47,7 @@ public class MessageTokenizer {
         return mergedList;
     }
 
-    private void tokenizeContent(Token token, int depth) {
+    public void tokenizeContent(Token token, int depth) {
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot tokenize a token that is not of type GROUP");
 
@@ -53,7 +55,6 @@ public class MessageTokenizer {
             throw new RuntimeException("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.rootToken.getContent());
 
         String content = token.getContent();
-        List<Token> children = new ArrayList<>();
 
         outer:
         while (!content.isEmpty()) {
@@ -65,14 +66,12 @@ public class MessageTokenizer {
 
                 Token child = result.getToken();
                 child.parent = token;
-                children.add(child);
+                token.children.add(child);
                 content = content.substring(result.getConsumed());
                 continue outer;
             }
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
-
-        token.setChildren(children);
 
         if (token.getType() == TokenType.GROUP)
             for (Token child : token.getChildren())
@@ -82,41 +81,46 @@ public class MessageTokenizer {
 
     public BaseComponent[] toComponents() {
         BaseComponent[] components = this.toComponents(this.rootToken, new TokenDecorators());
-        RoseChat.getInstance().getLogger().warning(ComponentSerializer.toString(components));
+        RoseChat.getInstance().getLogger().warning(Arrays.stream(components).map(ComponentSerializer::toString).collect(Collectors.joining(",")));
         return components;
     }
 
-    private BaseComponent[] toComponents(Token token, TokenDecorators contextDecorators) {
+    public BaseComponent[] toComponents(Token token, TokenDecorators contextDecorators) {
+        if (token.getType() != TokenType.GROUP)
+            throw new IllegalStateException("Cannot convert a token that is not of type GROUP");
+
         ComponentBuilder componentBuilder = new ComponentBuilder();
+        StringBuilder contentBuilder = new StringBuilder();
 
-        switch (token.getType()) {
-            case TEXT -> {
-                TokenDecorators textDecorators = contextDecorators.copyWith(token.getDecorators());
-                componentBuilder.append(token.getContent(), FormatRetention.NONE);
-                if (!token.getContent().trim().isEmpty()) // Don't color empty text
-                    textDecorators.apply(componentBuilder);
+        for (Token child : token.getChildren()) {
+            if (child.getType() != TokenType.TEXT && !contentBuilder.isEmpty()) {
+                componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
+                contentBuilder.setLength(0);
+                contextDecorators.apply(componentBuilder, this);
             }
-            case DECORATOR -> contextDecorators.add(token.getDecorators());
-            case GROUP -> {
-                if (token.getDecorators().isEmpty()) {
-                    for (Token child : token.getChildren())
-                        for (BaseComponent component : this.toComponents(child, contextDecorators))
-                            componentBuilder.append(component, FormatRetention.NONE);
 
-                    contextDecorators.apply(componentBuilder);
-                } else {
-                    TextComponent groupComponent = new TextComponent();
-                    for (Token child : token.getChildren())
-                        for (BaseComponent component : this.toComponents(child, contextDecorators))
-                            groupComponent.addExtra(component);
-
-                    componentBuilder.append(groupComponent, FormatRetention.NONE);
-                    contextDecorators.apply(componentBuilder);
+            switch (child.getType()) {
+                case TEXT -> contentBuilder.append(child.getContent());
+                case DECORATOR -> contextDecorators.add(child.getDecorators());
+                case GROUP -> {
+                    for (BaseComponent component : this.toComponents(child, contextDecorators))
+                        componentBuilder.append(component, FormatRetention.NONE);
                 }
             }
         }
 
-        return componentBuilder.create();
+        if (!contentBuilder.isEmpty()) {
+            componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
+            contextDecorators.apply(componentBuilder, this);
+        }
+
+        BaseComponent[] components = componentBuilder.create();
+        if (token.isPlain() || components.length == 0)
+            return components;
+
+        TextComponent wrapperComponent = new TextComponent(components);
+        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this));
+        return new BaseComponent[] { wrapperComponent };
     }
 
     public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {

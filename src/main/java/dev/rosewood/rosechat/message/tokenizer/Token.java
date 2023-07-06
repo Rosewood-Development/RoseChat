@@ -7,9 +7,9 @@ import java.util.List;
 public class Token {
 
     protected Token parent; // Exposed and set in the MessageTokenizer class
-    private TokenType type;
-    private String content;
-    private final List<Token> children;
+    protected final List<Token> children; // Exposed and added to in the MessageTokenizer class
+    private final TokenType type;
+    private final String content;
     private final List<TokenDecorator> decorators;
     private final boolean containsPlayerInput;
 
@@ -52,45 +52,8 @@ public class Token {
         return this.children;
     }
 
-    protected void setChildren(List<Token> children) {
-        if (this.type != TokenType.GROUP)
-            throw new IllegalStateException("Cannot set children of a token that is not of type GROUP");
-
-        // Combine all children into a single token if they are all text and have no decorators and transform this into a single text token instead
-        if (children.stream().allMatch(x -> x.type == TokenType.TEXT && x.isPlain())) {
-            StringBuilder builder = new StringBuilder();
-            for (Token child : children)
-                builder.append(child.getContent());
-
-            this.content = builder.toString();
-            this.type = TokenType.TEXT;
-            return;
-        }
-
-        // If all children are decorators combine them into a single list and make this a decorator token
-        if (children.stream().allMatch(x -> x.type == TokenType.DECORATOR)) {
-            List<TokenDecorator> decorators = new ArrayList<>();
-            for (Token child : children)
-                decorators.addAll(child.getDecorators());
-
-            this.type = TokenType.DECORATOR;
-            this.decorators.addAll(decorators);
-            return;
-        }
-
-        this.children.clear();
-        this.children.addAll(children);
-    }
-
     /**
-     * Token decorators are applied differently depending on the state of this token:
-     * This token has no children:
-     *  - If this token's content is not empty, the decorators are applied to this token
-     *  - If this token's content is empty, the decorators are applied to the parent token's context
-     * This token has children:
-     *  - The decorators are applied to the children of this token
-     *
-     * @return the decorators belonging to this token
+     * @return the decorators to be applied to this token
      */
     public List<TokenDecorator> getDecorators() {
         return this.decorators;
@@ -106,7 +69,7 @@ public class Token {
     /**
      * @return true if this token has no decorators, false otherwise
      */
-    private boolean isPlain() {
+    public boolean isPlain() {
         return this.decorators.isEmpty();
     }
 

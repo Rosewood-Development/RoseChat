@@ -1,10 +1,31 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
+import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.Token;
+import java.util.function.BiFunction;
 import net.md_5.bungee.api.chat.BaseComponent;
 
-public interface TokenDecorator {
+public abstract class TokenDecorator {
 
-    void apply(BaseComponent component);
+    private final DecoratorType type;
+    protected final String content;
+
+    protected TokenDecorator(String content, DecoratorType type) {
+        this.content = content;
+        this.type = type;
+    }
+
+    protected TokenDecorator(DecoratorType type) {
+        this(null, type);
+    }
+
+    /**
+     * Applies this decorator to the given component.
+     *
+     * @param component The component to apply this decorator to
+     * @param tokenizer The tokenizer
+     */
+    public abstract void apply(BaseComponent component, MessageTokenizer tokenizer);
 
     /**
      * Checks if this decorator is overwritten by the given decorator.
@@ -12,7 +33,7 @@ public interface TokenDecorator {
      * @param newDecorator The decorator to check compatibility with
      * @return true if this decorator is overwritten by the given decorator
      */
-    boolean isOverwrittenBy(TokenDecorator newDecorator);
+    protected abstract boolean isOverwrittenBy(TokenDecorator newDecorator);
 
     /**
      * Checks if this decorator is a marker decorator.
@@ -20,8 +41,15 @@ public interface TokenDecorator {
      *
      * @return true if this decorator is a marker decorator
      */
-    default boolean isMarker() {
+    protected boolean isMarker() {
         return false;
+    }
+
+    /**
+     * @return the type of this decorator
+     */
+    public DecoratorType getType() {
+        return this.type;
     }
 
 }

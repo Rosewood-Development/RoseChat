@@ -6,10 +6,14 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 
 public class RoseChatPlaceholderTokenizer implements Tokenizer {
 
@@ -34,16 +38,17 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer {
 
             StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
             String content = placeholders.apply(roseChatPlaceholder.getText().parseToString(params.getSender(), params.getReceiver(), placeholders));
-//            String hover = roseChatPlaceholder.getHover() == null ? null : placeholders.apply(roseChatPlaceholder.getHover().parseToString(messageWrapper.getSender(), viewer, placeholders));
-//            String click = roseChatPlaceholder.getClick() == null ? null : placeholders.apply(roseChatPlaceholder.getClick().parseToString(messageWrapper.getSender(), viewer, placeholders));
-//            ClickEvent.Action clickAction = roseChatPlaceholder.getClick() == null ? null : roseChatPlaceholder.getClick().parseToAction(messageWrapper.getSender(), viewer, placeholders);
+            String hover = roseChatPlaceholder.getHover() == null ? null : placeholders.apply(roseChatPlaceholder.getHover().parseToString(params.getSender(), params.getReceiver(), placeholders));
+            String click = roseChatPlaceholder.getClick() == null ? null : placeholders.apply(roseChatPlaceholder.getClick().parseToString(params.getSender(), params.getReceiver(), placeholders));
+            ClickEvent.Action clickAction = roseChatPlaceholder.getClick() == null ? null : roseChatPlaceholder.getClick().parseToAction(params.getSender(), params.getReceiver(), placeholders);
 
-//            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).hover(hover).click(click).clickAction(clickAction).noCaching();
-//            if (originalContent.equals(content))
-//                tokenSettings.ignoreTokenizer(this);
-//            tokenSettings.retainColour(true);
+            Token.Builder tokenBuilder = Token.group(content);
+            if (hover != null)
+                tokenBuilder.addDecorator(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
+            if (click != null)
+                tokenBuilder.addDecorator(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
 
-            return new TokenizerResult(Token.group(content).build(), matcher.group(1).length());
+            return new TokenizerResult(tokenBuilder.build(), matcher.group(1).length());
         }
 
         return null;

@@ -1,6 +1,6 @@
-package dev.rosewood.rosechat.message.tokenizer;
+package dev.rosewood.rosechat.message.tokenizer.decorator;
 
-import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
+import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,22 +31,9 @@ public class TokenDecorators {
                 this.decorators.add(decorator);
     }
 
-    public void apply(ComponentBuilder builder) {
+    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer) {
         for (TokenDecorator decorator : this.decorators)
-            decorator.apply(builder.getCurrentComponent());
-    }
-
-    /**
-     * Creates a copy of this TokenDecorators with additional decorators added.
-     *
-     * @param toAdd The decorators to add
-     * @return a copy of this TokenDecorators with additional decorators added
-     */
-    public TokenDecorators copyWith(List<TokenDecorator> toAdd) {
-        TokenDecorators newDecorators = new TokenDecorators();
-        newDecorators.add(this.decorators);
-        newDecorators.add(toAdd);
-        return newDecorators;
+            decorator.apply(builder.getCurrentComponent(), tokenizer);
     }
 
 }
