@@ -5,11 +5,13 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class MessageTokenizer {
@@ -23,7 +25,7 @@ public class MessageTokenizer {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).collect(Collectors.toList()));
-        this.rootToken = Token.builder().content(message).build();
+        this.rootToken = Token.group(message).build();
 
         this.tokenizeContent(this.rootToken, 0);
     }
@@ -45,32 +47,38 @@ public class MessageTokenizer {
     }
 
     private void tokenizeContent(Token token, int depth) {
+        if (token.getType() != TokenType.GROUP)
+            throw new IllegalStateException("Cannot tokenize a token that is not of type GROUP");
+
         if (depth > 15)
             throw new RuntimeException("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.rootToken.getContent());
 
         String content = token.getContent();
-        if (content.isEmpty())
-            throw new IllegalStateException("Token with empty content was not marked as resolved");
+        List<Token> children = new ArrayList<>();
 
         outer:
         while (!content.isEmpty()) {
             for (Tokenizer tokenizer : this.tokenizers) {
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
                 TokenizerResult result = tokenizer.tokenize(params);
-                if (result != null) {
-                    Token child = result.getToken();
-                    child.parent = token;
-                    token.children.add(child);
-                    content = content.substring(result.getConsumed());
-                    continue outer;
-                }
+                if (result == null)
+                    continue;
+
+                Token child = result.getToken();
+                child.parent = token;
+                children.add(child);
+                content = content.substring(result.getConsumed());
+                continue outer;
             }
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
 
-        for (Token child : token.getChildren())
-            if (!child.isResolved())
-                this.tokenizeContent(child, depth + 1);
+        token.setChildren(children);
+
+        if (token.getType() == TokenType.GROUP)
+            for (Token child : token.getChildren())
+                if (child.getType() == TokenType.GROUP)
+                    this.tokenizeContent(child, depth + 1);
     }
 
     public BaseComponent[] toComponents() {
@@ -82,45 +90,35 @@ public class MessageTokenizer {
     private BaseComponent[] toComponents(Token token, TokenDecorators contextDecorators) {
         ComponentBuilder componentBuilder = new ComponentBuilder();
 
-        if (!token.hasChildren()) {
-            contextDecorators.add(token.getDecorators());
-
-            if (token.hasContent()) {
+        switch (token.getType()) {
+            case TEXT:
+                TokenDecorators textDecorators = contextDecorators.copyWith(token.getDecorators());
                 componentBuilder.append(token.getContent(), FormatRetention.NONE);
-                contextDecorators.apply(componentBuilder);
-            }
+                if (!token.getContent().trim().isEmpty()) // Don't color empty text
+                    textDecorators.apply(componentBuilder);
+                break;
 
-            return componentBuilder.create();
-        }
+            case DECORATOR:
+                contextDecorators.add(token.getDecorators());
+                break;
 
-        StringBuilder builder = new StringBuilder();
-        for (Token child : token.getChildren()) {
-            if (child.hasContent() && !child.hasDecorators() && !child.hasChildren()) {
-                builder.append(child.getContent());
-                continue;
-            }
+            case GROUP:
+                if (token.getDecorators().isEmpty()) {
+                    for (Token child : token.getChildren())
+                        for (BaseComponent component : this.toComponents(child, contextDecorators))
+                            componentBuilder.append(component, FormatRetention.NONE);
 
-            if (builder.length() > 0) {
-                componentBuilder.append(builder.toString(), FormatRetention.NONE);
-                builder.setLength(0);
-                contextDecorators.apply(componentBuilder);
-            }
+                    contextDecorators.apply(componentBuilder);
+                } else {
+                    TextComponent groupComponent = new TextComponent();
+                    for (Token child : token.getChildren())
+                        for (BaseComponent component : this.toComponents(child, contextDecorators))
+                            groupComponent.addExtra(component);
 
-            contextDecorators.add(child.getDecorators());
-
-            if (child.hasChildren()) {
-                BaseComponent[] components = this.toComponents(child, contextDecorators);
-                if (components.length > 0)
-                    componentBuilder.append(components, FormatRetention.NONE);
-            } else if (child.hasContent()) {
-                componentBuilder.append(child.getContent(), FormatRetention.NONE);
-                contextDecorators.apply(componentBuilder);
-            }
-        }
-
-        if (builder.length() > 0) {
-            componentBuilder.append(builder.toString(), FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder);
+                    componentBuilder.append(groupComponent, FormatRetention.NONE);
+                    contextDecorators.apply(componentBuilder);
+                }
+                break;
         }
 
         return componentBuilder.create();

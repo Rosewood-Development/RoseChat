@@ -25,8 +25,8 @@ public class FormatTokenizer implements Tokenizer {
             ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
             boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
             return hasPermission
-                    ? new TokenizerResult(Token.builder().addDecorator(FormatDecorator.of(formatCode, value)).resolve().build(), content.length())
-                    : new TokenizerResult(Token.builder().content(content).resolve().build(), content.length());
+                    ? new TokenizerResult(Token.decorator().addDecorator(FormatDecorator.of(formatCode, value)).build(), content.length())
+                    : new TokenizerResult(Token.text(content).build(), content.length());
         }
 
         return null;

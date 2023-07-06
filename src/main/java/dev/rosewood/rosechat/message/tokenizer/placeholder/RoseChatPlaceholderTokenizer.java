@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -27,7 +26,7 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer {
             // Hardcoded special {message} placeholder to inject the player's message
             // Do not let the {message} placeholder be used if the message contains player input
             if (placeholder.equals("message") && !params.containsPlayerInput())
-                return new TokenizerResult(Token.builder().content(params.getPlayerInput()).containsPlayerInput().build(), matcher.group(1).length());
+                return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group(1).length());
 
             RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder);
             if (roseChatPlaceholder == null)
@@ -43,8 +42,8 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer {
 //            if (originalContent.equals(content))
 //                tokenSettings.ignoreTokenizer(this);
 //            tokenSettings.retainColour(true);
-            RoseChat.getInstance().getLogger().info(placeholder + " -> " + content);
-            return new TokenizerResult(Token.builder().content(content).build(), matcher.group(1).length());
+
+            return new TokenizerResult(Token.group(content).build(), matcher.group(1).length());
         }
 
         return null;

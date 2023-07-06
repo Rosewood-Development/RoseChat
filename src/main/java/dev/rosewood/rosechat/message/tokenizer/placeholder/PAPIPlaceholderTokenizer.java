@@ -43,9 +43,9 @@ public class PAPIPlaceholderTokenizer implements Tokenizer {
             }
 
             if (Objects.equals(content, originalContent)) {
-                return new TokenizerResult(Token.builder().content(content).resolve().build(), originalContent.length());
+                return new TokenizerResult(Token.text(content).build(), originalContent.length());
             } else {
-                return new TokenizerResult(Token.builder().content(content).build(), originalContent.length());
+                return new TokenizerResult(Token.group(content).build(), originalContent.length());
             }
         }
 

@@ -7,76 +7,79 @@ import java.util.List;
 public class Token {
 
     protected Token parent; // Exposed and set in the MessageTokenizer class
-    protected final List<Token> children; // Exposed and set in the MessageTokenizer class
-    private final String content;
-    private final boolean resolved;
+    private TokenType type;
+    private String content;
+    private final List<Token> children;
     private final List<TokenDecorator> decorators;
     private final boolean containsPlayerInput;
 
-    private Token(String content, boolean resolved, List<TokenDecorator> decorators, boolean containsPlayerInput) {
+    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput) {
+        this.type = type;
         this.content = content;
         this.children = new ArrayList<>();
-        this.resolved = resolved;
         this.decorators = decorators;
         this.containsPlayerInput = containsPlayerInput;
     }
 
     /**
+     * @return the type of this token
+     */
+    public TokenType getType() {
+        return this.type;
+    }
+
+    /**
      * Gets the content of this token.
-     * If {@link #isResolved()} is true, this will be the final content of the token.
-     * If {@link #isResolved()} is false, this will be the raw content of the token.
      *
      * @return the content of this token
+     * @throws IllegalStateException if this token has a type of {@link TokenType#DECORATOR}
      */
     public String getContent() {
+        if (this.type == TokenType.DECORATOR)
+            throw new IllegalStateException("Cannot get content of a decorator token");
         return this.content;
     }
 
     /**
-     * @return true if this token has content, false otherwise
-     */
-    public boolean hasContent() {
-        return !this.content.isEmpty();
-    }
-
-    /**
+     * Gets the children of this token if it is of type {@link TokenType#GROUP}.
+     *
      * @return the effective children of this token
+     * @throws IllegalStateException if this token is not of type {@link TokenType#GROUP}
      */
     public List<Token> getChildren() {
-//        // Combine all children into a single token if they are all resolved and have no immediate decorators
-//        boolean allResolved = true;
-//        boolean allDecoratorsEmpty = true;
-//        for (Token child : this.children) {
-//            if (!child.isResolved())
-//                allResolved = false;
-//            if (!child.decorators.isEmpty())
-//                allDecoratorsEmpty = false;
-//        }
-//
-//        if (allResolved && allDecoratorsEmpty) {
-//            StringBuilder combinedContent = new StringBuilder();
-//            for (Token child : this.children)
-//                combinedContent.append(child.getContent());
-//            return Collections.singletonList(Token.builder().content(combinedContent.toString()).resolve().build());
-//        }
-
+        if (this.type != TokenType.GROUP)
+            throw new IllegalStateException("Cannot get children of a token that is not of type GROUP");
         return this.children;
     }
 
-    /**
-     * @return true if this token has children, false otherwise
-     */
-    public boolean hasChildren() {
-        return !this.children.isEmpty();
-    }
+    protected void setChildren(List<Token> children) {
+        if (this.type != TokenType.GROUP)
+            throw new IllegalStateException("Cannot set children of a token that is not of type GROUP");
 
-    /**
-     * This should NOT be used to determine how the Token is displayed.
-     *
-     * @return true if this token's content will be tokenized again, false otherwise
-     */
-    public boolean isResolved() {
-        return this.resolved;
+        // Combine all children into a single token if they are all text and have no decorators and transform this into a single text token instead
+        if (children.stream().allMatch(x -> x.type == TokenType.TEXT && x.isPlain())) {
+            StringBuilder builder = new StringBuilder();
+            for (Token child : children)
+                builder.append(child.getContent());
+
+            this.content = builder.toString();
+            this.type = TokenType.TEXT;
+            return;
+        }
+
+        // If all children are decorators combine them into a single list and make this a decorator token
+        if (children.stream().allMatch(x -> x.type == TokenType.DECORATOR)) {
+            List<TokenDecorator> decorators = new ArrayList<>();
+            for (Token child : children)
+                decorators.addAll(child.getDecorators());
+
+            this.type = TokenType.DECORATOR;
+            this.decorators.addAll(decorators);
+            return;
+        }
+
+        this.children.clear();
+        this.children.addAll(children);
     }
 
     /**
@@ -93,10 +96,6 @@ public class Token {
         return this.decorators;
     }
 
-    public boolean hasDecorators() {
-        return !this.decorators.isEmpty();
-    }
-
     /**
      * @return true if this token contains player input, false otherwise
      */
@@ -104,31 +103,41 @@ public class Token {
         return this.containsPlayerInput || (this.parent != null && this.parent.containsPlayerInput());
     }
 
-    public static Builder builder() {
-        return new Builder();
+    /**
+     * @return true if this token has no decorators, false otherwise
+     */
+    private boolean isPlain() {
+        return this.decorators.isEmpty();
+    }
+
+    public static Builder text(String value) {
+        return new Builder(TokenType.TEXT, value);
+    }
+
+    public static Builder group(String rawContent) {
+        return new Builder(TokenType.GROUP, rawContent);
+    }
+
+    public static Builder decorator() {
+        return new Builder(TokenType.DECORATOR, null);
     }
 
     public static class Builder {
 
+        private final TokenType tokenType;
         private String content;
-        private boolean resolved;
         private final List<TokenDecorator> decorators;
         private boolean containsPlayerInput;
 
-        private Builder() {
-            this.content = "";
-            this.resolved = false;
+        private Builder(TokenType tokenType, String content) {
+            this.tokenType = tokenType;
+            this.content = content;
             this.decorators = new ArrayList<>();
             this.containsPlayerInput = false;
         }
 
         public Builder content(String content) {
             this.content = content;
-            return this;
-        }
-
-        public Builder resolve() {
-            this.resolved = true;
             return this;
         }
 
@@ -143,7 +152,7 @@ public class Token {
         }
 
         public Token build() {
-            return new Token(this.content, this.resolved, this.decorators, this.containsPlayerInput);
+            return new Token(this.tokenType, this.content, this.decorators, this.containsPlayerInput);
         }
 
     }
