@@ -155,7 +155,7 @@ public class PlayerListener implements Listener {
                     if (input.equalsIgnoreCase("/" + command)) {
                         if (!ChannelCommand.processChannelSwitch(event.getPlayer(), channel.getId())) {
                             RoseChatAPI.getInstance().getLocaleManager()
-                                    .sendComponentMessage(event.getPlayer(), "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getId()));
+                                    .sendComponentMessage(event.getPlayer(), "command-channel-custom-usage", StringPlaceholders.of("channel", channel.getId()));
                         }
                     } else {
                         String message = input.substring(("/" + command + " ").length());

@@ -78,10 +78,10 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             UUID uuid = this.discord.getAccountLinkManager().getUuid(member.getId());
             String color = getColor(member);
             StringPlaceholders.Builder placeholders = StringPlaceholders.builder()
-                    .addPlaceholder("user_name", member.getUser().getName())
-                    .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
-                    .addPlaceholder("user_color", "#" + (color.length() == 5 ? "0" + color : color))
-                    .addPlaceholder("user_tag", member.getUser().getDiscriminator());
+                    .add("user_name", member.getUser().getName())
+                    .add("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
+                    .add("user_color", "#" + (color.length() == 5 ? "0" + color : color))
+                    .add("user_tag", member.getUser().getDiscriminator());
 
             // If not using the setting, or the player has never joined, use their discord name.
             if (!Setting.USE_IGN_WITH_DISCORD.getBoolean() || uuid == null) {
@@ -140,7 +140,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt()) return;
             if (!MessageUtils.isMessageEmpty(line)) {
                 RoseMessage messageWrapper = new RoseMessage(sender, channel, line);
-                messageWrapper.setPlaceholders(placeholders.addPlaceholder("user_nickname", name).build());
+                messageWrapper.setPlaceholders(placeholders.add("user_nickname", name).build());
 
                 MessageRules rules = new MessageRules();
                 if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {

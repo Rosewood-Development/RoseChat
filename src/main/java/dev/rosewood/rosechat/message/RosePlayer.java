@@ -25,7 +25,7 @@ public class RosePlayer {
     private String group;
     private OfflinePlayer player;
     private List<String> ignoredPermissions;
-    private Map<String, Boolean> cachedPermissions;
+    private final Map<String, Boolean> cachedPermissions;
 
     private RosePlayer() {
         this.api = RoseChatAPI.getInstance();
@@ -64,8 +64,7 @@ public class RosePlayer {
      */
     public RosePlayer(CommandSender sender) {
         this();
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player player) {
             this.player = player;
             this.displayName = player.getDisplayName();
         } else {
@@ -158,7 +157,7 @@ public class RosePlayer {
      * @return A list of permissions that were previously checked.
      */
     public Map<String, Boolean> getCachedPermissions() {
-        return cachedPermissions;
+        return this.cachedPermissions;
     }
 
     public void setIgnoredPermissions(List<String> permissions) {

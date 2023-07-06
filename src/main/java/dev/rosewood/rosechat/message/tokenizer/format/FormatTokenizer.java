@@ -33,20 +33,15 @@ public class FormatTokenizer implements Tokenizer {
     }
 
     public String getPermissionForFormat(char format) {
-        switch (format) {
-            case 'l':
-                return "rosechat.bold";
-            case 'n':
-                return "rosechat.underline";
-            case 'm':
-                return "rosechat.strikethrough";
-            case 'o':
-                return "rosechat.italic";
-            case 'k':
-                return "rosechat.magic";
-        }
+        return switch (format) {
+            case 'l' -> "rosechat.bold";
+            case 'n' -> "rosechat.underline";
+            case 'm' -> "rosechat.strikethrough";
+            case 'o' -> "rosechat.italic";
+            case 'k' -> "rosechat.magic";
+            default -> null;
+        };
 
-        return null;
     }
 
 }

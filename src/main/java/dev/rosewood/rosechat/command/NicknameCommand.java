@@ -37,7 +37,7 @@ public class NicknameCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || (args.length == 1 && !(sender instanceof Player))) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -52,7 +52,7 @@ public class NicknameCommand extends AbstractCommand {
 
         // If the player only entered a player name, show the syntax.
         if (args.length == 1 && target != null && target != sender) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -64,9 +64,9 @@ public class NicknameCommand extends AbstractCommand {
             data.save();
 
             if (player == sender) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.of("name", player.getName()));
             } else {
-                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.single("name", player.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.of("name", player.getName()));
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
                         StringPlaceholders.builder("name", player.getName()).addPlaceholder("player", player.getName()).build());
             }
@@ -84,7 +84,7 @@ public class NicknameCommand extends AbstractCommand {
                     nickname = getAllArgs(0, args);
                 }
                 else {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found", StringPlaceholders.single("syntax", getSyntax()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found", StringPlaceholders.of("syntax", getSyntax()));
                     return;
                 }
             } else {
@@ -131,9 +131,9 @@ public class NicknameCommand extends AbstractCommand {
                 data.save();
 
                 if (roseTarget.getUUID().equals(roseSender.getUUID())) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.single("name", data.getNickname()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.of("name", data.getNickname()));
                 } else {
-                    this.getAPI().getLocaleManager().sendComponentMessage(roseTarget, "command-nickname-success", StringPlaceholders.single("name", data.getNickname()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(roseTarget, "command-nickname-success", StringPlaceholders.of("name", data.getNickname()));
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
                             StringPlaceholders.builder("name", data.getNickname()).addPlaceholder("player", roseTarget.getName()).build());
                 }

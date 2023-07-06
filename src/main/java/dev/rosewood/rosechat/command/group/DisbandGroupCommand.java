@@ -20,7 +20,7 @@ public class DisbandGroupCommand extends AbstractCommand {
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
             if (!(sender instanceof Player)) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
                 return;
             }
 
@@ -34,7 +34,7 @@ public class DisbandGroupCommand extends AbstractCommand {
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
 
@@ -52,12 +52,12 @@ public class DisbandGroupCommand extends AbstractCommand {
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.single("name", groupChat.getName()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
 
             this.getAPI().deleteGroupChat(groupChat);
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.single("name", groupChat.getName()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.of("name", groupChat.getName()));
         } else {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "no-permission");
         }

@@ -19,7 +19,7 @@ public class MuteCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || args.length == 2) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -40,7 +40,7 @@ public class MuteCommand extends AbstractCommand {
         int muteTime = -1;
         if (args.length == 1) {
             String name = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.single("player", name));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-indefinite", StringPlaceholders.of("player", name));
             this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");
             targetData.mute(-1);
             targetData.save();
@@ -86,7 +86,7 @@ public class MuteCommand extends AbstractCommand {
                         }
                         break;
                     default:
-                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                        this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
                         return;
                 }
             } catch (NumberFormatException e) {

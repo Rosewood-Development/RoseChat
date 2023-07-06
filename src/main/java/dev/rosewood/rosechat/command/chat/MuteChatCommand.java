@@ -16,7 +16,7 @@ public class MuteChatCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             return;
         }
 
@@ -29,10 +29,10 @@ public class MuteChatCommand extends AbstractCommand {
         channel.setMuted(!channel.isMuted());
 
         if (channel.isMuted()) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-muted", StringPlaceholders.single("channel", channel.getId()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-muted", StringPlaceholders.of("channel", channel.getId()));
             this.getAPI().getPlayerDataManager().addMutedChannel(channel);
         } else {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.single("channel", channel.getId()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-mute-unmuted", StringPlaceholders.of("channel", channel.getId()));
             this.getAPI().getPlayerDataManager().removeMutedChannel(channel);
         }
     }

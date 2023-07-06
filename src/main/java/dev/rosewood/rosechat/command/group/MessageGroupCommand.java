@@ -24,14 +24,14 @@ public class MessageGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
         if (args.length == 1) {
             if (Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean()) {
                 if (!processChannelSwitch(sender, args[0])) {
-                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+                    this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
                 }
                 return;
             }
@@ -115,7 +115,7 @@ public class MessageGroupCommand extends AbstractCommand {
             playerData.setIsInGroupChannel(true);
             playerData.save();
 
-            api.getLocaleManager().sendComponentMessage(sender, "command-channel-joined", StringPlaceholders.single("id", newChannel.getName()));
+            api.getLocaleManager().sendComponentMessage(sender, "command-channel-joined", StringPlaceholders.of("id", newChannel.getName()));
             return true;
         } else {
             return false;

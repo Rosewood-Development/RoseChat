@@ -175,9 +175,9 @@ public class PacketListener {
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                        .addPlaceholder("id", messageId)
-                        .addPlaceholder("type", "client")
-                        .addPlaceholder("message", "").build());
+                        .add("id", messageId)
+                        .add("type", "client")
+                        .add("message", "").build());
 
         if (deleteClientButton == null) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
@@ -202,7 +202,7 @@ public class PacketListener {
 
         String text = placeholder.getText().parseToString(sender, sender,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                        .addPlaceholder("type", "client").build());
+                        .add("type", "client").build());
         return text.trim().startsWith("%message%");
     }
 

@@ -56,7 +56,7 @@ public class Tokenizers {
     public static final Tokenizer CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 
     public static List<Tokenizer> getBundleValues(String bundle) {
-        return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::getTokenizer).collect(Collectors.toList()));
+        return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::tokenizer).collect(Collectors.toList()));
     }
 
     /**
@@ -79,7 +79,7 @@ public class Tokenizers {
             bundles = new String[] { DEFAULT_BUNDLE };
         for (String bundle : bundles) {
             List<TokenizerEntry> tokenizerEntries = (List<TokenizerEntry>) TOKENIZERS.get(bundle);
-            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.getName().equals(after)).findFirst().orElse(null));
+            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.name().equals(after)).findFirst().orElse(null));
             if (index == -1)
                 throw new IllegalArgumentException("Could not find tokenizer with name " + after + " in bundle " + bundle);
             tokenizerEntries.add(index + 1, new TokenizerEntry(name, tokenizer));
@@ -92,7 +92,7 @@ public class Tokenizers {
             bundles = new String[] { DEFAULT_BUNDLE };
         for (String bundle : bundles) {
             List<TokenizerEntry> tokenizerEntries = (List<TokenizerEntry>) TOKENIZERS.get(bundle);
-            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.getName().equals(before)).findFirst().orElse(null));
+            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.name().equals(before)).findFirst().orElse(null));
             if (index == -1)
                 throw new IllegalArgumentException("Could not find tokenizer with name " + before + " in bundle " + bundle);
             tokenizerEntries.add(index, new TokenizerEntry(name, tokenizer));
@@ -100,23 +100,7 @@ public class Tokenizers {
         return tokenizer;
     }
 
-    public static class TokenizerEntry {
-
-        private final String name;
-        private final Tokenizer tokenizer;
-
-        public TokenizerEntry(String name, Tokenizer tokenizer) {
-            this.name = name;
-            this.tokenizer = tokenizer;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public Tokenizer getTokenizer() {
-            return this.tokenizer;
-        }
+    public record TokenizerEntry(String name, Tokenizer tokenizer) {
 
     }
 

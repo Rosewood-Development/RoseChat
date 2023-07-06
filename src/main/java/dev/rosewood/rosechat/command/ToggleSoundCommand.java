@@ -22,7 +22,7 @@ public class ToggleSoundCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || !this.arguments.contains(args[0])) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -69,10 +69,10 @@ public class ToggleSoundCommand extends AbstractCommand {
 
     private void sendToggleMessage(CommandSender sender, String[] args, boolean nowOn) {
         if (nowOn)
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglesound-on", StringPlaceholders.single("type",
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglesound-on", StringPlaceholders.of("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-togglesound-" + args[0].toLowerCase())));
         else
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglesound-off", StringPlaceholders.single("type",
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-togglesound-off", StringPlaceholders.of("type",
                     this.getAPI().getLocaleManager().getLocaleMessage("command-togglesound-" + args[0].toLowerCase())));
     }
 

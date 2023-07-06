@@ -21,7 +21,7 @@ public class MembersGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -32,7 +32,7 @@ public class MembersGroupCommand extends AbstractCommand {
             return;
         }
 
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-members-title", StringPlaceholders.single("name", groupChat.getName()));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-members-title", StringPlaceholders.of("name", groupChat.getName()));
         for (UUID uuid : groupChat.getMembers()) {
             OfflinePlayer member = Bukkit.getOfflinePlayer(uuid);
 
@@ -40,7 +40,7 @@ public class MembersGroupCommand extends AbstractCommand {
             String name = data == null ? member.getName() : (data.getNickname() == null ? member.getName() : data.getNickname());
 
             this.getAPI().getLocaleManager().sendComponentMessage(sender,
-                    uuid.equals(groupChat.getOwner()) ? "command-gc-members-owner" : "command-gc-members-member", StringPlaceholders.single("player", name));
+                    uuid.equals(groupChat.getOwner()) ? "command-gc-members-owner" : "command-gc-members-member", StringPlaceholders.of("player", name));
         }
     }
 

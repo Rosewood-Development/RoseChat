@@ -8,7 +8,7 @@
 //import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 //import java.util.regex.Matcher;
 //
-//public class ShaderTokenizer implements Tokenizer<Token> {
+//public class ShaderTokenizer implements Tokenizer {
 //
 //    @Override
 //    public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {

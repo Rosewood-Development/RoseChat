@@ -67,9 +67,9 @@ public class MessageListener implements Listener {
 
        String text = placeholder.getText().parseToString(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(),
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
-                        .addPlaceholder("id", event.getMessage().getUUID())
-                        .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getLocationPermission().replace("channel.", "")).build());
+                        .add("id", event.getMessage().getUUID())
+                        .add("type", "server")
+                        .add("channel", event.getMessage().getLocationPermission().replace("channel.", "")).build());
         return text.trim().startsWith("%message%");
     }
 
@@ -78,10 +78,10 @@ public class MessageListener implements Listener {
 
         return RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(), placeholder,
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
-                        .addPlaceholder("id", event.getMessage().getUUID())
-                        .addPlaceholder("type", "server")
-                        .addPlaceholder("channel", event.getMessage().getLocationPermission().replace("channel.", ""))
-                        .addPlaceholder("message", "").build());
+                        .add("id", event.getMessage().getUUID())
+                        .add("type", "server")
+                        .add("channel", event.getMessage().getLocationPermission().replace("channel.", ""))
+                        .add("message", "").build());
     }
 
 }

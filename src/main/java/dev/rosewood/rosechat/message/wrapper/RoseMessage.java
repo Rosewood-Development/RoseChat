@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.message.wrapper;
 
+import com.google.common.base.Stopwatch;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -13,6 +15,7 @@ import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
@@ -116,7 +119,9 @@ public class RoseMessage {
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (preParseMessageEvent.isCancelled()) return null;
+        Stopwatch stopwatch = Stopwatch.createStarted();
         this.components = parser.parse(this, this.sender, viewer, format);
+        RoseChat.getInstance().getLogger().warning("Parsing took " + (stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1_000_000D) + "ms");
 
         // Only call the PostParseMessageEvent if the message has a format.
         // This prevents non-chat messages from having delete buttons.

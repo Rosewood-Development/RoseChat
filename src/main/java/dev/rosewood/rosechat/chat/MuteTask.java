@@ -19,7 +19,11 @@ public class MuteTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        if (this.data == null) this.cancel();
+        if (this.data == null) {
+            this.cancel();
+            return;
+        }
+        
         Player player = Bukkit.getPlayer(this.data.getUUID());
         if (player == null) this.cancel();
         if (this.data.isMuteExpired()) {

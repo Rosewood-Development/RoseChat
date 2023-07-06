@@ -29,7 +29,7 @@ public class NickColorCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(uuid);
 
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 

@@ -16,6 +16,7 @@ import java.util.List;
  * but no help menu will be shown.
  * @deprecated Use {@link dev.rosewood.rosegarden.manager.AbstractCommandManager} instead.
  */
+@Deprecated
 public class SeniorCommandManager extends CommandManager {
 
     /**
@@ -64,7 +65,7 @@ public class SeniorCommandManager extends CommandManager {
             }
         }
 
-        this.localeManager.sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getMainSyntax()));
+        this.localeManager.sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getMainSyntax()));
         return true;
     }
 

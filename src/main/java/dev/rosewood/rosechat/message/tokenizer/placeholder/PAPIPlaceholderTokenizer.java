@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class PAPIPlaceholderTokenizer implements Tokenizer {
 
-    private static final Pattern PAPI_PATTERN = Pattern.compile("\\%(.*?)\\%");
+    private static final Pattern PAPI_PATTERN = Pattern.compile("%(.*?)%");
     private final boolean isBungee;
 
     public PAPIPlaceholderTokenizer(boolean isBungee) {

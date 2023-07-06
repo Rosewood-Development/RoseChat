@@ -131,18 +131,18 @@ public class MessageUtils {
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .addPlaceholder("player_name", sender.getName())
-                .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname());
+                .add("player_name", sender.getName())
+                .add("player_displayname", sender.getDisplayName())
+                .add("player_nickname", sender.getNickname());
 
         if (viewer != null) {
-            builder.addPlaceholder("other_player_name", viewer.getName())
-                    .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                    .addPlaceholder("other_player_nickname", viewer.getNickname());
+            builder.add("other_player_name", viewer.getName())
+                    .add("other_player_displayname", viewer.getDisplayName())
+                    .add("other_player_nickname", viewer.getNickname());
         }
 
         Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
+        if (vault != null) builder.add("vault_rank", sender.getGroup());
         return builder;
     }
 
@@ -157,7 +157,7 @@ public class MessageUtils {
         else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
 
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("channel", channel.getId());;
+        builder.add("channel", channel.getId());;
         return builder;
     }
 
@@ -185,9 +185,9 @@ public class MessageUtils {
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("group", group.getId())
-                .addPlaceholder("group_name", group.getName())
-                .addPlaceholder("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
+        builder.add("group", group.getId())
+                .add("group_name", group.getName())
+                .add("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
 
         return builder;
     }
@@ -460,18 +460,13 @@ public class MessageUtils {
      * @return The converted string, as Discord formatting.
      */
     private static String getDiscordFormatting(char c) {
-        switch (Character.toLowerCase(c)) {
-            case 'o':
-                return "*";
-            case 'n':
-                return "__";
-            case 'm':
-                return "~~";
-            case 'l':
-                return "**";
-            default:
-                return "";
-        }
+        return switch (Character.toLowerCase(c)) {
+            case 'o' -> "*";
+            case 'n' -> "__";
+            case 'm' -> "~~";
+            case 'l' -> "**";
+            default -> "";
+        };
     }
 
     public static String getCaptureGroup(Matcher matcher, String group) {

@@ -27,7 +27,7 @@ public class ChatColorCommand extends AbstractCommand {
         PlayerData playerData = this.getAPI().getPlayerData(uuid);
 
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -51,7 +51,7 @@ public class ChatColorCommand extends AbstractCommand {
         colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : (colorStr.startsWith("<g") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-gradient") : colorStr.startsWith("<r:") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-rainbow") : colorStr);
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.single("color", ChatColor.stripColor(color + colorStr)));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.of("color", ChatColor.stripColor(color + colorStr)));
         playerData.setColor(color);
         playerData.save();
     }

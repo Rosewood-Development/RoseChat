@@ -21,8 +21,8 @@ public class ListGroupCommand extends AbstractCommand {
         groupManager.getAllGroupInfo((infoList) -> {
             for (GroupManager.GroupInfo info : infoList) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-format",
-                        StringPlaceholders.builder("group", info.getName())
-                                .addPlaceholder("id",info.getId()).build(), false);
+                        StringPlaceholders.builder("group", info.name())
+                                .addPlaceholder("id",info.id()).build(), false);
             }
 
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-more", false);

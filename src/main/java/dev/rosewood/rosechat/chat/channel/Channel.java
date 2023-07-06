@@ -121,7 +121,7 @@ public abstract class Channel {
             this.onJoin(player);
 
         api.getLocaleManager().sendMessage(player,
-                "command-channel-joined", StringPlaceholders.single("id", this.getId()));
+                "command-channel-joined", StringPlaceholders.of("id", this.getId()));
 
     }
 
@@ -156,7 +156,7 @@ public abstract class Channel {
         foundChannel.onJoin(player);
         data.setCurrentChannel(foundChannel);
         api.getLocaleManager().sendMessage(player,
-                    "command-channel-joined", StringPlaceholders.single("id", foundChannel.getId()));
+                    "command-channel-joined", StringPlaceholders.of("id", foundChannel.getId()));
     }
 
     /**
@@ -246,13 +246,13 @@ public abstract class Channel {
      */
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return StringPlaceholders.builder()
-                .addPlaceholder("default", this.isDefaultChannel() ? trueValue : falseValue)
-                .addPlaceholder("muted", this.isMuted() ? trueValue : falseValue)
-                .addPlaceholder("members", this.getMemberCount(sender))
-                .addPlaceholder("players", this.getMemberCount(sender))
-                .addPlaceholder("id", this.getId())
-                .addPlaceholder("format", this.getFormat() == null ? nullValue : this.getFormat())
-                .addPlaceholder("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
+                .add("default", this.isDefaultChannel() ? trueValue : falseValue)
+                .add("muted", this.isMuted() ? trueValue : falseValue)
+                .add("members", this.getMemberCount(sender))
+                .add("players", this.getMemberCount(sender))
+                .add("id", this.getId())
+                .add("format", this.getFormat() == null ? nullValue : this.getFormat())
+                .add("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
     }
 
     public ChannelProvider getProvider() {

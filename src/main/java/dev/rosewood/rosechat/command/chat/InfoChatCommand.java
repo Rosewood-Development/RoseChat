@@ -17,7 +17,7 @@ public class InfoChatCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             return;
         }
 
@@ -31,7 +31,7 @@ public class InfoChatCommand extends AbstractCommand {
         String localeFalse = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-false");
         String localeNone = this.getAPI().getLocaleManager().getLocaleMessage("command-chat-info-none");
 
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-title", StringPlaceholders.single("id", channel.getId()), false);
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-title", StringPlaceholders.of("id", channel.getId()), false);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-info-format",
                 channel.getInfoPlaceholders(new RosePlayer(sender), localeTrue, localeFalse, localeNone).build(), false);
     }

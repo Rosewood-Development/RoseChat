@@ -18,7 +18,7 @@ public class ToggleChatCommand extends AbstractCommand {
     @Override // /chat toggle global
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             return;
         }
 
@@ -39,11 +39,11 @@ public class ToggleChatCommand extends AbstractCommand {
         if (data.isChannelHidden(channel.getId())) {
             data.showChannel(channel.getId());
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-toggle-on",
-                    StringPlaceholders.single("channel", channel.getId()));
+                    StringPlaceholders.of("channel", channel.getId()));
         } else {
             data.hideChannel(channel.getId());
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-toggle-off",
-                    StringPlaceholders.single("channel", channel.getId()));
+                    StringPlaceholders.of("channel", channel.getId()));
         }
     }
 

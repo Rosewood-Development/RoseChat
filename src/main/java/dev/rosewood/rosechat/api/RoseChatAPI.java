@@ -176,8 +176,8 @@ public final class RoseChatAPI {
         // Get the deleted message placeholder.
         BaseComponent[] deletedMessageFormat = MessageUtils.parseDeletedMessagePlaceholder(player, player,
                 MessageUtils.getSenderViewerPlaceholders(player, player)
-                        .addPlaceholder("id", uuid.toString())
-                        .addPlaceholder("type", messageToDelete.isClient() ? "client" : "server").build(), messageToDelete);
+                        .add("id", uuid.toString())
+                        .add("type", messageToDelete.isClient() ? "client" : "server").build(), messageToDelete);
 
         boolean updated = false;
         if (deletedMessageFormat != null && !TextComponent.toPlainText(deletedMessageFormat).isEmpty()) {

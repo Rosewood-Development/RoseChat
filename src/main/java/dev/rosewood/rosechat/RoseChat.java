@@ -57,7 +57,6 @@ import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
-import dev.rosewood.rosechat.listener.ChatPreviewListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
@@ -172,8 +171,6 @@ public class RoseChat extends RosePlugin {
         // Register Listeners
         pluginManager.registerEvents(new ChatListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
-        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean())
-            pluginManager.registerEvents(new ChatPreviewListener(), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));

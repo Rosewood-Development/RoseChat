@@ -50,7 +50,7 @@ public class MoveChatCommand extends AbstractCommand {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-move-success",
                 StringPlaceholders.builder("player", name)
                         .addPlaceholder("channel", channel.getId()).build());
-        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.single("channel", channel.getId()));
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-chat-move-moved", StringPlaceholders.of("channel", channel.getId()));
     }
 
     @Override

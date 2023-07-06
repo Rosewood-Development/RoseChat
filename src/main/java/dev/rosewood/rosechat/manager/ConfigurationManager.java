@@ -73,9 +73,6 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "rather than when they set their nickname."),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
-        CHAT_PREVIEW("chat-settings.chat-preview", true, "Should chat preview be enabled for 1.19.1 and 1.19.2 servers?",
-                "You will also need to set previews-chat=true in the server.properties file.",
-                "Enabling this setting will disable message signing from clients due to technical limitations."),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true,
                 "Should players be allowed to message other players on connected servers?", "Requires BungeeCord"),
         BUNGEECORD_MESSAGE_TIMEOUT("chat-settings.bungeecord-message-timeout", 500,

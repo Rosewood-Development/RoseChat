@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -21,7 +20,7 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final Token rootToken;
 
-    public MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).collect(Collectors.toList()));
@@ -30,7 +29,7 @@ public class MessageTokenizer {
         this.tokenizeContent(this.rootToken, 0);
     }
 
-    public static <T> List<T> zipperMerge(List<List<T>> listOfLists) {
+    private static <T> List<T> zipperMerge(List<List<T>> listOfLists) {
         List<T> mergedList = new ArrayList<>();
         int maxSize = 0;
 
@@ -91,18 +90,14 @@ public class MessageTokenizer {
         ComponentBuilder componentBuilder = new ComponentBuilder();
 
         switch (token.getType()) {
-            case TEXT:
+            case TEXT -> {
                 TokenDecorators textDecorators = contextDecorators.copyWith(token.getDecorators());
                 componentBuilder.append(token.getContent(), FormatRetention.NONE);
                 if (!token.getContent().trim().isEmpty()) // Don't color empty text
                     textDecorators.apply(componentBuilder);
-                break;
-
-            case DECORATOR:
-                contextDecorators.add(token.getDecorators());
-                break;
-
-            case GROUP:
+            }
+            case DECORATOR -> contextDecorators.add(token.getDecorators());
+            case GROUP -> {
                 if (token.getDecorators().isEmpty()) {
                     for (Token child : token.getChildren())
                         for (BaseComponent component : this.toComponents(child, contextDecorators))
@@ -118,10 +113,14 @@ public class MessageTokenizer {
                     componentBuilder.append(groupComponent, FormatRetention.NONE);
                     contextDecorators.apply(componentBuilder);
                 }
-                break;
+            }
         }
 
         return componentBuilder.create();
+    }
+
+    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
+        return new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles).toComponents();
     }
 
 }

@@ -21,7 +21,7 @@ public class KickGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -49,7 +49,7 @@ public class KickGroupCommand extends AbstractCommand {
         if (target.isOnline()) {
             Player kicked = Bukkit.getPlayer(target.getUniqueId());
             if (kicked != null) {
-                this.getAPI().getLocaleManager().sendComponentMessage(kicked, "command-gc-kick-kicked", StringPlaceholders.single("name", groupChat.getName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(kicked, "command-gc-kick-kicked", StringPlaceholders.of("name", groupChat.getName()));
             }
         }
 
