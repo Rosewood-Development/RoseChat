@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 
@@ -14,7 +15,7 @@ public class ColorDecorator extends TokenDecorator {
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer) {
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
         component.setColor(this.chatColor);
     }
 
@@ -22,7 +23,7 @@ public class ColorDecorator extends TokenDecorator {
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
         if (newDecorator instanceof FormatDecorator formatDecorator)
             return formatDecorator.chatColor == ChatColor.RESET;
-        return newDecorator instanceof ColorDecorator;
+        return super.isOverwrittenBy(newDecorator);
     }
 
     public static ColorDecorator of(ChatColor chatColor) {

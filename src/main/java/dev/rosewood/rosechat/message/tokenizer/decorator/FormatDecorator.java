@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 
@@ -16,7 +17,7 @@ public class FormatDecorator extends TokenDecorator {
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer) {
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
         if (this.chatColor == ChatColor.BOLD) {
             if (this.value)
                 component.setBold(true);

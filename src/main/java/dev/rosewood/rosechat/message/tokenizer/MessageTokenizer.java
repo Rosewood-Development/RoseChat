@@ -1,13 +1,16 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
+import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
+import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -25,26 +28,10 @@ public class MessageTokenizer {
     private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, String... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
-        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).collect(Collectors.toList()));
-        this.rootToken = Token.group(format == null ? "{message}" : format).build();
+        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).toList());
+        this.rootToken = Token.group(Objects.requireNonNullElse(format, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER)).build();
 
         this.tokenizeContent(this.rootToken, 0);
-    }
-
-    private static <T> List<T> zipperMerge(List<List<T>> listOfLists) {
-        List<T> mergedList = new ArrayList<>();
-        int maxSize = 0;
-
-        for (List<T> list : listOfLists)
-            if (list.size() > maxSize)
-                maxSize = list.size();
-
-        for (int i = 0; i < maxSize; i++)
-            for (List<T> list : listOfLists)
-                if (i < list.size())
-                    mergedList.add(list.get(i));
-
-        return mergedList;
     }
 
     public void tokenizeContent(Token token, int depth) {
@@ -96,14 +83,21 @@ public class MessageTokenizer {
             if (child.getType() != TokenType.TEXT && !contentBuilder.isEmpty()) {
                 componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
                 contentBuilder.setLength(0);
-                contextDecorators.apply(componentBuilder, this);
+                contextDecorators.apply(componentBuilder, this, child.getPlaceholders());
             }
 
             switch (child.getType()) {
                 case TEXT -> contentBuilder.append(child.getContent());
                 case DECORATOR -> contextDecorators.add(child.getDecorators());
                 case GROUP -> {
-                    for (BaseComponent component : this.toComponents(child, contextDecorators))
+                    TokenDecorators childDecorators;
+                    if (child.shouldEncapsulate()) {
+                        childDecorators = new TokenDecorators(contextDecorators);
+                    } else {
+                        childDecorators = contextDecorators;
+                    }
+
+                    for (BaseComponent component : this.toComponents(child, childDecorators))
                         componentBuilder.append(component, FormatRetention.NONE);
                 }
             }
@@ -111,7 +105,7 @@ public class MessageTokenizer {
 
         if (!contentBuilder.isEmpty()) {
             componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder, this);
+            contextDecorators.apply(componentBuilder, this, token.getPlaceholders());
         }
 
         BaseComponent[] components = componentBuilder.create();
@@ -119,12 +113,48 @@ public class MessageTokenizer {
             return components;
 
         TextComponent wrapperComponent = new TextComponent(components);
-        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this));
+        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this, token.getPlaceholders()));
         return new BaseComponent[] { wrapperComponent };
     }
 
     public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
-        return new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles).toComponents();
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
+        BaseComponent[] components = tokenizer.toComponents();
+        RoseChat.getInstance().getLogger().warning("Parsing took " + (stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1_000_000D) + "ms with " + countTokens(tokenizer.rootToken) + " tokens");
+        return components;
+    }
+
+    private static int countTokens(Token token) {
+        if (token.getType() != TokenType.GROUP)
+            return 1;
+
+        int count = 1;
+        for (Token child : token.getChildren())
+            count += countTokens(child);
+        return count;
+    }
+
+    private static <T> List<T> zipperMerge(List<List<T>> listOfLists) {
+        if (listOfLists.isEmpty())
+            return new ArrayList<>();
+
+        if (listOfLists.size() == 1)
+            return listOfLists.get(0);
+
+        List<T> mergedList = new ArrayList<>();
+        int maxSize = 0;
+
+        for (List<T> list : listOfLists)
+            if (list.size() > maxSize)
+                maxSize = list.size();
+
+        for (int i = 0; i < maxSize; i++)
+            for (List<T> list : listOfLists)
+                if (i < list.size())
+                    mergedList.add(list.get(i));
+
+        return mergedList;
     }
 
 }

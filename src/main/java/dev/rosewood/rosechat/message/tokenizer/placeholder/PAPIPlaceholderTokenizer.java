@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class PAPIPlaceholderTokenizer implements Tokenizer {
 
-    private static final Pattern PAPI_PATTERN = Pattern.compile("%(.*?)%");
+    private static final Pattern PATTERN = Pattern.compile("%(.*?)%");
     private final boolean isBungee;
 
     public PAPIPlaceholderTokenizer(boolean isBungee) {
@@ -24,9 +24,10 @@ public class PAPIPlaceholderTokenizer implements Tokenizer {
         String input = params.getInput();
         if (!input.startsWith("%")) return null;
 
-        Matcher matcher = PAPI_PATTERN.matcher(input);
+        Matcher matcher = PATTERN.matcher(input);
         if (matcher.find()) {
             if (matcher.start() != 0) return null;
+
             String placeholder = input.substring(1, matcher.end() - 1);
             String placeholderPermission = placeholder.replaceFirst("_", ".");
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))

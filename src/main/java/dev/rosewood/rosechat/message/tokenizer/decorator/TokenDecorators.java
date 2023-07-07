@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,10 @@ public class TokenDecorators {
 
     public TokenDecorators() {
         this.decorators = new ArrayList<>();
+    }
+
+    public TokenDecorators(TokenDecorators decorators) {
+        this.decorators = new ArrayList<>(decorators.decorators);
     }
 
     public void add(List<TokenDecorator> toAdd) {
@@ -31,9 +36,9 @@ public class TokenDecorators {
                 this.decorators.add(decorator);
     }
 
-    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer) {
+    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
         for (TokenDecorator decorator : this.decorators)
-            decorator.apply(builder.getCurrentComponent(), tokenizer);
+            decorator.apply(builder.getCurrentComponent(), tokenizer, placeholders);
     }
 
 }

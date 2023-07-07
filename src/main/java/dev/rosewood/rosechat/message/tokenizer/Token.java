@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +13,17 @@ public class Token {
     private final String content;
     private final List<TokenDecorator> decorators;
     private final boolean containsPlayerInput;
+    private final StringPlaceholders placeholders;
+    private final boolean encapsulate;
 
-    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput) {
+    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput, StringPlaceholders placeholders, boolean encapsulate) {
         this.type = type;
         this.content = content;
         this.children = new ArrayList<>();
         this.decorators = decorators;
         this.containsPlayerInput = containsPlayerInput;
+        this.placeholders = placeholders;
+        this.encapsulate = encapsulate;
     }
 
     /**
@@ -36,8 +41,8 @@ public class Token {
      */
     public String getContent() {
         if (this.type == TokenType.DECORATOR)
-            throw new IllegalStateException("Cannot get content of a decorator token");
-        return this.content;
+            throw new IllegalStateException("Cannot get content of a token that is of type DECORATOR");
+        return this.getPlaceholders().apply(this.content);
     }
 
     /**
@@ -73,6 +78,21 @@ public class Token {
         return this.decorators.isEmpty();
     }
 
+    /**
+     * @return true if this token should use an encapsulated decorator context, false otherwise
+     */
+    public boolean shouldEncapsulate() {
+        return this.encapsulate;
+    }
+
+    protected StringPlaceholders getPlaceholders() {
+        StringPlaceholders.Builder builder = StringPlaceholders.builder();
+        builder.addAll(this.placeholders);
+        if (this.parent != null)
+            builder.addAll(this.parent.getPlaceholders());
+        return builder.build();
+    }
+
     public static Builder text(String value) {
         return new Builder(TokenType.TEXT, value);
     }
@@ -91,6 +111,8 @@ public class Token {
         private String content;
         private final List<TokenDecorator> decorators;
         private boolean containsPlayerInput;
+        private StringPlaceholders.Builder placeholders;
+        private boolean encapsulate;
 
         private Builder(TokenType tokenType, String content) {
             this.tokenType = tokenType;
@@ -104,7 +126,7 @@ public class Token {
             return this;
         }
 
-        public Builder addDecorator(TokenDecorator decorator) {
+        public Builder decorate(TokenDecorator decorator) {
             this.decorators.add(decorator);
             return this;
         }
@@ -114,8 +136,34 @@ public class Token {
             return this;
         }
 
+        public Builder placeholder(String placeholder, Object value) {
+            if (this.placeholders == null)
+                this.placeholders = StringPlaceholders.builder();
+            this.placeholders.add(placeholder, value);
+            return this;
+        }
+
+        public Builder placeholders(StringPlaceholders placeholders) {
+            if (this.placeholders == null)
+                this.placeholders = StringPlaceholders.builder();
+            this.placeholders.addAll(placeholders);
+            return this;
+        }
+
+        public Builder encapsulate() {
+            this.encapsulate = true;
+            return this;
+        }
+
         public Token build() {
-            return new Token(this.tokenType, this.content, this.decorators, this.containsPlayerInput);
+            return new Token(
+                    this.tokenType,
+                    this.content,
+                    this.decorators,
+                    this.containsPlayerInput,
+                    this.placeholders == null ? StringPlaceholders.empty() : this.placeholders.build(),
+                    this.encapsulate
+            );
         }
 
     }

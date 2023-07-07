@@ -17,22 +17,27 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 public class RoseChatPlaceholderTokenizer implements Tokenizer {
 
-    public static final Pattern PATTERN = Pattern.compile("^(\\{(.*?)}).*");
+    public static final String MESSAGE_PLACEHOLDER = "{message}";
+    public static final Pattern PATTERN = Pattern.compile("^\\{(.*?)}");
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        Matcher matcher = PATTERN.matcher(params.getInput());
+        String input = params.getInput();
+        if (!input.startsWith("{")) return null;
+
+        Matcher matcher = PATTERN.matcher(input);
         if (matcher.find()) {
-            String placeholder = matcher.group(2);
-            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholder))
+            String placeholder = matcher.group();
+            String placeholderValue = matcher.group(1);
+            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue))
                 return null;
 
             // Hardcoded special {message} placeholder to inject the player's message
             // Do not let the {message} placeholder be used if the message contains player input
-            if (placeholder.equals("message") && !params.containsPlayerInput())
-                return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group(1).length());
+            if (placeholder.equals(MESSAGE_PLACEHOLDER) && !params.containsPlayerInput())
+                return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
 
-            RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder);
+            RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
             if (roseChatPlaceholder == null)
                 return null;
 
@@ -44,11 +49,11 @@ public class RoseChatPlaceholderTokenizer implements Tokenizer {
 
             Token.Builder tokenBuilder = Token.group(content);
             if (hover != null)
-                tokenBuilder.addDecorator(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
+                tokenBuilder.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
             if (click != null)
-                tokenBuilder.addDecorator(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
+                tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
 
-            return new TokenizerResult(tokenBuilder.build(), matcher.group(1).length());
+            return new TokenizerResult(tokenBuilder.build(), placeholder.length());
         }
 
         return null;

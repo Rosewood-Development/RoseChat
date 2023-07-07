@@ -119,9 +119,7 @@ public class RoseMessage {
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (preParseMessageEvent.isCancelled()) return null;
-        Stopwatch stopwatch = Stopwatch.createStarted();
         this.components = parser.parse(this, this.sender, viewer, format);
-        RoseChat.getInstance().getLogger().warning("Parsing took " + (stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1_000_000D) + "ms");
 
         // Only call the PostParseMessageEvent if the message has a format.
         // This prevents non-chat messages from having delete buttons.

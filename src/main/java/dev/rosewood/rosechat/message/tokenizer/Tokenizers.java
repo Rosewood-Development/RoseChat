@@ -7,9 +7,8 @@ import dev.rosewood.rosechat.message.tokenizer.color.ColorTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.format.FormatTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import java.util.Collections;
+import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownURLTokenizer;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Tokenizers {
 
@@ -40,12 +39,12 @@ public class Tokenizers {
 //    public static final Tokenizer MARKDOWN_ITALIC = register("markdown_italic", new MarkdownItalicTokenizer(), MARKDOWN_BUNDLE);
 //    public static final Tokenizer MARKDOWN_UNDERLINE = register("markdown_underline", new MarkdownUnderlineTokenizer(), MARKDOWN_BUNDLE);
 //    public static final Tokenizer MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), MARKDOWN_BUNDLE);
+    public static final Tokenizer MARKDOWN_URL = register("markdown_url", new MarkdownURLTokenizer(), MARKDOWN_BUNDLE);
 //    public static final Tokenizer GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer SHADER_COLORS = register("shader_colors", new ShaderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer FORMAT = register("format", new FormatTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);
-//    public static final Tokenizer URL = register("url", new URLTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer ROSECHAT_PLACEHOLDER = register("rosechat", new RoseChatPlaceholderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(false), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = register("bungee_papi", new PAPIPlaceholderTokenizer(true), BUNGEE_BUNDLE);
@@ -56,7 +55,7 @@ public class Tokenizers {
     public static final Tokenizer CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 
     public static List<Tokenizer> getBundleValues(String bundle) {
-        return Collections.unmodifiableList(TOKENIZERS.get(bundle).stream().map(TokenizerEntry::tokenizer).collect(Collectors.toList()));
+        return TOKENIZERS.get(bundle).stream().map(TokenizerEntry::tokenizer).toList();
     }
 
     /**
