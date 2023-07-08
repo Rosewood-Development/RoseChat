@@ -3,7 +3,9 @@ package dev.rosewood.rosechat.message.tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Token {
 
@@ -15,8 +17,9 @@ public class Token {
     private final boolean containsPlayerInput;
     private final StringPlaceholders placeholders;
     private final boolean encapsulate;
+    private final Set<Tokenizer> ignoredTokenizers;
 
-    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput, StringPlaceholders placeholders, boolean encapsulate) {
+    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput, StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
         this.type = type;
         this.content = content;
         this.children = new ArrayList<>();
@@ -24,6 +27,7 @@ public class Token {
         this.containsPlayerInput = containsPlayerInput;
         this.placeholders = placeholders;
         this.encapsulate = encapsulate;
+        this.ignoredTokenizers = ignoredTokenizers;
     }
 
     /**
@@ -85,6 +89,16 @@ public class Token {
         return this.encapsulate;
     }
 
+    /**
+     * Checks if a Tokenizer should be ignored.
+     *
+     * @param tokenizer The Tokenizer to check
+     * @return true if the Tokenizer should be ignored, false otherwise
+     */
+    public boolean ignoresTokenizer(Tokenizer tokenizer) {
+        return this.ignoredTokenizers.contains(tokenizer);
+    }
+
     protected StringPlaceholders getPlaceholders() {
         StringPlaceholders.Builder builder = StringPlaceholders.builder();
         builder.addAll(this.placeholders);
@@ -113,6 +127,7 @@ public class Token {
         private boolean containsPlayerInput;
         private StringPlaceholders.Builder placeholders;
         private boolean encapsulate;
+        private Set<Tokenizer> ignoredTokenizers;
 
         private Builder(TokenType tokenType, String content) {
             this.tokenType = tokenType;
@@ -155,6 +170,13 @@ public class Token {
             return this;
         }
 
+        public Builder ignoreTokenizer(Tokenizer tokenizer) {
+            if (this.ignoredTokenizers == null)
+                this.ignoredTokenizers = new HashSet<>();
+            this.ignoredTokenizers.add(tokenizer);
+            return this;
+        }
+
         public Token build() {
             return new Token(
                     this.tokenType,
@@ -162,7 +184,8 @@ public class Token {
                     this.decorators,
                     this.containsPlayerInput,
                     this.placeholders == null ? StringPlaceholders.empty() : this.placeholders.build(),
-                    this.encapsulate
+                    this.encapsulate,
+                    this.ignoredTokenizers == null ? Set.of() : this.ignoredTokenizers
             );
         }
 

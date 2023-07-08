@@ -48,6 +48,9 @@ public class MessageTokenizer {
         outer:
         while (!content.isEmpty()) {
             for (Tokenizer tokenizer : this.tokenizers) {
+                if (token.ignoresTokenizer(tokenizer))
+                    continue;
+
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
@@ -183,11 +186,14 @@ public class MessageTokenizer {
                     }
                 }
                 case GROUP -> {
-                    if (!child.shouldEncapsulate())
+                    if (!counting.get() || !child.shouldEncapsulate())
                         length += this.findDecoratorContentLength(child, decorator, counting);
                 }
             }
         }
+
+        if (token.shouldEncapsulate())
+            counting.set(false);
 
         return length;
     }

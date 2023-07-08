@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTo
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownURLTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.GradientTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.RainbowTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.tag.TagTokenizer;
 import java.util.List;
 
 public class Tokenizers {
@@ -51,7 +52,7 @@ public class Tokenizers {
     public static final Tokenizer PAPI_PLACEHOLDER = register("papi", new PAPIPlaceholderTokenizer(false), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = register("bungee_papi", new PAPIPlaceholderTokenizer(true), BUNGEE_BUNDLE);
 //    public static final Tokenizer EMOJI = register("emoji", new EmojiTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
-//    public static final Tokenizer TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
+    public static final Tokenizer TAG = register("tag", new TagTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer REGEX_REPLACEMENT = register("regex", new RegexReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer REPLACEMENT = register("replacement", new ReplacementTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer CHARACTER = register("character", new CharacterTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
