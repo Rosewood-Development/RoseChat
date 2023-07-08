@@ -41,4 +41,11 @@ public class TokenDecorators {
             decorator.apply(builder.getCurrentComponent(), tokenizer, placeholders);
     }
 
+    public boolean blocksTextStitching() {
+        for (TokenDecorator decorator : this.decorators)
+            if (decorator.blocksTextStitching())
+                return true;
+        return false;
+    }
+
 }

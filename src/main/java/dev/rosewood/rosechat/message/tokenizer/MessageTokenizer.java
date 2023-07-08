@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -80,7 +82,7 @@ public class MessageTokenizer {
         StringBuilder contentBuilder = new StringBuilder();
 
         for (Token child : token.getChildren()) {
-            if (child.getType() != TokenType.TEXT && !contentBuilder.isEmpty()) {
+            if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty()) {
                 componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
                 contentBuilder.setLength(0);
                 contextDecorators.apply(componentBuilder, this, child.getPlaceholders());
@@ -155,6 +157,39 @@ public class MessageTokenizer {
                     mergedList.add(list.get(i));
 
         return mergedList;
+    }
+
+    public int findDecoratorContentLength(TokenDecorator decorator) {
+        return this.findDecoratorContentLength(this.rootToken, decorator, new AtomicBoolean());
+    }
+
+    private int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {
+        if (token.getType() != TokenType.GROUP)
+            throw new IllegalStateException("Cannot find decorator content length of a token that is not of type GROUP");
+
+        int length = 0;
+        for (Token child : token.getChildren()) {
+            switch (child.getType()) {
+                case TEXT -> {
+                    if (counting.get())
+                        length += child.getContent().replaceAll("\\s", "").length();
+                }
+                case DECORATOR -> {
+                    if (counting.get() && child.getDecorators().stream().anyMatch(decorator::isOverwrittenBy)) {
+                        counting.set(false);
+                        return length;
+                    } else if (child.getDecorators().contains(decorator)) {
+                        counting.set(true);
+                    }
+                }
+                case GROUP -> {
+                    if (!child.shouldEncapsulate())
+                        length += this.findDecoratorContentLength(child, decorator, counting);
+                }
+            }
+        }
+
+        return length;
     }
 
 }

@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.message.tokenizer.color;
+package dev.rosewood.rosechat.message.tokenizer.style;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;

@@ -25,11 +25,6 @@ public class HoverDecorator extends TokenDecorator {
             component.setHoverEvent(new HoverEvent(this.action, hover));
     }
 
-    @Override
-    protected boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return newDecorator instanceof HoverDecorator;
-    }
-
     public static HoverDecorator of(HoverEvent.Action action, String content) {
         return new HoverDecorator(Objects.requireNonNullElse(action, HoverEvent.Action.SHOW_TEXT), content);
     }

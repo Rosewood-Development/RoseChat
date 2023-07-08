@@ -3,11 +3,13 @@ package dev.rosewood.rosechat.message.tokenizer;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import dev.rosewood.rosechat.message.tokenizer.character.CharacterTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.color.ColorTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.format.FormatTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.style.ColorTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.style.FormatTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownURLTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.style.GradientTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.style.RainbowTokenizer;
 import java.util.List;
 
 public class Tokenizers {
@@ -40,8 +42,8 @@ public class Tokenizers {
 //    public static final Tokenizer MARKDOWN_UNDERLINE = register("markdown_underline", new MarkdownUnderlineTokenizer(), MARKDOWN_BUNDLE);
 //    public static final Tokenizer MARKDOWN_STRIKETHROUGH = register("markdown_strikethrough", new MarkdownStrikethroughTokenizer(), MARKDOWN_BUNDLE);
     public static final Tokenizer MARKDOWN_URL = register("markdown_url", new MarkdownURLTokenizer(), MARKDOWN_BUNDLE);
-//    public static final Tokenizer GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
-//    public static final Tokenizer RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);
+    public static final Tokenizer GRADIENT = register("gradient", new GradientTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
+    public static final Tokenizer RAINBOW = register("rainbow", new RainbowTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);
 //    public static final Tokenizer SHADER_COLORS = register("shader_colors", new ShaderTokenizer(), DEFAULT_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer COLOR = register("color", new ColorTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, DEFAULT_DISCORD_BUNDLE, BUNGEE_BUNDLE);
     public static final Tokenizer FORMAT = register("format", new FormatTokenizer(), DEFAULT_BUNDLE, COLORS_BUNDLE, BUNGEE_BUNDLE);

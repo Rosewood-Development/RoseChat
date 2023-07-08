@@ -36,7 +36,7 @@ public abstract class TokenDecorator {
      * @param newDecorator The decorator to check compatibility with
      * @return true if this decorator is overwritten by the given decorator
      */
-    protected boolean isOverwrittenBy(TokenDecorator newDecorator) {
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
         return this.getClass() == newDecorator.getClass();
     }
 
@@ -47,6 +47,16 @@ public abstract class TokenDecorator {
      * @return true if this decorator is a marker decorator
      */
     protected boolean isMarker() {
+        return false;
+    }
+
+    /**
+     * Checks if this decorator blocks text stitching.
+     * Text stitching is the process of combining multiple text components into one.
+     *
+     * @return true if this decorator blocks text stitching
+     */
+    public boolean blocksTextStitching() {
         return false;
     }
 
