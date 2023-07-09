@@ -72,9 +72,7 @@ public class MessageTokenizer {
     }
 
     public BaseComponent[] toComponents() {
-        BaseComponent[] components = this.toComponents(this.rootToken, new TokenDecorators());
-        RoseChat.getInstance().getLogger().warning(Arrays.stream(components).map(ComponentSerializer::toString).collect(Collectors.joining(",")));
-        return components;
+        return this.toComponents(this.rootToken, new TokenDecorators());
     }
 
     public BaseComponent[] toComponents(Token token, TokenDecorators contextDecorators) {
