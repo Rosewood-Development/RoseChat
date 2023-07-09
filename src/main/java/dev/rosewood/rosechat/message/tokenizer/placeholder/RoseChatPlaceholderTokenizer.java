@@ -15,10 +15,14 @@ import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
-public class RoseChatPlaceholderTokenizer implements Tokenizer {
+public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
     public static final String MESSAGE_PLACEHOLDER = "{message}";
     public static final Pattern PATTERN = Pattern.compile("^\\{(.*?)}");
+
+    public RoseChatPlaceholderTokenizer() {
+        super("rosechat");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

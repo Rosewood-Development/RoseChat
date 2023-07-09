@@ -9,7 +9,11 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 
-public class FormatTokenizer implements Tokenizer {
+public class FormatTokenizer extends Tokenizer {
+
+    public FormatTokenizer() {
+        super("format");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

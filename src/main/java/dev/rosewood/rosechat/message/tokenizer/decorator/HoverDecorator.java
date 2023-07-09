@@ -7,6 +7,7 @@ import java.util.Objects;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
+@SuppressWarnings("deprecation")
 public class HoverDecorator extends TokenDecorator {
 
     private final HoverEvent.Action action;

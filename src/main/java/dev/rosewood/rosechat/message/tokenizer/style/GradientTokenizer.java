@@ -1,13 +1,11 @@
 package dev.rosewood.rosechat.message.tokenizer.style;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
-import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.awt.Color;
 import java.util.Arrays;
@@ -15,7 +13,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
-public class GradientTokenizer implements Tokenizer {
+public class GradientTokenizer extends Tokenizer {
+
+    public GradientTokenizer() {
+        super("gradient");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

@@ -12,6 +12,7 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
@@ -93,17 +94,16 @@ public class NicknameCommand extends AbstractCommand {
         }
 
         // Ignore shader colours in the nickname.
-        // TODO
-//        if (nickname.contains("#")) {
-//            Matcher matcher = MessageUtils.HEX_REGEX.matcher(nickname);
-//            if (matcher.find()) {
-//                String match = nickname.substring(matcher.start(), matcher.end());
-//                if (ConfigurationManager.Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
-//                    String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
-//                    nickname = nickname.replace(match, "#" + freeHex);
-//                }
-//            }
-//        }
+        if (nickname.contains("#")) {
+            Matcher matcher = MessageUtils.HEX_REGEX.matcher(nickname);
+            if (matcher.find()) {
+                String match = nickname.substring(matcher.start(), matcher.end());
+                if (ConfigurationManager.Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
+                    String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
+                    nickname = nickname.replace(match, "#" + freeHex);
+                }
+            }
+        }
 
         RosePlayer roseSender = new RosePlayer(sender);
         RosePlayer roseTarget = new RosePlayer(target);

@@ -122,7 +122,7 @@ public class Token {
     public static class Builder {
 
         private final TokenType tokenType;
-        private String content;
+        private final String content;
         private final List<TokenDecorator> decorators;
         private boolean containsPlayerInput;
         private StringPlaceholders.Builder placeholders;
@@ -134,11 +134,6 @@ public class Token {
             this.content = content;
             this.decorators = new ArrayList<>();
             this.containsPlayerInput = false;
-        }
-
-        public Builder content(String content) {
-            this.content = content;
-            return this;
         }
 
         public Builder decorate(TokenDecorator decorator) {

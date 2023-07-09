@@ -20,7 +20,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class TagTokenizer implements Tokenizer {
+public class TagTokenizer extends Tokenizer {
+
+    public TagTokenizer() {
+        super("tag");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

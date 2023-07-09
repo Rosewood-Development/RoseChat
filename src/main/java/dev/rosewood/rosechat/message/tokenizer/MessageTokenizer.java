@@ -27,10 +27,10 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final Token rootToken;
 
-    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, String... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, Tokenizers.TokenizerBundle... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
-        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers::getBundleValues).toList());
+        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
         this.rootToken = Token.group(Objects.requireNonNullElse(format, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER)).build();
 
         this.tokenizeContent(this.rootToken, 0);
@@ -122,12 +122,8 @@ public class MessageTokenizer {
         return new BaseComponent[] { wrapperComponent };
     }
 
-    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
-        BaseComponent[] components = tokenizer.toComponents();
-        RoseChat.getInstance().getLogger().warning("Parsing took " + (stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1_000_000D) + "ms with " + countTokens(tokenizer.rootToken) + " tokens");
-        return components;
+    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        return new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles).toComponents();
     }
 
     private static int countTokens(Token token) {

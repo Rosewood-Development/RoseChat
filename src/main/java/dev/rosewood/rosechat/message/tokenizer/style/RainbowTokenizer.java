@@ -10,7 +10,11 @@ import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
-public class RainbowTokenizer implements Tokenizer {
+public class RainbowTokenizer extends Tokenizer {
+
+    public RainbowTokenizer() {
+        super("rainbow");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

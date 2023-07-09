@@ -14,9 +14,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.ChatColor;
 
-public class ColorTokenizer implements Tokenizer {
+public class ColorTokenizer extends Tokenizer {
 
     private static final List<Character> COLOR_PREFIX_CHARACTERS = Arrays.asList('&', ChatColor.COLOR_CHAR, '#', '{', '<');
+
+    public ColorTokenizer() {
+        super("color");
+    }
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {

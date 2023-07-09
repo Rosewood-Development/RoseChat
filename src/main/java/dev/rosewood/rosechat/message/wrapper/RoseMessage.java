@@ -10,8 +10,11 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageLog;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.parser.BungeeParser;
+import dev.rosewood.rosechat.message.parser.FromDiscordParser;
 import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.parser.RoseChatParser;
+import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
@@ -158,9 +161,8 @@ public class RoseMessage {
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
-//        FromDiscordParser parser = new FromDiscordParser();
-//        return this.parse(parser, viewer, format, discordId);
-        throw new UnsupportedOperationException();
+        FromDiscordParser parser = new FromDiscordParser();
+        return this.parse(parser, viewer, format, discordId);
     }
 
     /**
@@ -172,9 +174,8 @@ public class RoseMessage {
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseMessageToDiscord(RosePlayer viewer, String format) {
-//        ToDiscordParser parser = new ToDiscordParser();
-//        return this.parse(parser, viewer, format, null);
-        throw new UnsupportedOperationException();
+        ToDiscordParser parser = new ToDiscordParser();
+        return this.parse(parser, viewer, format, null);
     }
 
     /**
@@ -186,9 +187,8 @@ public class RoseMessage {
      * @return A {@link BaseComponent[]} containing the parsed message.
      */
     public BaseComponent[] parseBungeeMessage(RosePlayer viewer, String format) {
-//        BungeeParser parser = new BungeeParser();
-//        return this.parse(parser, viewer, format, null);
-        throw new UnsupportedOperationException();
+        BungeeParser parser = new BungeeParser();
+        return this.parse(parser, viewer, format, null);
     }
 
     /**
