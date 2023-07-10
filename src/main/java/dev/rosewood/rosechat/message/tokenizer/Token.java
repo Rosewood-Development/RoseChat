@@ -115,8 +115,8 @@ public class Token {
         return new Builder(TokenType.GROUP, rawContent);
     }
 
-    public static Builder decorator() {
-        return new Builder(TokenType.DECORATOR, null);
+    public static Builder decorator(TokenDecorator decorator) {
+        return new Builder(TokenType.DECORATOR, null).decorate(decorator);
     }
 
     public static class Builder {

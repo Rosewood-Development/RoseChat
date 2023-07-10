@@ -130,35 +130,31 @@ public class Tokenizers {
     public static final TokenizerBundle DISCORD_EMOJI_BUNDLE = new TokenizerBundle("discord_emoji",
             DISCORD_EMOJI);
 
-//    public static Tokenizer registerAfter(String after, String name, Tokenizer tokenizer, TokenizerBundle... bundles) {
-//        if (bundles.length == 0)
-//            bundles = new TokenizerBundle[] { DEFAULT_BUNDLE };
-//        for (TokenizerBundle bundle : bundles) {
-//            List<TokenizerEntry> tokenizerEntries = (List<TokenizerEntry>) TOKENIZERS.get(bundle);
-//            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.name().equals(after)).findFirst().orElse(null));
-//            if (index == -1)
-//                throw new IllegalArgumentException("Could not find tokenizer with name " + after + " in bundle " + bundle);
-//            tokenizerEntries.add(index + 1, new TokenizerEntry(name, tokenizer));
-//        }
-//        return tokenizer;
-//    }
-//
-//    public static Tokenizer registerBefore(String before, String name, Tokenizer tokenizer, TokenizerBundle... bundles) {
-//        if (bundles.length == 0)
-//            bundles = new TokenizerBundle[] { DEFAULT_BUNDLE };
-//        for (TokenizerBundle bundle : bundles) {
-//            List<TokenizerEntry> tokenizerEntries = (List<TokenizerEntry>) TOKENIZERS.get(bundle);
-//            int index = tokenizerEntries.indexOf(tokenizerEntries.stream().filter(tokenizerEntry -> tokenizerEntry.name().equals(before)).findFirst().orElse(null));
-//            if (index == -1)
-//                throw new IllegalArgumentException("Could not find tokenizer with name " + before + " in bundle " + bundle);
-//            tokenizerEntries.add(index, new TokenizerEntry(name, tokenizer));
-//        }
-//        return tokenizer;
-//    }
-
     public record TokenizerBundle(String name, List<Tokenizer> tokenizers) {
         public TokenizerBundle(String name, Tokenizer... tokenizers) {
             this(name, new ArrayList<>(Arrays.asList(tokenizers)));
+        }
+
+        public void registerBefore(Tokenizer target, Tokenizer tokenizer) {
+            int index = this.tokenizers.indexOf(target);
+            if (index == -1)
+                throw new IllegalArgumentException("Could not find tokenizer with name " + target + " in bundle " + this.name);
+            this.tokenizers.add(index, tokenizer);
+        }
+
+        public void registerBefore(String before, Tokenizer tokenizer) {
+            this.registerBefore(this.tokenizers.stream().filter(x -> x.getName().equals(before)).findFirst().orElse(null), tokenizer);
+        }
+
+        public void registerAfter(Tokenizer after, Tokenizer tokenizer) {
+            int index = this.tokenizers.indexOf(after);
+            if (index == -1)
+                throw new IllegalArgumentException("Could not find tokenizer with name " + after + " in bundle " + this.name);
+            this.tokenizers.add(index + 1, tokenizer);
+        }
+
+        public void registerAfter(String after, Tokenizer tokenizer) {
+            this.registerAfter(this.tokenizers.stream().filter(x -> x.getName().equals(after)).findFirst().orElse(null), tokenizer);
         }
     }
 

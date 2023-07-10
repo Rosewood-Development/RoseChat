@@ -24,10 +24,8 @@ public class RainbowTokenizer extends Tokenizer {
 
         // Check if the content contains the rainbow pattern.
         Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(input);
-        if (!matcher.find())
+        if (!matcher.find() || matcher.start() != 0)
             return null;
-
-        if (matcher.start() != 0) return null;
 
         var rainbowValues = new Object() {
             int speed = 0;
@@ -60,7 +58,7 @@ public class RainbowTokenizer extends Tokenizer {
 
         String content = matcher.group();
         return MessageUtils.hasTokenPermission(params, "rosechat.rainbow")
-                ? new TokenizerResult(Token.decorator().decorate(ColorDecorator.of(generatorGenerator)).build(), content.length())
+                ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)).build(), content.length())
                 : new TokenizerResult(Token.text(content).build(), content.length());
     }
 

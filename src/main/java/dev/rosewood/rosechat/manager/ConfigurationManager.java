@@ -143,7 +143,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The format of a button to delete a player's own messages.",
                 "Requires ProtocolLib"),
         DELETE_OTHER_MESSAGE_FORMAT("chat-formats.delete-other-message", "{delete-message}",
-                "The format of a the button to delete other players' messages.",
+                "The format of a button to delete other players' messages.",
                 "Requires ProtocolLib"),
         DELETED_MESSAGE_FORMAT("chat-formats.deleted-message", "{deleted-message}",
                 "The format of a previously deleted message.",

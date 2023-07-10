@@ -53,7 +53,7 @@ public class GradientTokenizer extends Tokenizer {
 
             String content = matcher.group();
             return MessageUtils.hasTokenPermission(params, "rosechat.gradient")
-                    ? new TokenizerResult(Token.decorator().decorate(ColorDecorator.of(generatorGenerator)).build(), content.length())
+                    ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)).build(), content.length())
                     : new TokenizerResult(Token.text(content).build(), content.length());
         }
 
