@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.awt.Color;
 import java.util.function.Function;
 import net.md_5.bungee.api.ChatColor;
@@ -26,7 +26,7 @@ public class ColorDecorator extends TokenDecorator {
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
         if (this.colorGenerator == null && this.colorGeneratorFunction != null)
             this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(this));
 

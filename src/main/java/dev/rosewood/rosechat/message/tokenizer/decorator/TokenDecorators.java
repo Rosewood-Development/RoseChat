@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,9 +37,9 @@ public class TokenDecorators {
                 this.decorators.add(decorator);
     }
 
-    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
+    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer, Token parent) {
         for (TokenDecorator decorator : this.decorators)
-            decorator.apply(builder.getCurrentComponent(), tokenizer, placeholders);
+            decorator.apply(builder.getCurrentComponent(), tokenizer, parent);
     }
 
     public boolean blocksTextStitching() {

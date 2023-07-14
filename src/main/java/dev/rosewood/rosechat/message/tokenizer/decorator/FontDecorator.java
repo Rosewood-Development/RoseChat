@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import dev.rosewood.rosechat.message.tokenizer.Token;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 public class FontDecorator extends TokenDecorator {
@@ -14,7 +14,7 @@ public class FontDecorator extends TokenDecorator {
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
         component.setFont(this.font);
     }
 

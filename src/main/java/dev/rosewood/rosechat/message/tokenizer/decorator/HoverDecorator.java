@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Objects;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -12,15 +11,20 @@ import net.md_5.bungee.api.chat.HoverEvent;
 public class HoverDecorator extends TokenDecorator {
 
     private final HoverEvent.Action action;
+    private final String content;
 
     protected HoverDecorator(HoverEvent.Action action, String content) {
-        super(content, DecoratorType.CONTENT);
+        super(DecoratorType.CONTENT);
         this.action = action;
+        this.content = content;
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer, StringPlaceholders placeholders) {
-        Token token = Token.group(this.content).placeholders(placeholders).build();
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
+        Token.Builder builder = Token.group(this.content).placeholders(parent.getPlaceholders());
+        parent.getIgnoredTokenizers().forEach(builder::ignoreTokenizer);
+
+        Token token = builder.build();
         tokenizer.tokenizeContent(token, 0);
         BaseComponent[] hover = tokenizer.toComponents(token, TokenComposer.styles(tokenizer));
         if (hover.length > 0)

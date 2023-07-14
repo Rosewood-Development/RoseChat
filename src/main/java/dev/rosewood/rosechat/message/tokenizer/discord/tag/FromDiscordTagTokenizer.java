@@ -65,7 +65,7 @@ public class FromDiscordTagTokenizer extends Tokenizer {
         if (isRole) params.getOutputs().getTaggedPlayers().addAll(discord.getPlayersWithRole(content));
 
         String finalTag = prefix + (isRole ? discord.getRoleFromId(content).replaceFirst(" ", "_") : discord.getUserFromId(content));
-        return new TokenizerResult(Token.text(finalTag).build(), originalContent.length());
+        return new TokenizerResult(Token.group(finalTag).build(), originalContent.length());
     }
 
 }

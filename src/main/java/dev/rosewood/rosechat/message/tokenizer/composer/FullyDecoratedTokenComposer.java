@@ -32,7 +32,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer {
             if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty()) {
                 componentBuilder.append(contentBuilder.toString(), ComponentBuilder.FormatRetention.NONE);
                 contentBuilder.setLength(0);
-                contextDecorators.apply(componentBuilder, this.tokenizer, child.getPlaceholders());
+                contextDecorators.apply(componentBuilder, this.tokenizer, token);
             }
 
             switch (child.getType()) {
@@ -54,7 +54,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer {
 
         if (!contentBuilder.isEmpty()) {
             componentBuilder.append(contentBuilder.toString(), ComponentBuilder.FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder, this.tokenizer, token.getPlaceholders());
+            contextDecorators.apply(componentBuilder, this.tokenizer, token);
         }
 
         BaseComponent[] components = componentBuilder.create();
@@ -62,7 +62,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer {
             return components;
 
         TextComponent wrapperComponent = new TextComponent(components);
-        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this.tokenizer, token.getPlaceholders()));
+        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this.tokenizer, token));
         return new BaseComponent[]{wrapperComponent};
     }
 
