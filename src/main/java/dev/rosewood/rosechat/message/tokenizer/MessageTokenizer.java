@@ -3,8 +3,8 @@ package dev.rosewood.rosechat.message.tokenizer;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
-import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.ArrayList;
@@ -15,9 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class MessageTokenizer {
@@ -71,57 +68,30 @@ public class MessageTokenizer {
                     this.tokenizeContent(child, depth + 1);
     }
 
-    public BaseComponent[] toComponents() {
-        return this.toComponents(this.rootToken, new TokenDecorators());
+    public BaseComponent[] toComponents(TokenComposer composer) {
+        return this.toComponents(this.rootToken, composer);
     }
 
-    public BaseComponent[] toComponents(Token token, TokenDecorators contextDecorators) {
-        if (token.getType() != TokenType.GROUP)
-            throw new IllegalStateException("Cannot convert a token that is not of type GROUP");
-
-        ComponentBuilder componentBuilder = new ComponentBuilder();
-        StringBuilder contentBuilder = new StringBuilder();
-
-        for (Token child : token.getChildren()) {
-            if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty()) {
-                componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
-                contentBuilder.setLength(0);
-                contextDecorators.apply(componentBuilder, this, child.getPlaceholders());
-            }
-
-            switch (child.getType()) {
-                case TEXT -> contentBuilder.append(child.getContent());
-                case DECORATOR -> contextDecorators.add(child.getDecorators());
-                case GROUP -> {
-                    TokenDecorators childDecorators;
-                    if (child.shouldEncapsulate()) {
-                        childDecorators = new TokenDecorators(contextDecorators);
-                    } else {
-                        childDecorators = contextDecorators;
-                    }
-
-                    for (BaseComponent component : this.toComponents(child, childDecorators))
-                        componentBuilder.append(component, FormatRetention.NONE);
-                }
-            }
-        }
-
-        if (!contentBuilder.isEmpty()) {
-            componentBuilder.append(contentBuilder.toString(), FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder, this, token.getPlaceholders());
-        }
-
-        BaseComponent[] components = componentBuilder.create();
-        if (token.isPlain() || components.length == 0)
-            return components;
-
-        TextComponent wrapperComponent = new TextComponent(components);
-        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this, token.getPlaceholders()));
-        return new BaseComponent[] { wrapperComponent };
+    public BaseComponent[] toComponents(Token token, TokenComposer composer) {
+        BaseComponent[] components = composer.compose(token);
+        RoseChat.getInstance().getLogger().warning(Arrays.stream(components).map(ComponentSerializer::toString).collect(Collectors.joining(",")));
+        return components;
     }
 
     public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
-        return new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles).toComponents();
+        return tokenize(roseMessage, viewer, message, null, tokenizerBundles);
+    }
+
+    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, TokenComposer composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
+
+        if (composer == null)
+            composer = TokenComposer.decorated(tokenizer);
+
+        BaseComponent[] components = tokenizer.toComponents(composer);
+        RoseChat.getInstance().getLogger().warning("Took " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens");
+        return components;
     }
 
     private static int countTokens(Token token) {

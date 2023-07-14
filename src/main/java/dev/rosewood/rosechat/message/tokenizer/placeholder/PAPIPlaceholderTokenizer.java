@@ -26,7 +26,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         if (!input.startsWith("%")) return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0) return null;
 
         String placeholder = input.substring(1, matcher.end() - 1);
         String placeholderPermission = placeholder.replaceFirst("_", ".");

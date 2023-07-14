@@ -20,20 +20,17 @@ public class FormatTokenizer extends Tokenizer {
         if (!params.getInput().startsWith("&")) return null;
 
         Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(params.getInput());
-        if (matcher.find()) {
-            if (matcher.start() != 0) return null;
-            String content = matcher.group();
-            char formatCharacter = content.charAt(1);
-            char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
-            boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
-            ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
-            boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
-            return hasPermission
-                    ? new TokenizerResult(Token.decorator(FormatDecorator.of(formatCode, value)).build(), content.length())
-                    : new TokenizerResult(Token.text(content).build(), content.length());
-        }
+        if (!matcher.find() || matcher.start() != 0) return null;
 
-        return null;
+        String content = matcher.group();
+        char formatCharacter = content.charAt(1);
+        char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
+        boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
+        ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
+        boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
+        return hasPermission
+                ? new TokenizerResult(Token.decorator(FormatDecorator.of(formatCode, value)).build(), content.length())
+                : new TokenizerResult(Token.text(content).build(), content.length());
     }
 
     public String getPermissionForFormat(char format) {

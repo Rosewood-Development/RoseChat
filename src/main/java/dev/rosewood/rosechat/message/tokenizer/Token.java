@@ -99,7 +99,7 @@ public class Token {
         return this.ignoredTokenizers.contains(tokenizer);
     }
 
-    protected StringPlaceholders getPlaceholders() {
+    public StringPlaceholders getPlaceholders() {
         StringPlaceholders.Builder builder = StringPlaceholders.builder();
         builder.addAll(this.placeholders);
         if (this.parent != null)
