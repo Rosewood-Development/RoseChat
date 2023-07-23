@@ -36,21 +36,16 @@ public class RenameGroupCommand extends AbstractCommand {
         String name = getAllArgs(1, args);
         if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
-        // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + name + "&f&r";
-
         RosePlayer rosePlayer = new RosePlayer(sender);
-        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
         MessageRules messageRules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyURLFilter();
-        message.applyRules(messageRules);
 
-        if (message.getOutputs().isBlocked()) {
-            if (message.getOutputs().getFilterType() != null) message.getOutputs().getFilterType().sendWarning(rosePlayer);
+        MessageRules.RuleOutputs outputs = messageRules.apply(rosePlayer, MessageLocation.GROUP, name);
+
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(rosePlayer);
             return;
         }
 
-        // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = message.getMessage();
         groupChat.setName(name);
         groupChat.save();
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.of("name", name));

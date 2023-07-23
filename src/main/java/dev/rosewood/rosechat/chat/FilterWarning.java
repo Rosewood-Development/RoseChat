@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.entity.Player;
 
-public enum FilterType {
+public enum FilterWarning {
 
     CAPS("blocked-caps"),
     SPAM("blocked-spam"),
@@ -12,7 +12,7 @@ public enum FilterType {
 
     private final String warning;
 
-    FilterType(String warning) {
+    FilterWarning(String warning) {
         this.warning = warning;
     }
 
@@ -20,7 +20,7 @@ public enum FilterType {
      * Sends a warning message, defined in the language file, to the sender.
      * @param sender The person to receive the message.
      */
-    public void sendWarning(RosePlayer sender) {
+    public void send(RosePlayer sender) {
         sender.sendLocaleMessage(this.warning);
     }
 
@@ -28,8 +28,8 @@ public enum FilterType {
      * Sends a warning message, defined in the language file, to the player.
      * @param player The person to receive the message.
      */
-    public void sendWarning(Player player) {
-        this.sendWarning(new RosePlayer(player));
+    public void send(Player player) {
+        this.send(new RosePlayer(player));
     }
 
 }

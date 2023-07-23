@@ -68,8 +68,8 @@ public class TagTokenizer extends Tokenizer {
             // Try to find a player, if we don't find a player, stop at the first space, otherwise consume the entire player tag string
             DetectedPlayer detectedTaggedPlayer = this.matchPartialPlayer(content);
             if (detectedTaggedPlayer != null) {
-                originalContent = tag.getPrefix() + content.substring(0, detectedTaggedPlayer.getConsumedTextLength());
-                Player taggedPlayer = detectedTaggedPlayer.getPlayer();
+                originalContent = tag.getPrefix() + content.substring(0, detectedTaggedPlayer.consumedTextLength());
+                Player taggedPlayer = detectedTaggedPlayer.player();
                 placeholderViewer = new RosePlayer(taggedPlayer);
                 params.getOutputs().getTaggedPlayers().add(taggedPlayer.getUniqueId());
                 if (tag.getSound() != null) params.getOutputs().setTagSound(tag.getSound());
@@ -157,24 +157,6 @@ public class TagTokenizer extends Tokenizer {
         return matchLength;
     }
 
-    private static class DetectedPlayer {
-
-        private final Player player;
-        private final int consumedTextLength;
-
-        public DetectedPlayer(Player player, int consumedTextLength) {
-            this.player = player;
-            this.consumedTextLength = consumedTextLength;
-        }
-
-        public Player getPlayer() {
-            return this.player;
-        }
-
-        public int getConsumedTextLength() {
-            return this.consumedTextLength;
-        }
-
-    }
+    private record DetectedPlayer(Player player, int consumedTextLength) { }
 
 }

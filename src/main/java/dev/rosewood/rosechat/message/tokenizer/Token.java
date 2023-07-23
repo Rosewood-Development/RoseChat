@@ -11,7 +11,7 @@ import java.util.Set;
 public class Token {
 
     protected Token parent; // Exposed and set in the MessageTokenizer class
-    protected final List<Token> children; // Exposed and added to in the MessageTokenizer class
+    private final List<Token> children;
     private final TokenType type;
     private final String content;
     private final List<TokenDecorator> decorators;
@@ -20,7 +20,8 @@ public class Token {
     private final boolean encapsulate;
     private final Set<Tokenizer> ignoredTokenizers;
 
-    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput, StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
+    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput,
+                  StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
         this.type = type;
         this.content = content;
         this.children = new ArrayList<>();

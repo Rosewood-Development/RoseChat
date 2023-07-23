@@ -1,57 +1,43 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import com.google.common.base.Stopwatch;
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
-import dev.rosewood.rosechat.message.MessageLog;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.parser.BungeeParser;
 import dev.rosewood.rosechat.message.parser.FromDiscordParser;
 import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
-import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 
 /**
- * Wrapper to turn regular messages into BaseComponent[]'s with colour, emoji, tags, etc.
+ * A wrapper for chat messages which can be used to parse a message for a given receiver.
+ * TODO: Potentially remove the need for this class and send messages through channels instead
  */
 public class RoseMessage {
 
     private UUID uuid;
-    private DeletableMessage deletableMessage;
-
-    // In Values
     private final RosePlayer sender;
     private final MessageLocation location;
-    private String message;
+    private String playerInput;
     private Channel channel;
-    private MessageRules messageRules;
     private StringPlaceholders placeholders;
-
-    // Out Values
-    private final MessageOutputs outputs = new MessageOutputs();
-    private BaseComponent[] components;
 
     /**
      * Creates a new RoseMessage to be parsed later.
      * This should be parsed using {@link #parse(RosePlayer, String)}.
      * @param sender The {@link RosePlayer} who is sending the message.
      * @param channel The {@link Channel} that the message is being sent in.
-     * @param message The message that is being sent.
      */
-    public RoseMessage(RosePlayer sender, Channel channel, String message) {
-        this(sender, MessageLocation.CHANNEL, message);
+    private RoseMessage(RosePlayer sender, Channel channel) {
+        this(sender, MessageLocation.CHANNEL);
         this.channel = channel;
     }
 
@@ -60,50 +46,11 @@ public class RoseMessage {
      * This should be parsed using {@link #parse(RosePlayer, String)}.
      * @param sender The {@link RosePlayer} who is sending the message.
      * @param location The {@link MessageLocation} that the message is being sent in.
-     * @param message The message that is being sent.
      */
-    public RoseMessage(RosePlayer sender, MessageLocation location, String message) {
+    private RoseMessage(RosePlayer sender, MessageLocation location) {
         this.sender = sender;
         this.location = location;
-        this.message = message;
-
         this.uuid = UUID.randomUUID();
-    }
-
-    /**
-     * Copy constructor to prevent asynchronously editing the tokenized value.
-     * @param other The {@link RoseMessage} to copy.
-     */
-    public RoseMessage(RoseMessage other) {
-        this.uuid = other.uuid;
-        this.deletableMessage = null;
-        this.sender = other.sender;
-        this.location = other.location;
-        this.message = other.message;
-        this.channel = other.channel;
-        this.messageRules = new MessageRules(other.messageRules);
-        this.placeholders = other.placeholders;
-    }
-
-    /**
-     * Applies the given message rules to this message.
-     * @param messageRules The {@link MessageRules} to be applied.
-     */
-    public void applyRules(MessageRules messageRules) {
-        this.messageRules = messageRules;
-        messageRules.apply(this);
-    }
-
-    private void logMessage(MessageLog log, String discordId) {
-        if (this.messageRules == null || this.messageRules.isIgnoringMessageLogging()) return;
-
-        this.deletableMessage = new DeletableMessage(this.uuid);
-        this.deletableMessage.setJson(ComponentSerializer.toString(this.components));
-        this.deletableMessage.setClient(false);
-        this.deletableMessage.setDiscordId(discordId);
-        this.deletableMessage.setPrivateMessageInfo(this.messageRules.getPrivateMessageInfo());
-
-        log.addDeletableMessage(this.deletableMessage);
     }
 
     /**
@@ -114,29 +61,41 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The discord id of the message, or null if not sent from discord.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public BaseComponent[] parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
+    public RoseMessageComponents parse(MessageParser parser, RosePlayer viewer, String format, String discordId, MessageRules messageRules) {
         // Call the PreParseMessageEvent and check if the message can still be parsed.
         PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
         Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
         if (preParseMessageEvent.isCancelled()) return null;
-        this.components = parser.parse(this, this.sender, viewer, format);
+        RoseMessageComponents components = parser.parse(this, viewer, format);
 
-        // Only call the PostParseMessageEvent if the message has a format.
+        // Only call the PostParseMessageEvent if the message has player input.
         // This prevents non-chat messages from having delete buttons.
-        if (format != null) {
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, parser.getMessageDirection());
+        if (this.playerInput != null) {
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, parser.getMessageDirection(), components);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+            if (preParseMessageEvent.isCancelled()) return null;
+            components = postParseMessageEvent.getMessageComponents();
         }
 
         if (viewer != null) {
             PlayerData viewerData = viewer.getPlayerData();
-            if (viewerData != null) this.logMessage(viewerData.getMessageLog(), discordId);
+            if (viewerData != null && messageRules != null && !messageRules.isIgnoringMessageLogging()) {
+                DeletableMessage deletableMessage = new DeletableMessage(UUID.randomUUID());
+                deletableMessage.setJson(ComponentSerializer.toString(components.components()));
+                deletableMessage.setClient(false);
+                deletableMessage.setDiscordId(discordId);
+                viewerData.getMessageLog().addDeletableMessage(deletableMessage);
+            }
         }
 
-        return this.components;
+        return components;
+    }
+
+    public RoseMessageComponents parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
+        return this.parse(parser, viewer, format, discordId, new MessageRules());
     }
 
     /**
@@ -144,9 +103,9 @@ public class RoseMessage {
      * This allows for the message to gain hover and click events, along with emojis and other features.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer viewer, String format) {
+    public RoseMessageComponents parse(RosePlayer viewer, String format) {
         RoseChatParser parser = new RoseChatParser();
         return this.parse(parser, viewer, format, null);
     }
@@ -158,9 +117,9 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The id of the discord message. Used for deleting discord messages.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public BaseComponent[] parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
+    public RoseMessageComponents parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
         FromDiscordParser parser = new FromDiscordParser();
         return this.parse(parser, viewer, format, discordId);
     }
@@ -171,9 +130,9 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for discord messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public BaseComponent[] parseMessageToDiscord(RosePlayer viewer, String format) {
+    public RoseMessageComponents parseMessageToDiscord(RosePlayer viewer, String format) {
         ToDiscordParser parser = new ToDiscordParser();
         return this.parse(parser, viewer, format, null);
     }
@@ -184,43 +143,11 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for bungee messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public BaseComponent[] parseBungeeMessage(RosePlayer viewer, String format) {
+    public RoseMessageComponents parseBungeeMessage(RosePlayer viewer, String format) {
         BungeeParser parser = new BungeeParser();
         return this.parse(parser, viewer, format, null);
-    }
-
-    /**
-     * @return The {@link BaseComponent[]} containing the parsed message.
-     * This will be null if the message as not been parsed.
-     */
-    public BaseComponent[] toComponents() {
-        return this.components;
-    }
-
-    /**
-     * Sets the components for the message.
-     * This is mainly used for editing the message after it has been parsed.
-     * @param components The components to use.
-     */
-    public void setComponents(BaseComponent[] components) {
-        this.components = components;
-    }
-
-    /**
-     * @return The {@link UUID} of the message.
-     */
-    public UUID getUUID() {
-        return this.uuid;
-    }
-
-    /**
-     * Sets the {@link UUID} of the message.
-     * @param uuid The {@link UUID} to use.
-     */
-    public void setUUID(UUID uuid) {
-        this.uuid = uuid;
     }
 
     /**
@@ -240,17 +167,16 @@ public class RoseMessage {
     /**
      * @return The message that should be parsed.
      */
-    public String getMessage() {
-        return this.message;
+    public String getPlayerInput() {
+        return this.playerInput;
     }
 
     /**
      * Changes the message that should be parsed.
-     * This will do nothing if the message has already been parsed.
-     * @param message The new message to use.
+     * @param playerInput The new message to use.
      */
-    protected void setMessage(String message) {
-        this.message = message;
+    public void setPlayerInput(String playerInput) {
+        this.playerInput = playerInput;
     }
 
     /**
@@ -273,36 +199,14 @@ public class RoseMessage {
      * @return The permission for the location of the message.
      */
     public String getLocationPermission() {
-        switch (this.location) {
-            case CHANNEL:
-                if (this.channel == null) return null;
-                return "channel." + this.channel.getId();
-            case GROUP:
-                return "group";
-            default:
-                return this.location.toString().toLowerCase();
-        }
-    }
-
-    /**
-     * @return The {@link MessageRules} that the message should abide by.
-     */
-    public MessageRules getMessageRules() {
-        return this.messageRules;
-    }
-
-    /**
-     * @return The {@link MessageOutputs} for this message.
-     */
-    public MessageOutputs getOutputs() {
-        return this.outputs;
-    }
-
-    /**
-     * @return The {@link DeletableMessage} version of this message.
-     */
-    public DeletableMessage getDeletableMessage() {
-        return this.deletableMessage;
+        return switch (this.location) {
+            case CHANNEL -> {
+                if (this.channel == null) yield null;
+                yield "channel." + this.channel.getId();
+            }
+            case GROUP -> "group";
+            default -> this.location.toString().toLowerCase();
+        };
     }
 
     /**
@@ -313,11 +217,27 @@ public class RoseMessage {
         this.placeholders = placeholders;
     }
 
+    public UUID getUUID() {
+        return this.uuid;
+    }
+
+    public void setUUID(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     /**
      * @return The {@link StringPlaceholders} that this message should use.
      */
     public StringPlaceholders getPlaceholders() {
         return this.placeholders;
+    }
+
+    public static RoseMessage forChannel(RosePlayer sender, Channel channel) {
+        return new RoseMessage(sender, channel);
+    }
+
+    public static RoseMessage forLocation(RosePlayer sender, MessageLocation location) {
+        return new RoseMessage(sender, location);
     }
 
 }

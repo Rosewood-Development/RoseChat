@@ -139,21 +139,23 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt()) return;
             if (!MessageUtils.isMessageEmpty(line)) {
-                RoseMessage messageWrapper = new RoseMessage(sender, channel, line);
+                RoseMessage messageWrapper = RoseMessage.forChannel(sender, channel);
                 messageWrapper.setPlaceholders(placeholders.add("user_nickname", name).build());
 
                 MessageRules rules = new MessageRules();
                 if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {
                     // Don't count the message as spam if the message is being edited.
-                    if (update) rules.applyCapsFilter().applyURLFilter().applyLanguageFilter().applySenderChatColor();
-                    else rules.applyAllFilters().applySenderChatColor();
+                    if (update) rules.applyCapsFilter().applyURLFilter().applyLanguageFilter();
+                    else rules.applyAllFilters();
                 }
 
-                messageWrapper.applyRules(rules);
-                if (messageWrapper.getOutputs().isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                MessageRules.RuleOutputs outputs = rules.apply(messageWrapper, line);
+                if (outputs.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
                     message.delete().queue();
                     return;
                 }
+
+                messageWrapper.setPlayerInput(line);
 
                 if (update) {
                     for (PlayerData playerData : updateFor) {
@@ -164,7 +166,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId())) continue;
                             messageWrapper.setUUID(deletableMessage.getUUID());
-                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId());
+                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).components();
                             deletableMessage.setJson(ComponentSerializer.toString(components));
                             break;
                         }
@@ -175,8 +177,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     }
                 } else {
                     channel.send(messageWrapper, message.getId());
-                    BaseComponent[] messageComponents = messageWrapper.toComponents();
-                    if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
                 }
             }
         }

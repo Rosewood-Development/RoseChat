@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -69,10 +70,9 @@ public class PlayerListener implements Listener {
             // Set the display name when the player logs in
             if (playerData.getNickname() != null) {
                 RosePlayer rosePlayer = new RosePlayer(player);
-                RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, playerData.getNickname());
-                message.parse(rosePlayer, null);
-
-                NicknameCommand.setDisplayName(rosePlayer, message);
+                RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
+                RoseMessageComponents components = message.parse(rosePlayer, playerData.getNickname());
+                NicknameCommand.setDisplayName(rosePlayer, components);
             }
         });
     }

@@ -30,9 +30,6 @@ public class ColorDecorator extends TokenDecorator {
         if (this.colorGenerator == null && this.colorGeneratorFunction != null)
             this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(this));
 
-        if (component.toPlainText().replaceAll("\\s", "").isEmpty())
-            return;
-
         if (this.colorGenerator != null)
             component.setColor(this.colorGenerator.nextChatColor());
     }
@@ -57,13 +54,7 @@ public class ColorDecorator extends TokenDecorator {
         return new ColorDecorator(colorGeneratorFunction);
     }
 
-    private static class SolidColorGenerator implements HexUtils.ColorGenerator {
-
-        private final ChatColor chatColor;
-
-        public SolidColorGenerator(ChatColor chatColor) {
-            this.chatColor = chatColor;
-        }
+    private record SolidColorGenerator(ChatColor chatColor) implements HexUtils.ColorGenerator {
 
         @Override
         public ChatColor nextChatColor() {

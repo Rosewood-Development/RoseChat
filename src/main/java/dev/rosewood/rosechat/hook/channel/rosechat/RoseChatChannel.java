@@ -13,8 +13,10 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -152,32 +154,32 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     protected void sendToPlayer(RoseMessage message, RosePlayer receiver, MessageDirection direction, String format, String discordId) {
-        message = new RoseMessage(message);
-
         PlayerData receiverData = RoseChatAPI.getInstance().getPlayerData(receiver.getUUID());
         // Don't send the message if the receiver can't receive it.
         if (!this.canReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
 
         // Send the message to the player asynchronously.
-        RoseMessage finalMessage = message;
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
 
             Stopwatch messageTimer;
-            if (debugManager.isEnabled())
+            if (debugManager.isEnabled()) {
                 messageTimer = Stopwatch.createStarted();
-            else {
+            } else {
                 messageTimer = null;
             }
 
             // If the message is not a json message, parse normally or parse from discord if an id is available.
+            MessageOutputs outputs;
             if (direction != MessageDirection.FROM_BUNGEE_RAW) {
-                receiver.send(discordId == null ? finalMessage.parse(receiver, format) : finalMessage.parseMessageFromDiscord(receiver, format, discordId));
+                RoseMessageComponents components = discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
+                outputs = components.outputs();
+                receiver.send(components.components());
             } else {
                 // Parse the json message.
 
                 // Replace %other placeholders.
-                String jsonMessage = finalMessage.getMessage();
+                String jsonMessage = message.getPlayerInput();
                 if (PlaceholderAPIHook.enabled()) {
                     Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(jsonMessage);
                     while (matcher.find()) {
@@ -187,21 +189,22 @@ public class RoseChatChannel extends ConditionalChannel {
 
                 // Serialize the json message and set the components.
                 BaseComponent[] parsedMessage = ComponentSerializer.parse(receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), jsonMessage) : jsonMessage);
-                finalMessage.setComponents(parsedMessage);
+                RoseMessageComponents components = new RoseMessageComponents(parsedMessage, new MessageOutputs());
 
                 //Call the post parse message event for the correct viewer if the message was sent over bungee
-                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(finalMessage, finalMessage.getSender(), MessageDirection.PLAYER_TO_SERVER);
+                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.PLAYER_TO_SERVER, components);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
-                receiver.send(finalMessage.toComponents());
-                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(finalMessage.getUUID(), ComponentSerializer.toString(finalMessage.toComponents()),
-                        false, discordId));
+                parsedMessage = postParseMessageEvent.getMessageComponents().components();
+                outputs = postParseMessageEvent.getMessageComponents().outputs();
+                receiver.send(parsedMessage);
+                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage), false, discordId));
             }
 
             // Play the tag sound to the player.
-            if (receiver.isPlayer() && finalMessage.getOutputs().getTaggedPlayers().contains(receiver.getUUID())) {
+            if (receiver.isPlayer() && outputs.getTaggedPlayers().contains(receiver.getUUID())) {
                 Player player = receiver.asPlayer();
-                if (finalMessage.getOutputs().getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
-                    player.playSound(player.getLocation(), finalMessage.getOutputs().getTagSound(), 1.0f, 1.0f);
+                if (outputs.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
+                    player.playSound(player.getLocation(), outputs.getTagSound(), 1.0f, 1.0f);
             }
 
             if (debugManager.isEnabled() && debugManager.isTimerEnabled() && messageTimer != null && messageTimer.isRunning()) {
@@ -228,9 +231,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
             if (api.getDiscord() != null && this.getDiscordChannel() != null) {
-                RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                    MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel());
-                });
+                RoseChat.MESSAGE_THREAD_POOL.submit(() -> MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel()));
             }
         }
     }
@@ -248,25 +249,27 @@ public class RoseChatChannel extends ConditionalChannel {
                                         ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormat())));
                     });
                 } else {
-                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), false, message.getMessage());
+                    api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), false, message.getPlayerInput());
                 }
             }
         }
     }
 
-    private void send(RoseMessage message, MessageDirection direction, String format, String discordId) {
+    private void send(RoseMessage message, MessageDirection direction, String format, String discordId, MessageRules messageRules) {
         // Send message to the player
         this.sendToPlayer(message, message.getSender(), direction, format, discordId);
 
         // Send message to Discord
-        RoseMessage discordMessage = new RoseMessage(message);
-        discordMessage.getMessageRules().ignoreMessageLogging();
-        this.sendToDiscord(discordMessage, direction);
+        messageRules.ignoreMessageLogging();
+        this.sendToDiscord(message, direction);
 
         // Send message to Bungee
-        RoseMessage bungeeMessage = new RoseMessage(message);
-        bungeeMessage.getMessageRules().ignoreMessageLogging();
-        this.sendToBungee(bungeeMessage, direction);
+        this.sendToBungee(message, direction);
+
+        if (direction == MessageDirection.PLAYER_TO_SERVER) {
+            BaseComponent[] parsedConsoleMessage = message.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat()).components();
+            Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
+        }
 
         List<Player> currentSpies = new ArrayList<>();
 
@@ -391,51 +394,47 @@ public class RoseChatChannel extends ConditionalChannel {
 
     @Override
     public void send(RosePlayer sender, String message) {
-        // Create the rules for this message.
-        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor();
+        RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
 
-        // Parses the first message synchronously
-        // Allows for creating a token storage.
-        RoseMessage roseMessage = new RoseMessage(sender, this, message);
-        roseMessage.applyRules(rules);
+        // Create the rules for this message.
+        MessageRules rules = new MessageRules().applyAllFilters();
+        MessageRules.RuleOutputs outputs = rules.apply(roseMessage, message);
 
         // Check if the message is allowed to be sent.
-        if (roseMessage.getOutputs().isBlocked()) {
-            if (roseMessage.getOutputs().getFilterType() != null)
-                roseMessage.getOutputs().getFilterType().sendWarning(sender);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null)
+                outputs.getWarning().send(sender);
             return;
         }
 
-        BaseComponent[] parsedConsoleMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat());
-
-        // Send the parsed message to the console
-        Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
+        roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // Send the message to the members.
-        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, this.getFormat(), null);
+        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, this.getFormat(), null, rules);
     }
 
     @Override
     public void send(RoseMessage message, String discordId) {
         // Send the message from discord, with the correct format.
-        this.send(message, MessageDirection.FROM_DISCORD, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), discordId);
+        this.send(message, MessageDirection.FROM_DISCORD, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), discordId, new MessageRules());
     }
 
     @Override
     public void send(RosePlayer sender, String message, UUID messageId) {
-        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor();
-        RoseMessage roseMessage = new RoseMessage(sender, this, message);
-        roseMessage.applyRules(rules);
+        RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
+        roseMessage.setPlayerInput(message);
         roseMessage.setUUID(messageId);
-        this.send(roseMessage, MessageDirection.FROM_BUNGEE_SERVER, this.getFormat(), null);
+        MessageRules rules = new MessageRules().applyAllFilters();
+        this.send(roseMessage, MessageDirection.FROM_BUNGEE_SERVER, this.getFormat(), null, rules);
     }
 
     @Override
     public void sendJson(RosePlayer sender, String message, UUID messageId) {
         // Don't apply rules as they've already been applied.
-        RoseMessage roseMessage = new RoseMessage(sender, this, message);
+        RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
+        roseMessage.setPlayerInput(message);
         roseMessage.setUUID(messageId);
-        this.send(roseMessage, MessageDirection.FROM_BUNGEE_RAW, this.getFormat(), null);
+        this.send(roseMessage, MessageDirection.FROM_BUNGEE_RAW, this.getFormat(), null, new MessageRules());
     }
 
     @Override
@@ -506,14 +505,14 @@ public class RoseChatChannel extends ConditionalChannel {
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("radius", this.radius == -1 ? nullValue : this.radius)
-                .addPlaceholder("discord", this.getDiscordChannel() == null ? nullValue : this.getDiscordChannel())
-                .addPlaceholder("auto-join", this.autoJoin ? trueValue : falseValue)
-                .addPlaceholder("visible-anywhere", this.visibleAnywhere ? trueValue : falseValue)
-                .addPlaceholder("joinable", this.joinable ? trueValue : falseValue)
-                .addPlaceholder("keep-format", this.keepFormatOverBungee ? trueValue : falseValue)
-                .addPlaceholder("worlds", this.worlds.isEmpty() ? nullValue : this.worlds.toString())
-                .addPlaceholder("servers", this.servers.isEmpty() ? nullValue : this.servers.toString());
+                .add("radius", this.radius == -1 ? nullValue : this.radius)
+                .add("discord", this.getDiscordChannel() == null ? nullValue : this.getDiscordChannel())
+                .add("auto-join", this.autoJoin ? trueValue : falseValue)
+                .add("visible-anywhere", this.visibleAnywhere ? trueValue : falseValue)
+                .add("joinable", this.joinable ? trueValue : falseValue)
+                .add("keep-format", this.keepFormatOverBungee ? trueValue : falseValue)
+                .add("worlds", this.worlds.isEmpty() ? nullValue : this.worlds.toString())
+                .add("servers", this.servers.isEmpty() ? nullValue : this.servers.toString());
     }
 
 }

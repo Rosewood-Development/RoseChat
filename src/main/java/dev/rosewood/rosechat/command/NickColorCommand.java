@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -47,10 +48,9 @@ public class NickColorCommand extends AbstractCommand {
                     String nickname = ChatColor.stripColor(HexUtils.colorify(player.getNickname())) + "&r";
                     playerData.setNickname(nickname);
 
-                    RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-                    nicknameMessage.parse(player, null);
-
-                    NicknameCommand.setDisplayName(player, nicknameMessage);
+                    RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
+                    RoseMessageComponents components = nicknameMessage.parse(player, nickname);
+                    NicknameCommand.setDisplayName(player, components);
                 }
 
                 playerData.save();
@@ -73,17 +73,17 @@ public class NickColorCommand extends AbstractCommand {
         if (playerData.getNickname() == null) {
             nickname = color + sender.getName() + "&r";
             playerData.setNickname(nickname);
-            RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-            nicknameMessage.parse(player, null);
-            NicknameCommand.setDisplayName(player, nicknameMessage);
+            RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
+            RoseMessageComponents components = nicknameMessage.parse(player, nickname);
+            NicknameCommand.setDisplayName(player, components);
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             nickname = color + nickname + "&r";
             playerData.setNickname(nickname);
-            RoseMessage nicknameMessage = new RoseMessage(player, MessageLocation.NICKNAME, nickname);
-            nicknameMessage.parse(player, null);
-            NicknameCommand.setDisplayName(player, nicknameMessage);
+            RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
+            RoseMessageComponents components = nicknameMessage.parse(player, nickname);
+            NicknameCommand.setDisplayName(player, components);
         }
 
         playerData.save();

@@ -71,38 +71,40 @@ public final class RoseChatAPI {
      * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
-     * @param message The string to parse.
+     * @param format The string to parse.
      * @param placeholders A set of {@link StringPlaceholders} to be parsed in the message.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, StringPlaceholders placeholders) {
-        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NONE, message);
+    @Deprecated(forRemoval = true)
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NONE);
         roseMessage.setPlaceholders(placeholders);
-
-        return roseMessage.parse(viewer, null);
+        return roseMessage.parse(viewer, format).components();
     }
 
     /**
      * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
-     * @param message The string to parse.
+     * @param format The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message) {
-        return new RoseMessage(sender, MessageLocation.NONE, message).parse(viewer, null);
+    @Deprecated(forRemoval = true)
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format) {
+        return RoseMessage.forLocation(sender, MessageLocation.NONE).parse(viewer, format).components();
     }
 
     /**
      * Parses a string allowing for hex color, tags and emoji in other text.
      * @param sender The person sending the message.
      * @param viewer The person receiving the message.
-     * @param message The string to parse.
+     * @param format The string to parse.
      * @param location The location that the chat message is in.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String message, MessageLocation location) {
-        return new RoseMessage(sender, location, message).parse(viewer, null);
+    @Deprecated(forRemoval = true)
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, MessageLocation location) {
+        return RoseMessage.forLocation(sender, location).parse(viewer, format).components();
     }
 
     public void sendToChannel(Player player, String message, Channel channel, boolean checkPermissions) {
@@ -154,11 +156,13 @@ public final class RoseChatAPI {
 
         // Update the player's display name if the setting is enabled.
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.NICKNAME, data.getNickname());
-                roseMessage.parse(sender, null);
+            String nickname = data.getNickname();
+            if (data.getNickname() == null)
+                return;
 
-                if (data.getNickname() != null) NicknameCommand.setDisplayName(sender, roseMessage);
+            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NICKNAME);
+                NicknameCommand.setDisplayName(sender, roseMessage.parse(sender, nickname));
             });
         }
     }

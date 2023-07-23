@@ -18,19 +18,10 @@ public abstract class Tokenizer {
     public abstract TokenizerResult tokenize(TokenizerParams params);
 
     /**
-     * @return true if this tokenizer is enabled, false otherwise.
-     */
-    public boolean isEnabled() {
-        return true;
-    }
-
-    /**
      * @return The name of this tokenizer.
      */
     public final String getName() {
         return this.name;
     }
-
-
 
 }

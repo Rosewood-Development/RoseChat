@@ -1,25 +1,17 @@
 package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -27,7 +19,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class NicknameCommand extends AbstractCommand {
 
@@ -108,26 +99,26 @@ public class NicknameCommand extends AbstractCommand {
         RosePlayer roseSender = new RosePlayer(sender);
         RosePlayer roseTarget = new RosePlayer(target);
 
-        MessageRules rules = new MessageRules().applyAllFilters().ignoreMessageLogging();
+        RoseMessage message = RoseMessage.forLocation(roseSender, MessageLocation.NICKNAME);
 
-        RoseMessage message = new RoseMessage(roseSender, MessageLocation.NICKNAME, nickname);
-        message.applyRules(rules);
+        MessageRules rules = new MessageRules().applyAllFilters().ignoreMessageLogging();
+        MessageRules.RuleOutputs outputs = rules.apply(message, nickname);
 
         // Block the message if it breaks the rules.
-        if (message.getOutputs().isBlocked()) {
-            if (message.getOutputs().getFilterType() != null)
-                message.getOutputs().getFilterType().sendWarning(roseSender);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null)
+                outputs.getWarning().send(roseSender);
             return;
         }
 
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             if (roseSender.isConsole() || this.isNicknameAllowed(roseSender, roseTarget, message)) {
-                String finalNickname = TextComponent.toLegacyText(message.parse(roseTarget, null));
+                RoseMessageComponents components = message.parse(roseTarget, outputs.getFilteredMessage());
 
                 PlayerData data = this.getAPI().getPlayerData(roseTarget.getUUID());
 
-                setDisplayName(roseTarget, message);
-                data.setNickname(message.getMessage());
+                setDisplayName(roseTarget, components);
+                data.setNickname(message.getPlayerInput());
                 data.save();
 
                 if (roseTarget.getUUID().equals(roseSender.getUUID())) {
@@ -135,23 +126,24 @@ public class NicknameCommand extends AbstractCommand {
                 } else {
                     this.getAPI().getLocaleManager().sendComponentMessage(roseTarget, "command-nickname-success", StringPlaceholders.of("name", data.getNickname()));
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
-                            StringPlaceholders.builder("name", data.getNickname()).addPlaceholder("player", roseTarget.getName()).build());
+                            StringPlaceholders.builder("name", data.getNickname()).add("player", roseTarget.getName()).build());
                 }
             }
         });
     }
 
-    public static void setDisplayName(RosePlayer target, RoseMessage message) {
-        if (message == null || message.getMessage().isEmpty()) return;
+    public static void setDisplayName(RosePlayer target, RoseMessageComponents components) {
+        if (components == null) return;
 
         // Remove emojis from the display name.
-        String displayName = message.getMessage();
-        for (ChatReplacement replacement : RoseChatAPI.getInstance().getEmojis()) {
-            if (!displayName.contains(replacement.getText()) || replacement.getFont() == null || replacement.getFont().equals("default")) continue;
-            displayName = displayName.replace(replacement.getText(), "").trim();
-        }
+        // TODO
+//        String displayName = message.getPlayerInput();
+//        for (ChatReplacement replacement : RoseChatAPI.getInstance().getEmojis()) {
+//            if (!displayName.contains(replacement.getText()) || replacement.getFont() == null || replacement.getFont().equals("default")) continue;
+//            displayName = displayName.replace(replacement.getText(), "").trim();
+//        }
 
-        target.asPlayer().setDisplayName(TextComponent.toLegacyText(message.toComponents()));
+        target.asPlayer().setDisplayName(TextComponent.toLegacyText(components.components()));
     }
 
     @Override

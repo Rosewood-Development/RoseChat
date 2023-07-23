@@ -25,7 +25,7 @@ public class TokenizerParams {
         this.receiver = receiver;
         this.input = input;
         this.containsPlayerInput = containsPlayerInput;
-        this.playerInput = message.getMessage();
+        this.playerInput = message.getPlayerInput();
         this.location = message.getLocation();
         this.locationPermission = message.getLocationPermission();
         this.channel = message.getChannel();

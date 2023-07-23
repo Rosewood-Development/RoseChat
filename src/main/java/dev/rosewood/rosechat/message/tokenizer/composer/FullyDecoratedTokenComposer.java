@@ -32,20 +32,14 @@ public class FullyDecoratedTokenComposer implements TokenComposer {
             if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty()) {
                 componentBuilder.append(contentBuilder.toString(), ComponentBuilder.FormatRetention.NONE);
                 contentBuilder.setLength(0);
-                contextDecorators.apply(componentBuilder, this.tokenizer, token);
+                contextDecorators.apply(componentBuilder, this.tokenizer, child);
             }
 
             switch (child.getType()) {
                 case TEXT -> contentBuilder.append(child.getContent());
                 case DECORATOR -> contextDecorators.add(child.getDecorators());
                 case GROUP -> {
-                    TokenDecorators childDecorators;
-                    if (child.shouldEncapsulate()) {
-                        childDecorators = new TokenDecorators(contextDecorators);
-                    } else {
-                        childDecorators = contextDecorators;
-                    }
-
+                    TokenDecorators childDecorators = child.shouldEncapsulate() ? new TokenDecorators(contextDecorators) : contextDecorators;
                     for (BaseComponent component : this.compose(child, childDecorators))
                         componentBuilder.append(component, ComponentBuilder.FormatRetention.NONE);
                 }

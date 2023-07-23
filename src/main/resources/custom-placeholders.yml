@@ -13,7 +13,7 @@
 #                     If the displayname does not exist, the name will be used.
 # These placeholders can be prefixed with "other_" to get the viewer rather than the sender.
 # For example, %other_player_name% gets the name of the viewer.
-# {message} - An internal placeholder that is reserved for sent messages.
+# {message} - An internal placeholder that is reserved for the player chat input.
 
 # The ID of the custom placeholder.
 prefix:
@@ -147,13 +147,12 @@ spy-players:
 # This custom placeholder only uses the %type% condition as permissions are checked internally.
 # The %id% placeholder is used for the id of the message being deleted.
 # The %type% placeholder is used for the type of message, server or client.
-# The %message% placeholder is used to define where the X should be shown, before or after the message.
 # The %channel% placeholder is used to choose which servers should also delete the message, when using BungeeCord.
 delete-message:
   text:
     condition: "%type%"
-    client: "&c&l✖ %message%"
-    server: "&4&l✖ %message%"
+    client: "&c&l✖ "
+    server: "&4&l✖ "
   hover:
     default:
       - "&7&oClick to Delete"

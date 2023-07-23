@@ -9,8 +9,8 @@ import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -46,15 +46,6 @@ public class MessageUtils {
     public static final Pattern SPIGOT_HEX_REGEX_PARSED = Pattern.compile("#(§[A-Fa-f0-9]){6}|§x(§[A-Fa-f0-9]){6}");
     public static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
     public static final Pattern GRADIENT_PATTERN = Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>");
-    public static final Pattern STOP = Pattern.compile(
-            "<(rainbow|r)(#(\\d+))?(:(\\d*\\.?\\d+))?(:(\\d*\\.?\\d+))?(:(l|L|loop))?>|" +
-                    "<(gradient|g)(#(\\d+))?((:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(l|L|loop))?>|" +
-                    "(&[a-f0-9r])|" +
-                    "<#([A-Fa-f0-9]){6}>|" +
-                    "\\{#([A-Fa-f0-9]){6}}|" +
-                    "&#([A-Fa-f0-9]){6}|" +
-                    "#([A-Fa-f0-9]){6}"
-    );
 
     /**
      * Removes the accents from a string.
@@ -202,16 +193,15 @@ public class MessageUtils {
         Player target = Bukkit.getPlayer(targetName);
         RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
-        // Create the private message info, rules, and the message, then apply the rules.
-        PrivateMessageInfo privateMessageInfo = new PrivateMessageInfo(sender, messageTarget);
-        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor().setPrivateMessageInfo(privateMessageInfo);
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.MESSAGE);
 
-        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, message);
-        roseMessage.applyRules(rules);
+        MessageRules rules = new MessageRules().applyAllFilters();
+        MessageRules.RuleOutputs outputs = rules.apply(roseMessage, message);
+        roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // If the message is blocked, send a warning to the player.
-        if (roseMessage.getOutputs().isBlocked()) {
-            if (roseMessage.getOutputs().getFilterType() != null) roseMessage.getOutputs().getFilterType().sendWarning(sender);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(sender);
             return;
         }
 
@@ -226,7 +216,7 @@ public class MessageUtils {
         }
 
         // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString());
+        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString()).components();
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         // The tokens will always be generated before even if this message is not sent.
@@ -242,19 +232,16 @@ public class MessageUtils {
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
 
-            // Adds the spy to the private message info.
-            privateMessageInfo.addSpy(new RosePlayer(spy));
-
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString()).components();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
-            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
+            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString()).components();
+            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).components();
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
@@ -284,12 +271,11 @@ public class MessageUtils {
 
         // Update the player's display name if the setting is enabled.
         if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
+        String nickname = sender.getPlayerData().getNickname();
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
-                nickname.parse(sender, null);
-
-                if (sender.getPlayerData().getNickname() != null) NicknameCommand.setDisplayName(sender, nickname);
+                RoseMessageComponents components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
+                NicknameCommand.setDisplayName(sender, components);
             });
         }
     }
@@ -365,7 +351,7 @@ public class MessageUtils {
     public static boolean hasDefaultColor(String input, RoseMessage roseMessage) {
         if (roseMessage == null || roseMessage.getSenderData() == null || roseMessage.getSenderData().getColor() == null) return false;
 
-        String message = roseMessage.getMessage();
+        String message = roseMessage.getPlayerInput();
         String color = roseMessage.getSenderData().getColor();
         if (color.isEmpty() || color.length() >= message.length()) return false;
 
@@ -494,9 +480,11 @@ public class MessageUtils {
      * @return True if the sender has permission.
      */
     public static boolean hasExtendedTokenPermission(TokenizerParams params, String permission, String extendedPermission) {
+        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
+        if (params == null || params.getSender() == null || params.getLocation() == MessageLocation.NONE || params.getSender().isConsole() || !params.containsPlayerInput()) return true;
+
         // The sender will not have an extended permission if they do not have the base permission.
         if (!hasTokenPermission(params, permission)) return false;
-        if (!params.containsPlayerInput()) return true;
 
         return params.getSender().hasPermission(extendedPermission)
                 || params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))

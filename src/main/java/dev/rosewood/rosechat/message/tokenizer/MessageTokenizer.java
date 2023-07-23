@@ -7,10 +7,10 @@ import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -23,14 +23,20 @@ public class MessageTokenizer {
     private final RoseMessage roseMessage;
     private final RosePlayer viewer;
     private final Token rootToken;
+    private final MessageOutputs outputs;
+    private int parses = 0;
 
     private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, Tokenizers.TokenizerBundle... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
-        this.rootToken = Token.group(Objects.requireNonNullElse(format, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER)).build();
+        this.rootToken = Token.group(format).build();
+        this.outputs = new MessageOutputs();
+    }
 
+    public MessageOutputs tokenizeContent() {
         this.tokenizeContent(this.rootToken, 0);
+        return this.outputs;
     }
 
     public void tokenizeContent(Token token, int depth) {
@@ -47,7 +53,7 @@ public class MessageTokenizer {
             for (Tokenizer tokenizer : this.tokenizers) {
                 if (token.ignoresTokenizer(tokenizer))
                     continue;
-
+                parses++;
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
@@ -55,7 +61,7 @@ public class MessageTokenizer {
 
                 Token child = result.getToken();
                 child.parent = token;
-                token.children.add(child);
+                token.getChildren().add(child);
                 content = content.substring(result.getConsumed());
                 continue outer;
             }
@@ -78,20 +84,31 @@ public class MessageTokenizer {
         return components;
     }
 
-    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static RoseMessageComponents tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
         return tokenize(roseMessage, viewer, message, null, tokenizerBundles);
     }
 
-    public static BaseComponent[] tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, TokenComposer composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static RoseMessageComponents tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, TokenComposer composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        if (message == null) {
+            if (roseMessage.getPlayerInput() != null) {
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                message = RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER;
+            } else {
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with an empty string instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                message = "";
+            }
+        }
+
         Stopwatch stopwatch = Stopwatch.createStarted();
         MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
 
         if (composer == null)
             composer = TokenComposer.decorated(tokenizer);
 
+        MessageOutputs outputs = tokenizer.tokenizeContent();
         BaseComponent[] components = tokenizer.toComponents(composer);
-        RoseChat.getInstance().getLogger().warning("Took " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens");
-        return components;
+        RoseChat.getInstance().getLogger().warning("Took " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times");
+        return new RoseMessageComponents(components, outputs);
     }
 
     private static int countTokens(Token token) {
@@ -139,7 +156,7 @@ public class MessageTokenizer {
             switch (child.getType()) {
                 case TEXT -> {
                     if (counting.get())
-                        length += child.getContent().replaceAll("\\s", "").length();
+                        length += child.getContent().length();
                 }
                 case DECORATOR -> {
                     if (counting.get() && child.getDecorators().stream().anyMatch(decorator::isOverwrittenBy)) {

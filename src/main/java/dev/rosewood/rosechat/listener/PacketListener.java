@@ -16,14 +16,15 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -93,8 +94,7 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    if (group != null) sender.setGroup(group);
-                    else sender.setGroup("default");
+                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
 
                     BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
 
@@ -150,8 +150,7 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    if (group != null) sender.setGroup(group);
-                    else sender.setGroup("default");
+                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
 
                     BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
 
@@ -173,18 +172,17 @@ public class PacketListener {
     public static BaseComponent[] appendButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
+        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
                         .add("id", messageId)
-                        .add("type", "client")
-                        .add("message", "").build());
+                        .add("type", "client").build());
 
         if (deleteClientButton == null) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
             return null;
         }
 
-        if (shouldSuffixButton(sender, placeholder)) {
+        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
             builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
             builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
         } else {
@@ -193,17 +191,6 @@ public class PacketListener {
         }
 
         return builder.create();
-    }
-
-    private static boolean shouldSuffixButton(RosePlayer sender, String placeholderId) {
-        if (placeholderId == null || placeholderId.isEmpty()) return false;
-        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-        if (placeholder == null) return false;
-
-        String text = placeholder.getText().parseToString(sender, sender,
-                MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                        .add("type", "client").build());
-        return text.trim().startsWith("%message%");
     }
 
     // Thanks, Nicole!

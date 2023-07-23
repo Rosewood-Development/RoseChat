@@ -24,18 +24,18 @@ public class RegexReplacementTokenizer extends Tokenizer {
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) continue;
 
             Matcher matcher = Pattern.compile(replacement.getText()).matcher(input);
-            if (matcher.find()) {
-                String originalContent = matcher.group();
-                if (!input.startsWith(originalContent)) return null;
+            if (!matcher.find()) continue;
 
-                String content = replacement.getReplacement();
+            String originalContent = matcher.group();
+            if (!input.startsWith(originalContent)) continue;
 
-                return new TokenizerResult(Token.group(content)
-                        .placeholder("message", originalContent)
-                        .placeholder("extra", originalContent)
-                        .ignoreTokenizer(this)
-                        .build(), originalContent.length());
-            }
+            String content = replacement.getReplacement();
+
+            return new TokenizerResult(Token.group(content)
+                    .placeholder("message", originalContent)
+                    .placeholder("extra", originalContent)
+                    .ignoreTokenizer(this)
+                    .build(), originalContent.length());
         }
 
         return null;

@@ -56,7 +56,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
         if (text != null) {
             if (text.contains("{message}")) {
-                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text);
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).components();
                 text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
             } else {
                 // Apply PAPI placeholders if the text isn't a chat message.
@@ -73,7 +73,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (title != null) {
             if (title.contains("{message}")) {
-                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title);
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).components();
                 title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
                 hasMessagePlaceholder = true;
             } else {
@@ -86,7 +86,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (description != null) {
             if (description.contains("{message}")) {
-                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description);
+                message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).components();
                 description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
                 hasMessagePlaceholder = true;
             } else {

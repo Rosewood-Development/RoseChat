@@ -6,8 +6,6 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import org.bukkit.ChatColor;
 
 public class MarkdownBlockQuoteTokenizer extends Tokenizer {
 
@@ -17,8 +15,10 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
+        String playerInput = params.getPlayerInput();
+        if (playerInput == null || !params.getPlayerInput().startsWith("> ")) return null;
+
         String input = params.getInput();
-        if (!ChatColor.stripColor(HexUtils.colorify(params.getPlayerInput())).startsWith("> ")) return null;
         if (!input.startsWith("> ")) return null;
         if (!MessageUtils.hasTokenPermission(params, "rosechat.quote")) return null;
 

@@ -44,19 +44,18 @@ public class CreateGroupCommand extends AbstractCommand {
 
         RosePlayer rosePlayer = new RosePlayer(player);
 
-        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
+        RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.GROUP);
         MessageRules messageRules = new MessageRules().applyAllFilters();
-        message.applyRules(messageRules);
 
-        if (message.getOutputs().isBlocked()) {
-            if (message.getOutputs().getFilterType() != null) message.getOutputs().getFilterType().sendWarning(rosePlayer);
+        MessageRules.RuleOutputs outputs = messageRules.apply(message, name);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(rosePlayer);
             return;
         }
 
         GroupChannel groupChat = this.getAPI().createGroupChat(id, player);
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + message.getMessage() + "&f&r";
         groupChat.setName(name);
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.of("name", name));
     }

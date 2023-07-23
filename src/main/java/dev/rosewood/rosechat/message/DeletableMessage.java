@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.message;
 
-import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import java.util.UUID;
 
 public class DeletableMessage {
@@ -9,7 +8,6 @@ public class DeletableMessage {
     private String json;
     private String discordId;
     private boolean isClient;
-    private PrivateMessageInfo privateMessageInfo;
 
     public DeletableMessage(UUID uuid) {
         this.uuid = uuid;
@@ -52,14 +50,6 @@ public class DeletableMessage {
 
     public void setDiscordId(String discordId) {
         this.discordId = discordId;
-    }
-
-    public void setPrivateMessageInfo(PrivateMessageInfo privateMessageInfo) {
-        this.privateMessageInfo = privateMessageInfo;
-    }
-
-    public PrivateMessageInfo getPrivateMessageInfo() {
-        return this.privateMessageInfo;
     }
 
 }

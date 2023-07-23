@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

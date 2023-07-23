@@ -57,11 +57,12 @@ import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
-import dev.rosewood.rosechat.listener.ChatListener;
+import dev.rosewood.rosechat.listener.chat.BukkitChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
+import dev.rosewood.rosechat.listener.chat.ChatListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
@@ -170,7 +171,7 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new HelpCommand(this));
 
         // Register Listeners
-        pluginManager.registerEvents(new ChatListener(this), this);
+        pluginManager.registerEvents(ChatListener.create(), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
