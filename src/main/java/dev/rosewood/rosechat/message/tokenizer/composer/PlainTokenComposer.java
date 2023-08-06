@@ -2,20 +2,18 @@ package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 
-public class PlainTokenComposer implements TokenComposer {
+public class PlainTokenComposer implements TokenComposer<String> {
 
     protected PlainTokenComposer() {
 
     }
 
     @Override
-    public BaseComponent[] compose(Token token) {
+    public String compose(Token token) {
         StringBuilder builder = new StringBuilder();
         this.compose(token, builder);
-        return new BaseComponent[] { new TextComponent(builder.toString()) };
+        return builder.toString();
     }
 
     private void compose(Token token, StringBuilder stringBuilder) {

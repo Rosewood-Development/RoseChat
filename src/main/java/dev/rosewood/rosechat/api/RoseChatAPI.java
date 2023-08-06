@@ -75,7 +75,6 @@ public final class RoseChatAPI {
      * @param placeholders A set of {@link StringPlaceholders} to be parsed in the message.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    @Deprecated(forRemoval = true)
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
         RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NONE);
         roseMessage.setPlaceholders(placeholders);
@@ -89,7 +88,6 @@ public final class RoseChatAPI {
      * @param format The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    @Deprecated(forRemoval = true)
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format) {
         return RoseMessage.forLocation(sender, MessageLocation.NONE).parse(viewer, format).components();
     }
@@ -102,7 +100,6 @@ public final class RoseChatAPI {
      * @param location The location that the chat message is in.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    @Deprecated(forRemoval = true)
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, MessageLocation location) {
         return RoseMessage.forLocation(sender, location).parse(viewer, format).components();
     }
@@ -140,7 +137,7 @@ public final class RoseChatAPI {
             }
         }
 
-        // Make the message isn't empty.
+        // Make sure the message isn't empty.
         if (MessageUtils.isMessageEmpty(message)) {
             sender.sendLocaleMessage("message-blank");
             return;

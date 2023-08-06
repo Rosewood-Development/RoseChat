@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.message.tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -98,14 +97,17 @@ public class Token {
      * @return true if the Tokenizer should be ignored, false otherwise
      */
     public boolean ignoresTokenizer(Tokenizer tokenizer) {
-        return this.ignoredTokenizers.contains(tokenizer);
+        return this.getIgnoredTokenizers().contains(tokenizer);
     }
 
     /**
      * @return the ignored tokenizers
      */
     public Set<Tokenizer> getIgnoredTokenizers() {
-        return Collections.unmodifiableSet(this.ignoredTokenizers);
+        Set<Tokenizer> ignoredTokenizers = new HashSet<>(this.ignoredTokenizers);
+        if (this.parent != null)
+            ignoredTokenizers.addAll(this.parent.getIgnoredTokenizers());
+        return ignoredTokenizers;
     }
 
     public StringPlaceholders getPlaceholders() {
