@@ -78,16 +78,16 @@ public class RoseMessage {
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
             if (preParseMessageEvent.isCancelled()) return null;
             components = postParseMessageEvent.getMessageComponents();
-        }
 
-        if (viewer != null) {
-            PlayerData viewerData = viewer.getPlayerData();
-            if (viewerData != null && messageRules != null && !messageRules.isIgnoringMessageLogging()) {
-                DeletableMessage deletableMessage = new DeletableMessage(UUID.randomUUID());
-                deletableMessage.setJson(ComponentSerializer.toString(components.components()));
-                deletableMessage.setClient(false);
-                deletableMessage.setDiscordId(discordId);
-                viewerData.getMessageLog().addDeletableMessage(deletableMessage);
+            if (viewer != null) {
+                PlayerData viewerData = viewer.getPlayerData();
+                if (viewerData != null && messageRules != null && !messageRules.isIgnoringMessageLogging()) {
+                    DeletableMessage deletableMessage = new DeletableMessage(this.uuid);
+                    deletableMessage.setJson(ComponentSerializer.toString(components.components()));
+                    deletableMessage.setClient(false);
+                    deletableMessage.setDiscordId(discordId);
+                    viewerData.getMessageLog().addDeletableMessage(deletableMessage);
+                }
             }
         }
 
