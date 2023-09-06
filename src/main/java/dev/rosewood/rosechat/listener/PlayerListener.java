@@ -105,40 +105,41 @@ public class PlayerListener implements Listener {
     public void onWorldChange(PlayerChangedWorldEvent event) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         Player player = event.getPlayer();
-        PlayerData playerData = api.getPlayerData(player.getUniqueId());
-        World world = player.getWorld();
-        Channel currentChannel = playerData.getCurrentChannel();
+        api.getPlayerDataManager().getPlayerData(player.getUniqueId(), (playerData) -> {
+            World world = player.getWorld();
+            Channel currentChannel = playerData.getCurrentChannel();
 
-        // Check if the player can leave their current channel first.
-        if (currentChannel.onWorldLeave(player, event.getFrom(), world)) {
-            // Leave the channel
-            currentChannel.onLeave(player);
-            // Temporarily set the current channel to null
-            playerData.setCurrentChannel(null);
-        }
-
-        // Loop through the channels to find if the player should join one.
-        boolean foundChannel = false;
-        for (Channel channel : api.getChannels()) {
-            // If the player can join a channel, join.
-            if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
-                channel.onJoin(player);
-                playerData.setCurrentChannel(channel);
-                foundChannel = true;
-                break;
+            // Check if the player can leave their current channel first.
+            if (currentChannel.onWorldLeave(player, event.getFrom(), world)) {
+                // Leave the channel
+                currentChannel.onLeave(player);
+                // Temporarily set the current channel to null
+                playerData.setCurrentChannel(null);
             }
 
-        }
+            // Loop through the channels to find if the player should join one.
+            boolean foundChannel = false;
+            for (Channel channel : api.getChannels()) {
+                // If the player can join a channel, join.
+                if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
+                    channel.onJoin(player);
+                    playerData.setCurrentChannel(channel);
+                    foundChannel = true;
+                    break;
+                }
 
-        // If no suitable channel was found, put the player in the default channel.
-        if (!foundChannel) {
-            // Force join the default channel as there is no other option
-            Channel defaultChannel = api.getChannelManager().getDefaultChannel();
-            defaultChannel.onJoin(player);
-            playerData.setCurrentChannel(defaultChannel);
-        }
+            }
 
-        playerData.save();
+            // If no suitable channel was found, put the player in the default channel.
+            if (!foundChannel) {
+                // Force join the default channel as there is no other option
+                Channel defaultChannel = api.getChannelManager().getDefaultChannel();
+                defaultChannel.onJoin(player);
+                playerData.setCurrentChannel(defaultChannel);
+            }
+
+            playerData.save();
+        });
     }
 
     @EventHandler
