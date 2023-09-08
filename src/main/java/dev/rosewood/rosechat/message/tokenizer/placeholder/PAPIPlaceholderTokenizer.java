@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import net.md_5.bungee.api.ChatColor;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,10 +44,44 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
             content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), originalContent);
         }
 
+        // Encapsulate if the placeholder only contains a colour
+        boolean encapsulate = true;
+
+        // Ignore everything that definitely isn't a colour.
+        if (content.startsWith(ChatColor.COLOR_CHAR + "") || content.startsWith("&") || content.startsWith("#") || content.startsWith("<") || !content.startsWith("{")) {
+            Matcher legacyMatcher = MessageUtils.VALID_LEGACY_REGEX_COMBINED.matcher(content);
+            if (legacyMatcher.find() && content.equalsIgnoreCase(legacyMatcher.group()))
+                encapsulate = false;
+
+            if (encapsulate) {
+                Matcher hexMatcher = MessageUtils.SPIGOT_HEX_REGEX_COMBINED.matcher(content);
+                if (hexMatcher.find() && content.equalsIgnoreCase(hexMatcher.group()))
+                    encapsulate = false;
+            }
+
+            if (encapsulate) {
+                Matcher gradientMatcher = MessageUtils.GRADIENT_PATTERN.matcher(content);
+                if (gradientMatcher.find() && content.equalsIgnoreCase(gradientMatcher.group()))
+                    encapsulate = false;
+            }
+
+            if (encapsulate) {
+                Matcher rainbowMatcher = MessageUtils.RAINBOW_PATTERN.matcher(content);
+                if (rainbowMatcher.find() && content.equalsIgnoreCase(rainbowMatcher.group()))
+                    encapsulate = false;
+            }
+        }
+
         if (Objects.equals(content, originalContent)) {
-            return new TokenizerResult(Token.text(content).build(), originalContent.length());
+            Token.Builder token = Token.text(content);
+            if (encapsulate) token.encapsulate();
+
+            return new TokenizerResult(token.build(), originalContent.length());
         } else {
-            return new TokenizerResult(Token.group(content).build(), originalContent.length());
+            Token.Builder token = Token.group(content);
+            if (encapsulate) token.encapsulate();
+
+            return new TokenizerResult(token.build(), originalContent.length());
         }
     }
 
