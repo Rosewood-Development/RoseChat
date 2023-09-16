@@ -159,7 +159,7 @@ public final class RoseChatAPI {
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NICKNAME);
-                NicknameCommand.setDisplayName(sender, roseMessage.parse(sender, nickname));
+                sender.asPlayer().setDisplayName(TextComponent.toLegacyText(roseMessage.parse(sender, nickname).components()));
             });
         }
     }

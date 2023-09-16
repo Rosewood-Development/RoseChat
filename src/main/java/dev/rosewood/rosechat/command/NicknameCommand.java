@@ -117,8 +117,8 @@ public class NicknameCommand extends AbstractCommand {
 
                 PlayerData data = this.getAPI().getPlayerData(roseTarget.getUUID());
 
-                setDisplayName(roseTarget, components);
-                data.setNickname(message.getPlayerInput());
+                roseTarget.asPlayer().setDisplayName(TextComponent.toLegacyText(components.components()));
+                data.setNickname(outputs.getFilteredMessage());
                 data.save();
 
                 if (roseTarget.getUUID().equals(roseSender.getUUID())) {
@@ -130,20 +130,6 @@ public class NicknameCommand extends AbstractCommand {
                 }
             }
         });
-    }
-
-    public static void setDisplayName(RosePlayer target, RoseMessageComponents components) {
-        if (components == null) return;
-
-        // Remove emojis from the display name.
-        // TODO
-//        String displayName = message.getPlayerInput();
-//        for (ChatReplacement replacement : RoseChatAPI.getInstance().getEmojis()) {
-//            if (!displayName.contains(replacement.getText()) || replacement.getFont() == null || replacement.getFont().equals("default")) continue;
-//            displayName = displayName.replace(replacement.getText(), "").trim();
-//        }
-
-        target.asPlayer().setDisplayName(TextComponent.toLegacyText(components.components()));
     }
 
     @Override

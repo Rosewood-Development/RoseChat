@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface MessageParser {
 

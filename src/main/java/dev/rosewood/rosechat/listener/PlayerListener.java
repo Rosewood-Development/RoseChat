@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,7 +73,7 @@ public class PlayerListener implements Listener {
                 RosePlayer rosePlayer = new RosePlayer(player);
                 RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
                 RoseMessageComponents components = message.parse(rosePlayer, playerData.getNickname());
-                NicknameCommand.setDisplayName(rosePlayer, components);
+                player.setDisplayName(TextComponent.toLegacyText(components.components()));
             }
         });
     }

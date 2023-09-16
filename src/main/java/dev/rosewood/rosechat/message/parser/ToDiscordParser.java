@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 public class ToDiscordParser implements MessageParser {
 

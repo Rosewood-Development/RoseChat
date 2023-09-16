@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class NickColorCommand extends AbstractCommand {
 
                     RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
                     RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-                    NicknameCommand.setDisplayName(player, components);
+                    player.setDisplayName(TextComponent.toLegacyText(components.components()));
                 }
 
                 playerData.save();
@@ -75,7 +76,7 @@ public class NickColorCommand extends AbstractCommand {
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
             RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-            NicknameCommand.setDisplayName(player, components);
+            player.setDisplayName(TextComponent.toLegacyText(components.components()));
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
@@ -83,7 +84,7 @@ public class NickColorCommand extends AbstractCommand {
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
             RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-            NicknameCommand.setDisplayName(player, components);
+            player.setDisplayName(TextComponent.toLegacyText(components.components()));
         }
 
         playerData.save();

@@ -277,7 +277,7 @@ public class MessageUtils {
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessageComponents components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
-                NicknameCommand.setDisplayName(sender, components);
+                sender.setDisplayName(TextComponent.toLegacyText(components.components()));
             });
         }
     }
