@@ -203,14 +203,6 @@ spoiler-tag:
     default:
       - "%group_1%"
 
-staff-only:
-  text:
-    default: "&c⬛"
-  hover:
-    condition: "%player_has_permission_rosechat.staffonly%"
-    default: "&cYou do not have permission to view this!"
-    true: "%tagged%"
-
 url:
   text:
     default: "&9&n%group_1%"

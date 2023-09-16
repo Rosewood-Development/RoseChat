@@ -367,8 +367,7 @@ public class MessageUtils {
      * @return The string without any non-legacy colors.
      */
     public static String stripNonLegacyColors(String message) {
-        return message.replaceAll(HEX_REGEX.pattern(), "")
-                .replaceAll(GRADIENT_PATTERN.pattern(), "")
+        return message.replaceAll(GRADIENT_PATTERN.pattern(), "")
                 .replaceAll(RAINBOW_PATTERN.pattern(), "");
     }
 

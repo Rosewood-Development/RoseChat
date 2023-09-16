@@ -10,8 +10,8 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import net.md_5.bungee.api.chat.HoverEvent;
+import org.apache.commons.text.StringEscapeUtils;
 import org.bukkit.Bukkit;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +42,8 @@ public class InlineReplacementTokenizer extends Tokenizer {
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
 
-            String outerRegex = "(?:\\" + prefix + "(.*?)\\" + suffix + ")\\" + inlinePrefix + "(.*?)\\" + inlineSuffix;
+            String outerRegex = "(?:" + Pattern.quote(prefix) + "(.*?)" + Pattern.quote(suffix) + ")"
+                    + Pattern.quote(inlinePrefix) + "(.*?)" + Pattern.quote(inlineSuffix);
             Matcher matcher = Pattern.compile(outerRegex).matcher(input);
             if (!matcher.find() || matcher.start() != 0) return null;
 
@@ -60,7 +61,6 @@ public class InlineReplacementTokenizer extends Tokenizer {
                 if (!inlineMatcher.find()) return null;
             }
 
-            Bukkit.getConsoleSender().sendMessage("Text: " + replacement.getOutput().getText() + " / Group 0: " + originalContent + " / Group 1: " + matcher.group(1) + " / Group 2: " + matcher.group(2));
             return new TokenizerResult(Token.group(replacement.getOutput().getText())
                     .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()))
                     .decorate(FontDecorator.of(replacement.getOutput().getFont()))

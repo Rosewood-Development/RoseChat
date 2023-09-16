@@ -19,7 +19,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,7 +108,9 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
             placeholderViewer = new RosePlayer(content, "default");
 
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), placeholderViewer, params.getChannel())
-                .add("tagged", content).build();
+                .add("tagged", content)
+                .add("group_0", originalContent)
+                .add("group_1", content).build();
 
         if (placeholder != null) {
             String hover = placeholder.getHover() == null ? null : placeholders.apply(placeholder.getHover().parseToString(params.getSender(), params.getReceiver(), placeholders));
