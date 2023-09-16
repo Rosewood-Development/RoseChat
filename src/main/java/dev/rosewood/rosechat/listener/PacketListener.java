@@ -131,7 +131,6 @@ public class PacketListener {
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
                     UUID messageId = UUID.randomUUID();
 
-
                     if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
                         permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
 

@@ -57,7 +57,6 @@ import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
-import dev.rosewood.rosechat.listener.chat.BukkitChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
@@ -68,13 +67,11 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
-import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
+import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
-import dev.rosewood.rosechat.manager.ReplacementManager;
-import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -190,9 +187,7 @@ public class RoseChat extends RosePlugin {
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
                 ChannelManager.class,
-                EmojiManager.class,
                 ReplacementManager.class,
-                TagManager.class,
                 PlaceholderManager.class,
                 PlayerDataManager.class,
                 GroupManager.class,

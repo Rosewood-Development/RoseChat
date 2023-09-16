@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 public class MessageTokenizer {
 
@@ -79,6 +78,7 @@ public class MessageTokenizer {
                 child.parent = token;
                 token.getChildren().add(child);
                 content = content.substring(result.getConsumed());
+                this.outputs.merge(params.getOutputs());
                 continue outer;
             }
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));

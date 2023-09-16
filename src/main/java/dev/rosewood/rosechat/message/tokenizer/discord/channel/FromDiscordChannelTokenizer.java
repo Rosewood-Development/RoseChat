@@ -40,7 +40,6 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
                 .placeholder("channel_id", matcher.group(1))
                 .placeholder("channel_name", channelName)
                 .ignoreTokenizer(this)
-                .ignoreTokenizer(Tokenizers.TAG)
                 .build(), matcher.group().length());
     }
 

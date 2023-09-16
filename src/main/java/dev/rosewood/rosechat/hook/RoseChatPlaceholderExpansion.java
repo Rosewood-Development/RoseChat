@@ -2,8 +2,8 @@ package dev.rosewood.rosechat.hook;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
@@ -40,9 +40,10 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         if (placeholder.startsWith("emoji_")) {
-            for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
+            for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
+                if (!emoji.getInput().isEmoji()) continue;
                 if (placeholder.equalsIgnoreCase("emoji_" + emoji.getId())) {
-                    return emoji.getReplacement();
+                    return emoji.getOutput().getText();
                 }
             }
         }

@@ -15,6 +15,8 @@ public class FontDecorator extends TokenDecorator {
 
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
+        if (this.font == null) return;
+
         component.setFont(this.font);
     }
 

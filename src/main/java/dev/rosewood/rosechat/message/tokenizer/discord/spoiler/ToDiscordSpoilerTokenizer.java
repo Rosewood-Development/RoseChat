@@ -31,7 +31,6 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
 
         return new TokenizerResult(Token.group("||" + content + "||")
                 .ignoreTokenizer(this)
-                .ignoreTokenizer(Tokenizers.TAG)
                 .ignoreTokenizer(Tokenizers.COLOR)
                 .ignoreTokenizer(Tokenizers.FORMAT)
                 .build(), originalContent.length());

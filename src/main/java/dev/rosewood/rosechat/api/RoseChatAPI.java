@@ -1,10 +1,12 @@
 package dev.rosewood.rosechat.api;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
+import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
 import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -14,13 +16,11 @@ import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
-import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
-import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -263,92 +263,48 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Creates a new chat replacement.
+     * Creates a new replacement.
      * @param id The ID to use.
-     * @param text The text that will be replaced.
-     * @param replacement The text to replace with.
-     * @param regex Whether this replacement uses regex.
+     * @param input The input for the replacement.
+     * @param output The output of the replacement.
      * @return The new chat replacement.
      */
-    public ChatReplacement createReplacement(String id, String text, String replacement, boolean regex) {
-        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, regex);
-        this.getReplacementManager().addReplacement(chatReplacement);
-        return chatReplacement;
+    public Replacement createReplacement(String id, ReplacementInput input, ReplacementOutput output) {
+        Replacement replacement = new Replacement(id);
+        replacement.setInput(input);
+        replacement.setOutput(output);
+        this.getReplacementManager().addReplacement(replacement);
+        return replacement;
     }
 
     /**
-     * Deletes a chat replacement.
+     * Deletes a replacement.
      * @param replacement The replacement to delete.
      */
-    public void deleteReplacement(ChatReplacement replacement) {
-        this.getReplacementManager().removeReplacement(replacement);
+    public void deleteReplacement(Replacement replacement) {
+        this.getReplacementManager().deleteReplacement(replacement);
     }
 
     /**
      * @param id The ID to use.
-     * @return The chat replacement found, or null if it doesn't exist.
+     * @return The replacement found, or null if it doesn't exist.
      */
-    public ChatReplacement getReplacementById(String id) {
+    public Replacement getReplacementById(String id) {
         return this.getReplacementManager().getReplacement(id);
     }
 
     /**
-     * @return A list of all chat replacements.
+     * @return A list of all replacements.
      */
-    public List<ChatReplacement> getReplacements() {
+    public List<Replacement> getReplacements() {
         return new ArrayList<>(this.getReplacementManager().getReplacements().values());
     }
 
     /**
-     * @return A list of all chat replacement IDs.
+     * @return A list of all replacement IDs.
      */
     public List<String> getReplacementIDs() {
         return new ArrayList<>(this.getReplacementManager().getReplacements().keySet());
-    }
-
-    /**
-     * Creates a new emoji.
-     * @param id The ID to use.
-     * @param text The text to be replaced.
-     * @param replacement The text to replace with.
-     * @param hoverText The text shown when the replacement is hovered over.
-     * @param font The font to use for the emoji.
-     * @return The new emoji.
-     */
-    public ChatReplacement createEmoji(String id, String text, String replacement, String hoverText, String font) {
-        ChatReplacement chatReplacement = new ChatReplacement(id, text, replacement, hoverText, font, false);
-        this.getEmojiManager().addEmoji(chatReplacement);
-        return chatReplacement;
-    }
-
-    /**
-     * Deletes an emoji.
-     * @param emoji The emoji to delete.
-     */
-    public void deleteEmoji(ChatReplacement emoji) {
-        this.getEmojiManager().removeEmoji(emoji);
-    }
-
-    /**
-     * @param id The ID to use.
-     * @return The emoji found, or null if it doesn't exist.
-     */
-    public ChatReplacement getEmojiById(String id) {
-        return this.getEmojiManager().getEmoji(id);
-    }
-
-    /**
-     * @return A list of all emojis, specified in emojis.yml.
-     */
-    public List<ChatReplacement> getEmojis() {
-        return new ArrayList<>(this.getEmojiManager().getEmojis().values());
-    }
-
-    /**
-     * @return A list of all emoji IDs.
-     */
-    public List<String> getEmojiIds() {
-        return new ArrayList<>(this.getEmojiManager().getEmojis().keySet());
     }
 
     /**
@@ -443,47 +399,6 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Creates a new tag.
-     * @param id The ID to use.
-     * @return The new tag.
-     */
-    public Tag createTag(String id) {
-        Tag tag = new Tag(id);
-        this.getTagManager().addTag(tag);
-        return tag;
-    }
-
-    /**
-     * Deletes a tag.
-     * @param tag The tag to delete
-     */
-    public void deleteTag(Tag tag) {
-        this.getTagManager().removeTag(tag);
-    }
-
-    /**
-     * @param id The id to use.
-     * @return The tag found, or null if it doesn't exist.
-     */
-    public Tag getTagById(String id) {
-        return this.getTagManager().getTag(id);
-    }
-
-    /**
-     * @return A list of all tags.
-     */
-    public List<Tag> getTags() {
-        return new ArrayList<>(this.getTagManager().getTags().values());
-    }
-
-    /**
-     * @return A list of all tag IDs.
-     */
-    public List<String> getTagIDs() {
-        return new ArrayList<>(this.getTagManager().getTags().keySet());
-    }
-
-    /**
      * @param uuid The uuid of the player whose data should be got.
      * @return The data of the player.
      */
@@ -526,25 +441,12 @@ public final class RoseChatAPI {
         return this.plugin.getManager(PlaceholderManager.class);
     }
 
-    /**
-     * @return An instance of the emoji manager.
-     */
-    public EmojiManager getEmojiManager() {
-        return this.plugin.getManager(EmojiManager.class);
-    }
 
     /**
      * @return An instance of the replacement manager.
      */
     public ReplacementManager getReplacementManager() {
         return this.plugin.getManager(ReplacementManager.class);
-    }
-
-    /**
-     * @return An instance of the tag manager.
-     */
-    public TagManager getTagManager() {
-        return this.plugin.getManager(TagManager.class);
     }
 
     /**

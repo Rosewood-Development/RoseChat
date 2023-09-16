@@ -21,6 +21,8 @@ public class HoverDecorator extends TokenDecorator {
 
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
+        if (this.content == null) return;
+
         Token.Builder builder = Token.group(this.content).placeholders(parent.getPlaceholders());
         parent.getIgnoredTokenizers().forEach(builder::ignoreTokenizer);
 

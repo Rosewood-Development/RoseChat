@@ -15,19 +15,17 @@ import dev.rosewood.rosechat.message.tokenizer.discord.tag.ToDiscordTagTokenizer
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownBoldTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownItalicTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownStrikethroughTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownURLTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownUnderlineTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.EmojiTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.RegexReplacementTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.replacement.InlineReplacementTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.replacement.PrefixedReplacementTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.replacement.ReplacementTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.ColorTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.FormatTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.GradientTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.RainbowTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.tag.TagTokenizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +47,6 @@ public class Tokenizers {
     public static final Tokenizer MARKDOWN_ITALIC = new MarkdownItalicTokenizer();
     public static final Tokenizer MARKDOWN_UNDERLINE = new MarkdownUnderlineTokenizer();
     public static final Tokenizer MARKDOWN_STRIKETHROUGH = new MarkdownStrikethroughTokenizer();
-    public static final Tokenizer MARKDOWN_URL = new MarkdownURLTokenizer();
     public static final Tokenizer GRADIENT = new GradientTokenizer();
     public static final Tokenizer RAINBOW = new RainbowTokenizer();
     public static final Tokenizer SHADER_COLORS = new ShaderTokenizer();
@@ -58,9 +55,8 @@ public class Tokenizers {
     public static final Tokenizer ROSECHAT_PLACEHOLDER = new RoseChatPlaceholderTokenizer();
     public static final Tokenizer PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(false);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(true);
-    public static final Tokenizer EMOJI = new EmojiTokenizer();
-    public static final Tokenizer TAG = new TagTokenizer();
-    public static final Tokenizer REGEX_REPLACEMENT = new RegexReplacementTokenizer();
+    public static final Tokenizer INLINE_REPLACEMENT = new InlineReplacementTokenizer();
+    public static final Tokenizer PREFIXED_REPLACEMENT = new PrefixedReplacementTokenizer();
     public static final Tokenizer REPLACEMENT = new ReplacementTokenizer();
     public static final Tokenizer CHARACTER = new CharacterTokenizer();
 
@@ -72,9 +68,8 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            EMOJI,
-            TAG,
-            REGEX_REPLACEMENT,
+            INLINE_REPLACEMENT,
+            PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
     public static final TokenizerBundle COLORS_BUNDLE = new TokenizerBundle("colors",
@@ -86,8 +81,7 @@ public class Tokenizers {
             MARKDOWN_BOLD,
             MARKDOWN_ITALIC,
             MARKDOWN_UNDERLINE,
-            MARKDOWN_STRIKETHROUGH,
-            MARKDOWN_URL);
+            MARKDOWN_STRIKETHROUGH);
     public static final TokenizerBundle BUNGEE_BUNDLE = new TokenizerBundle("bungee",
             ROSECHAT_PLACEHOLDER,
             BUNGEE_PAPI_PLACEHOLDER,
@@ -96,9 +90,8 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            EMOJI,
-            TAG,
-            REGEX_REPLACEMENT,
+            INLINE_REPLACEMENT,
+            PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
     public static final TokenizerBundle DEFAULT_DISCORD_BUNDLE = new TokenizerBundle("default_discord",
@@ -109,9 +102,8 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            EMOJI,
-            TAG,
-            REGEX_REPLACEMENT,
+            INLINE_REPLACEMENT,
+            PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
     public static final TokenizerBundle DISCORD_FORMATTING_BUNDLE = new TokenizerBundle("discord_formatting",

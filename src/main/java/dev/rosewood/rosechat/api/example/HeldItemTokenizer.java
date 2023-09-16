@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.api.example;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -43,13 +43,14 @@ public class HeldItemTokenizer extends Tokenizer {
         this.api = RoseChatAPI.getInstance();
     }
 
+    // TODO: Make this work!
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        ChatReplacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());
+        Replacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());
         if (replacement == null) return null;
 
         String input = params.getInput();
-        if (!input.startsWith(replacement.getText())) return null;
+        if (!input.startsWith(replacement.getInput().getText())) return null;
         if (!params.getSender().isPlayer()) return null;
         if (!MessageUtils.hasTokenPermission(params, "rosechat.helditem")) return null;
         if (params.getSender().asPlayer().getEquipment() == null) return null;
@@ -66,16 +67,14 @@ public class HeldItemTokenizer extends Tokenizer {
                     ? itemMeta.getDisplayName() 
                     : WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
 
-            return new TokenizerResult(Token.group(replacement.getReplacement())
+            return new TokenizerResult(Token.group(replacement.getOutput().getText())
                     .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_ITEM, json))
                     .placeholder("item_name", itemName)
                     .placeholder("item", json)
                     .ignoreTokenizer(this)
-                    .ignoreTokenizer(Tokenizers.TAG)
-                    .ignoreTokenizer(Tokenizers.REGEX_REPLACEMENT)
                     .ignoreTokenizer(Tokenizers.REPLACEMENT)
                     .encapsulate()
-                    .build(), replacement.getText().length());
+                    .build(), replacement.getInput().getText().length());
 
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

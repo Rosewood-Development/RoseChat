@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Bukkit;
 
 public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
@@ -37,16 +38,18 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         String placeholderValue = matcher.group(1);
         if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue)) return null;
 
+        if (input.contains("url")) Bukkit.getConsoleSender().sendMessage("Doing shit for "+ input + " / Is Recx Player: " + params.getReceiver().isPlayer());
         // Hardcoded special {message} placeholder to inject the player's message
         // Do not let the {message} placeholder be used if the message contains player input
-        // TODO: Append player chat color before injecting their input
         if (placeholder.equals(MESSAGE_PLACEHOLDER) && !params.containsPlayerInput()) {
             String playerInput = params.getPlayerInput();
             if (playerInput == null || playerInput.isEmpty()) {
                 RoseChat.getInstance().getLogger().warning("Parsed {message} with no player input. This is likely a configuration error.");
                 return new TokenizerResult(Token.text("").build(), matcher.group().length());
             }
-            return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
+
+            String color = params.getSender().getPlayerData().getColor();
+            return new TokenizerResult(Token.group(color + params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
         }
 
         RoseChatPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
@@ -58,9 +61,24 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         String click = roseChatPlaceholder.getClick() == null ? null : placeholders.apply(roseChatPlaceholder.getClick().parseToString(params.getSender(), params.getReceiver(), placeholders));
         ClickEvent.Action clickAction = roseChatPlaceholder.getClick() == null ? null : roseChatPlaceholder.getClick().parseToAction(params.getSender(), params.getReceiver(), placeholders);
 
+        if (input.contains("url")) {
+            Bukkit.getConsoleSender().sendMessage("url content " + content);
+            Bukkit.getConsoleSender().sendMessage("url hover " + hover);
+            if (click != null) {
+                Bukkit.getConsoleSender().sendMessage("url click " + click);
+                Bukkit.getConsoleSender().sendMessage("url ca " + clickAction.toString());
+            }
+        }
         Token.Builder tokenBuilder = Token.group(content);
         if (hover != null) tokenBuilder.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
-        if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
+        if (click != null) {
+            if (clickAction == ClickEvent.Action.OPEN_URL && !click.startsWith("https://"))
+                click = "https://" + click;
+            tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
+        }
+
+        if (params.containsPlayerInput())
+            tokenBuilder.encapsulate();
 
         return new TokenizerResult(tokenBuilder.build(), placeholder.length());
     }

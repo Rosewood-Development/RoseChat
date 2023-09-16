@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.emoji;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -22,6 +22,8 @@ public class DiscordEmojiTokenizer extends Tokenizer {
         super("discord_emoji");
     }
 
+    // TODO: May need changes with new replacements
+
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
@@ -31,18 +33,18 @@ public class DiscordEmojiTokenizer extends Tokenizer {
         if (!matcher.find() || matcher.start() != 0) return null;
 
         String content = matcher.group(1);
-        for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
-            if (!emoji.getText().equalsIgnoreCase(content)) continue;
+        for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
+            if (!emoji.getInput().getText().equalsIgnoreCase(content)) continue;
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
                 return null;
 
-            content = emoji.getReplacement();
+            content = emoji.getOutput().getText();
 
             return new TokenizerResult(Token.group(content)
-                    .decorate(FontDecorator.of(emoji.getFont()))
-                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, emoji.getHoverText()))
+                    .decorate(FontDecorator.of(emoji.getOutput().getFont()))
+                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, emoji.getOutput().getHover()))
                     .ignoreTokenizer(this)
-                    .ignoreTokenizer(Tokenizers.EMOJI)
+                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
                     .build(), matcher.group().length());
         }
 

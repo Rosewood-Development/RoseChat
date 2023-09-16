@@ -191,7 +191,7 @@ public class RoseChatChannel extends ConditionalChannel {
                 BaseComponent[] parsedMessage = ComponentSerializer.parse(receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), jsonMessage) : jsonMessage);
                 RoseMessageComponents components = new RoseMessageComponents(parsedMessage, new MessageOutputs());
 
-                //Call the post parse message event for the correct viewer if the message was sent over bungee
+                // Call the post parse message event for the correct viewer if the message was sent over bungee
                 PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.PLAYER_TO_SERVER, components);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
                 parsedMessage = postParseMessageEvent.getMessageComponents().components();

@@ -85,7 +85,7 @@ message-received:
 
 console-message:
   text:
-    default: "&8[&f%player_nickname% &6-> &e%other_player_nickname%&7] &f"
+    default: "&8[&f%player_nickname% &6-> &e%other_player_nickname%&8] &f"
 
 # These custom placeholders are used in the group format.
 group-prefix:
@@ -190,9 +190,9 @@ hashtag:
   text:
     default: "&9#%tagged%"
 
-money-tag:
+money:
   text:
-    default: "&a$%tagged%"
+    default: "&a$%group_1%"
   hover:
     default:
       - "&7Click to pay &f%player_nickname% &a$%tagged%"
@@ -233,14 +233,25 @@ staff-only:
 
 url:
   text:
-    default: "&9&n%message%"
+    default: "&9&n%group_1%"
   hover:
     default:
       - "&7Click to Open"
   click:
     default:
       action: OPEN_URL
-      value: "%extra%"
+      value: "%group_2%"
+
+copy:
+  text:
+    default: "%group_1%"
+  hover:
+    default:
+      - "&7Click to copy"
+  click:
+    default:
+      action: COPY_TO_CLIPBOARD
+      value: "%group_2%"
 
 # This placeholder allows an item to be shown in chat.
 # The %item_name% placeholder is used for the name of the item.

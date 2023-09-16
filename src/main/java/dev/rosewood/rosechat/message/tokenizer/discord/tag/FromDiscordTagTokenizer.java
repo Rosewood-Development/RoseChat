@@ -24,6 +24,8 @@ public class FromDiscordTagTokenizer extends Tokenizer {
         super("from_discord_tag");
     }
 
+    // TODO: May need changes with new replacements
+
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
@@ -53,14 +55,14 @@ public class FromDiscordTagTokenizer extends Tokenizer {
         String taggedName = discord.getUserFromId(content);
         String prefix = "@";
 
-        for (Tag tag : RoseChatAPI.getInstance().getTags()) {
+        /* for (Tag tag : RoseChatAPI.getInstance().getTags()) {
             if (tag.getPrefix().equals(prefix)) {
                 if (!tag.shouldTagOnlinePlayers() || !tag.getPrefix().equals(prefix)) continue;
                 params.getOutputs().setTagSound(tag.getSound());
                 if (player == null) break;
                 return new TokenizerResult(Token.text(tag.getPrefix() + taggedName + (tag.getSuffix() != null ? tag.getSuffix() : "")).build(), originalContent.length());
             }
-        }
+        } */
 
         if (isRole) params.getOutputs().getTaggedPlayers().addAll(discord.getPlayersWithRole(content));
 
