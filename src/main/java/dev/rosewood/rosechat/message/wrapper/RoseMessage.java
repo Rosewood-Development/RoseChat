@@ -19,7 +19,6 @@ import org.bukkit.Bukkit;
 
 /**
  * A wrapper for chat messages which can be used to parse a message for a given receiver.
- * TODO: Potentially remove the need for this class and send messages through channels instead
  */
 public class RoseMessage {
 

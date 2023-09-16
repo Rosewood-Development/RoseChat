@@ -182,24 +182,16 @@ player-tag:
   text:
     default: "&e@%other_player_nickname%"
 
-bounce-tag:
-  text:
-    default: "#FDFFFF%tagged%"
-
-hashtag:
-  text:
-    default: "&9#%tagged%"
-
 money:
   text:
     default: "&a$%group_1%"
   hover:
     default:
-      - "&7Click to pay &f%player_nickname% &a$%tagged%"
+      - "&7Click to pay &f%player_nickname% &a$%group_1%"
   click:
     default:
       action: SUGGEST_COMMAND
-      value: "/pay %player_name% %tagged%"
+      value: "/pay %player_name% %group_1%"
 
 # This custom placeholder uses 1 character in the text.
 # This is because the tag has match-length enabled in the tags.yml file.
@@ -209,19 +201,7 @@ spoiler-tag:
     default: "&0⬛"
   hover:
     default:
-      - "%tagged%"
-
-# This custom placeholder uses a different action to allow the viewer to copy a message.
-copy-paste:
-  text:
-    default: "%tagged%"
-  hover:
-    default:
-      - "Click to Copy"
-  click:
-    default:
-      action: COPY_TO_CLIPBOARD
-      value: "%tagged%"
+      - "%group_1%"
 
 staff-only:
   text:
@@ -240,17 +220,6 @@ url:
   click:
     default:
       action: OPEN_URL
-      value: "%group_2%"
-
-copy:
-  text:
-    default: "%group_1%"
-  hover:
-    default:
-      - "&7Click to copy"
-  click:
-    default:
-      action: COPY_TO_CLIPBOARD
       value: "%group_2%"
 
 # This placeholder allows an item to be shown in chat.

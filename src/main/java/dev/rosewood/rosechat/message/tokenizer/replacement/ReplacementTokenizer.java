@@ -12,8 +12,6 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.bukkit.Bukkit;
-
 import java.util.regex.Matcher;
 
 public class ReplacementTokenizer extends Tokenizer {
@@ -22,7 +20,6 @@ public class ReplacementTokenizer extends Tokenizer {
         super("replacement");
     }
 
-    // TODO: Something with encapsulation at the end of (urls specifically)
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();

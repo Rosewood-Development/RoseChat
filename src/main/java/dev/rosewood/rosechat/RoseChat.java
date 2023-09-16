@@ -22,12 +22,12 @@ import dev.rosewood.rosechat.command.UnmuteCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
-import dev.rosewood.rosechat.command.chat.InfoChatCommand;
-import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
+import dev.rosewood.rosechat.command.chat.InfoChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
+import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
@@ -69,9 +69,9 @@ import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
+import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -163,6 +163,7 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
                 .addCommandManager(deleteMessageCommand)
+                .addCommandManager(realnameCommand)
                 .addSubcommand(new DebugCommand(this))
                 .addSubcommand(new ReloadCommand())
                 .addSubcommand(new HelpCommand(this));

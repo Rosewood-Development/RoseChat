@@ -19,7 +19,10 @@ public class ClickDecorator extends TokenDecorator {
 
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
-        component.setClickEvent(new ClickEvent(this.action, parent.getPlaceholders().apply(this.value)));
+        String value = parent.getPlaceholders().apply(this.value);
+        if (this.action == ClickEvent.Action.OPEN_URL && !value.startsWith("https://"))
+            value = "https://" + value;
+        component.setClickEvent(new ClickEvent(this.action, parent.getPlaceholders().apply(value)));
     }
 
     public static ClickDecorator of(ClickEvent.Action action, String value) {
