@@ -177,8 +177,9 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         Role role = this.discord.getMainGuild().getRoleById(id);
         if (role == null) return null;
 
-        String color = Integer.toHexString(role.getColorRaw());
-        return "#" + color + role.getName();
+        String color = "FFFFFF";
+        if (role.getColor() != null) Integer.toHexString(role.getColorRaw());
+        return "#" + (color.length() == 5 ? "0" + color : color) + role.getName();
     }
 
     @Override

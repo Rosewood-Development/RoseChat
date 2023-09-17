@@ -22,8 +22,6 @@ public class DiscordEmojiTokenizer extends Tokenizer {
         super("discord_emoji");
     }
 
-    // TODO: May need changes with new replacements
-
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
@@ -34,6 +32,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
 
         String content = matcher.group(1);
         for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
+            if (!emoji.getInput().isEmoji()) continue;
             if (!emoji.getInput().getText().equalsIgnoreCase(content)) continue;
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
                 return null;

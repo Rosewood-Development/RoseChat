@@ -61,7 +61,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 int endIndex = input.lastIndexOf(suffix) + suffix.length();
                 String originalContent = input.substring(0, endIndex);
                 String content = input.substring(prefix.length(), input.lastIndexOf(suffix));
-                return this.createTagToken(params, originalContent, content, replacement, prefix, suffix);
+                return this.createTagToken(params, originalContent, content, replacement, prefix);
             }
 
             String originalContent = null;
@@ -75,13 +75,13 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 tagContent = input.substring(prefix.length(), endIndex);
             }
 
-            return this.createTagToken(params, originalContent, tagContent, replacement, prefix, suffix);
+            return this.createTagToken(params, originalContent, tagContent, replacement, prefix);
         }
 
         return null;
     }
 
-    private TokenizerResult createTagToken(TokenizerParams params, String originalContent, String content, Replacement replacement, String prefix, String suffix) {
+    private TokenizerResult createTagToken(TokenizerParams params, String originalContent, String content, Replacement replacement, String prefix) {
         String output = replacement.getOutput().getText();
         RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(output.substring(1, output.length() - 1));
 

@@ -229,13 +229,12 @@ item:
 # %user_name% - The user's name.
 # %user_role% - The user's role.
 # %user_color% - The user's color.
-# %user_tag% - The user's tag.
 discord-player:
   text:
     default: "&8[%user_color%%user_role%&8] %user_color%%user_nickname%"
   hover:
     default:
-      - "&f%user_name%&8#%user_tag%"
+      - "&7Discord: &f%user_name%"
 
 # This is a unique custom placeholder.
 # These options will do nothing in-game, they are only for Discord.
