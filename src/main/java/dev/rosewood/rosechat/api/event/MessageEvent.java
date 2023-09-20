@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.api.event;
 
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
@@ -11,14 +12,16 @@ public class MessageEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
+    private final MessageDirection messageDirection;
     private final RoseMessage message;
     private final RosePlayer viewer;
     private boolean cancelled;
 
-    public MessageEvent(RoseMessage message, RosePlayer viewer) {
+    public MessageEvent(RoseMessage message, RosePlayer viewer, MessageDirection messageDirection) {
         super(!Bukkit.isPrimaryThread());
         this.message = message;
         this.viewer = viewer;
+        this.messageDirection = messageDirection;
     }
 
     public RoseMessage getMessage() {
@@ -27,6 +30,10 @@ public class MessageEvent extends Event implements Cancellable {
 
     public RosePlayer getViewer() {
         return this.viewer;
+    }
+
+    public MessageDirection getMessageDirection() {
+        return this.messageDirection;
     }
 
     @Override

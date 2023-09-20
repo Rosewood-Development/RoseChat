@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
 
 public class PostParseMessageEvent extends MessageEvent {
 
-    private final MessageDirection messageDirection;
     private RoseMessageComponents messageComponents;
 
     /**
@@ -18,13 +17,8 @@ public class PostParseMessageEvent extends MessageEvent {
      * @param messageComponents The {@link RoseMessageComponents} for the parsed message.
      */
     public PostParseMessageEvent(RoseMessage message, RosePlayer viewer, MessageDirection messageDirection, RoseMessageComponents messageComponents) {
-        super(message, viewer);
-        this.messageDirection = messageDirection;
+        super(message, viewer, messageDirection);
         this.messageComponents = messageComponents;
-    }
-
-    public MessageDirection getMessageDirection() {
-        return this.messageDirection;
     }
 
     /**

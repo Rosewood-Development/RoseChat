@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 public class RoseMessage {
 
     private UUID uuid;
+    private String discordId;
     private final RosePlayer sender;
     private final MessageLocation location;
     private String playerInput;
@@ -62,39 +63,9 @@ public class RoseMessage {
      * @param discordId The discord id of the message, or null if not sent from discord.
      * @return A {@link RoseMessageComponents} containing the parsed message.
      */
-    public RoseMessageComponents parse(MessageParser parser, RosePlayer viewer, String format, String discordId, MessageRules messageRules) {
-        // Call the PreParseMessageEvent and check if the message can still be parsed.
-        PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(this, viewer);
-        Bukkit.getPluginManager().callEvent(preParseMessageEvent);
-
-        if (preParseMessageEvent.isCancelled()) return null;
-        RoseMessageComponents components = parser.parse(this, viewer, format);
-
-        // Only call the PostParseMessageEvent if the message has player input.
-        // This prevents non-chat messages from having delete buttons.
-        if (this.playerInput != null) {
-            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(this, viewer, parser.getMessageDirection(), components);
-            Bukkit.getPluginManager().callEvent(postParseMessageEvent);
-            if (preParseMessageEvent.isCancelled()) return null;
-            components = postParseMessageEvent.getMessageComponents();
-
-            if (viewer != null) {
-                PlayerData viewerData = viewer.getPlayerData();
-                if (viewerData != null && messageRules != null && !messageRules.isIgnoringMessageLogging()) {
-                    DeletableMessage deletableMessage = new DeletableMessage(this.uuid);
-                    deletableMessage.setJson(ComponentSerializer.toString(components.components()));
-                    deletableMessage.setClient(false);
-                    deletableMessage.setDiscordId(discordId);
-                    viewerData.getMessageLog().addDeletableMessage(deletableMessage);
-                }
-            }
-        }
-
-        return components;
-    }
-
     public RoseMessageComponents parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
-        return this.parse(parser, viewer, format, discordId, new MessageRules());
+        this.discordId = discordId;
+        return parser.parse(this, viewer, format);
     }
 
     /**
@@ -222,6 +193,14 @@ public class RoseMessage {
 
     public void setUUID(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public String getDiscordId() {
+        return this.discordId;
+    }
+
+    public void setDiscordId(String discordId) {
+        this.discordId = discordId;
     }
 
     /**

@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
@@ -169,12 +170,30 @@ public class RoseChatChannel extends ConditionalChannel {
                 messageTimer = null;
             }
 
-            // If the message is not a json message, parse normally or parse from discord if an id is available.
+            // If the message is not a json message, parse normally, or parse from discord if an id is available.
             MessageOutputs outputs;
             if (direction != MessageDirection.FROM_BUNGEE_RAW) {
+
+                // Call the PreParseMessageEvent and check if the message can be parsed.
+                PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(message, receiver, direction);
+                Bukkit.getPluginManager().callEvent(preParseMessageEvent);
+
+                if (preParseMessageEvent.isCancelled()) return;
                 RoseMessageComponents components = discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
-                outputs = components.outputs();
-                receiver.send(components.components());
+
+                PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, receiver, direction, components);
+                Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+
+                if (postParseMessageEvent.isCancelled()) return;
+
+                outputs = postParseMessageEvent.getMessageComponents().outputs();
+                receiver.send(postParseMessageEvent.getMessageComponents().components());
+
+                DeletableMessage deletableMessage = new DeletableMessage(message.getUUID());
+                deletableMessage.setJson(ComponentSerializer.toString(postParseMessageEvent.getMessageComponents().components()));
+                deletableMessage.setClient(false);
+                deletableMessage.setDiscordId(discordId);
+                receiverData.getMessageLog().addDeletableMessage(deletableMessage);
             } else {
                 // Parse the json message.
 
@@ -267,7 +286,15 @@ public class RoseChatChannel extends ConditionalChannel {
         this.sendToBungee(message, direction);
 
         if (direction == MessageDirection.PLAYER_TO_SERVER) {
-            BaseComponent[] parsedConsoleMessage = message.parse(new RosePlayer(Bukkit.getConsoleSender()), this.getFormat()).components();
+            RosePlayer consoleReceiver = new RosePlayer(Bukkit.getConsoleSender());
+
+            // Call the PreParseMessageEvent and check if the message can be parsed.
+            PreParseMessageEvent preParseMessageEvent = new PreParseMessageEvent(message, consoleReceiver, direction);
+            Bukkit.getPluginManager().callEvent(preParseMessageEvent);
+
+            if (preParseMessageEvent.isCancelled()) return;
+
+            BaseComponent[] parsedConsoleMessage = message.parse(consoleReceiver, this.getFormat()).components();
             Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
         }
 
