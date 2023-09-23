@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -23,19 +24,35 @@ public class ChatColorCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        UUID uuid = ((Player) sender).getUniqueId();
-        PlayerData playerData = this.getAPI().getPlayerData(uuid);
-
         if (args.length == 0) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
+        }
+
+        Player player = (Player) sender;
+        UUID uuid = player.getUniqueId();
+        PlayerData playerData = this.getAPI().getPlayerData(uuid);
+        if (args.length == 2 && sender.hasPermission("rosechat.chatcolor.others")) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target != null) {
+                player = target;
+                uuid = player.getUniqueId();
+                playerData = this.getAPI().getPlayerData(uuid);
+            }
         }
 
         String color = args[0];
         if (color.equalsIgnoreCase("remove")) {
             playerData.setColor("");
             playerData.save();
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-removed");
+
+            if (player == sender) {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-removed");
+            } else {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-others-removed", StringPlaceholders.of("player", player.getDisplayName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-color-removed");
+            }
+
             return;
         }
 
@@ -51,7 +68,14 @@ public class ChatColorCommand extends AbstractCommand {
         colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : (colorStr.startsWith("<g") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-gradient") : colorStr.startsWith("<r:") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-rainbow") : colorStr);
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.of("color", ChatColor.stripColor(color + colorStr)));
+
+        if (player == sender) {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-success", StringPlaceholders.of("color", ChatColor.stripColor(color + colorStr)));
+        } else {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-color-others", StringPlaceholders.of("player", player.getDisplayName(), "color", ChatColor.stripColor(color + colorStr)));
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-color-success", StringPlaceholders.of("color", ChatColor.stripColor(color + colorStr)));
+        }
+
         playerData.setColor(color);
         playerData.save();
     }
@@ -70,6 +94,12 @@ public class ChatColorCommand extends AbstractCommand {
                 for (ChatColor color : ChatColor.values()) {
                     if (sender.hasPermission("rosechat." + color.getName().toLowerCase() + ".chatcolor")) tab.add("&" + color.toString().substring(1));
                 }
+            }
+        }
+
+        if (args.length == 2 && sender.hasPermission("rosechat.chatcolor.others")) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
             }
         }
 

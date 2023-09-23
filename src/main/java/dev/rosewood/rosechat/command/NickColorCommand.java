@@ -27,16 +27,24 @@ public class NickColorCommand extends AbstractCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        UUID uuid = ((Player) sender).getUniqueId();
-        PlayerData playerData = this.getAPI().getPlayerData(uuid);
-
         if (args.length == 0) {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
-        RosePlayer player = new RosePlayer(sender);
+        Player player = (Player) sender;
+        UUID uuid = ((Player) sender).getUniqueId();
+        PlayerData playerData = this.getAPI().getPlayerData(uuid);
+        if (args.length == 2 && sender.hasPermission("rosechat.nickcolor.others")) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target != null) {
+                player = target;
+                uuid = player.getUniqueId();
+                playerData = this.getAPI().getPlayerData(uuid);
+            }
+        }
 
+        RosePlayer rosePlayer = new RosePlayer(player);
         String color = args[0];
         if (color.equalsIgnoreCase("remove")) {
             if (playerData.getNickname() != null) {
@@ -46,21 +54,29 @@ public class NickColorCommand extends AbstractCommand {
                     ((Player) sender).setDisplayName(null);
                 } else {
                     // Remove only colours from the nickname.
-                    String nickname = ChatColor.stripColor(HexUtils.colorify(player.getNickname())) + "&r";
+                    String nickname = ChatColor.stripColor(HexUtils.colorify(rosePlayer.getNickname())) + "&r";
                     playerData.setNickname(nickname);
 
-                    RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
-                    RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-                    player.setDisplayName(TextComponent.toLegacyText(components.components()));
+                    RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
+                    RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
+                    rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
                 }
 
                 playerData.save();
             }
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-removed");
+
+
+            if (player == sender) {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-removed");
+            } else {
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-removed", StringPlaceholders.of("player", player.getDisplayName()));
+                this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickcolor-removed");
+            }
+
             return;
         }
 
-        if (!MessageUtils.canColor(player, color, MessageLocation.NICKNAME.toString().toLowerCase())) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), color, MessageLocation.NICKNAME.toString().toLowerCase())) return;
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {
@@ -74,17 +90,17 @@ public class NickColorCommand extends AbstractCommand {
         if (playerData.getNickname() == null) {
             nickname = color + sender.getName() + "&r";
             playerData.setNickname(nickname);
-            RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
-            RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-            player.setDisplayName(TextComponent.toLegacyText(components.components()));
+            RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
+            RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
+            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             nickname = color + nickname + "&r";
             playerData.setNickname(nickname);
-            RoseMessage nicknameMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
-            RoseMessageComponents components = nicknameMessage.parse(player, nickname);
-            player.setDisplayName(TextComponent.toLegacyText(components.components()));
+            RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
+            RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
+            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
         }
 
         playerData.save();
@@ -93,9 +109,20 @@ public class NickColorCommand extends AbstractCommand {
         colorStr = !colorStr.startsWith("<") ? colorStr.substring(1) : (colorStr.startsWith("<g") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-gradient") : colorStr.startsWith("<r:") ?
                 this.getAPI().getLocaleManager().getMessage("command-color-rainbow") : colorStr);
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-success",
-                StringPlaceholders.builder("color", ChatColor.stripColor(color + colorStr))
-                        .addPlaceholder("name", nickname).build());
+
+        if (player == sender) {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-success",
+                    StringPlaceholders.builder("color", ChatColor.stripColor(color + colorStr))
+                            .add("name", nickname).build());
+        } else {
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickcolor-others",
+                    StringPlaceholders.builder("color", ChatColor.stripColor(color + colorStr))
+                            .add("name", nickname)
+                            .add("player", player.getDisplayName()).build());
+            this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickcolor-success",
+                    StringPlaceholders.builder("color", ChatColor.stripColor(color + colorStr))
+                            .add("name", nickname).build());
+        }
     }
 
     @Override
@@ -112,6 +139,12 @@ public class NickColorCommand extends AbstractCommand {
                 for (ChatColor color : ChatColor.values()) {
                     if (sender.hasPermission("rosechat." + color.getName().toLowerCase() + ".nickname")) tab.add("&" + color.toString().substring(1));
                 }
+            }
+        }
+
+        if (args.length == 2 && sender.hasPermission("rosechat.nickcolor.others")) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player != sender) tab.add(player.getName());
             }
         }
 

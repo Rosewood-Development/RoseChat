@@ -263,7 +263,7 @@ public abstract class Channel {
      * Floods the channel with the specified message.
      * @param message The message to use
      */
-    public void flood(String message) {
+    public void send(String message) {
         // No default implementation.
     }
 

@@ -111,15 +111,11 @@ permissions:
       rosechat.caps: true
       rosechat.links: true
       rosechat.placeholders: true
-      rosechat.tags: true
       rosechat.replacements: true
-      rosechat.emojis: true
       rosechat.chat: true
       rosechat.message: true
       rosechat.reply: true
-      rosechat.tag: true
       rosechat.replacement: true
-      rosechat.emoji: true
       rosechat.spy: true
       rosechat.togglemessage: true
       rosechat.togglesound: true
@@ -132,6 +128,7 @@ permissions:
       rosechat.group: true
       rosechat.groups: true
       rosechat.nickname: true
+      rosechat.nickcolor: true
       rosechat.ignore: true
       rosechat.deletemessages: true
       rosechat.discordchannel: true
@@ -254,17 +251,6 @@ permissions:
   rosechat.placeholder:
     description: Allows using a specific placeholder.
     default: op
-  rosechat.tags:
-    description: Allows using tags.
-    default: op
-    children:
-      rosechat.tags.message: true
-      rosechat.tags.channel: true
-      rosechat.tags.group: true
-      rosechat.tags.nickname: true
-  rosechat.tag:
-    description: Allows using a specific tag.
-    default: op
   rosechat.replacements:
     description: Allows using replacements.
     default: op
@@ -275,17 +261,6 @@ permissions:
       rosechat.replacements.nickname: true
   rosechat.replacement:
     description: Allows using a specific replacement.
-    default: op
-  rosechat.emojis:
-    description: Allows using emojis.
-    default: op
-    children:
-      rosechat.emojis.message: true
-      rosechat.emojis.channel: true
-      rosechat.emojis.group: true
-      rosechat.emojis.nickname: true
-  rosechat.emoji:
-    description: Allows using a specific emoji.
     default: op
   rosechat.message:
     description: Allows using the message command.
@@ -356,6 +331,9 @@ permissions:
   rosechat.chatcolor:
     description: Allows using the chatcolor command.
     default: op
+  rosechat.chatcolor.others:
+    description: Allows using the chatcolor command on other players.
+    default: op
   rosechat.group.create:
     description: Allows using the group create command.
     default: op
@@ -406,6 +384,12 @@ permissions:
     default: true
   rosechat.nickname.others:
     description: Allows setting the nickname of another player.
+    default: op
+  rosechat.nickcolor:
+    description: Allows using the nickcolor command.
+    default: op
+  rosechat.nickcolor.others:
+    description: Allows using the nickcolor command on another player.
     default: op
   rosechat.ignore:
     description: Allows using the ignore command.

@@ -2,12 +2,10 @@ package dev.rosewood.rosechat.api;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.Tag;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
 import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
-import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;

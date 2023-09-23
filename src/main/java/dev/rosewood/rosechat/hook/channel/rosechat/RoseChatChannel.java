@@ -465,7 +465,7 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     @Override
-    public void flood(String message) {
+    public void send(String message) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         // Flood the channel on the linked servers.

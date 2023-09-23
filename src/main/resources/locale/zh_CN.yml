@@ -219,12 +219,14 @@ command-gcm-enter-message: '&c请输入消息.'
 
 # Color Command
 command-color-description: '&8 - &d/color &7- 改变默认聊天颜色.'
-command-color-usage: '&e/color <颜色>'
+command-color-usage: '&e/color <颜色> [玩家名]'
 command-color-success: '&e你的聊天颜色现在为&f%color%&e.'
 command-color-invalid: '&e此颜色不存在!'
 command-color-removed: '&e你移除了你的聊天颜色.'
 command-color-gradient: '渐变色'
 command-color-rainbow: '彩虹色'
+command-color-others: "&e你已将玩家&b%player%&e的聊天颜色设置为&f%color%&e。"
+command-color-others-removed: "&e你已移除玩家&b%player%&e的聊天颜色。"
 
 # 禁言命令
 command-mute-description: '&8 - &d/mute &7- 禁言玩家.'
@@ -280,10 +282,12 @@ command-debug-off: '&e调试模式已关闭。'
 
 # 昵称颜色命令
 command-nickcolor-description: '&8 - &d/nickcolor &7- 更改昵称颜色.'
-command-nickcolor-usage: '&e/nickcolor <color>'
+command-nickcolor-usage: '&e/nickcolor <color> [玩家名]'
 command-nickcolor-success: '&e你的新昵称为：&f%name%&e.'
 command-nickcolor-invalid: '&e这不是一个有效的颜色！'
 command-nickcolor-removed: '&e你的昵称颜色已移除.'
+command-nickcolor-others: "&e你已将玩家&b%player%&e的昵称颜色设置为&f%color%&e。"
+command-nickcolor-others-removed: "&e你已移除玩家&b%player%&e的昵称颜色。"
 
 # 切换频道可见性命令
 command-chat-toggle-description: '&8 - &c/chat toggle &7- 切换频道可见性.'
