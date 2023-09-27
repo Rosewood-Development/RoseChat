@@ -150,11 +150,7 @@ public class BungeeManager extends Manager {
 
         // Must be done asynchronously for LuckPerms & Vault.
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-            if (isJson) {
-                channel.sendJson(sender, message, messageId);
-            } else {
-                channel.send(sender, message, messageId);
-            }
+            channel.send(sender, message, messageId, isJson);
         });
     }
 

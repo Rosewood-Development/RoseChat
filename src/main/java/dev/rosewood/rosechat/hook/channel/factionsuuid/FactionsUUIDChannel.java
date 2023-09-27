@@ -10,6 +10,7 @@ import com.massivecraft.factions.event.FactionDisbandEvent;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -48,19 +49,25 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
     @EventHandler
     public void onTeamDisband(FactionDisbandEvent event) {
-        for (FPlayer player : event.getFaction().getFPlayers())
+        for (FPlayer player : event.getFaction().getFPlayers()) {
             this.kick(player.getOfflinePlayer().getUniqueId());
+            this.onTeamLeaveGeneric(player.getOfflinePlayer().getUniqueId());
+        }
     }
 
     @EventHandler
     public void onTeamLeave(FPlayerLeaveEvent event) {
         this.kick(event.getfPlayer().getOfflinePlayer().getUniqueId());
+        this.onTeamLeaveGeneric(event.getfPlayer().getOfflinePlayer().getUniqueId());
     }
 
     @EventHandler
     public void onTeamJoin(FPlayerJoinEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getfPlayer().getOfflinePlayer().getUniqueId());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getfPlayer().getPlayer(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {

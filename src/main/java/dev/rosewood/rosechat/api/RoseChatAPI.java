@@ -9,7 +9,6 @@ import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
-import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -102,14 +101,21 @@ public final class RoseChatAPI {
         return RoseMessage.forLocation(sender, location).parse(viewer, format).components();
     }
 
-    public void sendToChannel(Player player, String message, Channel channel, boolean checkPermissions) {
-        RosePlayer sender = new RosePlayer(player);
-        PlayerData data = sender.getPlayerData();
+    /**
+     * Sends a message directly to a channel, from a player.
+     * @param sender The {@link Player} who is sending the message.
+     * @param message The message.
+     * @param channel The {@link Channel} to send the message in.
+     * @param checkPermissions Whether to check permissions of the player before sending.
+     */
+    public void sendToChannel(Player sender, String message, Channel channel, boolean checkPermissions) {
+        RosePlayer player = new RosePlayer(sender);
+        PlayerData data = player.getPlayerData();
 
         if (checkPermissions) {
             // Don't send the message if the player doesn't have permission.
-            if (data == null || !sender.hasPermission("rosechat.chat")) {
-                this.getLocaleManager().sendComponentMessage(player, "no-permission");
+            if (data == null || !player.hasPermission("rosechat.chat")) {
+                this.getLocaleManager().sendComponentMessage(sender, "no-permission");
                 return;
             }
 
@@ -120,16 +126,16 @@ public final class RoseChatAPI {
             }
 
             // Check if the player is muted.
-            if (data.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
-                sender.sendLocaleMessage("command-mute-cannot-send");
+            if (data.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+                player.sendLocaleMessage("command-mute-cannot-send");
                 return;
             }
 
             // Only check channel permission if the player is not in a group channel.
             if (!data.isCurrentChannelGroupChannel()) {
                 // Check if the player has permission for this channel.
-                if (!sender.hasPermission("rosechat.channel." + channel.getId())) {
-                    sender.sendLocaleMessage("no-permission");
+                if (!player.hasPermission("rosechat.channel." + channel.getId())) {
+                    player.sendLocaleMessage("no-permission");
                     return;
                 }
             }
@@ -137,31 +143,39 @@ public final class RoseChatAPI {
 
         // Make sure the message isn't empty.
         if (MessageUtils.isMessageEmpty(message)) {
-            sender.sendLocaleMessage("message-blank");
+            player.sendLocaleMessage("message-blank");
             return;
         }
 
-        if (channel.isMuted() && !sender.hasPermission("rosechat.mute.bypass")) {
-            sender.sendLocaleMessage("channel-muted");
+        // Check if the channel is muted.
+        if (channel.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+            player.sendLocaleMessage("channel-muted");
             return;
         }
 
         // Send the message.
-        channel.send(sender, message);
+        channel.send(player, message);
 
         // Update the player's display name if the setting is enabled.
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null && !sender.getDisplayName().equals(data.getNickname())) {
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null) {
             String nickname = data.getNickname();
             if (data.getNickname() == null)
                 return;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NICKNAME);
-                sender.asPlayer().setDisplayName(TextComponent.toLegacyText(roseMessage.parse(sender, nickname).components()));
+                RoseMessage roseMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
+                String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).components());
+                player.asPlayer().setDisplayName(displayName);
+                player.setDisplayName(displayName);
             });
         }
     }
 
+    /**
+     * Deletes a chat message with the given UUID.
+     * @param player The {@link Player} to delete the message for.
+     * @param uuid The {@link UUID} of the message.
+     */
     public void deleteMessage(RosePlayer player, UUID uuid) {
         DeletableMessage messageToDelete = null;
 
@@ -182,7 +196,7 @@ public final class RoseChatAPI {
         if (deletedMessageFormat != null && !TextComponent.toPlainText(deletedMessageFormat).isEmpty()) {
             String json = ComponentSerializer.toString(deletedMessageFormat);
             if (player.hasPermission("rosechat.deletemessages.client")) {
-                BaseComponent[] withDeleteButton = PacketListener.appendButton(player, player.getPlayerData(), uuid.toString(), json);
+                BaseComponent[] withDeleteButton = MessageUtils.appendDeleteButton(player, player.getPlayerData(), uuid.toString(), json);
                 if (withDeleteButton != null) {
                     messageToDelete.setJson(ComponentSerializer.toString(withDeleteButton));
                 } else {

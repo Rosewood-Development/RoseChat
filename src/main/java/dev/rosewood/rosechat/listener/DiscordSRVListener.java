@@ -21,6 +21,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
@@ -59,6 +61,28 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         }));
 
         this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
+    }
+
+    @Override
+    public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        List<PlayerData> updatePlayers = new ArrayList<>();
+        AtomicReference<UUID> deletableMessageUUID = new AtomicReference<>();
+        api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
+            for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
+                if (deletableMessage.getDiscordId() != null && !deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
+                updatePlayers.add(playerData);
+                deletableMessageUUID.set(deletableMessage.getUUID());
+            }
+        }));
+
+        if (deletableMessageUUID.get() == null) return;
+        for (PlayerData data : updatePlayers) {
+            Player player = Bukkit.getPlayer(data.getUUID());
+            if (player == null) continue;
+
+            api.deleteMessage(new RosePlayer(player), deletableMessageUUID.get());
+        }
     }
 
     @Subscribe(priority = ListenerPriority.LOW)

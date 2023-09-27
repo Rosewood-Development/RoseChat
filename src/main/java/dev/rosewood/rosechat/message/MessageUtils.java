@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -17,6 +16,7 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -535,4 +535,28 @@ public class MessageUtils {
         return components;
     }
 
+
+    public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
+        ComponentBuilder builder = new ComponentBuilder();
+        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
+        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
+                MessageUtils.getSenderViewerPlaceholders(sender, sender)
+                        .add("id", messageId)
+                        .add("type", "client").build());
+
+        if (deleteClientButton == null) {
+            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
+            return null;
+        }
+
+        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+        } else {
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+        }
+
+        return builder.create();
+    }
 }

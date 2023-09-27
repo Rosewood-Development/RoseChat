@@ -9,6 +9,7 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -52,6 +53,7 @@ public class TownyChannel extends RoseChatChannel implements Listener {
         if (town != null && this.channelType == TownyChannelType.TOWN) {
             for (Resident resident : town.getResidents()) {
                 this.kick(resident.getUUID());
+                this.onTeamLeaveGeneric(resident.getUUID());
             }
         }
     }
@@ -60,19 +62,24 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onTeamKick(TownKickEvent event) {
         this.kick(event.getKickedResident().getUUID());
+        this.onTeamLeaveGeneric(event.getKickedResident().getUUID());
     }
 
     // Team Leave
     @EventHandler
     public void onTeamLeave(TownLeaveEvent event) {
         this.kick(event.getResident().getUUID());
+        this.onTeamLeaveGeneric(event.getResident().getUUID());
     }
 
     // Team Join
     @EventHandler
     public void onTeamJoin(TownAddResidentEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getResident().getUUID());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getResident().getPlayer(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {

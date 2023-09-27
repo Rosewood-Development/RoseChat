@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.hook.channel.bentobox;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -46,30 +48,39 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
 
     @EventHandler
     public void onIslandReset(IslandPreclearEvent event) {
-        for (UUID uuid : event.getIsland().getMemberSet())
+        for (UUID uuid : event.getIsland().getMemberSet()) {
             this.kick(uuid);
+            this.onTeamLeaveGeneric(uuid);
+        }
     }
 
     @EventHandler
     public void onTeamDisband(TeamDeleteEvent event) {
-        for (UUID uuid : event.getIsland().getMemberSet())
+        for (UUID uuid : event.getIsland().getMemberSet()) {
             this.kick(uuid);
+            this.onTeamLeaveGeneric(uuid);
+        }
     }
 
     @EventHandler
     public void onTeamKick(TeamKickEvent event) {
         this.kick(event.getPlayerUUID());
+        this.onTeamLeaveGeneric(event.getPlayerUUID());
     }
 
     @EventHandler
     public void onTeamLeave(TeamLeaveEvent event) {
         this.kick(event.getPlayerUUID());
+        this.onTeamLeaveGeneric(event.getPlayerUUID());
     }
 
     @EventHandler
     public void onTeamJoin(TeamJoinedEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getPlayerUUID());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(Bukkit.getPlayer(event.getPlayerUUID()),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {

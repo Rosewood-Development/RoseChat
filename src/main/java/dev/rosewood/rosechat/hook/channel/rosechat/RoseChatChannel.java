@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
 import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -63,6 +64,20 @@ public class RoseChatChannel extends ConditionalChannel {
         this.keepFormatOverBungee = config.contains("keep-format") && config.getBoolean("keep-format");
         this.worlds = config.contains("worlds") ? config.getStringList("worlds") : new ArrayList<>();
         this.servers = config.contains("servers") ? config.getStringList("servers") : new ArrayList<>();
+    }
+
+    // Generic function for when a player leaves a team.
+    // This finds the new channel and adds the player to it.
+    // Then, sends the player the channel-joined message.
+    public void onTeamLeaveGeneric(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+
+        Channel newChannel = Channel.findNextChannel(player);
+        newChannel.forceJoin(uuid);
+
+        RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                "command-channel-joined", StringPlaceholders.of("id", this.getId()));
     }
 
     @Override
@@ -157,7 +172,7 @@ public class RoseChatChannel extends ConditionalChannel {
     protected void sendToPlayer(RoseMessage message, RosePlayer receiver, MessageDirection direction, String format, String discordId) {
         PlayerData receiverData = RoseChatAPI.getInstance().getPlayerData(receiver.getUUID());
         // Don't send the message if the receiver can't receive it.
-        if (!this.canReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
+        if (!this.canPlayerReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
 
         // Send the message to the player asynchronously.
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
@@ -447,21 +462,17 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message, UUID messageId) {
+    public void send(RosePlayer sender, String message, UUID messageId, boolean isJson) {
         RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
         roseMessage.setPlayerInput(message);
         roseMessage.setUUID(messageId);
-        MessageRules rules = new MessageRules().applyAllFilters();
-        this.send(roseMessage, MessageDirection.FROM_BUNGEE_SERVER, this.getFormat(), null, rules);
-    }
 
-    @Override
-    public void sendJson(RosePlayer sender, String message, UUID messageId) {
-        // Don't apply rules as they've already been applied.
-        RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
-        roseMessage.setPlayerInput(message);
-        roseMessage.setUUID(messageId);
-        this.send(roseMessage, MessageDirection.FROM_BUNGEE_RAW, this.getFormat(), null, new MessageRules());
+        if (isJson) {
+            this.send(roseMessage, MessageDirection.FROM_BUNGEE_RAW, this.getFormat(), null, new MessageRules());
+        } else {
+            MessageRules rules = new MessageRules().applyAllFilters();
+            this.send(roseMessage, MessageDirection.FROM_BUNGEE_SERVER, this.getFormat(), null, rules);
+        }
     }
 
     @Override

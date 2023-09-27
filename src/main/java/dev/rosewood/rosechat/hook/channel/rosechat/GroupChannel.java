@@ -74,7 +74,7 @@ public class GroupChannel extends Channel {
         for (RosePlayer receiver : receivers) {
             // Clone the message for viewer-specific placeholders.
             PlayerData playerData = receiver.getPlayerData();
-            if (playerData != null && !this.canReceiveMessage(receiver, playerData, sender.getUUID())) continue;
+            if (playerData != null && !this.canPlayerReceiveMessage(receiver, playerData, sender.getUUID())) continue;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 receiver.send(roseMessage.parse(receiver, this.getFormat()).components());
@@ -91,7 +91,7 @@ public class GroupChannel extends Channel {
             PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(uuid);
 
             // Don't send the message if the receiver can't receive it.
-            if (!this.canReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
+            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).components());
@@ -105,17 +105,12 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message, UUID messageId) {
+    public void send(RosePlayer sender, String message, UUID messageId, boolean isJson) {
         // No bungee support for GroupChats
     }
 
     @Override
-    public void sendJson(RosePlayer sender, String message, UUID messageId) {
-        // No bungee support for GroupChats
-    }
-
-    @Override
-    public boolean canReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
+    public boolean canPlayerReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
         return (data != null
                 && !data.getIgnoringPlayers().contains(senderUUID));
     }

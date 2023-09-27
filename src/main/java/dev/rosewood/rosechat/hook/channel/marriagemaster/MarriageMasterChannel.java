@@ -5,9 +5,11 @@ import at.pcgamingfreaks.MarriageMaster.Bukkit.API.Events.MarriedEvent;
 import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriageMasterPlugin;
 import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriagePlayer;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -37,8 +39,15 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
 
     @EventHandler
     public void onTeamLeave(DivorcedEvent event) {
-        if (!event.getPlayer1().isMarried()) this.kick(event.getPlayer1().getUUID());
-        if (!event.getPlayer2().isMarried()) this.kick(event.getPlayer2().getUUID());
+        if (!event.getPlayer1().isMarried()) {
+            this.kick(event.getPlayer1().getUUID());
+            this.onTeamLeaveGeneric(event.getPlayer1().getUUID());
+        }
+
+        if (!event.getPlayer2().isMarried()) {
+            this.kick(event.getPlayer2().getUUID());
+            this.onTeamLeaveGeneric(event.getPlayer2().getUUID());
+        }
     }
 
     @EventHandler
@@ -46,6 +55,10 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
         if (this.autoJoin) {
             this.forceJoin(event.getPlayer1().getUUID());
             this.forceJoin(event.getPlayer2().getUUID());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer1().getPlayerOnline(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer2().getPlayerOnline(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
         }
     }
 

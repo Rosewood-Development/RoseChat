@@ -119,10 +119,6 @@ public abstract class Channel {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null)
             this.onJoin(player);
-
-        api.getLocaleManager().sendMessage(player,
-                "command-channel-joined", StringPlaceholders.of("id", this.getId()));
-
     }
 
     /**
@@ -139,24 +135,8 @@ public abstract class Channel {
         if (!data.getCurrentChannel().equals(this)) return;
 
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return;
-
-        this.onLeave(player);
-
-        // Find the correct channel for the player to go in.
-        Channel foundChannel = null;
-        for (Channel channel : api.getChannels()) {
-            if (channel.onWorldJoin(player, null, player.getWorld())) {
-                foundChannel = channel;
-            }
-        }
-
-        if (foundChannel == null) foundChannel = api.getDefaultChannel();
-
-        foundChannel.onJoin(player);
-        data.setCurrentChannel(foundChannel);
-        api.getLocaleManager().sendMessage(player,
-                    "command-channel-joined", StringPlaceholders.of("id", foundChannel.getId()));
+        if (player != null)
+            this.onLeave(player);
     }
 
     /**
@@ -188,19 +168,10 @@ public abstract class Channel {
      * @param sender The {@link RosePlayer} who is sending the message.
      * @param message The message to be sent.
      * @param messageId The {@link UUID} of the message sent from the other server.
+     * @param isJson True if the message contains a json string.
+     *               This is typically only used when keep-format-over-bungee is enabled.
      */
-    public void send(RosePlayer sender, String message, UUID messageId) {
-        // No default implementation
-    }
-
-    /**
-     * Called when a Json message is sent from Bungee.
-     * Typically, only when keep-format-over-bungee is enabled.
-     * @param sender The {@link RosePlayer} who is sending the message.
-     * @param message The message to be sent.
-     * @param messageId The {@link UUID} of the message sent from the other server.
-     */
-    public void sendJson(RosePlayer sender, String message, UUID messageId) {
+    public void send(RosePlayer sender, String message, UUID messageId, boolean isJson) {
         // No default implementation
     }
 
@@ -274,7 +245,7 @@ public abstract class Channel {
      * @param senderUUID The {@link UUID} of the player sending the message.
      * @return True if the receiver can receive the message.
      */
-    public boolean canReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
+    public boolean canPlayerReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
         return (data != null
                 && !data.getIgnoringPlayers().contains(senderUUID)
                 && receiver.hasPermission("rosechat.channel." + this.getId())
@@ -338,4 +309,25 @@ public abstract class Channel {
         this.shoutCommands = shoutCommands;
     }
 
+    /**
+     * Finds the next channel that the player should be moved to.
+     * This is mainly used in instances where a player is removed from a channel and needs to join the
+     * appropriate channel based on their location.
+     * @param player The {@link Player} to move channels.
+     * @return The {@link Channel} that the player should move to.
+     */
+    public static Channel findNextChannel(Player player) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        // Find the correct channel for the player to go in.
+        Channel foundChannel = null;
+        for (Channel channel : api.getChannels()) {
+            if (channel.onWorldJoin(player, null, player.getWorld())) {
+                foundChannel = channel;
+            }
+        }
+
+        if (foundChannel == null) foundChannel = api.getDefaultChannel();
+        return foundChannel;
+    }
 }

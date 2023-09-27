@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
@@ -210,6 +211,8 @@ public class ChannelManager extends Manager {
 
                 if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(player)) {
                     channel.forceJoin(player.getUniqueId());
+                    this.localeManager.sendMessage(player,
+                            "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
                     break;
                 }
             }

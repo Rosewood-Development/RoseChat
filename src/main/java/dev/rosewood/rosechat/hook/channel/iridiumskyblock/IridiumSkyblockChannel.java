@@ -10,6 +10,7 @@ import com.iridium.iridiumskyblock.database.Island;
 import com.iridium.iridiumskyblock.database.IslandTrusted;
 import com.iridium.iridiumskyblock.database.User;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -46,24 +47,31 @@ public class IridiumSkyblockChannel extends RoseChatChannel implements Listener 
 
     @EventHandler
     public void onTeamDisband(IslandDeleteEvent event) {
-        for (User user : event.getIsland().getMembers())
+        for (User user : event.getIsland().getMembers()) {
             this.kick(user.getUuid());
+            this.onTeamLeaveGeneric(user.getUuid());
+        }
     }
 
     @EventHandler
     public void onTeamKick(UserKickEvent event) {
         this.kick(event.getUser().getUuid());
+        this.onTeamLeaveGeneric(event.getUser().getUuid());
     }
 
     @EventHandler
     public void onTeamLeave(UserLeaveEvent event) {
         this.kick(event.getUser().getUuid());
+        this.onTeamLeaveGeneric(event.getUser().getUuid());
     }
 
     @EventHandler
     public void onTeamJoin(UserJoinEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getUser().getUuid());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getUser().getPlayer(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {
