@@ -50,6 +50,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean()) return;
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
         api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
@@ -65,6 +67,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean()) return;
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
         AtomicReference<UUID> deletableMessageUUID = new AtomicReference<>();
@@ -87,6 +91,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean()) return;
+
         event.setCancelled(true);
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
             this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);

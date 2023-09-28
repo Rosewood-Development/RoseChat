@@ -99,6 +99,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "A player can use /gcmsg <channel> without a message to join the channel."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings", "Requires DiscordSRV"),
+        USE_DISCORD("discord-settings.use-discord", true, "Should DiscordSRV support be enabled?"),
         USE_IGN_WITH_DISCORD("discord-settings.use-minecraft-ign-with-discord", true,
                 "Should a player's in-game name (nickname, displayname, or username) be used instead of the Discord name?",
                 "Will only work if a player links their accounts."),

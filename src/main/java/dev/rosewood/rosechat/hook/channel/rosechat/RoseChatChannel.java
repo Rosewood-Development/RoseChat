@@ -264,7 +264,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Send the message to discord, if not sent from discord.
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
-            if (api.getDiscord() != null && this.getDiscordChannel() != null) {
+            if (api.getDiscord() != null && this.getDiscordChannel() != null && Setting.USE_DISCORD.getBoolean()) {
                 RoseChat.MESSAGE_THREAD_POOL.submit(() -> MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel()));
             }
         }
