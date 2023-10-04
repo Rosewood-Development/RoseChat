@@ -75,9 +75,13 @@ public class PlaceholderCondition {
         return null;
     }
 
-    protected String parsePlaceholders(Player player, String placeholder, StringPlaceholders placeholders) {
+    protected String parsePlaceholders(Player player, Player player2, String placeholder, StringPlaceholders placeholders) {
         if (placeholder == null) return null;
-        if (PlaceholderAPIHook.enabled()) return PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder));
+        if (PlaceholderAPIHook.enabled()) {
+            placeholder = placeholders.apply(placeholder);
+            placeholder = PlaceholderAPIHook.applyRelationalPlaceholders(player, player2, placeholder);
+            return PlaceholderAPIHook.applyPlaceholders(player, placeholder);
+        }
         else return placeholders.apply(placeholder);
     }
 

@@ -35,13 +35,13 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
     public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         Player singlePlayer = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String singleCondition = this.condition.replace("other_", "");
-        String singleParsed = this.parsePlaceholders(singlePlayer, singleCondition, placeholders);
+        String singleParsed = this.parsePlaceholders(singlePlayer, viewer == null ? null : viewer.asPlayer(), singleCondition, placeholders);
         Player leftPlayer = this.left == null ? null : this.left.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         Player rightPlayer = this.right == null ? null : this.right.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String leftCondition = this.left == null ? null : this.left.replace("other_", "");
         String rightCondition = this.right == null ? null : this.right.replace("other_", "");
-        String leftParsed = this.left == null ? null : this.parsePlaceholders(leftPlayer, leftCondition, placeholders);
-        String rightParsed = this.right == null ? null : this.parsePlaceholders(rightPlayer, rightCondition, placeholders);
+        String leftParsed = this.left == null ? null : this.parsePlaceholders(leftPlayer, viewer == null ? null : viewer.asPlayer(), leftCondition, placeholders);
+        String rightParsed = this.right == null ? null : this.parsePlaceholders(rightPlayer, viewer == null ? null : viewer.asPlayer(), rightCondition, placeholders);
 
         boolean result;
         if (this.operator != null) {

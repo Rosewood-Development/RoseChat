@@ -21,7 +21,7 @@ public class NumberPlaceholderCondition extends PlaceholderCondition {
     public String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         Player player = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String condition = this.condition.replace("other_", "");
-        String parsed = this.parsePlaceholders(player, condition, placeholders);
+        String parsed = this.parsePlaceholders(player, viewer == null ? null : viewer.asPlayer(), condition, placeholders);
 
         List<String> valueList = this.conditionValues.get("value");
         if (valueList == null || valueList.isEmpty()) return "";

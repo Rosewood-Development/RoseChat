@@ -24,7 +24,7 @@ public class StringPlaceholderCondition extends PlaceholderCondition  {
             } else {
                 Player player = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
                 String condition = placeholder.replace("other_", "");
-                parsed = this.parsePlaceholders(player, condition, placeholders);
+                parsed = this.parsePlaceholders(player, viewer == null ? null : viewer.asPlayer(), condition, placeholders);
 
                 // Convert PAPI 'yes' and 'no' to 'true' and 'false'
                 parsed = parsed.equalsIgnoreCase("yes") ? "true" : parsed;

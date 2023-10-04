@@ -39,9 +39,13 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
             if (!params.getReceiver().isPlayer()) content = originalContent;
-            else content = PlaceholderAPIHook.applyPlaceholders(params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
+            else {
+                content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
+                content = PlaceholderAPIHook.applyPlaceholders(params.getReceiver().asPlayer(), content.replaceFirst("other_", ""));
+            }
         } else {
-            content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), originalContent);
+            content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent);
+            content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), content);
         }
 
         // Encapsulate if the placeholder only contains a colour
