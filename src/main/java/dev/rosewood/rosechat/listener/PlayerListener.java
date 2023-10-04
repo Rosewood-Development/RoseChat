@@ -5,7 +5,6 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.ChannelCommand;
-import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLocation;
@@ -110,37 +109,36 @@ public class PlayerListener implements Listener {
             World world = player.getWorld();
             Channel currentChannel = playerData.getCurrentChannel();
 
-            // Check if the player can leave their current channel first.
-            if (currentChannel.onWorldLeave(player, event.getFrom(), world)) {
-                // Leave the channel
+        // Check if the player can leave their current channel first.
+        boolean leftWorld = currentChannel.onWorldLeave(player, event.getFrom(), world);
+
+        // Find the appropriate channel before removing the player.
+        // Loop through the channels to find if the player should join one.
+        boolean joinedWorld = false;
+        for (Channel channel : api.getChannels()) {
+            // If the player can join a channel, join.
+            if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
                 currentChannel.onLeave(player);
-                // Temporarily set the current channel to null
-                playerData.setCurrentChannel(null);
+                channel.onJoin(player);
+                playerData.setCurrentChannel(channel);
+                api.getLocaleManager().sendMessage(player, "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+
+                joinedWorld = true;
+                break;
             }
+        }
 
-            // Loop through the channels to find if the player should join one.
-            boolean foundChannel = false;
-            for (Channel channel : api.getChannels()) {
-                // If the player can join a channel, join.
-                if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
-                    channel.onJoin(player);
-                    playerData.setCurrentChannel(channel);
-                    foundChannel = true;
-                    break;
-                }
+        // If the player left a world channel and did not find an appropriate channel
+        if (leftWorld && !joinedWorld) {
+            currentChannel.onLeave(player);
 
-            }
+            // Force join the default channel as there is no other option
+            Channel defaultChannel = api.getChannelManager().getDefaultChannel();
+            defaultChannel.onJoin(player);
+            playerData.setCurrentChannel(defaultChannel);
+        }
 
-            // If no suitable channel was found, put the player in the default channel.
-            if (!foundChannel) {
-                // Force join the default channel as there is no other option
-                Channel defaultChannel = api.getChannelManager().getDefaultChannel();
-                defaultChannel.onJoin(player);
-                playerData.setCurrentChannel(defaultChannel);
-            }
-
-            playerData.save();
-        });
+        playerData.save();
     }
 
     @EventHandler
