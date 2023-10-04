@@ -22,7 +22,7 @@ public class ListGroupCommand extends AbstractCommand {
             for (GroupManager.GroupInfo info : infoList) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-format",
                         StringPlaceholders.builder("group", info.name())
-                                .addPlaceholder("id",info.id()).build(), false);
+                                .add("id",info.id()).build(), false);
             }
 
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-list-more", false);

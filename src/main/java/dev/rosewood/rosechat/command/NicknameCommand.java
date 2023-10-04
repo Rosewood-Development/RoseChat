@@ -60,7 +60,7 @@ public class NicknameCommand extends AbstractCommand {
             } else {
                 this.getAPI().getLocaleManager().sendComponentMessage(player, "command-nickname-success", StringPlaceholders.of("name", player.getName()));
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-other",
-                        StringPlaceholders.builder("name", player.getName()).addPlaceholder("player", player.getName()).build());
+                        StringPlaceholders.builder("name", player.getName()).add("player", player.getName()).build());
             }
 
             return;

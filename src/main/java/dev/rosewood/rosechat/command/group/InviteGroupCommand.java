@@ -52,9 +52,9 @@ public class InviteGroupCommand extends AbstractCommand {
         String targetName = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
 
         this.getAPI().getLocaleManager().sendComponentMessage(target, "command-gc-invite-invited",
-                StringPlaceholders.builder().addPlaceholder("player", name).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().add("player", name).add("name", groupChat.getName()).build());
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-invite-success",
-                StringPlaceholders.builder().addPlaceholder("player", targetName).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().add("player", targetName).add("name", groupChat.getName()).build());
         sendAcceptMessage(target, groupChat);
 
         targetData.inviteToGroup(groupChat);

@@ -49,7 +49,7 @@ public class LeaveGroupCommand extends AbstractCommand {
             if (member != null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
                         StringPlaceholders.builder("player", name)
-                                .addPlaceholder("name", groupChat.getName())
+                                .add("name", groupChat.getName())
                                 .build());
             }
         }

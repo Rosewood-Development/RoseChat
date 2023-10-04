@@ -97,11 +97,11 @@ public class AcceptGroupCommand extends AbstractCommand {
             Player member = Bukkit.getPlayer(uuid);
             if (member != null)
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-accept-accepted",
-                            StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
+                            StringPlaceholders.builder().add("name", groupChat.getName()).add("player", name).build());
         }
 
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-accept-success",
-                StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).addPlaceholder("player", name).build());
+                StringPlaceholders.builder().add("name", groupChat.getName()).add("player", name).build());
 
         this.getAPI().addGroupChatMember(groupChat, player);
     }

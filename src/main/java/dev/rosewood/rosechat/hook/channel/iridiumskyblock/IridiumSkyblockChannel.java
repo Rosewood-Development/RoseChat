@@ -129,7 +129,7 @@ public class IridiumSkyblockChannel extends RoseChatChannel implements Listener 
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("type", this.channelType.toString().toLowerCase());
+                .add("type", this.channelType.toString().toLowerCase());
     }
 
     public IridiumSkyblockChannelType getChannelType() {

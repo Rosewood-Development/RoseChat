@@ -106,6 +106,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         DELETE_DISCORD_MESSAGES("discord-settings.delete-discord-messages", true,
                 "Should messages sent in Discord be deleted when the same message is deleted in-game, and vice versa?",
                 "Requires ProtocolLib"),
+        EDIT_DISCORD_MESSAGES("discord-settings.edit-messages", true,
+                "Should messages in-game be edited when the equivalent Discord message is edited?"),
         REQUIRE_PERMISSIONS("discord-settings.require-permissions", true,
                 "Should messages sent in Discord require in-game permissions?",
                 "For example, when sending a message with color."),

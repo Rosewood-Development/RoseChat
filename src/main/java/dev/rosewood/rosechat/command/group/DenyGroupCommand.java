@@ -75,7 +75,7 @@ public class DenyGroupCommand extends AbstractCommand {
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-deny-success",
-                StringPlaceholders.builder().addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().add("name", groupChat.getName()).build());
         if (owner != null && owner.isOnline()) {
             this.getAPI().getLocaleManager().sendComponentMessage(owner.getPlayer(), "command-gc-deny-denied", StringPlaceholders.of("player", name));
         }

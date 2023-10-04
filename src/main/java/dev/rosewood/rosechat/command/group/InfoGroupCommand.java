@@ -79,9 +79,9 @@ public class InfoGroupCommand extends AbstractCommand {
     public void sendInfoMessage(CommandSender sender, String id, String name, String owner, int members) {
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-info-title", StringPlaceholders.of("group", name), false);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-info-format", StringPlaceholders.builder()
-                .addPlaceholder("id", id)
-                .addPlaceholder("owner", owner)
-                .addPlaceholder("members", members).build(), false);
+                .add("id", id)
+                .add("owner", owner)
+                .add("members", members).build(), false);
     }
 
     @Override

@@ -1,23 +1,31 @@
-package dev.rosewood.rosechat.listener.chat;
+package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public interface ChatListener extends Listener {
+public class ChatListener implements Listener {
 
-    default void handleChat(Player player, String chat) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onChat(AsyncPlayerChatEvent event) {
+        event.setCancelled(true);
+
+        Player player = event.getPlayer();
+        String message = event.getMessage();
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         // Check if the message is using a shout command and send the message if they are.
         for (Channel channel : api.getChannels()) {
             if (channel.getShoutCommands().isEmpty()) continue;
             for (String command : channel.getShoutCommands()) {
-                if (chat.startsWith(command)) {
-                    api.sendToChannel(player, chat.substring(command.length()).trim(), channel, true);
+                if (message.startsWith(command)) {
+                    api.sendToChannel(event.getPlayer(), message.substring(command.length()).trim(), channel, true);
                     return;
                 }
             }
@@ -27,15 +35,7 @@ public interface ChatListener extends Listener {
         PlayerData data = sender.getPlayerData();
 
         Channel channel = data.getCurrentChannel();
-        api.sendToChannel(player, chat, channel, true);
-    }
-
-    static ChatListener create() {
-        if (NMSUtil.isPaper()) {
-            return new PaperChatListener();
-        } else {
-            return new BukkitChatListener();
-        }
+        api.sendToChannel(player, message, channel, true);
     }
 
 }

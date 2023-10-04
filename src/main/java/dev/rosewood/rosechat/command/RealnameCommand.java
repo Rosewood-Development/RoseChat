@@ -33,8 +33,8 @@ public class RealnameCommand extends AbstractCommand {
         String name = data.getNickname() != null ? data.getNickname() : player.getDisplayName();
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-realname-success",
-                StringPlaceholders.builder().addPlaceholder("player", player.getName())
-                        .addPlaceholder("name", name).build());
+                StringPlaceholders.builder().add("player", player.getName())
+                        .add("name", name).build());
     }
 
     @Override

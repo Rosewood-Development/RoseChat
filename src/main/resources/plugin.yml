@@ -23,6 +23,7 @@ softdepend:
   - IridiumSkyblock
   - FabledSkyblock
   - MarriageMaster
+  - InteractiveChat
 commands:
   rosechat:
     aliases: [rc]

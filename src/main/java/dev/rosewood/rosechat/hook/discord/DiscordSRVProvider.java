@@ -122,9 +122,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 this.updateMessageLogs(roseMessage.getUUID(), m.getId());
             });
         } else if (text != null) {
-            textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
-                this.updateMessageLogs(roseMessage.getUUID(), m.getId());
-            });
+            discord.processChatMessage(roseMessage.getSender().asPlayer(), this.emojiManager.formatUnicode(text), channel, false);
         }
     }
 

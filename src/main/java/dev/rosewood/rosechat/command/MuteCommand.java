@@ -103,8 +103,8 @@ public class MuteCommand extends AbstractCommand {
         } else {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-mute-success",
                     StringPlaceholders.builder("player", name)
-                            .addPlaceholder("time", outTime)
-                            .addPlaceholder("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
+                            .add("time", outTime)
+                            .add("scale", this.getAPI().getLocaleManager().getLocaleMessage("command-mute-" + outScale)).build());
         }
 
         this.getAPI().getLocaleManager().sendComponentMessage(target, "command-mute-muted");

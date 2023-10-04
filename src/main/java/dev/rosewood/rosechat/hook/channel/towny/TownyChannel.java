@@ -148,8 +148,8 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("type", this.channelType.toString().toLowerCase())
-                .addPlaceholder("use-allies", this.useAllies ? trueValue : falseValue);
+                .add("type", this.channelType.toString().toLowerCase())
+                .add("use-allies", this.useAllies ? trueValue : falseValue);
     }
 
     public TownyChannelType getChannelType() {
