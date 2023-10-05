@@ -204,10 +204,9 @@ public class RoseChatChannel extends ConditionalChannel {
                 outputs = postParseMessageEvent.getMessageComponents().outputs();
                 receiver.send(postParseMessageEvent.getMessageComponents().components());
 
-                DeletableMessage deletableMessage = new DeletableMessage(message.getUUID());
-                deletableMessage.setJson(ComponentSerializer.toString(postParseMessageEvent.getMessageComponents().components()));
-                deletableMessage.setClient(false);
-                deletableMessage.setDiscordId(discordId);
+                DeletableMessage deletableMessage = message.createDeletableMessage(
+                        ComponentSerializer.toString(postParseMessageEvent.getMessageComponents().components()), discordId
+                );
                 receiverData.getMessageLog().addDeletableMessage(deletableMessage);
             } else {
                 // Parse the json message.

@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
-import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.DeletableMessage;
@@ -14,8 +12,6 @@ import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
-import net.md_5.bungee.chat.ComponentSerializer;
-import org.bukkit.Bukkit;
 
 /**
  * A wrapper for chat messages which can be used to parse a message for a given receiver.
@@ -118,6 +114,20 @@ public class RoseMessage {
     public RoseMessageComponents parseBungeeMessage(RosePlayer viewer, String format) {
         BungeeParser parser = new BungeeParser();
         return this.parse(parser, viewer, format, null);
+    }
+
+    /**
+     * Turns this message into a deletable message.
+     * @param json The json to use, typically gotten from the PostParseMessageEvent.
+     * @param discordId The discord id of the message.
+     * @return The deletable message.
+     */
+    public DeletableMessage createDeletableMessage(String json, String discordId) {
+        DeletableMessage deletableMessage = new DeletableMessage(this.getUUID());
+        deletableMessage.setJson(json);
+        deletableMessage.setClient(false);
+        deletableMessage.setDiscordId(discordId);
+        return deletableMessage;
     }
 
     /**
