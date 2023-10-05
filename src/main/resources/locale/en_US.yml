@@ -289,7 +289,6 @@ command-nickcolor-removed: '&eYour nickname color has been removed.'
 command-nickcolor-others: "&eYou have set &b%player%&e's nick color to &f%color%&e."
 command-nickcolor-others-removed: "&eYou have removed &b%player%&e's nick color."
 
-
 # Chat Toggle Command
 command-chat-toggle-description: '&8 - &c/chat toggle &7- Toggles seeing a channel.'
 command-chat-toggle-usage: '&e/chat toggle <channel>'
