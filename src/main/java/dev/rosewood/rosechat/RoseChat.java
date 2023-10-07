@@ -45,7 +45,7 @@ import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
 import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
 import dev.rosewood.rosechat.hook.channel.fabledskyblock.FabledSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.factionsuuid.FactionsUUIDChannelProvider;
-import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
+//import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.kingdomsx.KingdomsXChannelProvider;
 import dev.rosewood.rosechat.hook.channel.marriagemaster.MarriageMasterChannelProvider;
 import dev.rosewood.rosechat.hook.channel.mcmmo.McMMOChannelProvider;
@@ -254,8 +254,8 @@ public class RoseChat extends RosePlugin {
         if (pluginManager.getPlugin("SuperiorSkyblock2") != null)
             new SuperiorSkyblockChannelProvider().register();
 
-        if (pluginManager.getPlugin("IridiumSkyblock") != null)
-            new IridiumSkyblockChannelProvider().register();
+//        if (pluginManager.getPlugin("IridiumSkyblock") != null)
+//            new IridiumSkyblockChannelProvider().register();
 
         if (pluginManager.getPlugin("FabledSkyblock") != null)
             new FabledSkyblockChannelProvider().register();

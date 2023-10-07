@@ -64,7 +64,7 @@ dependencies {
     compileOnly 'com.github.cryptomorin:kingdoms:1.16.3.3'
     compileOnly 'world.bentobox:bentobox:1.20.0-SNAPSHOT'
     compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2023.1'
-    compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
+    //compileOnly 'com.iridium:IridiumSkyblock:3.2.8'
     compileOnly 'com.songoda:skyblock:2.5.0'
     compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.7.0.1'
 }
