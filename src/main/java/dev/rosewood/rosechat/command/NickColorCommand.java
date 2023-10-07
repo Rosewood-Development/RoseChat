@@ -7,10 +7,11 @@ import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -58,8 +59,8 @@ public class NickColorCommand extends AbstractCommand {
                     playerData.setNickname(nickname);
 
                     RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
-                    RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
-                    rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
+                    MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
+                    rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
                 }
 
                 playerData.save();
@@ -91,16 +92,16 @@ public class NickColorCommand extends AbstractCommand {
             nickname = color + sender.getName() + "&r";
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
-            RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
-            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
+            MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
+            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             nickname = color + nickname + "&r";
             playerData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
-            RoseMessageComponents components = nicknameMessage.parse(rosePlayer, nickname);
-            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.components()));
+            MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
+            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
         }
 
         playerData.save();

@@ -10,8 +10,9 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -113,11 +114,11 @@ public class NicknameCommand extends AbstractCommand {
 
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
             if (roseSender.isConsole() || this.isNicknameAllowed(roseSender, roseTarget, message)) {
-                RoseMessageComponents components = message.parse(roseTarget, outputs.getFilteredMessage());
+                MessageTokenizerResults<BaseComponent[]> components = message.parse(roseTarget, outputs.getFilteredMessage());
 
                 PlayerData data = this.getAPI().getPlayerData(roseTarget.getUUID());
 
-                roseTarget.asPlayer().setDisplayName(TextComponent.toLegacyText(components.components()));
+                roseTarget.asPlayer().setDisplayName(TextComponent.toLegacyText(components.content()));
                 data.setNickname(outputs.getFilteredMessage());
                 data.save();
 

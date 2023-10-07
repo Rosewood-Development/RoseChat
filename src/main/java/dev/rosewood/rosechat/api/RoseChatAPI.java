@@ -75,7 +75,7 @@ public final class RoseChatAPI {
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
         RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NONE);
         roseMessage.setPlaceholders(placeholders);
-        return roseMessage.parse(viewer, format).components();
+        return roseMessage.parse(viewer, format).content();
     }
 
     /**
@@ -86,7 +86,7 @@ public final class RoseChatAPI {
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format) {
-        return RoseMessage.forLocation(sender, MessageLocation.NONE).parse(viewer, format).components();
+        return RoseMessage.forLocation(sender, MessageLocation.NONE).parse(viewer, format).content();
     }
 
     /**
@@ -98,7 +98,7 @@ public final class RoseChatAPI {
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, MessageLocation location) {
-        return RoseMessage.forLocation(sender, location).parse(viewer, format).components();
+        return RoseMessage.forLocation(sender, location).parse(viewer, format).content();
     }
 
     /**
@@ -164,7 +164,7 @@ public final class RoseChatAPI {
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
                 RoseMessage roseMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
-                String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).components());
+                String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).content());
                 player.asPlayer().setDisplayName(displayName);
                 player.setDisplayName(displayName);
             });

@@ -43,7 +43,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             String playerInput = params.getPlayerInput();
             if (playerInput == null || playerInput.isEmpty()) {
                 RoseChat.getInstance().getLogger().warning("Parsed {message} with no player input. This is likely a configuration error.");
-                return new TokenizerResult(Token.text("").build(), matcher.group().length());
+                return new TokenizerResult(Token.text(""), matcher.group().length());
             }
 
             if (params.getSender().getPlayerData() == null)

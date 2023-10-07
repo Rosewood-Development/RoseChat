@@ -35,4 +35,11 @@ public interface TokenComposer<T> {
         return new PlainTokenComposer();
     }
 
+    /**
+     * @return a token composer that only applies formatting using markdown
+     */
+    static TokenComposer<String> markdown() {
+        return new MarkdownTokenComposer();
+    }
+
 }

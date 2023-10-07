@@ -9,7 +9,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -27,8 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -218,7 +216,7 @@ public class MessageUtils {
         }
 
         // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString()).components();
+        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString()).content();
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         // The tokens will always be generated before even if this message is not sent.
@@ -235,15 +233,15 @@ public class MessageUtils {
             if (spy == null) continue;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString()).components();
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString()).content();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString()).components();
-            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).components();
+            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString()).content();
+            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).content();
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
@@ -276,8 +274,8 @@ public class MessageUtils {
         String nickname = sender.getPlayerData().getNickname();
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessageComponents components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
-                sender.setDisplayName(TextComponent.toLegacyText(components.components()));
+                MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
+                sender.setDisplayName(TextComponent.toLegacyText(components.content()));
             });
         }
     }
@@ -369,81 +367,6 @@ public class MessageUtils {
     public static String stripNonLegacyColors(String message) {
         return message.replaceAll(GRADIENT_PATTERN.pattern(), "")
                 .replaceAll(RAINBOW_PATTERN.pattern(), "");
-    }
-
-    /**
-     * Processes the given string to be sent on Discord.
-     * Converts Minecraft formatting to Discord formatting.
-     * @param text The string to use.
-     * @return The string ready to be sent to Discord.
-     */
-    public static String processForDiscord(String text) {
-        text = stripNonLegacyColors(ChatColor.stripColor(text));
-        StringBuilder stringBuilder = new StringBuilder();
-
-        boolean isFormattingCode = false;
-        Deque<Character> deque = new ArrayDeque<>();
-        for (int i = 0; i < text.length(); i++) {
-            if (isFormattingCode) {
-                isFormattingCode = false;
-                continue;
-            }
-
-            char currentChar = text.charAt(i);
-            if (i < text.length() - 1) {
-                char nextChar = text.charAt(i + 1);
-                if (currentChar == '&') {
-                    if (Character.toLowerCase(nextChar) == 'r' || Character.isUpperCase(nextChar)) {
-                        while (deque.descendingIterator().hasNext()) {
-                            Character c = deque.pollLast();
-                            if (c != null) {
-                                stringBuilder.append(getDiscordFormatting(c));
-                            }
-                        }
-
-                        isFormattingCode = true;
-                        continue;
-                    }
-
-                    deque.add(Character.toLowerCase(nextChar));
-                    stringBuilder.append(getDiscordFormatting(nextChar));
-
-                    isFormattingCode = true;
-                    continue;
-                }
-
-                stringBuilder.append(currentChar);
-                continue;
-            }
-
-            if (i == text.length() - 1) {
-                stringBuilder.append(currentChar);
-                while (deque.descendingIterator().hasNext()) {
-                    Character c = deque.pollLast();
-                    if (c != null) {
-                        stringBuilder.append(getDiscordFormatting(c));
-                    }
-                }
-            }
-        }
-
-        return ChatColor.stripColor(stringBuilder.toString());
-    }
-
-    /**
-     * Converts Minecraft formatting to Discord formatting.
-     * For example, &l to **.
-     * @param c The character to convert.
-     * @return The converted string, as Discord formatting.
-     */
-    private static String getDiscordFormatting(char c) {
-        return switch (Character.toLowerCase(c)) {
-            case 'o' -> "*";
-            case 'n' -> "__";
-            case 'm' -> "~~";
-            case 'l' -> "**";
-            default -> "";
-        };
     }
 
     public static String getCaptureGroup(Matcher matcher, String group) {

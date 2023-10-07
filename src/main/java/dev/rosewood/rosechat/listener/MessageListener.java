@@ -6,7 +6,7 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -35,7 +35,7 @@ public class MessageListener implements Listener {
         if (!event.getViewer().hasPermission(permission))
             return;
 
-        BaseComponent[] components = event.getMessageComponents().components();
+        BaseComponent[] components = event.getMessageComponents().content();
         if (components != null && components.length > 0)
             this.appendButton(event, components, format);
     }
@@ -52,7 +52,7 @@ public class MessageListener implements Listener {
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
         }
 
-        event.setMessageComponents(new RoseMessageComponents(componentBuilder.create(), event.getMessageComponents().outputs()));
+        event.setMessageComponents(new MessageTokenizerResults<>(componentBuilder.create(), event.getMessageComponents().outputs()));
     }
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {

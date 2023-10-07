@@ -196,7 +196,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId())) continue;
                             messageWrapper.setUUID(deletableMessage.getUUID());
-                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).components();
+                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
                             deletableMessage.setJson(ComponentSerializer.toString(components));
                             break;
                         }

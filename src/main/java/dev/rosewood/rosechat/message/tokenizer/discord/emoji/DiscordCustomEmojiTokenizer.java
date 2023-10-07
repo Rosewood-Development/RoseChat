@@ -29,7 +29,7 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
         String content = matcher.group(1);
         if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji." + content)) return null;
         content = RoseChatAPI.getInstance().getDiscord().getCustomEmoji(content);
-        return new TokenizerResult(Token.text(content).build(), matcher.group().length());
+        return new TokenizerResult(Token.text(content), matcher.group().length());
     }
 
 }

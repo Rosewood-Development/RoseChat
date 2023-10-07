@@ -77,10 +77,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         }
 
         if (Objects.equals(content, originalContent)) {
-            Token.Builder token = Token.text(content);
-            if (encapsulate) token.encapsulate();
-
-            return new TokenizerResult(token.build(), originalContent.length());
+            return new TokenizerResult(Token.text(content), originalContent.length());
         } else {
             Token.Builder token = Token.group(content);
             if (encapsulate) token.encapsulate();

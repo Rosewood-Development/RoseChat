@@ -13,7 +13,7 @@ public class CharacterTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        return new TokenizerResult(Token.text(String.valueOf(params.getInput().charAt(0))).build(), 1);
+        return new TokenizerResult(Token.text(String.valueOf(params.getInput().charAt(0))), 1);
     }
 
 }

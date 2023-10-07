@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -54,8 +53,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         PlaceholderCondition textPlaceholder = placeholder.getPlaceholder("text");
         String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
         if (text != null) {
-            BaseComponent[] message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).components();
-            text = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).content();
         }
 
         PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
@@ -66,8 +64,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String title = titlePlaceholder != null ?
                 placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (title != null) {
-            BaseComponent[] message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).components();
-            title = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            title = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).content();
             sendAsEmbed = true;
         }
 
@@ -75,8 +72,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         String description = descriptionPlaceholder != null ?
                 placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (description != null) {
-            BaseComponent[] message = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).components();
-            description = MessageUtils.processForDiscord(TextComponent.toLegacyText(message));
+            description = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).content();
             sendAsEmbed = true;
         }
 

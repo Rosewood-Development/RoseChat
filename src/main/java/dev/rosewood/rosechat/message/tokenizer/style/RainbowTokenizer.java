@@ -58,8 +58,8 @@ public class RainbowTokenizer extends Tokenizer {
 
         String content = matcher.group();
         return MessageUtils.hasTokenPermission(params, "rosechat.rainbow")
-                ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)).build(), content.length())
-                : new TokenizerResult(Token.text(content).build(), content.length());
+                ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)), content.length())
+                : new TokenizerResult(Token.text(content), content.length());
     }
 
 }

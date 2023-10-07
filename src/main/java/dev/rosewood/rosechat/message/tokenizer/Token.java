@@ -66,6 +66,8 @@ public class Token {
      * @return the decorators to be applied to this token
      */
     public List<TokenDecorator> getDecorators() {
+        if (this.type == TokenType.TEXT)
+            throw new IllegalStateException("Cannot get decorators of a token that is of type TEXT");
         return this.decorators;
     }
 
@@ -91,16 +93,6 @@ public class Token {
     }
 
     /**
-     * Checks if a Tokenizer should be ignored.
-     *
-     * @param tokenizer The Tokenizer to check
-     * @return true if the Tokenizer should be ignored, false otherwise
-     */
-    public boolean ignoresTokenizer(Tokenizer tokenizer) {
-        return this.getIgnoredTokenizers().contains(tokenizer);
-    }
-
-    /**
      * @return the ignored tokenizers
      */
     public Set<Tokenizer> getIgnoredTokenizers() {
@@ -118,16 +110,16 @@ public class Token {
         return builder.build();
     }
 
-    public static Builder text(String value) {
-        return new Builder(TokenType.TEXT, value);
+    public static Token text(String value) {
+        return new Builder(TokenType.TEXT, value).build();
+    }
+
+    public static Token decorator(TokenDecorator decorator) {
+        return new Builder(TokenType.DECORATOR, null).decorate(decorator).build();
     }
 
     public static Builder group(String rawContent) {
         return new Builder(TokenType.GROUP, rawContent);
-    }
-
-    public static Builder decorator(TokenDecorator decorator) {
-        return new Builder(TokenType.DECORATOR, null).decorate(decorator);
     }
 
     public static class Builder {

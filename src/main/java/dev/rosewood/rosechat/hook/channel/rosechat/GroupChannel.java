@@ -77,7 +77,7 @@ public class GroupChannel extends Channel {
             if (playerData != null && !this.canPlayerReceiveMessage(receiver, playerData, sender.getUUID())) continue;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                receiver.send(roseMessage.parse(receiver, this.getFormat()).components());
+                receiver.send(roseMessage.parse(receiver, this.getFormat()).content());
             });
         }
 
@@ -94,7 +94,7 @@ public class GroupChannel extends Channel {
             if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
 
             RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).components());
+                rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content());
             });
         }
     }

@@ -83,6 +83,7 @@ public class HeldItemTokenizer extends Tokenizer {
 
     private void initialiseNMSClasses() {
         Map<String, String> saveMethods = new HashMap<>() {{
+            this.put("v1_20_R2", "b");
             this.put("v1_20_R1", "b");
             this.put("v1_19_R3", "b");
             this.put("v1_18_R2", "b");

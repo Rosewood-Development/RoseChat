@@ -47,7 +47,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
                     .build(), matcher.group().length());
         }
 
-        return new TokenizerResult(Token.text(matcher.group(1)).build(), matcher.group().length());
+        return new TokenizerResult(Token.text(matcher.group(1)), matcher.group().length());
     }
 
 }

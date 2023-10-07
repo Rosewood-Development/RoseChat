@@ -18,7 +18,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -194,7 +194,7 @@ public class RoseChatChannel extends ConditionalChannel {
                 Bukkit.getPluginManager().callEvent(preParseMessageEvent);
 
                 if (preParseMessageEvent.isCancelled()) return;
-                RoseMessageComponents components = discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
+                MessageTokenizerResults<BaseComponent[]> components = discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
 
                 PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, receiver, direction, components);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
@@ -202,10 +202,10 @@ public class RoseChatChannel extends ConditionalChannel {
                 if (postParseMessageEvent.isCancelled()) return;
 
                 outputs = postParseMessageEvent.getMessageComponents().outputs();
-                receiver.send(postParseMessageEvent.getMessageComponents().components());
+                receiver.send(postParseMessageEvent.getMessageComponents().content());
 
                 DeletableMessage deletableMessage = message.createDeletableMessage(
-                        ComponentSerializer.toString(postParseMessageEvent.getMessageComponents().components()), discordId
+                        ComponentSerializer.toString(postParseMessageEvent.getMessageComponents().content()), discordId
                 );
                 receiverData.getMessageLog().addDeletableMessage(deletableMessage);
             } else {
@@ -222,12 +222,12 @@ public class RoseChatChannel extends ConditionalChannel {
 
                 // Serialize the json message and set the components.
                 BaseComponent[] parsedMessage = ComponentSerializer.parse(receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), jsonMessage) : jsonMessage);
-                RoseMessageComponents components = new RoseMessageComponents(parsedMessage, new MessageOutputs());
+                MessageTokenizerResults<BaseComponent[]> components = new MessageTokenizerResults<>(parsedMessage, new MessageOutputs());
 
                 // Call the post parse message event for the correct viewer if the message was sent over bungee
                 PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, message.getSender(), MessageDirection.PLAYER_TO_SERVER, components);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
-                parsedMessage = postParseMessageEvent.getMessageComponents().components();
+                parsedMessage = postParseMessageEvent.getMessageComponents().content();
                 outputs = postParseMessageEvent.getMessageComponents().outputs();
                 receiver.send(parsedMessage);
                 receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage), false, discordId));
@@ -308,7 +308,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
             if (preParseMessageEvent.isCancelled()) return;
 
-            BaseComponent[] parsedConsoleMessage = message.parse(consoleReceiver, this.getFormat()).components();
+            BaseComponent[] parsedConsoleMessage = message.parse(consoleReceiver, this.getFormat()).content();
             Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
         }
 

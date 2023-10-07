@@ -54,6 +54,10 @@ public class FormatDecorator extends TokenDecorator {
         return !this.value;
     }
 
+    public ChatColor getChatColor() {
+        return this.chatColor;
+    }
+
     public static FormatDecorator of(ChatColor chatColor, boolean value) {
         return new FormatDecorator(chatColor, value);
     }

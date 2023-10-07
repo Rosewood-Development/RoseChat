@@ -10,8 +10,9 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.wrapper.RoseMessageComponents;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -71,8 +72,8 @@ public class PlayerListener implements Listener {
             if (playerData.getNickname() != null) {
                 RosePlayer rosePlayer = new RosePlayer(player);
                 RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
-                RoseMessageComponents components = message.parse(rosePlayer, playerData.getNickname());
-                player.setDisplayName(TextComponent.toLegacyText(components.components()));
+                MessageTokenizerResults<BaseComponent[]> components = message.parse(rosePlayer, playerData.getNickname());
+                player.setDisplayName(TextComponent.toLegacyText(components.content()));
             }
         });
     }

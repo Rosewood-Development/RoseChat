@@ -7,13 +7,9 @@ public class TokenizerResult {
     private final MessageOutputs outputs;
 
     public TokenizerResult(Token token, int consumed) {
-        this(token, consumed, new MessageOutputs());
-    }
-
-    public TokenizerResult(Token token, int consumed, MessageOutputs outputs) {
         this.token = token;
         this.consumed = consumed;
-        this.outputs = outputs;
+        this.outputs = new MessageOutputs();
     }
 
     public Token getToken() {

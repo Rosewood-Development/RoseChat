@@ -26,7 +26,7 @@ public class ToDiscordTagTokenizer extends Tokenizer {
         DiscordChatProvider.DetectedMention member = discord.matchPartialMember(input.substring(1));
         if (member == null) return null;
 
-        return new TokenizerResult(Token.text(member.mention()).build(), member.consumedTextLength() + 1);
+        return new TokenizerResult(Token.text(member.mention()), member.consumedTextLength() + 1);
     }
 
 }
