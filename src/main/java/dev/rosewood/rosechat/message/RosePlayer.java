@@ -98,7 +98,7 @@ public class RosePlayer {
      * @return True if the RosePlayer has the permission.
      */
     public boolean hasPermission(String permission) {
-        if (this.isConsole())
+        if (this.isConsole() && this.group == null)
             return true; // Console has all permissions
 
         // If the permission is ignored, return true
@@ -106,19 +106,21 @@ public class RosePlayer {
             return true;
 
         // Is the player online?
-        Player onlinePlayer = this.player.getPlayer();
-        if (onlinePlayer != null)
-            return onlinePlayer.hasPermission(permission);
+       if (this.player != null) {
+           Player onlinePlayer = this.player.getPlayer();
+           if (onlinePlayer != null)
+               return onlinePlayer.hasPermission(permission);
 
-        // Otherwise, check their offline permissions if Vault is available
-        if (this.api.getVault() != null) {
-            return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.player.isOp()
-                    || this.api.getVault().playerHas(null, this.player, permission);
-        }
+           // Otherwise, check their offline permissions if Vault is available
+           if (this.api.getVault() != null) {
+               return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.player.isOp()
+                       || this.api.getVault().playerHas(null, this.player, permission);
+           }
+       }
 
         // If the player is not available, check the group permissions as long as we have Vault
         if (this.group != null && this.api.getVault() != null)
-            return this.api.getVault().groupHas((String) null, this.group, permission);
+            return !ConfigurationManager.Setting.REQUIRE_PERMISSIONS.getBoolean() || this.api.getVault().groupHas((String) null, this.group, permission);
 
         // If none of the above worked, just allow it
         return true;

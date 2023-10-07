@@ -17,8 +17,6 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePostProcessEvent;
-import github.scarsz.discordsrv.api.events.GameChatMessagePostProcessEvent;
-import github.scarsz.discordsrv.api.events.GameChatMessagePreProcessEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
@@ -187,7 +185,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     return;
                 }
 
-                messageWrapper.setPlayerInput(line);
+                messageWrapper.setPlayerInput(outputs.getFilteredMessage());
 
                 if (update) {
                     for (PlayerData playerData : updateFor) {
