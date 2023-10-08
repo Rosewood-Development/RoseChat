@@ -6,12 +6,21 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 public class ShaderTokenizer extends Tokenizer {
 
+    private List<String> shaderColors;
+
     public ShaderTokenizer() {
         super("shader");
+
+        this.shaderColors = new ArrayList<>();
+        for (String color : Setting.CORE_SHADER_COLORS.getStringList()) {
+            this.shaderColors.add(color.toLowerCase());
+        }
     }
 
     @Override
@@ -25,7 +34,7 @@ public class ShaderTokenizer extends Tokenizer {
         String match = input.substring(0, matcher.end());
         if (!input.startsWith(match)) return null;
 
-        if (!Setting.CORE_SHADER_COLORS.getStringList().contains(match)) return null;
+        if (!this.shaderColors.contains(match.toLowerCase())) return null;
         String freeHex = findFreeHex(match.substring(1));
 
         return new TokenizerResult(Token.group("#" + freeHex).build(), match.length());
