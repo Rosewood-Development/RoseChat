@@ -5,6 +5,8 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import org.bukkit.ChatColor;
+
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
@@ -117,7 +119,7 @@ public class MessageRules {
         Matcher matcher = MessageUtils.URL_PATTERN.matcher(outputs.getFilteredMessage());
         while (matcher.find()) {
             String url = outputs.getFilteredMessage().substring(matcher.start(), matcher.end());
-            outputs.transformMessage(x -> x.replace(url, "&m" + url.replace(".", " ") + "&r"));
+            outputs.transformMessage(x -> x.replace(url, ChatColor.STRIKETHROUGH + url.replace(".", " ") + ChatColor.RESET));
             hasURL = true;
         }
 
