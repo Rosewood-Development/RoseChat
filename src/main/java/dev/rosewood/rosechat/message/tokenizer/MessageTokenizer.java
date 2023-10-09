@@ -74,11 +74,11 @@ public class MessageTokenizer {
                 if (result == null)
                     continue;
 
-                Token child = result.getToken();
+                Token child = result.token();
                 child.parent = token;
                 token.getChildren().add(child);
-                content = content.substring(result.getConsumed());
-                this.outputs.merge(result.getOutputs());
+                content = content.substring(result.consumed());
+                this.outputs.merge(params.getOutputs());
                 continue outer;
             }
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
