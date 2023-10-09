@@ -29,11 +29,8 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
         StringBuilder contentBuilder = new StringBuilder();
 
         for (Token child : token.getChildren()) {
-            if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty()) {
-                componentBuilder.append(contentBuilder.toString(), ComponentBuilder.FormatRetention.NONE);
-                contentBuilder.setLength(0);
-                contextDecorators.apply(componentBuilder, this.tokenizer, child);
-            }
+            if ((child.getType() != TokenType.TEXT || contextDecorators.blocksTextStitching()) && !contentBuilder.isEmpty())
+                this.applyAndDecorate(componentBuilder, contentBuilder, child, contextDecorators);
 
             switch (child.getType()) {
                 case TEXT -> contentBuilder.append(child.getContent());
@@ -46,10 +43,8 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
             }
         }
 
-        if (!contentBuilder.isEmpty()) {
-            componentBuilder.append(contentBuilder.toString(), ComponentBuilder.FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder, this.tokenizer, token);
-        }
+        if (!contentBuilder.isEmpty())
+            this.applyAndDecorate(componentBuilder, contentBuilder, token, contextDecorators);
 
         BaseComponent[] components = componentBuilder.create();
         if (token.isPlain() || components.length == 0)
@@ -58,6 +53,21 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
         TextComponent wrapperComponent = new TextComponent(components);
         token.getDecorators().forEach(x -> x.apply(wrapperComponent, this.tokenizer, token));
         return new BaseComponent[]{wrapperComponent};
+    }
+
+    private void applyAndDecorate(ComponentBuilder componentBuilder, StringBuilder contentBuilder, Token token, TokenDecorators contextDecorators) {
+        String content = contentBuilder.toString();
+        contentBuilder.setLength(0);
+
+        if (contextDecorators.blocksTextStitching()) {
+            for (char c : content.toCharArray()) {
+                componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
+                contextDecorators.apply(componentBuilder, this.tokenizer, token);
+            }
+        } else {
+            componentBuilder.append(content, ComponentBuilder.FormatRetention.NONE);
+            contextDecorators.apply(componentBuilder, this.tokenizer, token);
+        }
     }
 
 }

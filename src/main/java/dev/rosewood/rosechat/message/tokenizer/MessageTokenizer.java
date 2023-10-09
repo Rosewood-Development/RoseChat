@@ -182,14 +182,13 @@ public class MessageTokenizer {
                     }
                 }
                 case GROUP -> {
-                    if (!counting.get() || !child.shouldEncapsulate())
-                        length += this.findDecoratorContentLength(child, decorator, counting);
+                    boolean countingBefore = counting.get();
+                    length += this.findDecoratorContentLength(child, decorator, counting);
+                    if (child.shouldEncapsulate())
+                        counting.set(countingBefore);
                 }
             }
         }
-
-        if (token.shouldEncapsulate())
-            counting.set(false);
 
         return length;
     }
