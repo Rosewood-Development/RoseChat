@@ -175,7 +175,7 @@ public class RoseChatChannel extends ConditionalChannel {
         if (!this.canPlayerReceiveMessage(receiver, receiverData, message.getSender().getUUID())) return;
 
         // Send the message to the player asynchronously.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
 
             Stopwatch messageTimer;
@@ -264,7 +264,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
             if (api.getDiscord() != null && this.getDiscordChannel() != null && Setting.USE_DISCORD.getBoolean()) {
-                RoseChat.MESSAGE_THREAD_POOL.submit(() -> MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel()));
+                RoseChat.MESSAGE_THREAD_POOL.execute(() -> MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel()));
             }
         }
     }
@@ -276,7 +276,7 @@ public class RoseChatChannel extends ConditionalChannel {
         if (direction != MessageDirection.FROM_BUNGEE_SERVER && direction != MessageDirection.FROM_BUNGEE_RAW && api.isBungee() && direction != MessageDirection.FROM_DISCORD) {
             for (String server : this.servers) {
                 if (this.keepFormatOverBungee) {
-                    RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+                    RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                         api.getBungeeManager()
                                 .sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), true,
                                         ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormat())));

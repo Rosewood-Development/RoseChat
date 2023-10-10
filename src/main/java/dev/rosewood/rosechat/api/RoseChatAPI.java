@@ -162,7 +162,7 @@ public final class RoseChatAPI {
             if (data.getNickname() == null)
                 return;
 
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 RoseMessage roseMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
                 String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).content());
                 player.asPlayer().setDisplayName(displayName);

@@ -147,7 +147,7 @@ public class BungeeManager extends Manager {
         sender.setIgnoredPermissions(permissions);
 
         // Must be done asynchronously for LuckPerms & Vault.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             channel.send(sender, message, messageId, isJson);
         });
     }

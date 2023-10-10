@@ -232,14 +232,14 @@ public class MessageUtils {
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
 
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString()).content();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
 
         // Parse the message for the sender and the receiver.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString()).content();
             BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).content();
 
@@ -273,7 +273,7 @@ public class MessageUtils {
         if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
         String nickname = sender.getPlayerData().getNickname();
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
                 sender.setDisplayName(TextComponent.toLegacyText(components.content()));
             });

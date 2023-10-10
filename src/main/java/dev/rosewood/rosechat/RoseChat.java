@@ -77,6 +77,7 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import github.scarsz.discordsrv.DiscordSRV;
+import java.util.concurrent.Executors;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -84,13 +85,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
-    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+    public static final ExecutorService MESSAGE_THREAD_POOL = Executors.newCachedThreadPool();
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;

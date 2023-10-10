@@ -112,7 +112,7 @@ public class NicknameCommand extends AbstractCommand {
             return;
         }
 
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             if (roseSender.isConsole() || this.isNicknameAllowed(roseSender, roseTarget, message)) {
                 MessageTokenizerResults<BaseComponent[]> components = message.parse(roseTarget, outputs.getFilteredMessage());
 
