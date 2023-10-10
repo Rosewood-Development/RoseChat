@@ -28,7 +28,7 @@ public class ColorDecorator extends TokenDecorator {
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
         if (this.colorGenerator == null && this.colorGeneratorFunction != null)
-            this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(this));
+            this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(parent, this));
 
         if (this.colorGenerator != null)
             component.setColor(this.colorGenerator.nextChatColor());

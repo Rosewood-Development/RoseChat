@@ -102,6 +102,16 @@ public class Token {
         return ignoredTokenizers;
     }
 
+    /**
+     * @return the highest level parent Token that this Token ultimately belongs to
+     */
+    protected Token getHighestParent() {
+        Token root = this;
+        while (root.parent != null)
+            root = root.parent;
+        return root;
+    }
+
     public StringPlaceholders getPlaceholders() {
         StringPlaceholders.Builder builder = StringPlaceholders.builder();
         builder.addAll(this.placeholders);

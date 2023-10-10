@@ -166,8 +166,8 @@ public class MessageTokenizer {
         return mergedList;
     }
 
-    public int findDecoratorContentLength(TokenDecorator decorator) {
-        return this.findDecoratorContentLength(this.rootToken, decorator, new AtomicBoolean());
+    public int findDecoratorContentLength(Token source, TokenDecorator decorator) {
+        return this.findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
     }
 
     private int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {
