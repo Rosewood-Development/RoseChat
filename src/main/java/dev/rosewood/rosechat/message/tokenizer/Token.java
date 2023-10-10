@@ -75,7 +75,7 @@ public class Token {
      * @return true if this token contains player input, false otherwise
      */
     public boolean containsPlayerInput() {
-        return this.containsPlayerInput || (this.parent != null && this.parent.containsPlayerInput());
+        return this.containsPlayerInput;
     }
 
     /**
