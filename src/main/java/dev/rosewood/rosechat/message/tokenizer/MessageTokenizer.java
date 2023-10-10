@@ -15,7 +15,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -143,6 +145,7 @@ public class MessageTokenizer {
         if (listOfLists.size() == 1)
             return listOfLists.get(0);
 
+        Set<T> allValues = new HashSet<>(); // used to disallow duplicates in the final List
         List<T> mergedList = new ArrayList<>();
         int maxSize = 0;
 
@@ -150,10 +153,15 @@ public class MessageTokenizer {
             if (list.size() > maxSize)
                 maxSize = list.size();
 
-        for (int i = 0; i < maxSize; i++)
-            for (List<T> list : listOfLists)
-                if (i < list.size())
-                    mergedList.add(list.get(i));
+        for (int i = 0; i < maxSize; i++) {
+            for (List<T> list : listOfLists) {
+                if (i < list.size()) {
+                    T value = list.get(i);
+                    if (allValues.add(value))
+                        mergedList.add(list.get(i));
+                }
+            }
+        }
 
         return mergedList;
     }
