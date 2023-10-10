@@ -42,7 +42,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         if (placeholder.equals(MESSAGE_PLACEHOLDER) && !params.containsPlayerInput()) {
             String playerInput = params.getPlayerInput();
             if (playerInput == null || playerInput.isEmpty()) {
-                RoseChat.getInstance().getLogger().warning("Parsed {message} with no player input. This is likely a configuration error.");
+                RoseChat.getInstance().getLogger().warning("Parsed " + MESSAGE_PLACEHOLDER + " with no player input. This is likely a configuration error.");
                 return new TokenizerResult(Token.text(""), matcher.group().length());
             }
 
@@ -64,12 +64,13 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
         Token.Builder tokenBuilder = Token.group(content);
         if (hover != null) tokenBuilder.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
-        if (click != null) {
-            tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
-        }
+        if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
+        if (params.containsPlayerInput()) tokenBuilder.encapsulate();
 
-        if (params.containsPlayerInput())
-            tokenBuilder.encapsulate();
+        if (content.contains(placeholder)) {
+            // If we contain ourselves, avoid infinite recursion by disallowing tokenizing this again.
+            tokenBuilder.ignoreTokenizer(this);
+        }
 
         return new TokenizerResult(tokenBuilder.build(), placeholder.length());
     }

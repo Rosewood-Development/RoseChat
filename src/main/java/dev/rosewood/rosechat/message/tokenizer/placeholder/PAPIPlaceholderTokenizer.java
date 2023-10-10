@@ -48,6 +48,10 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
             content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), content);
         }
 
+        // If we haven't changed, don't allow tokenizing this text anymore
+        if (Objects.equals(content, originalContent))
+            return new TokenizerResult(Token.text(content), originalContent.length());
+
         // Encapsulate if the placeholder only contains a colour
         boolean encapsulate = true;
 
@@ -76,14 +80,9 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
             }
         }
 
-        if (Objects.equals(content, originalContent)) {
-            return new TokenizerResult(Token.text(content), originalContent.length());
-        } else {
-            Token.Builder token = Token.group(content);
-            if (encapsulate) token.encapsulate();
-
-            return new TokenizerResult(token.build(), originalContent.length());
-        }
+        Token.Builder token = Token.group(content);
+        if (encapsulate) token.encapsulate();
+        return new TokenizerResult(token.build(), originalContent.length());
     }
 
 }

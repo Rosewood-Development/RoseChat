@@ -392,9 +392,9 @@ public class MessageUtils {
         // Gets the full permission, e.g. rosechat.emoji.channel.global
         String fullPermission = permission + "." + params.getLocationPermission();
 
-        return params.getSender().hasPermission(fullPermission)
-                || params.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
-                || params.getSender().getIgnoredPermissions().contains("*");
+        return params.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*")
+                || checkAndLogPermission(params, fullPermission);
     }
 
     /**
@@ -414,9 +414,15 @@ public class MessageUtils {
         // The sender will not have an extended permission if they do not have the base permission.
         if (!hasTokenPermission(params, permission)) return false;
 
-        return params.getSender().hasPermission(extendedPermission)
-                || params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
-                || params.getSender().getIgnoredPermissions().contains("*");
+        return params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*")
+                || checkAndLogPermission(params, extendedPermission);
+    }
+
+    private static boolean checkAndLogPermission(TokenizerParams params, String permission) {
+        boolean hasPermission = params.getSender().hasPermission(permission);
+        if (!hasPermission) params.getOutputs().getMissingPermissions().add(permission);
+        return hasPermission;
     }
 
     public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
