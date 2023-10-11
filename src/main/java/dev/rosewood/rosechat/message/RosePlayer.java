@@ -23,6 +23,7 @@ public class RosePlayer {
     private String group;
     private OfflinePlayer player;
     private List<String> ignoredPermissions;
+    private boolean isDiscordUser;
 
     private RosePlayer() {
         this.api = RoseChatAPI.getInstance();
@@ -72,6 +73,18 @@ public class RosePlayer {
     /**
      * Creates a new RosePlayer.
      * @param name The name to use.
+     * @param isDiscordUser Whether this RosePlayer is sending a message from Discord.
+     */
+    public RosePlayer(String name, boolean isDiscordUser) {
+        this();
+        this.displayName = name;
+        this.group = "default";
+        this.isDiscordUser = isDiscordUser;
+    }
+
+    /**
+     * Creates a new RosePlayer.
+     * @param name The name to use.
      * @param group The group to use.
      */
     public RosePlayer(String name, String group) {
@@ -98,7 +111,7 @@ public class RosePlayer {
      * @return True if the RosePlayer has the permission.
      */
     public boolean hasPermission(String permission) {
-        if (this.isConsole() && this.group == null)
+        if (this.isConsole())
             return true; // Console has all permissions
 
         // If the permission is ignored, return true
@@ -159,7 +172,7 @@ public class RosePlayer {
      * @return True if the RosePlayer is a Console.
      */
     public boolean isConsole() {
-        return this.player == null;
+        return this.player == null && !this.isDiscordUser;
     }
 
     /**
@@ -223,7 +236,7 @@ public class RosePlayer {
      */
     public String getGroup() {
         if (this.group == null) {
-            if (this.player.isOnline()) {
+            if (this.player != null && this.player.isOnline()) {
                 Player onlinePlayer = this.player.getPlayer();
                 return this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(onlinePlayer);
             } else {
@@ -275,6 +288,10 @@ public class RosePlayer {
      */
     public PlayerData getPlayerData() {
         return this.player != null ? this.api.getPlayerData(this.player.getUniqueId()) : null;
+    }
+
+    public boolean isDiscordUser() {
+        return this.isDiscordUser;
     }
 
 }

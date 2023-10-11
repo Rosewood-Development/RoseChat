@@ -114,7 +114,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     .add("user_tag", member.getUser().getDiscriminator());
 
             // If not using the setting, or the player has never joined, use their discord name.
-            if (!Setting.USE_IGN_WITH_DISCORD.getBoolean() || uuid == null) {
+            if (uuid == null) {
                 this.createMessage(message, null, member.getEffectiveName(), channel, placeholders, update, updateFor);
                 return;
             }
@@ -123,7 +123,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 PlayerData data = this.api.getPlayerData(player.getUniqueId());
-                this.createMessage(message, player, data.getNickname() == null ? player.getDisplayName() : data.getNickname(), channel, placeholders, update, updateFor);
+
+                String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
+                name = Setting.USE_IGN_WITH_DISCORD.getBoolean() ? name : member.getEffectiveName();
+
+                this.createMessage(message, player, name, channel, placeholders, update, updateFor);
                 return;
             }
 
@@ -156,7 +160,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, Channel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
-        RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, "default") : new RosePlayer(offlinePlayer));
+        RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, true) : new RosePlayer(offlinePlayer));
 
         // Add all attachments.
         for (Message.Attachment attachment : message.getAttachments())

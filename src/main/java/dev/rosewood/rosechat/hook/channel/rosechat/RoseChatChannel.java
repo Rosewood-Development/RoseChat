@@ -324,7 +324,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
                 // Loop through all the players in the world.
                 for (Player player : this.getVisibleAnywhereRecipients(message.getSender(), senderLocation.getWorld())) {
-                    if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                    if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     // Send the message if the player is within the distance.
                     if (player.getLocation().distance(senderLocation) <= this.radius) {
@@ -344,7 +344,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
                     // Loop through all the players in the world.
                     for (Player player : this.getVisibleAnywhereRecipients(message.getSender(), world)) {
-                        if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                        if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                         this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
                     }
@@ -358,7 +358,7 @@ public class RoseChatChannel extends ConditionalChannel {
                 List<Player> players = this.getVisibleAnywhereRecipients(message.getSender(), null);
 
                 for (Player player : players) {
-                    if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                    if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
                 }
@@ -373,7 +373,7 @@ public class RoseChatChannel extends ConditionalChannel {
             // Send the message to all the spies who will not receive the message by being in the channel.
             for (Player spy : currentSpies) {
                 if (spy == null) continue;
-                if (!message.getSender().isConsole() && message.getSender().getUUID().equals(spy.getUniqueId())) continue;
+                if (message.getSender().isPlayer() && message.getSender().getUUID().equals(spy.getUniqueId())) continue;
 
                 this.sendToPlayer(message, new RosePlayer(spy), direction, Setting.CHANNEL_SPY_FORMAT.getString(), discordId);
             }
@@ -385,7 +385,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
                 // Sender to all members of the channel.
                 for (Player player : this.getMemberRecipients(message.getSender(), null)) {
-                    if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                    if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     if (player.getWorld().getName().equals(senderLocation.getWorld().getName())
                             && player.getLocation().distance(senderLocation) <= this.radius) {
@@ -401,7 +401,7 @@ public class RoseChatChannel extends ConditionalChannel {
             } else if (!this.worlds.isEmpty()) {
                 // Not Visible Anywhere + World - Player must be in the channel AND the world to see the message
                 for (Player player : this.getMemberRecipients(message.getSender(), null)) {
-                    if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                    if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     if (this.worlds.contains(player.getWorld().getName())) {
                         this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
@@ -415,7 +415,7 @@ public class RoseChatChannel extends ConditionalChannel {
             } else {
                 // Not Visible Anywhere - Send to the members
                 for (Player player : this.getMemberRecipients(message.getSender(), null)) {
-                    if (!message.getSender().isConsole() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
+                    if (message.getSender().isPlayer() && message.getSender().getUUID().equals(player.getUniqueId())) continue;
 
                     this.sendToPlayer(message, new RosePlayer(player), direction, format, discordId);
                 }
@@ -426,7 +426,7 @@ public class RoseChatChannel extends ConditionalChannel {
 
             // Send the message to all the spies who will not receive the message by being in the channel.
             for (Player spy : currentSpies) {
-                if (spy == null || (message.getSender().isConsole() && message.getSender().getUUID().equals(spy.getUniqueId()))) continue;
+                if (spy == null || (message.getSender().isPlayer() && message.getSender().getUUID().equals(spy.getUniqueId()))) continue;
 
                 this.sendToPlayer(message, new RosePlayer(spy), direction, Setting.CHANNEL_SPY_FORMAT.getString(), discordId);
             }
