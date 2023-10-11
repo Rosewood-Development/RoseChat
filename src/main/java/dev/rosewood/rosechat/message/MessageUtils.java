@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
 import java.util.UUID;
@@ -266,6 +267,14 @@ public class MessageUtils {
 
                 // If the target is online, send the message.
                 messageTarget.send(parsedReceivedMessage);
+
+                if (messageTarget.isPlayer()) {
+                    Player targetPlayer = messageTarget.asPlayer();
+                    PlayerData targetData = messageTarget.getPlayerData();
+                    if (targetData != null && targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
+                        targetPlayer.playSound(targetPlayer.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
+                    }
+                }
             }
         });
 
