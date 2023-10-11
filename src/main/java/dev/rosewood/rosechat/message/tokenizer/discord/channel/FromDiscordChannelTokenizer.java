@@ -24,7 +24,6 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("<")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.discordchannel")) return null;
 
         Matcher matcher = PATTERN.matcher(input);
         if (!matcher.find() || matcher.start() != 0) return null;
@@ -35,12 +34,14 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
         String serverId = discord.getServerId();
         String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();
 
-        return new TokenizerResult(Token.group(content)
+        return MessageUtils.hasTokenPermission(params, "rosechat.discordchannel") ?
+                new TokenizerResult(Token.group(content)
                 .placeholder("server_id", serverId)
                 .placeholder("channel_id", matcher.group(1))
                 .placeholder("channel_name", channelName)
                 .ignoreTokenizer(this)
-                .build(), matcher.group().length());
+                .build(), matcher.group().length())
+                : new TokenizerResult(Token.text(matcher.group()), matcher.group().length());
     }
 
 }
