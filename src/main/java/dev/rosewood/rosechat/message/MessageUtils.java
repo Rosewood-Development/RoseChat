@@ -217,10 +217,9 @@ public class MessageUtils {
         }
 
         // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString()).content();
+        BaseComponent[] parsedMessage = roseMessage.parse(messageTarget, Setting.CONSOLE_MESSAGE_FORMAT.getString()).content();
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
-        // The tokens will always be generated before even if this message is not sent.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
             Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
 
@@ -234,14 +233,14 @@ public class MessageUtils {
             if (spy == null) continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString()).content();
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SPY_FORMAT.getString()).content();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString()).content();
+            BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SENT_FORMAT.getString()).content();
             BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).content();
 
             if (target == null) {

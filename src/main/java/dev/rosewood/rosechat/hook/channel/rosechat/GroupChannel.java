@@ -91,7 +91,7 @@ public class GroupChannel extends Channel {
             PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(uuid);
 
             // Don't send the message if the receiver can't receive it.
-            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID())) return;
+            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID())) continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content());
