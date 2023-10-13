@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -34,6 +36,8 @@ public class DisbandGroupCommand extends AbstractCommand {
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
+                    PlayerData data = this.getAPI().getPlayerData(uuid);
+                    data.setCurrentChannel(Channel.findNextChannel(member));
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
@@ -52,6 +56,9 @@ public class DisbandGroupCommand extends AbstractCommand {
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
+                    PlayerData data = this.getAPI().getPlayerData(uuid);
+                    data.setCurrentChannel(Channel.findNextChannel(member));
+                    groupChat.removeMember(uuid);
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
