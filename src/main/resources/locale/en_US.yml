@@ -219,7 +219,7 @@ command-gcm-enter-message: '&cPlease enter a message.'
 
 # Color Command
 command-color-description: '&8 - &d/color &7- Change your default chat color.'
-command-color-usage: '&e/color <color> [player]'
+command-color-usage: '&e/color <color/player> [color/remove]'
 command-color-success: '&eYour new chat color is &f%color%&e.'
 command-color-invalid: '&eThis is not a valid color!'
 command-color-removed: '&eYour chat color has been removed.'
@@ -282,11 +282,11 @@ command-debug-off: '&eDebug mode is now &coff&e.'
 
 # Nick Color Command
 command-nickcolor-description: '&8 - &d/nickcolor &7- Change your nickname color.'
-command-nickcolor-usage: '&e/nickcolor <color> [player]'
+command-nickcolor-usage: '&e/nickcolor <color/player> [color/remove]'
 command-nickcolor-success: '&eYour new nickname is: &f%name%&e.'
 command-nickcolor-invalid: '&eThis is not a valid color!'
 command-nickcolor-removed: '&eYour nickname color has been removed.'
-command-nickcolor-others: "&eYou have set &b%player%&e's nick color to &f%color%&e."
+command-nickcolor-others: "&eYou have set &b%player%&e's nickname to &f%name%&e."
 command-nickcolor-others-removed: "&eYou have removed &b%player%&e's nick color."
 
 # Chat Toggle Command

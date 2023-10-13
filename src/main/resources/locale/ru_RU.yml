@@ -219,7 +219,7 @@ command-gcm-enter-message: '&cПожалуйста, введите сообще�
 
 # цвета
 command-color-description: '&8 - &d/color &7- Изменить твой цвет чата'
-command-color-usage: '&e/color <color> [игрок]'
+command-color-usage: '&e/color <color/игрок> [color/remove]'
 command-color-success: '&eЦвет твоего чата &f%color%&e.'
 command-color-invalid: '&eЭто недопустимый цвет!'
 command-color-removed: '&eЦвет вашего чата был удален.'
@@ -282,7 +282,7 @@ command-debug-off: '&eРежим отладки теперь &coff&e.'
 
 # Цветной ник
 command-nickcolor-description: '&8 - &d/nickcolor &7- Изменить цвет никнейма.'
-command-nickcolor-usage: '&e/nickcolor <color> [игрок]'
+command-nickcolor-usage: '&e/nickcolor <color/игрок> [color/remove]'
 command-nickcolor-success: '&eваш новый ник - это: &f%name%&e.'
 command-nickcolor-invalid: '&eЭто недопустимый цвет!'
 command-nickcolor-removed: '&eВаш ник color был удален.'

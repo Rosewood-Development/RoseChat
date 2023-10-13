@@ -219,7 +219,7 @@ command-gcm-enter-message: '&cメッセージを入力してください！'
 
 #  チャット・カラー ・コマンド
 command-color-description: '&8 - &d/color &7- あなたのデフォルトのチャット色を変更します。'
-command-color-usage: '&e/color <装飾コード> [プレイヤー]'
+command-color-usage: '&e/color <装飾コード/プレイヤー> [装飾コード/remove]'
 command-color-success: '&e新しいチャット色は&f%color%&e&r。'
 command-color-invalid: '&eこれは有効な装飾コードではありません。'
 command-color-removed: '&eあなたのチャットカラーは外しました。'
@@ -282,7 +282,7 @@ command-debug-off: '&eデバッグモードは&cオフ&eです。'
 
 # ニックネーム・カラー・コマンド
 command-nickcolor-description: '&8 - &d/nickcolor &7- Cあなたのニックネーム色を変更します。'
-command-nickcolor-usage: '&e/nickcolor <装飾コード> [プレイヤー]'
+command-nickcolor-usage: '&e/nickcolor <装飾コード/プレイヤー> [装飾コード/remove]'
 command-nickcolor-success: '&e新しいニックネームは&f%name%&e&r。'
 command-nickcolor-invalid: '&eこれは有効な装飾コードではありません。'
 command-nickcolor-removed: '&eあなたのニックネームカラーは外しました。'
