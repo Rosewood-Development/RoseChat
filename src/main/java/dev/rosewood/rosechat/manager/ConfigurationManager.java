@@ -120,6 +120,11 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         CAN_TAG_MEMBERS("discord-settings.can-tag-members", true,
                 "Can players tag Discord members?",
                 "Players can use @<username> in messages to tag a member."),
+        SUPPORT_THIRD_PARTY_PLUGINS("discord-settings.support-third-party-plugins", false,
+                "Should third-party plugins be supported?",
+                "This should be enabled when using plugins that edit discord messages.",
+                "For example, InteractiveChatDiscordAddon.",
+                "Enabling this will disable the ability delete Discord message from in-game."),
 
         CHAT_FORMATS("chat-formats", null, "These are the the other chat formats in the plugin."),
         MESSAGE_SENT_FORMAT("chat-formats.message-sent", "{message-sent}{message}",

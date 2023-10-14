@@ -50,7 +50,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-        if (!Setting.USE_DISCORD.getBoolean() || !Setting.EDIT_DISCORD_MESSAGES.getBoolean()) return;
+        if (!Setting.USE_DISCORD.getBoolean() || !Setting.EDIT_DISCORD_MESSAGES.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
@@ -67,13 +67,14 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        if (!Setting.USE_DISCORD.getBoolean()) return;
+        if (!Setting.USE_DISCORD.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
         AtomicReference<UUID> deletableMessageUUID = new AtomicReference<>();
         api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
             for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
+                if (deletableMessage.isClient()) continue;
                 if (deletableMessage.getDiscordId() != null && !deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
                 updatePlayers.add(playerData);
                 deletableMessageUUID.set(deletableMessage.getUUID());
@@ -100,6 +101,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     }
 
     public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
+        if (member == null) return;
+
         for (Channel channel : this.api.getChannels()) {
             if (channel.getDiscordChannel() == null) continue;
             if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel))) continue;
