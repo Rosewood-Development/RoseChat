@@ -34,6 +34,7 @@ public class PlaceholderManager extends Manager {
         this.placeholders.clear();
         this.chatFormats.clear();
         this.parsedFormats.clear();
+        this.discordEmbedPlaceholder = null;
 
         File placeholderFile = new File(this.rosePlugin.getDataFolder(), "custom-placeholders.yml");
         if (!placeholderFile.exists()) this.rosePlugin.saveResource("custom-placeholders.yml", false);
