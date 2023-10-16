@@ -9,7 +9,7 @@ import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
@@ -20,15 +20,15 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageEmbed;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -49,19 +49,20 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         boolean sendAsEmbed = false;
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
-        DiscordPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordPlaceholder();
+        String placeholderId = Setting.MINECRAFT_TO_DISCORD_FORMAT.getString();
+        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
 
-        PlaceholderCondition textPlaceholder = placeholder.getPlaceholder("text");
+        PlaceholderCondition textPlaceholder = placeholder.get("text");
         String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
         if (text != null) {
             text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).content();
         }
 
-        PlaceholderCondition urlPlaceholder = placeholder.getPlaceholder("url");
+        PlaceholderCondition urlPlaceholder = placeholder.get("url");
         String url = urlPlaceholder != null ?
                 ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) : null;
 
-        PlaceholderCondition titlePlaceholder = placeholder.getPlaceholder("title");
+        PlaceholderCondition titlePlaceholder = placeholder.get("title");
         String title = titlePlaceholder != null ?
                 placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (title != null) {
@@ -69,7 +70,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             sendAsEmbed = true;
         }
 
-        PlaceholderCondition descriptionPlaceholder = placeholder.getPlaceholder("description");
+        PlaceholderCondition descriptionPlaceholder = placeholder.get("description");
         String description = descriptionPlaceholder != null ?
                 placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
         if (description != null) {
@@ -77,10 +78,10 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             sendAsEmbed = true;
         }
 
-        PlaceholderCondition timestampPlaceholder = placeholder.getPlaceholder("timestamp");
+        PlaceholderCondition timestampPlaceholder = placeholder.get("timestamp");
         boolean timestamp = timestampPlaceholder != null && Boolean.parseBoolean(timestampPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders));
 
-        PlaceholderCondition colorPlaceholder = placeholder.getPlaceholder("color");
+        PlaceholderCondition colorPlaceholder = placeholder.get("color");
         int color = 16777215; // #FFFFFF
         if (colorPlaceholder != null) {
             String colorStr = colorPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
@@ -92,14 +93,16 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             }
         }
 
-        PlaceholderCondition thumbnailPlaceholder = placeholder.getPlaceholder("thumbnail");
+        PlaceholderCondition thumbnailPlaceholder = placeholder.get("thumbnail");
         String thumbnail = thumbnailPlaceholder != null? placeholders.apply(thumbnailPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
 
-        PlaceholderCondition thumbnailWidthPlaceholder = placeholder.getPlaceholder("thumbnail-width");
+        PlaceholderCondition thumbnailWidthPlaceholder = placeholder.get("thumbnail-width");
         int thumbnailWidth = thumbnailWidthPlaceholder != null? Integer.parseInt(thumbnailWidthPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : 128;
 
-        PlaceholderCondition thumbnailHeightPlaceholder = placeholder.getPlaceholder("thumbnail-height");
+        PlaceholderCondition thumbnailHeightPlaceholder = placeholder.get("thumbnail-height");
         int thumbnailHeight = thumbnailHeightPlaceholder != null? Integer.parseInt(thumbnailHeightPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : 128;
+
+
 
         if (sendAsEmbed) {
             MessageEmbed messageEmbed = new MessageEmbed(url,

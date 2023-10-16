@@ -4,12 +4,12 @@ import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DiscordPlaceholder {
+public class CustomPlaceholder {
 
     private final String id;
     private final Map<String, PlaceholderCondition> placeholders;
 
-    public DiscordPlaceholder(String id) {
+    public CustomPlaceholder(String id) {
         this.id = id;
         this.placeholders = new HashMap<>();
     }
@@ -18,11 +18,11 @@ public class DiscordPlaceholder {
         return this.placeholders;
     }
 
-    public void addPlaceholder(String id, PlaceholderCondition placeholder) {
+    public void add(String id, PlaceholderCondition placeholder) {
         this.placeholders.put(id, placeholder);
     }
 
-    public PlaceholderCondition getPlaceholder(String id) {
+    public PlaceholderCondition get(String id) {
         return this.placeholders.get(id);
     }
 

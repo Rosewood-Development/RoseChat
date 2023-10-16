@@ -46,9 +46,8 @@ player:
       - "&7Click to Message"
   # This defines the click event for this custom placeholder. This is optional.
   click:
-    default:
-      action: SUGGEST_COMMAND
-      value: "/msg %player_name% "
+    action: SUGGEST_COMMAND
+    default: "/msg %player_name% "
 
 # This custom placeholder is the last one used before the {message} placeholder.
 # This means that the last color in this custom placeholder will be the default colour of the message.
@@ -66,9 +65,8 @@ message-sent:
       - "&eTo: &f%other_player_name%"
       - "&7Click to Reply"
   click:
-    default:
-      action: SUGGEST_COMMAND
-      value: "/r "
+    action: SUGGEST_COMMAND
+    default: "/r "
 
 message-received:
   text:
@@ -79,9 +77,8 @@ message-received:
       - "&eTo: &f%other_player_name%"
       - "&7Click to Reply"
   click:
-    default:
-      action: SUGGEST_COMMAND
-      value: "/r "
+    action: SUGGEST_COMMAND
+    default: "/r "
 
 console-message:
   text:
@@ -96,9 +93,8 @@ group-prefix:
       - "&7Owner: &e:star: &7%group_owner%"
       - "&7Click to Message"
   click:
-    default:
-      action: SUGGEST_COMMAND
-      value: "/gcm %group% "
+    action: SUGGEST_COMMAND
+    default: "/gcm %group% "
 
 group-member-prefix:
   text:
@@ -157,9 +153,8 @@ delete-message:
     default:
       - "&7&oClick to Delete"
   click:
-    default:
-      action: RUN_COMMAND
-      value: "/delmsg %id% %channel%"
+    action: RUN_COMMAND
+    default: "/delmsg %id% %channel%"
 
 # This custom placeholder is used when a message is deleted.
 # This custom placeholder can be removed and no message will be shown when a message is deleted.
@@ -189,9 +184,8 @@ money:
     default:
       - "&7Click to pay &f%player_nickname% &a$%group_1%"
   click:
-    default:
-      action: SUGGEST_COMMAND
-      value: "/pay %player_name% %group_1%"
+    action: SUGGEST_COMMAND
+    default: "/pay %player_name% %group_1%"
 
 # This custom placeholder uses 1 character in the text.
 # This is because the tag has match-length enabled in the tags.yml file.
@@ -210,9 +204,8 @@ url:
     default:
       - "&7Click to Open"
   click:
-    default:
-      action: OPEN_URL
-      value: "%group_2%"
+    action: OPEN_URL
+    default: "%group_2%"
 
 # This placeholder allows an item to be shown in chat.
 # The %item_name% placeholder is used for the name of the item.
@@ -221,6 +214,7 @@ item:
   text:
     default: "&7» &e%item_name% &7«"
   hover:
+    action: SHOW_ITEM
     default:
       - "%item%"
 
@@ -253,6 +247,5 @@ discord-channel-link:
     default:
       - "&7Click to Open"
   click:
-    default:
-      action: OPEN_URL
-      value: "https://discord.com/channels/%server_id%/%channel_id%"
+    action: OPEN_URL
+    default: "https://discord.com/channels/%server_id%/%channel_id%"

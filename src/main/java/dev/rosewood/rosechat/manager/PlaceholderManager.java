@@ -2,8 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.placeholders.ConditionManager;
-import dev.rosewood.rosechat.placeholders.DiscordPlaceholder;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
@@ -17,10 +16,9 @@ import java.util.Map;
 
 public class PlaceholderManager extends Manager {
 
-    private final Map<String, RoseChatPlaceholder> placeholders;
+    private final Map<String, CustomPlaceholder> placeholders;
     private final Map<String, String> chatFormats;
     private final Map<String, List<String>> parsedFormats;
-    private DiscordPlaceholder discordPlaceholder;
 
     public PlaceholderManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -42,29 +40,15 @@ public class PlaceholderManager extends Manager {
 
         // Placeholders
         for (String id : placeholderConfiguration.getKeys(false)) {
-            if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)) {
-                if (placeholderConfiguration.contains(id)) parseDiscordFormat(id, placeholderConfiguration.getConfigurationSection(id));
-                continue;
-            }
+            CustomPlaceholder placeholder = new CustomPlaceholder(id);
 
-            RoseChatPlaceholder placeholder = new RoseChatPlaceholder(id);
+            ConfigurationSection placeholderSection = placeholderConfiguration.getConfigurationSection(id);
+            if (placeholderSection == null) continue;
 
-            if (placeholderConfiguration.contains(id + ".text")) {
-                String conditionStr = placeholderConfiguration.contains(id + ".text.condition") ? placeholderConfiguration.getString(id + ".text.condition") : null;
-                PlaceholderCondition condition = ConditionManager.getCondition(placeholderConfiguration.getConfigurationSection(id + ".text"), conditionStr).parseValues();
-                placeholder.setText(condition);
-            }
-
-            if (placeholderConfiguration.contains(id + ".hover")) {
-                String conditionStr = placeholderConfiguration.contains(id + ".hover.condition") ? placeholderConfiguration.getString(id + ".hover.condition") : null;
-                PlaceholderCondition condition = ConditionManager.getCondition(placeholderConfiguration.getConfigurationSection(id + ".hover"), conditionStr).parseValues();
-                placeholder.setHover(condition);
-            }
-
-            if (placeholderConfiguration.contains(id + ".click")) {
-                String conditionStr = placeholderConfiguration.contains(id + ".click.condition") ? placeholderConfiguration.getString(id + ".click.condition") : null;
-                PlaceholderCondition condition = ConditionManager.getCondition(placeholderConfiguration.getConfigurationSection(id + ".click"), conditionStr).parseValues();
-                placeholder.setClick(condition);
+            for (String location : placeholderSection.getKeys(false)) {
+                String conditionStr = placeholderSection.getString(location + ".condition");
+                PlaceholderCondition condition = ConditionManager.getCondition(placeholderSection.getConfigurationSection(location), conditionStr).parseValues();
+                placeholder.add(location, condition);
             }
 
             this.placeholders.put(id, placeholder);
@@ -81,18 +65,6 @@ public class PlaceholderManager extends Manager {
     @Override
     public void disable() {
 
-    }
-
-    private void parseDiscordFormat(String format, ConfigurationSection section) {
-        DiscordPlaceholder discordPlaceholder = new DiscordPlaceholder(format);
-
-        for (String embedInfo : section.getKeys(false)) {
-            String condition = section.contains(embedInfo + ".condition") ? section.getString(embedInfo + ".condition") : null;
-            PlaceholderCondition placeholder = ConditionManager.getCondition(section.getConfigurationSection(embedInfo), condition).parseValues();
-            discordPlaceholder.addPlaceholder(embedInfo, placeholder);
-        }
-
-        this.discordPlaceholder = discordPlaceholder;
     }
 
     private void parseFormats() {
@@ -115,11 +87,11 @@ public class PlaceholderManager extends Manager {
         this.parsedFormats.put(id, parsed);
     }
 
-    public RoseChatPlaceholder getPlaceholder(String id) {
+    public CustomPlaceholder getPlaceholder(String id) {
         return this.placeholders.getOrDefault(id, null);
     }
 
-    public Map<String, RoseChatPlaceholder> getPlaceholders() {
+    public Map<String, CustomPlaceholder> getPlaceholders() {
         return this.placeholders;
     }
 
@@ -137,10 +109,6 @@ public class PlaceholderManager extends Manager {
 
     public Map<String, List<String>> getParsedFormats() {
         return this.parsedFormats;
-    }
-
-    public DiscordPlaceholder getDiscordPlaceholder() {
-        return this.discordPlaceholder;
     }
 
 }

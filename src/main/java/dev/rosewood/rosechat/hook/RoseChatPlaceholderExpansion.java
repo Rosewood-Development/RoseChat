@@ -9,7 +9,7 @@ import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -55,10 +55,10 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         if (placeholder.startsWith("placeholder_")) {
             String rcPlaceholderId = placeholder.substring("placeholder_".length());
             RosePlayer sender = new RosePlayer(player);
-            RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
+            CustomPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
             if (rcPlaceholder == null) return null;
 
-            return HexUtils.colorify(rcPlaceholder.getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
+            return HexUtils.colorify(rcPlaceholder.get("text").parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
         }
 
         return switch (placeholder) {

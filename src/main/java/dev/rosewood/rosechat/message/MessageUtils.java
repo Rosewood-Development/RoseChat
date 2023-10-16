@@ -10,7 +10,7 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -437,20 +437,20 @@ public class MessageUtils {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
-        RoseChatPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        CustomPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return null;
 
         BaseComponent[] components;
         HoverEvent hoverEvent = null;
         ClickEvent clickEvent = null;
 
-        if (placeholder.getText() == null) return null;
-        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
+        if (placeholder.get("text") == null) return null;
+        String text = placeholder.get("text").parseToString(sender, viewer, placeholders);
         if (text == null) return null;
         components = api.parse(sender, viewer, text);
 
-        if (placeholder.getHover() != null) {
-            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
+        if (placeholder.get("hover") != null) {
+            String hover = placeholder.get("hover").parseToString(sender, viewer, placeholders);
             if (hover != null) {
                 if (hover.equalsIgnoreCase("%original%")) {
                     hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
@@ -460,9 +460,9 @@ public class MessageUtils {
             }
         }
 
-        if (placeholder.getClick() != null) {
-            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
-            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
+        if (placeholder.get("click") != null) {
+            String click = placeholder.get("click").parseToString(sender, viewer, placeholders);
+            ClickEvent.Action action = placeholder.get("click").getClickAction();
             if (click != null && action != null) {
                 clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
             }

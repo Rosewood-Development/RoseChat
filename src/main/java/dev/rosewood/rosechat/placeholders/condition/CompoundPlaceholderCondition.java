@@ -39,12 +39,6 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public ClickEvent.Action parseToAction(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        String parsed = this.parse(sender, viewer, placeholders);
-        return this.getClickAction(parsed);
-    }
-
-    @Override
     public PlaceholderCondition parseValues() {
         for (String condition : this.condition.split("\\|\\|")) {
             BooleanPlaceholderCondition booleanPlaceholderCondition = new BooleanPlaceholderCondition(this.section, condition);

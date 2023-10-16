@@ -11,7 +11,7 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -83,7 +83,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
 
     private TokenizerResult createTagToken(TokenizerParams params, String originalContent, String content, Replacement replacement, String prefix) {
         String output = replacement.getOutput().getText();
-        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(output.substring(1, output.length() - 1));
+        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(output.substring(1, output.length() - 1));
 
         RosePlayer placeholderViewer = null;
         if (replacement.getOutput().shouldTagOnlinePlayers()) {
@@ -113,10 +113,10 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 .add("group_1", content).build();
 
         if (placeholder != null) {
-            String hover = placeholder.getHover() == null ? null : placeholders.apply(placeholder.getHover().parseToString(params.getSender(), params.getReceiver(), placeholders));
+            String hover = placeholder.get("hover") == null ? null : placeholders.apply(placeholder.get("hover").parseToString(params.getSender(), params.getReceiver(), placeholders));
 
             StringBuilder contentBuilder = new StringBuilder();
-            content = placeholders.apply(placeholder.getText().parseToString(params.getSender(), placeholderViewer, placeholders));
+            content = placeholders.apply(placeholder.get("text").parseToString(params.getSender(), placeholderViewer, placeholders));
             if (replacement.getOutput().shouldMatchLength()) {
                 if (hover != null) {
                     String colorlessHover = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), hover));
@@ -128,8 +128,8 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
 
             content = contentBuilder.toString();
 
-            String click = placeholder.getClick() == null ? null : placeholders.apply(placeholder.getClick().parseToString(params.getSender(), params.getReceiver(), placeholders));
-            ClickEvent.Action clickAction = placeholder.getClick() == null ? null : placeholder.getClick().parseToAction(params.getSender(), params.getReceiver(), placeholders);
+            String click = placeholder.get("click") == null ? null : placeholders.apply(placeholder.get("click").parseToString(params.getSender(), params.getReceiver(), placeholders));
+            ClickEvent.Action clickAction = placeholder.get("click") == null ? null : placeholder.get("click").getClickAction();
 
             StringPlaceholders.Builder groupPlaceholders = StringPlaceholders.builder();
             if (replacement.getInput().isRegex()) {
