@@ -7,7 +7,7 @@ import java.util.Map;
 public class CustomPlaceholder {
 
     private final String id;
-    private final Map<String, PlaceholderCondition> placeholders;
+    protected final Map<String, PlaceholderCondition> placeholders;
 
     public CustomPlaceholder(String id) {
         this.id = id;

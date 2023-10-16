@@ -8,9 +8,12 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholders.DiscordEmbedPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.EmbedType;
@@ -26,9 +29,8 @@ import org.bukkit.entity.Player;
 import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -47,44 +49,61 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
         if (textChannel == null) return;
 
-        boolean sendAsEmbed = false;
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
-        String placeholderId = Setting.MINECRAFT_TO_DISCORD_FORMAT.getString();
-        CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholder();
+        if (embedPlaceholder != null) {
+            this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
+        } else {
+            String placeholderId = Setting.MINECRAFT_TO_DISCORD_FORMAT.getString();
+            CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
 
-        PlaceholderCondition textPlaceholder = placeholder.get("text");
-        String text = textPlaceholder != null ? textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders) : null;
-        if (text != null) {
+            PlaceholderCondition textPlaceholder = placeholder.get("text");
+            if (textPlaceholder == null) return;
+
+            String text = textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
             text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).content();
+
+            if (text == null) return;
+            if (Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) {
+                this.discord.processChatMessage(roseMessage.getSender().asPlayer(), this.emojiManager.formatUnicode(text), channel, false);
+            } else {
+                textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((message) -> {
+                    this.updateMessageLogs(roseMessage.getUUID(), message.getId());
+                });
+            }
         }
+    }
 
-        PlaceholderCondition urlPlaceholder = placeholder.get("url");
-        String url = urlPlaceholder != null ?
-                ChatColor.stripColor(placeholders.apply(urlPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) : null;
+    private void sendMessageEmbed(RoseMessage roseMessage, TextChannel channel, DiscordEmbedPlaceholder embedPlaceholder, StringPlaceholders placeholders) {
+        // Title
+        PlaceholderCondition placeholderCondition = embedPlaceholder.get("title");
+        String title = placeholderCondition  != null ?
+                ChatColor.stripColor(placeholders.apply(placeholderCondition.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) :
+                null;
 
-        PlaceholderCondition titlePlaceholder = placeholder.get("title");
-        String title = titlePlaceholder != null ?
-                placeholders.apply(titlePlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
-        if (title != null) {
+        if (title != null)
             title = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).content();
-            sendAsEmbed = true;
-        }
 
-        PlaceholderCondition descriptionPlaceholder = placeholder.get("description");
-        String description = descriptionPlaceholder != null ?
-                placeholders.apply(descriptionPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
-        if (description != null) {
+        // Description
+        placeholderCondition = embedPlaceholder.get("description");
+        String description = placeholderCondition != null ?
+                ChatColor.stripColor(placeholders.apply(placeholderCondition.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders))) :
+                null;
+
+        if (description != null)
             description = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).content();
-            sendAsEmbed = true;
-        }
 
-        PlaceholderCondition timestampPlaceholder = placeholder.get("timestamp");
-        boolean timestamp = timestampPlaceholder != null && Boolean.parseBoolean(timestampPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders));
+        // URL
+        placeholderCondition = embedPlaceholder.get("url");
+        String url = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (url != null)
+            url = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), url));
 
-        PlaceholderCondition colorPlaceholder = placeholder.get("color");
-        int color = 16777215; // #FFFFFF
-        if (colorPlaceholder != null) {
-            String colorStr = colorPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
+        // Color
+        placeholderCondition = embedPlaceholder.get("color");
+        int color = 16777215;
+        if (placeholderCondition != null) {
+            String colorStr = placeholderCondition.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
             if (colorStr.startsWith("#")) {
                 Color c = Color.decode(colorStr);
                 color = (c.getRed() << 16) + (c.getGreen() << 8) + c.getBlue();
@@ -93,44 +112,108 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             }
         }
 
-        PlaceholderCondition thumbnailPlaceholder = placeholder.get("thumbnail");
-        String thumbnail = thumbnailPlaceholder != null? placeholders.apply(thumbnailPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : null;
+        // Timestamp
+        placeholderCondition = embedPlaceholder.get("timestamp");
+        String timestampStr = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        boolean timestamp = Boolean.parseBoolean(timestampStr);
 
-        PlaceholderCondition thumbnailWidthPlaceholder = placeholder.get("thumbnail-width");
-        int thumbnailWidth = thumbnailWidthPlaceholder != null? Integer.parseInt(thumbnailWidthPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : 128;
+        // Image
+        placeholderCondition = embedPlaceholder.get("image.url");
+        String imageUrl = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (imageUrl != null)
+            imageUrl = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), imageUrl));
 
-        PlaceholderCondition thumbnailHeightPlaceholder = placeholder.get("thumbnail-height");
-        int thumbnailHeight = thumbnailHeightPlaceholder != null? Integer.parseInt(thumbnailHeightPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders)) : 128;
+        placeholderCondition = embedPlaceholder.get("image.height");
+        String imageHeightStr = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        int imageHeight = imageHeightStr != null ? Integer.parseInt(imageHeightStr) : 128;
 
+        placeholderCondition = embedPlaceholder.get("image.width");
+        String imageWidthStr = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        int imageWidth = imageWidthStr != null ? Integer.parseInt(imageWidthStr) : 128;
 
+        // Thumbnail
+        placeholderCondition = embedPlaceholder.get("thumbnail.url");
+        String thumbnailUrl = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (thumbnailUrl != null)
+            thumbnailUrl = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), thumbnailUrl));
 
-        if (sendAsEmbed) {
-            MessageEmbed messageEmbed = new MessageEmbed(url,
-                    this.emojiManager.formatUnicode(ChatColor.stripColor(title)),
-                    this.emojiManager.formatUnicode(ChatColor.stripColor(description)),
-                    EmbedType.RICH,
-                    timestamp ? OffsetDateTime.now(): null,
-                    color,
-                    new MessageEmbed.Thumbnail(thumbnail, thumbnail, thumbnailWidth, thumbnailHeight),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-            // Unfortunately, may not always be able to be deleted.
-            textChannel.sendMessageEmbeds(messageEmbed).queue((m) -> {
-                this.updateMessageLogs(roseMessage.getUUID(), m.getId());
-            });
-        } else if (text != null) {
-            if (Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) {
-                discord.processChatMessage(roseMessage.getSender().asPlayer(), this.emojiManager.formatUnicode(text), channel, false);
-            } else {
-                textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((m) -> {
-                    this.updateMessageLogs(roseMessage.getUUID(), m.getId());
-                });
-            }
+        placeholderCondition = embedPlaceholder.get("thumbnail.height");
+        String thumbnailHeightStr = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        int thumbnailHeight = thumbnailHeightStr != null ? Integer.parseInt(thumbnailHeightStr) : 128;
+
+        placeholderCondition = embedPlaceholder.get("thumbnail.width");
+        String thumbnailWidthStr = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        int thumbnailWidth = thumbnailWidthStr != null ? Integer.parseInt(thumbnailWidthStr) : 128;
+
+        // Author
+        placeholderCondition = embedPlaceholder.get("author.name");
+        String authorName = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (authorName != null)
+            authorName = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), authorName));
+
+        placeholderCondition = embedPlaceholder.get("author.url");
+        String authorUrl = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (authorUrl != null)
+            authorUrl = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), authorUrl));
+
+        placeholderCondition = embedPlaceholder.get("author.icon-url");
+        String authorIconUrl = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (authorIconUrl != null)
+            authorIconUrl = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), authorIconUrl));
+
+        // Footer
+        placeholderCondition = embedPlaceholder.get("footer.text");
+        String footerText = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (footerText != null)
+            footerText = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), footerText));
+
+        placeholderCondition = embedPlaceholder.get("footer.icon-url");
+        String footerIconUrl = parsePlaceholder(placeholderCondition, roseMessage.getSender(), placeholders);
+        if (footerIconUrl != null)
+            footerIconUrl = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), footerIconUrl));
+
+        List<MessageEmbed.Field> fields = new LinkedList<>();
+        for (CustomPlaceholder fieldPlaceholder : embedPlaceholder.getFields()) {
+            PlaceholderCondition fieldCondition = fieldPlaceholder.get("name");
+            String name = parsePlaceholder(fieldCondition, roseMessage.getSender(), placeholders);
+            if (name != null)
+                name = ChatColor.stripColor( PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), name));
+
+            fieldCondition = fieldPlaceholder.get("value");
+            String value = parsePlaceholder(fieldCondition, roseMessage.getSender(), placeholders);
+            if (value != null)
+                value = ChatColor.stripColor(PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), value));
+
+            fieldCondition = fieldPlaceholder.get("inline");
+            String inlineStr = parsePlaceholder(fieldCondition, roseMessage.getSender(), placeholders);
+            boolean inline = Boolean.parseBoolean(inlineStr);
+
+            fields.add(new MessageEmbed.Field(name, value, inline));
         }
+
+        MessageEmbed messageEmbed = new MessageEmbed(
+                url,
+                title,
+                description,
+                EmbedType.RICH,
+                timestamp ? OffsetDateTime.now() : null,
+                color,
+                thumbnailUrl == null ? null : new MessageEmbed.Thumbnail(thumbnailUrl, thumbnailUrl, thumbnailWidth, thumbnailHeight),
+                null,
+                new MessageEmbed.AuthorInfo(authorName, authorUrl, authorIconUrl, authorIconUrl),
+                null,
+                new MessageEmbed.Footer(footerText, footerIconUrl, footerIconUrl),
+                imageUrl == null ? null : new MessageEmbed.ImageInfo(imageUrl, imageUrl, imageWidth, imageHeight),
+                fields);
+        channel.sendMessageEmbeds(messageEmbed).queue((message) -> {
+            this.updateMessageLogs(roseMessage.getUUID(), message.getId());
+        });
+    }
+
+    private String parsePlaceholder(PlaceholderCondition condition, RosePlayer rosePlayer, StringPlaceholders placeholders) {
+        return condition != null ?
+                placeholders.apply(condition.parseToString(rosePlayer, rosePlayer, placeholders)) :
+                null;
     }
 
     private void updateMessageLogs(UUID minecraftId, String discordId) {

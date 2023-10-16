@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.placeholders.ConditionManager;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholders.DiscordEmbedPlaceholder;
 import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
@@ -19,6 +20,7 @@ public class PlaceholderManager extends Manager {
     private final Map<String, CustomPlaceholder> placeholders;
     private final Map<String, String> chatFormats;
     private final Map<String, List<String>> parsedFormats;
+    private DiscordEmbedPlaceholder discordEmbedPlaceholder;
 
     public PlaceholderManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -44,6 +46,13 @@ public class PlaceholderManager extends Manager {
 
             ConfigurationSection placeholderSection = placeholderConfiguration.getConfigurationSection(id);
             if (placeholderSection == null) continue;
+
+            if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)
+                    && (placeholderSection.contains("title") || placeholderSection.contains("description"))) {
+                this.discordEmbedPlaceholder = new DiscordEmbedPlaceholder(id);
+                this.discordEmbedPlaceholder.parse(placeholderSection);
+                continue;
+            }
 
             for (String location : placeholderSection.getKeys(false)) {
                 String conditionStr = placeholderSection.getString(location + ".condition");
@@ -109,6 +118,10 @@ public class PlaceholderManager extends Manager {
 
     public Map<String, List<String>> getParsedFormats() {
         return this.parsedFormats;
+    }
+
+    public DiscordEmbedPlaceholder getDiscordEmbedPlaceholder() {
+        return this.discordEmbedPlaceholder;
     }
 
 }
