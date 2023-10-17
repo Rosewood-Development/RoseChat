@@ -34,6 +34,7 @@ public class HeldItemTokenizer extends Tokenizer {
         if (HELD_ITEM_TOKENIZER == null) {
             HELD_ITEM_TOKENIZER = this;
             Tokenizers.DEFAULT_BUNDLE.registerBefore(Tokenizers.ROSECHAT_PLACEHOLDER, this);
+            Tokenizers.DEFAULT_DISCORD_BUNDLE.registerBefore(Tokenizers.ROSECHAT_PLACEHOLDER, this);
         } else {
             throw new IllegalStateException("Cannot instantiate more than one HeldItemTokenizer");
         }
@@ -50,9 +51,10 @@ public class HeldItemTokenizer extends Tokenizer {
 
         String input = params.getInput();
         if (!input.startsWith(replacement.getInput().getText())) return null;
-        if (!params.getSender().isPlayer()) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.helditem")) return null;
-        if (params.getSender().asPlayer().getEquipment() == null) return null;
+
+        if (!params.getSender().isPlayer()
+                || !MessageUtils.hasTokenPermission(params, "rosechat.helditem")
+                || params.getSender().asPlayer().getEquipment() == null) return new TokenizerResult(Token.text(input), input.length());
 
         try {
             ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
