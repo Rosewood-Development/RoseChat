@@ -43,7 +43,6 @@ public class HeldItemTokenizer extends Tokenizer {
         this.api = RoseChatAPI.getInstance();
     }
 
-    // TODO: Make this work!
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         Replacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());

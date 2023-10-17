@@ -114,6 +114,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
 
         if (placeholder != null) {
             String hover = placeholder.get("hover") == null ? null : placeholders.apply(placeholder.get("hover").parseToString(params.getSender(), params.getReceiver(), placeholders));
+            HoverEvent.Action hoverAction = placeholder.get("hover") == null ? null : placeholder.get("hover").getHoverAction();
 
             StringBuilder contentBuilder = new StringBuilder();
             content = placeholders.apply(placeholder.get("text").parseToString(params.getSender(), placeholderViewer, placeholders));
@@ -154,7 +155,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     .ignoreTokenizer(this);
 
             if (hover != null)
-                tokenBuilder.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
+                tokenBuilder.decorate(HoverDecorator.of(hoverAction, hover));
             if (click != null)
                 tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
 
