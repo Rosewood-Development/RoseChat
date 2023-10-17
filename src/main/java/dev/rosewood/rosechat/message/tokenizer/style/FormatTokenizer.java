@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.style;
 
+import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -26,11 +27,21 @@ public class FormatTokenizer extends Tokenizer {
         char formatCharacter = content.charAt(1);
         char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
         boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
+        if (!hasPermission) return new TokenizerResult(Token.text(content), content.length());
+
         ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
-        boolean value = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
-        return hasPermission
-                ? new TokenizerResult(Token.decorator(FormatDecorator.of(formatCode, value)), content.length())
-                : new TokenizerResult(Token.text(content), content.length());
+        boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
+        if (formatCode == ChatColor.RESET) {
+            if (!enableFormat) // Full format reset
+                return new TokenizerResult(Token.decorator(FormatDecorator.of(formatCode, false)), content.length());
+
+            // Reset reapplies the player's chat color
+            PlayerData playerData = params.getSender().getPlayerData();
+            String chatColor = playerData != null ? playerData.getColor() : "";
+            return new TokenizerResult(Token.group("&R" + chatColor).build(), content.length());
+        }
+
+        return new TokenizerResult(Token.decorator(FormatDecorator.of(formatCode, enableFormat)), content.length());
     }
 
     public String getPermissionForFormat(char format) {

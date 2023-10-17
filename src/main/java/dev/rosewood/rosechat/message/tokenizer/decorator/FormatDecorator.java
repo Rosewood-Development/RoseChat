@@ -33,8 +33,6 @@ public class FormatDecorator extends TokenDecorator {
         } else if (this.chatColor == ChatColor.MAGIC) {
             if (this.value)
                 component.setObfuscated(true);
-        } else if (this.chatColor == ChatColor.RESET) {
-            component.setColor(ChatColor.WHITE); // TODO: Reset to player chat color
         }
     }
 
