@@ -125,7 +125,7 @@ public class PlaceholderCondition {
         return resultBuilder.toString();
     }
 
-    protected HoverEvent.Action getHoverAction() {
+    public HoverEvent.Action getHoverAction() {
         return this.hoverAction;
     }
 

@@ -61,10 +61,11 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         String hover = roseChatPlaceholder.get("hover") == null ? null : placeholders.apply(roseChatPlaceholder.get("hover").parseToString(params.getSender(), params.getReceiver(), placeholders));
         String click = roseChatPlaceholder.get("click") == null ? null : placeholders.apply(roseChatPlaceholder.get("click").parseToString(params.getSender(), params.getReceiver(), placeholders));
         ClickEvent.Action clickAction = roseChatPlaceholder.get("click") == null ? null : roseChatPlaceholder.get("click").getClickAction();
+        HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ? null : roseChatPlaceholder.get("hover").getHoverAction();
 
         Token.Builder tokenBuilder = Token.group(content);
-        if (hover != null) tokenBuilder.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
-        if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction, click));
+        if (hover != null) tokenBuilder.decorate(HoverDecorator.of(hoverAction, hover));
+        if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
         if (params.containsPlayerInput()) tokenBuilder.encapsulate();
 
         if (content.contains(placeholder)) {
