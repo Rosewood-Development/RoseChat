@@ -3,10 +3,13 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 
 public class ClickDecorator extends TokenDecorator {
+
+    private static final Pattern PATTERN = Pattern.compile("^https?://");
 
     private final String value;
     private final ClickEvent.Action action;
@@ -20,7 +23,7 @@ public class ClickDecorator extends TokenDecorator {
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
         String value = parent.getPlaceholders().apply(this.value);
-        if (this.action == ClickEvent.Action.OPEN_URL && !value.startsWith("https://"))
+        if (this.action == ClickEvent.Action.OPEN_URL && !PATTERN.matcher(value).find())
             value = "https://" + value;
         component.setClickEvent(new ClickEvent(this.action, parent.getPlaceholders().apply(value)));
     }
