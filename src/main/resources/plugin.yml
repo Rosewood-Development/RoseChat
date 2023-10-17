@@ -141,6 +141,7 @@ permissions:
       rosechat.strikethrough: true
       rosechat.underline: true
       rosechat.realname: true
+      rosechat.helditem: true
   rosechat.basecommand:
     description: Allows using the rc command.
     default: true
@@ -429,4 +430,7 @@ permissions:
       default: op
     rosechat.realname:
       description: Allows using the realname command.
+      default: op
+    rosechat.helditem:
+      description: Allows using the held item replacement.
       default: op
