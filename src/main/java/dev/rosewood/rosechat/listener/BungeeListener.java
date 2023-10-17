@@ -13,11 +13,9 @@ import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
 
-    private final RoseChat plugin;
     private final BungeeManager bungeeManager;
 
     public BungeeListener(RoseChat plugin) {
-        this.plugin = plugin;
         this.bungeeManager = plugin.getManager(BungeeManager.class);
     }
 
@@ -44,7 +42,7 @@ public class BungeeListener implements PluginMessageListener {
             DataInputStream data = new DataInputStream(new ByteArrayInputStream(msgBytes));
 
             switch (command) {
-                case "channel_message": {
+                case "channel_message" -> {
                     String rcChannel = data.readUTF();
                     String sender = data.readUTF();
                     String uuidStr = data.readUTF();
@@ -56,38 +54,32 @@ public class BungeeListener implements PluginMessageListener {
                     boolean isJson = data.readBoolean();
                     String rcMessage = data.readUTF();
                     this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);
-                    return;
                 }
-                case "direct_message": {
+                case "direct_message" -> {
                     String sender = data.readUTF();
                     UUID senderUUID = UUID.fromString(data.readUTF());
                     String group = data.readUTF();
                     List<String> permissions = Arrays.asList(data.readUTF().split(","));
                     String rcMessage = data.readUTF();
                     this.bungeeManager.receiveDirectMessage(player, sender, senderUUID, group, permissions, rcMessage);
-                    break;
                 }
-                case "update_reply": {
+                case "update_reply" -> {
                     String sender = data.readUTF();
                     this.bungeeManager.receiveUpdateReply(player, sender);
-                    break;
                 }
-                case "check_plugin": {
+                case "check_plugin" -> {
                     String sender = data.readUTF();
                     String plugin = data.readUTF();
                     this.bungeeManager.receivePluginCheck(sender, plugin);
-                    break;
                 }
-                case "confirm_plugin": {
+                case "confirm_plugin" -> {
                     boolean hasPlugin = data.readBoolean();
                     String sender = data.readUTF();
                     this.bungeeManager.receivePluginCheckConfirmation(sender, hasPlugin);
-                    break;
                 }
-                case "delete_message": {
+                case "delete_message" -> {
                     UUID messageId = UUID.fromString(data.readUTF());
                     this.bungeeManager.receiveMessageDeletion(messageId);
-                    break;
                 }
             }
         } catch (IOException e) {

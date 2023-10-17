@@ -131,35 +131,6 @@ public class GroupManager extends Manager {
         return this.channelProvider;
     }
 
-    public static class GroupInfo {
-
-        private final String id;
-        private final String name;
-        private final String owner;
-        private final int members;
-
-        public GroupInfo(String id, String name, String owner, int members) {
-            this.id = id;
-            this.name = name;
-            this.owner = owner;
-            this.members = members;
-        }
-
-        public String getId() {
-            return this.id;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public String getOwner() {
-            return this.owner;
-        }
-
-        public int getMembers() {
-            return this.members;
-        }
-    }
+    public record GroupInfo(String id, String name, String owner, int members) { }
 
 }

@@ -8,6 +8,7 @@ import com.songoda.skyblock.api.event.player.PlayerIslandLeaveEvent;
 import com.songoda.skyblock.api.island.Island;
 import com.songoda.skyblock.api.island.IslandRole;
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -50,24 +51,31 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
         members.addAll(event.getIsland().getPlayersWithRole(IslandRole.OPERATOR));
         members.addAll(event.getIsland().getPlayersWithRole(IslandRole.OWNER));
 
-        for (UUID uuid : members)
+        for (UUID uuid : members) {
             this.kick(uuid);
+            this.onTeamLeaveGeneric(uuid);
+        }
     }
 
     @EventHandler
     public void onTeamKick(IslandKickEvent event) {
         this.kick(event.getKicked().getUniqueId());
+        this.onTeamLeaveGeneric(event.getKicked().getUniqueId());
     }
 
     @EventHandler
     public void onTeamLeave(PlayerIslandLeaveEvent event) {
         this.kick(event.getPlayer().getUniqueId());
+        this.onTeamLeaveGeneric(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onTeamJoin(PlayerIslandJoinEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getPlayer().getUniqueId());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {
@@ -120,7 +128,7 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("type", this.channelType.toString().toLowerCase());
+                .add("type", this.channelType.toString().toLowerCase());
     }
 
     public FabledSkyblockChannelType getChannelType() {

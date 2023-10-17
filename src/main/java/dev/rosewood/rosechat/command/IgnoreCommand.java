@@ -21,7 +21,7 @@ public class IgnoreCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             return;
         }
 
@@ -31,7 +31,7 @@ public class IgnoreCommand extends AbstractCommand {
         // List the players that the sender is ignoring.
         if (args[0].equalsIgnoreCase("list")) {
             List<UUID> ignoring = playerData.getIgnoringPlayers();
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-list-title", StringPlaceholders.single("amount", ignoring.size()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-list-title", StringPlaceholders.of("amount", ignoring.size()));
 
             if (ignoring.isEmpty()) return;
             StringBuilder playersBuilder = new StringBuilder();
@@ -72,10 +72,10 @@ public class IgnoreCommand extends AbstractCommand {
 
         if (playerData.getIgnoringPlayers().contains(target.getUniqueId())) {
             playerData.unignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-unignored", StringPlaceholders.single("player", name));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-unignored", StringPlaceholders.of("player", name));
         } else {
             playerData.ignore(target.getUniqueId());
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-ignored", StringPlaceholders.single("player", name));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-ignore-ignored", StringPlaceholders.of("player", name));
         }
     }
 

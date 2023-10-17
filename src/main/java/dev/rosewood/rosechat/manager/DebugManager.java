@@ -31,7 +31,7 @@ public class DebugManager extends Manager {
             return;
 
         LocalDateTime now = LocalDateTime.now();
-        String prefix = "[" + System.currentTimeMillis() + "]";
+        String prefix = "[" + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond() + ":" + now.getNano() + "]";
         this.messages.add(prefix + " " + message.get() + "\n");
     }
 

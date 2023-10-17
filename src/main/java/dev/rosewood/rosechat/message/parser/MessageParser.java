@@ -3,20 +3,18 @@ package dev.rosewood.rosechat.message.parser;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import net.md_5.bungee.api.chat.BaseComponent;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 
-public interface MessageParser {
+public interface MessageParser<T> {
 
     /**
-     * Parses the message using RoseChat's {@link MessageTokenizer}.
+     * Parses the message using the tokenizer.
      * @param message The {@link RoseMessage} to be parsed.
-     * @param sender The {@link RosePlayer} who is sending the message.
      * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param format The format to parse into.
-     * @return A {@link BaseComponent[]} containing the parsed message.
+     * @return A {@link MessageTokenizerResults} containing the parsed message.
      */
-    BaseComponent[] parse(RoseMessage message, RosePlayer sender, RosePlayer viewer, String format);
+    MessageTokenizerResults<T> parse(RoseMessage message, RosePlayer viewer, String format);
 
     /**
      * @return The direction of the parsed message.

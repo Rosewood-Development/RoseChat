@@ -4,18 +4,19 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.PrivateMessageInfo;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -24,44 +25,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MessageUtils {
 
-    public final static String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
-    public static final Pattern URL_PATTERN = Pattern.compile("(http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-    public static final Pattern DISCORD_EMOJI_PATTERN = Pattern.compile("<a?(:[a-zA-Z0-9_\\-~]+:)[0-9]{18,19}>");
-    public static final Pattern EMOJI_PATTERN = Pattern.compile(":([a-zA-Z_]+):");
-    public static final Pattern DISCORD_CHANNEL_PATTERN = Pattern.compile("<#([0-9]{18,19})>");
-    public static final Pattern DISCORD_TAG_PATTERN = Pattern.compile("<@([0-9]{18,19})>");
-    public static final Pattern DISCORD_ROLE_TAG_PATTERN = Pattern.compile("<@&([0-9]{18,19})>");
-    public static final Pattern URL_MARKDOWN_PATTERN = Pattern.compile("\\[(.+)\\]\\(((http(s){0,1}://){0,1}[-a-zA-Z0-9@:%._\\+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))\\)");
-    public static final Pattern BOLD_MARKDOWN_PATTERN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
-    public static final Pattern UNDERLINE_MARKDOWN_PATTERN = Pattern.compile("__([\\s\\S]+?)__(?!_)");
-    public static final Pattern ITALIC_MARKDOWN_PATTERN = Pattern.compile("\\b_((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_\\b|\\*(?=\\S)((?:\\*\\*|\\s+(?:[^*\\s]|\\*\\*)|[^\\s*])+?)\\*(?!\\*)");
-    public static final Pattern STRIKETHROUGH_MARKDOWN_PATTERN = Pattern.compile("~~(?=\\S)([\\s\\S]*?\\S)~~");
+    public static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
+    public static final Pattern URL_PATTERN = Pattern.compile("(http(s)?://)?[-a-zA-Z0-9@:%._+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
+    public static final Pattern VALID_LEGACY_REGEX_PARSED = Pattern.compile("§[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
+    public static final Pattern VALID_LEGACY_REGEX_FORMATTING_PARSED = Pattern.compile("§[k-oK-OrR]");
+    public static final Pattern VALID_LEGACY_REGEX_COMBINED = Pattern.compile("(&|§)[0-9a-fA-F]|(&|§)[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX = Pattern.compile("&x(&[A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX_PARSED = Pattern.compile("#(§[A-Fa-f0-9]){6}|§x(§[A-Fa-f0-9]){6}");
+    public static final Pattern SPIGOT_HEX_REGEX_COMBINED = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}|&x(&[A-Fa-f0-9]){6}|#(§[A-Fa-f0-9]){6}|§x(§[A-Fa-f0-9]){6}");
     public static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
     public static final Pattern GRADIENT_PATTERN = Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>");
-    public static final Pattern STOP = Pattern.compile(
-            "<(rainbow|r)(#(\\d+))?(:(\\d*\\.?\\d+))?(:(\\d*\\.?\\d+))?(:(l|L|loop))?>|" +
-                    "<(gradient|g)(#(\\d+))?((:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(l|L|loop))?>|" +
-                    "(&[a-f0-9r])|" +
-                    "<#([A-Fa-f0-9]){6}>|" +
-                    "\\{#([A-Fa-f0-9]){6}}|" +
-                    "&#([A-Fa-f0-9]){6}|" +
-                    "#([A-Fa-f0-9]){6}"
-    );
 
     /**
      * Removes the accents from a string.
@@ -128,18 +113,18 @@ public class MessageUtils {
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
         StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .addPlaceholder("player_name", sender.getName())
-                .addPlaceholder("player_displayname", sender.getDisplayName())
-                .addPlaceholder("player_nickname", sender.getNickname());
+                .add("player_name", sender.getName())
+                .add("player_displayname", sender.getDisplayName())
+                .add("player_nickname", sender.getNickname());
 
         if (viewer != null) {
-            builder.addPlaceholder("other_player_name", viewer.getName())
-                    .addPlaceholder("other_player_displayname", viewer.getDisplayName())
-                    .addPlaceholder("other_player_nickname", viewer.getNickname());
+            builder.add("other_player_name", viewer.getName())
+                    .add("other_player_displayname", viewer.getDisplayName())
+                    .add("other_player_nickname", viewer.getNickname());
         }
 
         Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null) builder.addPlaceholder("vault_rank", sender.getGroup());
+        if (vault != null) builder.add("vault_rank", sender.getGroup());
         return builder;
     }
 
@@ -154,7 +139,7 @@ public class MessageUtils {
         else if (channel.getId().equalsIgnoreCase("group")) return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
 
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("channel", channel.getId());;
+        builder.add("channel", channel.getId());;
         return builder;
     }
 
@@ -182,9 +167,9 @@ public class MessageUtils {
      */
     public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
         StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.addPlaceholder("group", group.getId())
-                .addPlaceholder("group_name", group.getName())
-                .addPlaceholder("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
+        builder.add("group", group.getId())
+                .add("group_name", group.getName())
+                .add("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
 
         return builder;
     }
@@ -209,16 +194,15 @@ public class MessageUtils {
         Player target = Bukkit.getPlayer(targetName);
         RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
-        // Create the private message info, rules, and the message, then apply the rules.
-        PrivateMessageInfo privateMessageInfo = new PrivateMessageInfo(sender, messageTarget);
-        MessageRules rules = new MessageRules().applyAllFilters().applySenderChatColor().setPrivateMessageInfo(privateMessageInfo);
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.MESSAGE);
 
-        RoseMessage roseMessage = new RoseMessage(sender, MessageLocation.MESSAGE, message);
-        roseMessage.applyRules(rules);
+        MessageRules rules = new MessageRules().applyAllFilters();
+        MessageRules.RuleOutputs outputs = rules.apply(roseMessage, message);
+        roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // If the message is blocked, send a warning to the player.
-        if (roseMessage.isBlocked()) {
-            if (roseMessage.getFilterType() != null) roseMessage.getFilterType().sendWarning(sender);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(sender);
             return;
         }
 
@@ -233,10 +217,9 @@ public class MessageUtils {
         }
 
         // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(new RosePlayer(Bukkit.getConsoleSender()), Setting.CONSOLE_MESSAGE_FORMAT.getString());
+        BaseComponent[] parsedMessage = roseMessage.parse(messageTarget, Setting.CONSOLE_MESSAGE_FORMAT.getString()).content();
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
-        // The tokens will always be generated before even if this message is not sent.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
             Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
 
@@ -249,19 +232,16 @@ public class MessageUtils {
             Player spy = Bukkit.getPlayer(uuid);
             if (spy == null) continue;
 
-            // Adds the spy to the private message info.
-            privateMessageInfo.addSpy(new RosePlayer(spy));
-
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(new RosePlayer(spy), Setting.MESSAGE_SPY_FORMAT.getString());
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SPY_FORMAT.getString()).content();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
 
         // Parse the message for the sender and the receiver.
-        RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(sender, Setting.MESSAGE_SENT_FORMAT.getString());
-            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+            BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SENT_FORMAT.getString()).content();
+            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).content();
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
@@ -286,17 +266,24 @@ public class MessageUtils {
 
                 // If the target is online, send the message.
                 messageTarget.send(parsedReceivedMessage);
+
+                if (messageTarget.isPlayer()) {
+                    Player targetPlayer = messageTarget.asPlayer();
+                    PlayerData targetData = messageTarget.getPlayerData();
+                    if (targetData != null && targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
+                        targetPlayer.playSound(targetPlayer.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
+                    }
+                }
             }
         });
 
         // Update the player's display name if the setting is enabled.
         if (sender.getPlayerData() == null || sender.getPlayerData().getNickname() == null) return;
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && sender.getPlayerData().getNickname() != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
-            RoseChat.MESSAGE_THREAD_POOL.submit(() -> {
-                RoseMessage nickname = new RoseMessage(sender, MessageLocation.NICKNAME, sender.getPlayerData().getNickname());
-                nickname.parse(sender, null);
-
-                if (sender.getPlayerData().getNickname() != null) NicknameCommand.setDisplayName(sender, nickname);
+        String nickname = sender.getPlayerData().getNickname();
+        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+                MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
+                sender.setDisplayName(TextComponent.toLegacyText(components.content()));
             });
         }
     }
@@ -372,7 +359,7 @@ public class MessageUtils {
     public static boolean hasDefaultColor(String input, RoseMessage roseMessage) {
         if (roseMessage == null || roseMessage.getSenderData() == null || roseMessage.getSenderData().getColor() == null) return false;
 
-        String message = roseMessage.getMessage();
+        String message = roseMessage.getPlayerInput();
         String color = roseMessage.getSenderData().getColor();
         if (color.isEmpty() || color.length() >= message.length()) return false;
 
@@ -386,89 +373,8 @@ public class MessageUtils {
      * @return The string without any non-legacy colors.
      */
     public static String stripNonLegacyColors(String message) {
-        return message.replaceAll(HEX_REGEX.pattern(), "")
-                .replaceAll(GRADIENT_PATTERN.pattern(), "")
+        return message.replaceAll(GRADIENT_PATTERN.pattern(), "")
                 .replaceAll(RAINBOW_PATTERN.pattern(), "");
-    }
-
-    /**
-     * Processes the given string to be sent on Discord.
-     * Converts Minecraft formatting to Discord formatting.
-     * @param text The string to use.
-     * @return The string ready to be sent to Discord.
-     */
-    public static String processForDiscord(String text) {
-        text = stripNonLegacyColors(ChatColor.stripColor(text));
-        StringBuilder stringBuilder = new StringBuilder();
-
-        boolean isFormattingCode = false;
-        Deque<Character> deque = new ArrayDeque<>();
-        for (int i = 0; i < text.length(); i++) {
-            if (isFormattingCode) {
-                isFormattingCode = false;
-                continue;
-            }
-
-            char currentChar = text.charAt(i);
-            if (i < text.length() - 1) {
-                char nextChar = text.charAt(i + 1);
-                if (currentChar == '&') {
-                    if (Character.toLowerCase(nextChar) == 'r' || Character.isUpperCase(nextChar)) {
-                        while (deque.descendingIterator().hasNext()) {
-                            Character c = deque.pollLast();
-                            if (c != null) {
-                                stringBuilder.append(getDiscordFormatting(c));
-                            }
-                        }
-
-                        isFormattingCode = true;
-                        continue;
-                    }
-
-                    deque.add(Character.toLowerCase(nextChar));
-                    stringBuilder.append(getDiscordFormatting(nextChar));
-
-                    isFormattingCode = true;
-                    continue;
-                }
-
-                stringBuilder.append(currentChar);
-                continue;
-            }
-
-            if (i == text.length() - 1) {
-                stringBuilder.append(currentChar);
-                while (deque.descendingIterator().hasNext()) {
-                    Character c = deque.pollLast();
-                    if (c != null) {
-                        stringBuilder.append(getDiscordFormatting(c));
-                    }
-                }
-            }
-        }
-
-        return ChatColor.stripColor(stringBuilder.toString());
-    }
-
-    /**
-     * Converts Minecraft formatting to Discord formatting.
-     * For example, &l to **.
-     * @param c The character to convert.
-     * @return The converted string, as Discord formatting.
-     */
-    private static String getDiscordFormatting(char c) {
-        switch (Character.toLowerCase(c)) {
-            case 'o':
-                return "*";
-            case 'n':
-                return "__";
-            case 'm':
-                return "~~";
-            case 'l':
-                return "**";
-            default:
-                return "";
-        }
     }
 
     public static String getCaptureGroup(Matcher matcher, String group) {
@@ -480,58 +386,71 @@ public class MessageUtils {
     }
 
     /**
-     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
-     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * Checks if the sender of a message has the specified permission.
+     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
      * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'.
      * @return True if the sender has the permission
      */
-    public static boolean hasTokenPermission(RoseMessage message, String permission) {
+    public static boolean hasTokenPermission(TokenizerParams params, String permission) {
         // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (message == null || message.getSender() == null || message.getLocation() == MessageLocation.NONE || message.getSender().isConsole()) return true;
+        if (params == null || params.getSender() == null
+                || params.getLocation() == MessageLocation.NONE || (params.getSender().isConsole())
+                || !params.containsPlayerInput()) return true;
 
         // Gets the full permission, e.g. rosechat.emoji.channel.global
-        String fullPermission = permission + "." + message.getLocationPermission();
+        String fullPermission = permission + "." + params.getLocationPermission();
 
-        return message.getSender().hasPermission(fullPermission)
-                || message.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
-                || message.getSender().getIgnoredPermissions().contains("*");
+        return params.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*")
+                || checkAndLogPermission(params, fullPermission);
     }
 
     /**
-     * Checks if the sender of a given {@link RoseMessage} has the specified permission.
+     * Checks if the sender of a message has the specified permission.
      * Checks against the first permission, for example, 'rosechat.emojis', and extended permissions such as 'rosechat.emoji.smile'.
-     * @param message The {@link RoseMessage} to get information from, such as the sender and message location.
+     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
      * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'
      * @param extendedPermission The extended permission, should not contain the location information. For example, 'rosechat.emoji.smile'.
      * @return True if the sender has permission.
      */
-    public static boolean hasExtendedTokenPermission(RoseMessage message, String permission, String extendedPermission) {
-        // The sender will not have an extended permission if they do not have the base permission.
-        if (!hasTokenPermission(message, permission)) return false;
+    public static boolean hasExtendedTokenPermission(TokenizerParams params, String permission, String extendedPermission) {
+        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
+        if (params == null || params.getSender() == null
+                || params.getLocation() == MessageLocation.NONE || (params.getSender().isConsole())
+                || !params.containsPlayerInput()) return true;
 
-        return message.getSender().hasPermission(extendedPermission)
-                || message.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
-                || message.getSender().getIgnoredPermissions().contains("*");
+        // The sender will not have an extended permission if they do not have the base permission.
+        if (!hasTokenPermission(params, permission)) return false;
+
+        return params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
+                || params.getSender().getIgnoredPermissions().contains("*")
+                || checkAndLogPermission(params, extendedPermission);
+    }
+
+    private static boolean checkAndLogPermission(TokenizerParams params, String permission) {
+        boolean hasPermission = params.getSender().hasPermission(permission);
+        if (!hasPermission) params.getOutputs().getMissingPermissions().add(permission);
+        return hasPermission;
     }
 
     public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
-        RoseChatPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
+        CustomPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
         if (placeholder == null) return null;
 
         BaseComponent[] components;
         HoverEvent hoverEvent = null;
         ClickEvent clickEvent = null;
 
-        if (placeholder.getText() == null) return null;
-        String text = placeholder.getText().parseToString(sender, viewer, placeholders);
+        if (placeholder.get("text") == null) return null;
+        String text = placeholder.get("text").parseToString(sender, viewer, placeholders);
         if (text == null) return null;
         components = api.parse(sender, viewer, text);
 
-        if (placeholder.getHover() != null) {
-            String hover = placeholder.getHover().parseToString(sender, viewer, placeholders);
+        if (placeholder.get("hover") != null) {
+            String hover = placeholder.get("hover").parseToString(sender, viewer, placeholders);
             if (hover != null) {
                 if (hover.equalsIgnoreCase("%original%")) {
                     hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
@@ -541,9 +460,9 @@ public class MessageUtils {
             }
         }
 
-        if (placeholder.getClick() != null) {
-            String click = placeholder.getClick().parseToString(sender, viewer, placeholders);
-            ClickEvent.Action action = placeholder.getClick().parseToAction(sender, viewer, placeholders);
+        if (placeholder.get("click") != null) {
+            String click = placeholder.get("click").parseToString(sender, viewer, placeholders);
+            ClickEvent.Action action = placeholder.get("click").getClickAction();
             if (click != null && action != null) {
                 clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
             }
@@ -557,4 +476,28 @@ public class MessageUtils {
         return components;
     }
 
+
+    public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
+        ComponentBuilder builder = new ComponentBuilder();
+        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
+        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
+                MessageUtils.getSenderViewerPlaceholders(sender, sender)
+                        .add("id", messageId)
+                        .add("type", "client").build());
+
+        if (deleteClientButton == null) {
+            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
+            return null;
+        }
+
+        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+        } else {
+            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
+            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+        }
+
+        return builder.create();
+    }
 }

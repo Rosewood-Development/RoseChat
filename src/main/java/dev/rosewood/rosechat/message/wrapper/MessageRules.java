@@ -1,8 +1,13 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import dev.rosewood.rosechat.chat.FilterType;
+import dev.rosewood.rosechat.chat.FilterWarning;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.RosePlayer;
+import org.bukkit.ChatColor;
+
+import java.util.function.Function;
 import java.util.regex.Matcher;
 
 public class MessageRules {
@@ -12,28 +17,10 @@ public class MessageRules {
     private boolean filterSpam;
     private boolean filterURLs;
     private boolean filterLanguage;
-    private boolean applySenderChatColor;
     private boolean ignoreMessageLogging;
-    private boolean privateMessage;
-    private PrivateMessageInfo privateMessageInfo;
 
     public MessageRules() {
 
-    }
-
-    /**
-     * Copy constructor to prevent asynchronous editing issues.
-     * @param other The {@link MessageRules} to copy.
-     */
-    public MessageRules(MessageRules other) {
-        this.filterCaps = other.filterCaps;
-        this.filterSpam = other.filterSpam;
-        this.filterURLs = other.filterURLs;
-        this.filterLanguage = other.filterLanguage;
-        this.applySenderChatColor = other.applySenderChatColor;
-        this.ignoreMessageLogging = other.ignoreMessageLogging;
-        this.privateMessage = other.privateMessage;
-        this.privateMessageInfo = other.privateMessageInfo;
     }
 
     /**
@@ -81,14 +68,6 @@ public class MessageRules {
     }
 
     /**
-     * Prepends the sender's saved chat color to the message.
-     */
-    public MessageRules applySenderChatColor() {
-        this.applySenderChatColor = true;
-        return this;
-    }
-
-    /**
      * Disables message logging for the message.
      */
     public MessageRules ignoreMessageLogging() {
@@ -96,81 +75,72 @@ public class MessageRules {
         return this;
     }
 
-    /**
-     * Marks the message as a private message with the given information.
-     * @param info The information to use, containing the sender and the receiver.
-     */
-    public MessageRules setPrivateMessageInfo(PrivateMessageInfo info) {
-        this.privateMessage = true;
-        this.privateMessageInfo = info;
-        return this;
-    }
-
-    private boolean isCaps(RoseMessage message) {
+    private boolean isCaps(RoseMessage message, RuleOutputs outputs) {
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return false;
         if (message.getSender().hasPermission("rosechat.caps." + message.getLocationPermission())) return false;
 
         int caps = 0;
-        for (char c : message.getMessage().toCharArray()) {
+        for (char c : outputs.getFilteredMessage().toCharArray()) {
             if (Character.isAlphabetic(c) && c == Character.toUpperCase(c)) caps++;
         }
 
         return caps > Setting.MAXIMUM_CAPS_ALLOWED.getInt();
     }
 
-    private void filterCaps(RoseMessage message) {
+    private void filterCaps(RoseMessage message, RuleOutputs outputs) {
         if (!Setting.CAPS_CHECKING_ENABLED.getBoolean()) return;
-        if (!this.isCaps(message)) return;
+        if (!this.isCaps(message, outputs)) return;
 
-        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) message.setFilterType(FilterType.CAPS);
+        if (Setting.WARN_ON_CAPS_SENT.getBoolean()) outputs.setWarning(FilterWarning.CAPS);
         if (Setting.LOWERCASE_CAPS_ENABLED.getBoolean()) {
-            message.setMessage(message.getMessage().toLowerCase());
+            outputs.transformMessage(String::toLowerCase);
             return;
         }
 
-        message.setBlocked(true);
+        outputs.setBlocked();
     }
 
-    private void filterSpam(RoseMessage message) {
+    private void filterSpam(RoseMessage message, RuleOutputs outputs) {
         if (!Setting.SPAM_CHECKING_ENABLED.getBoolean()) return;
         if (message.getSender().hasPermission("rosechat.spam." + message.getLocationPermission())
                 || message.getSender().getPlayerData() == null) return;
 
-        if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(message.getMessage())) return;
-        if (Setting.WARN_ON_SPAM_SENT.getBoolean()) message.setFilterType(FilterType.SPAM);
+        if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(outputs.getFilteredMessage())) return;
+        if (Setting.WARN_ON_SPAM_SENT.getBoolean()) outputs.setWarning(FilterWarning.SPAM);
 
-        message.setBlocked(true);
+        outputs.setBlocked();
     }
 
-    private void filterURLs(RoseMessage message) {
+    private void filterURLs(RoseMessage message, RuleOutputs outputs) {
         if (!Setting.URL_CHECKING_ENABLED.getBoolean()) return;
         if (message.getSender().hasPermission("rosechat.links." + message.getLocationPermission())) return;
 
         boolean hasURL = false;
-        Matcher matcher = MessageUtils.URL_PATTERN.matcher(message.getMessage());
+        Matcher matcher = MessageUtils.URL_PATTERN.matcher(outputs.getFilteredMessage());
         while (matcher.find()) {
-            String url = message.getMessage().substring(matcher.start(), matcher.end());
-            message.setMessage(message.getMessage().replace(url, "&m" + url.replace(".", " ") + "&r"));
+            String url = outputs.getFilteredMessage().substring(matcher.start(), matcher.end());
+            outputs.transformMessage(x -> x.replace(url, ChatColor.STRIKETHROUGH + url.replace(".", " ") + ChatColor.RESET));
             hasURL = true;
         }
 
         if (!hasURL) return;
-        if (Setting.WARN_ON_URL_SENT.getBoolean()) message.setFilterType(FilterType.URL);
+        if (Setting.WARN_ON_URL_SENT.getBoolean()) outputs.setWarning(FilterWarning.URL);
 
-        message.setBlocked(!Setting.URL_CENSORING_ENABLED.getBoolean());
+        if (!Setting.URL_CENSORING_ENABLED.getBoolean())
+            outputs.setBlocked();
     }
 
-    private void filterLanguage(RoseMessage message) {
+    private void filterLanguage(RoseMessage message, RuleOutputs outputs) {
         if (!Setting.SWEAR_CHECKING_ENABLED.getBoolean()) return;
         if (message.getSender().hasPermission("rosechat.language." + message.getLocationPermission())) return;
-        String strippedMessage = MessageUtils.stripAccents(message.getMessage().toLowerCase());
+        String strippedMessage = MessageUtils.stripAccents(outputs.getFilteredMessage().toLowerCase());
 
         for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
             for (String word : strippedMessage.split(" ")) {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
-                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) message.setFilterType(FilterType.SWEAR);
-                    message.setBlocked(true);
+                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) outputs.setWarning(FilterWarning.SWEAR);
+                    outputs.setBlocked();
                     return;
                 }
             }
@@ -180,10 +150,10 @@ public class MessageRules {
             String[] swearReplacement = replacements.split(":");
             String swear = swearReplacement[0];
             String replacement = swearReplacement[1];
-            for (String word : message.getMessage().split(" ")) {
+            for (String word : outputs.getFilteredMessage().split(" ")) {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
-                    message.setMessage(message.getMessage().replace(word, replacement));
+                    outputs.transformMessage(x -> x.replace(word, replacement));
                 }
             }
         }
@@ -192,13 +162,19 @@ public class MessageRules {
     /**
      * Applies filters and settings based on the set rules.
      * @param message The message to edit and get information from.
+     * @param originalMessage The original message sent by the player.
      */
-    protected void apply(RoseMessage message) {
-        if (this.filterSpam) this.filterSpam(message);
-        if (this.filterCaps) this.filterCaps(message);
-        if (this.filterURLs) this.filterURLs(message);
-        if (this.filterLanguage) this.filterLanguage(message);
-        if (this.applySenderChatColor && message.getSenderData() != null) message.setMessage(message.getSenderData().getColor() + message.getMessage());
+    public RuleOutputs apply(RoseMessage message, String originalMessage) {
+        RuleOutputs outputs = new RuleOutputs(originalMessage);
+        if (this.filterSpam) this.filterSpam(message, outputs);
+        if (this.filterCaps) this.filterCaps(message, outputs);
+        if (this.filterURLs) this.filterURLs(message, outputs);
+        if (this.filterLanguage) this.filterLanguage(message, outputs);
+        return outputs;
+    }
+
+    public RuleOutputs apply(RosePlayer rosePlayer, MessageLocation messageLocation, String originalMessage) {
+        return this.apply(RoseMessage.forLocation(rosePlayer, messageLocation), originalMessage);
     }
 
     /**
@@ -208,25 +184,40 @@ public class MessageRules {
         return this.ignoreMessageLogging;
     }
 
-    /**
-     * @return True if the rules dictate that it is a private message.
-     */
-    public boolean isPrivateMessage() {
-        return this.privateMessage;
-    }
+    public static class RuleOutputs {
 
-    /**
-     * @return The {@link PrivateMessageInfo} for the message that these rules should be applied to.
-     */
-    public PrivateMessageInfo getPrivateMessageInfo() {
-        return this.privateMessageInfo;
-    }
+        private boolean blocked;
+        private FilterWarning warning;
+        private String message;
 
-    /**
-     * @param ignoreMessageLogging Whether to ignore message logging.
-     */
-    public void setIgnoreMessageLogging(boolean ignoreMessageLogging) {
-        this.ignoreMessageLogging = ignoreMessageLogging;
+        public RuleOutputs(String message) {
+            this.message = message;
+        }
+
+        public boolean isBlocked() {
+            return this.blocked;
+        }
+
+        public void setBlocked() {
+            this.blocked = true;
+        }
+
+        public FilterWarning getWarning() {
+            return this.warning;
+        }
+
+        public void setWarning(FilterWarning warning) {
+            this.warning = warning;
+        }
+
+        public String getFilteredMessage() {
+            return this.message;
+        }
+
+        public void transformMessage(Function<String, String> transformer) {
+            this.message = transformer.apply(this.message);
+        }
+
     }
 
 }

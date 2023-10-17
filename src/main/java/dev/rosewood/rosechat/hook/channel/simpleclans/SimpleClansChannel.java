@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.hook.channel.simpleclans;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -44,21 +45,27 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     // Team Disband
     @EventHandler
     public void onTeamDisband(DisbandClanEvent event) {
-        for (ClanPlayer cPlayer : event.getClan().getMembers())
+        for (ClanPlayer cPlayer : event.getClan().getMembers()) {
             this.kick(cPlayer.getUniqueId());
+            this.onTeamLeaveGeneric(cPlayer.getUniqueId());
+        }
     }
 
     // Team Kick
     @EventHandler
     public void onTeamKick(PlayerKickedClanEvent event) {
         this.kick(event.getClanPlayer().getUniqueId());
+        this.onTeamLeaveGeneric(event.getClanPlayer().getUniqueId());
     }
 
     // Team Join
     @EventHandler
     public void onTeamJoin(PlayerJoinedClanEvent event) {
-        if (this.autoJoin)
+        if (this.autoJoin) {
             this.forceJoin(event.getClanPlayer().getUniqueId());
+            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getClanPlayer().toPlayer(),
+                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        }
     }
 
     private boolean hasTeam(Player player) {
@@ -104,7 +111,7 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("type", this.channelType.toString().toLowerCase());
+                .add("type", this.channelType.toString().toLowerCase());
     }
 
     public SimpleClansChannelType getChannelType() {

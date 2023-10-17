@@ -200,8 +200,8 @@ public class WorldGuardChannel extends RoseChatChannel {
     @Override
     public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
         return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
-                .addPlaceholder("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString())
-                .addPlaceholder("use-members", this.useMembers ? trueValue : falseValue);
+                .add("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString())
+                .add("use-members", this.useMembers ? trueValue : falseValue);
     }
 
     public List<String> getWhitelist() {

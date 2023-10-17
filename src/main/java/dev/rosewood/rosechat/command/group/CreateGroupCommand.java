@@ -22,7 +22,7 @@ public class CreateGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length <= 1) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -44,21 +44,20 @@ public class CreateGroupCommand extends AbstractCommand {
 
         RosePlayer rosePlayer = new RosePlayer(player);
 
-        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
+        RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.GROUP);
         MessageRules messageRules = new MessageRules().applyAllFilters();
-        message.applyRules(messageRules);
 
-        if (message.isBlocked()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+        MessageRules.RuleOutputs outputs = messageRules.apply(message, name);
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(rosePlayer);
             return;
         }
 
         GroupChannel groupChat = this.getAPI().createGroupChat(id, player);
 
         // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + message.getMessage() + "&f&r";
         groupChat.setName(name);
-        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.single("name", name));
+        this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-create-success", StringPlaceholders.of("name", name));
     }
 
     @Override

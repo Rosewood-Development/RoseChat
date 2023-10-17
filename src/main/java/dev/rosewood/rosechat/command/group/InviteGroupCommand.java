@@ -23,7 +23,7 @@ public class InviteGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -52,9 +52,9 @@ public class InviteGroupCommand extends AbstractCommand {
         String targetName = targetData.getNickname() == null ? target.getDisplayName() : targetData.getNickname();
 
         this.getAPI().getLocaleManager().sendComponentMessage(target, "command-gc-invite-invited",
-                StringPlaceholders.builder().addPlaceholder("player", name).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().add("player", name).add("name", groupChat.getName()).build());
         this.getAPI().getLocaleManager().sendComponentMessage(player, "command-gc-invite-success",
-                StringPlaceholders.builder().addPlaceholder("player", targetName).addPlaceholder("name", groupChat.getName()).build());
+                StringPlaceholders.builder().add("player", targetName).add("name", groupChat.getName()).build());
         sendAcceptMessage(target, groupChat);
 
         targetData.inviteToGroup(groupChat);

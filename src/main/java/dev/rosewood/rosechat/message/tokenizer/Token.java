@@ -1,315 +1,200 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Token implements Cloneable {
+public class Token {
 
-    protected final String originalContent;
-    protected String content;
-    protected String hover;
-    protected String click;
-    protected String font;
-    protected HoverEvent.Action hoverAction;
-    protected ClickEvent.Action clickAction;
-    protected boolean requiresTokenizing;
-    protected boolean retainColour;
-    protected Set<Tokenizer<?>> ignoredTokenizers;
-    protected StringPlaceholders.Builder placeholders;
-    protected List<Token> children, hoverChildren;
-    protected boolean allowsCaching;
+    protected Token parent; // Exposed and set in the MessageTokenizer class
+    private final List<Token> children;
+    private final TokenType type;
+    private final String content;
+    private final List<TokenDecorator> decorators;
+    private final boolean containsPlayerInput;
+    private final StringPlaceholders placeholders;
+    private final boolean encapsulate;
+    private final Set<Tokenizer> ignoredTokenizers;
 
-    /**
-     * Creates a new token with the given settings.
-     * @param settings The {@link TokenSettings} to use.
-     */
-    public Token(TokenSettings settings) {
-        this.originalContent = settings.originalContent;
-        this.content = settings.content;
-        this.hover = settings.hover;
-        this.click = settings.click;
-        this.font = settings.font;
-        this.hoverAction = settings.hoverAction;
-        this.clickAction = settings.clickAction;
-        this.requiresTokenizing = settings.requiresTokenizing;
-        this.retainColour = settings.retainColour;
-        this.ignoredTokenizers = settings.ignoredTokenizers;
-        this.placeholders = settings.placeholders;
-        this.allowsCaching = settings.allowsCaching;
+    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput,
+                  StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
+        this.type = type;
+        this.content = content;
         this.children = new ArrayList<>();
-        this.hoverChildren = new ArrayList<>();
+        this.decorators = decorators;
+        this.containsPlayerInput = containsPlayerInput;
+        this.placeholders = placeholders;
+        this.encapsulate = encapsulate;
+        this.ignoredTokenizers = ignoredTokenizers;
     }
 
     /**
-     * @return The original text before any changes.
+     * @return the type of this token
      */
-    public final String getOriginalContent() {
-        return this.originalContent;
+    public TokenType getType() {
+        return this.type;
     }
 
     /**
-     * @return The final text after changes are applied.
+     * Gets the content of this token.
+     *
+     * @return the content of this token
+     * @throws IllegalStateException if this token has a type of {@link TokenType#DECORATOR}
      */
     public String getContent() {
-        return this.placeholders.build().apply(this.content);
+        if (this.type == TokenType.DECORATOR)
+            throw new IllegalStateException("Cannot get content of a token that is of type DECORATOR");
+        return this.getPlaceholders().apply(this.content);
     }
 
     /**
-     * @return Whether this token can be tokenized.
+     * Gets the children of this token if it is of type {@link TokenType#GROUP}.
+     *
+     * @return the effective children of this token
+     * @throws IllegalStateException if this token is not of type {@link TokenType#GROUP}
      */
-    public boolean requiresTokenizing() {
-        return this.requiresTokenizing;
-    }
-
-    public void addChildren(List<Token> children) {
-        for (Token child : children) {
-            if (this.font != null) {
-                child.font = this.font;
-            }
-
-            if (this.hover != null) {
-                child.hover = this.getHover();
-                child.hoverChildren = this.hoverChildren;
-                child.hoverAction = this.hoverAction;
-            }
-
-            if (this.click != null) {
-                child.click = this.getClick();
-                child.clickAction = this.clickAction;
-            }
-
-            child.retainColour = this.retainColour;
-        }
-
-        this.children.addAll(children);
-    }
-
     public List<Token> getChildren() {
+        if (this.type != TokenType.GROUP)
+            throw new IllegalStateException("Cannot get children of a token that is not of type GROUP");
         return this.children;
     }
 
-    public void addHoverChildren(List<Token> children) {
-        this.hoverChildren.addAll(children);
+    /**
+     * @return the decorators to be applied to this token
+     */
+    public List<TokenDecorator> getDecorators() {
+        if (this.type == TokenType.TEXT)
+            throw new IllegalStateException("Cannot get decorators of a token that is of type TEXT");
+        return this.decorators;
     }
 
-    public String getHover() {
-        return this.hover == null ? null : this.placeholders.build().apply(this.hover);
+    /**
+     * @return true if this token contains player input, false otherwise
+     */
+    public boolean containsPlayerInput() {
+        return this.containsPlayerInput;
     }
 
-    public HoverEvent.Action getHoverAction() {
-        return this.hover == null ? null : (this.hoverAction == null ? HoverEvent.Action.SHOW_TEXT : this.hoverAction);
+    /**
+     * @return true if this token has no decorators, false otherwise
+     */
+    public boolean isPlain() {
+        return this.decorators.isEmpty();
     }
 
-    public List<Token> getHoverChildren() {
-        return this.hoverChildren;
+    /**
+     * @return true if this token should use an encapsulated decorator context, false otherwise
+     */
+    public boolean shouldEncapsulate() {
+        return this.encapsulate;
     }
 
-    public String getClick() {
-        if (this.click == null)
-            return null;
-
-        String effectiveClick = this.placeholders.build().apply(this.click);
-        if (this.getClickAction() == ClickEvent.Action.OPEN_URL && !effectiveClick.startsWith("http")) {
-            return "https://" + effectiveClick;
-        } else {
-            return effectiveClick;
-        }
+    /**
+     * @return the ignored tokenizers
+     */
+    public Set<Tokenizer> getIgnoredTokenizers() {
+        Set<Tokenizer> ignoredTokenizers = new HashSet<>(this.ignoredTokenizers);
+        if (this.parent != null)
+            ignoredTokenizers.addAll(this.parent.getIgnoredTokenizers());
+        return ignoredTokenizers;
     }
 
-    public ClickEvent.Action getClickAction() {
-        return this.click == null ? null : (this.clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : this.clickAction);
-    }
-
-    public HexUtils.ColorGenerator getColorGenerator(List<Token> futureTokens) {
-        return null;
-    }
-
-    protected int getColorGeneratorContentLength(List<Token> futureTokens) {
-        int contentLength = 0;
-        for (Token token : futureTokens) {
-            if (!token.hasColorGenerator() || token == this) {
-                if (token.getChildren().isEmpty()) {
-                    contentLength += token.getContent().replaceAll("\\s+", "").length();
-                } else if (token.getChildren().stream().noneMatch(x -> x.getColorGenerator(futureTokens) != null)) {
-                    contentLength += token.getChildren().stream().mapToInt(x -> x.getContent().replaceAll("\\s+", "").length()).sum();
-                }
-            } else break;
-        }
-        return contentLength;
-    }
-
-    public boolean hasColorGenerator() {
-        return false;
-    }
-
-    public FormattedColorGenerator applyFormatCodes(FormattedColorGenerator colorGenerator, String baseColor, List<Token> futureTokens) {
-        return null;
-    }
-
-    public boolean hasFormatCodes() {
-        return false;
-    }
-
-    public boolean allowsCaching() {
-        return this.allowsCaching
-                && this.children.stream().allMatch(Token::allowsCaching)
-                && this.hoverChildren.stream().allMatch(Token::allowsCaching);
-    }
-
-    public String getEffectiveFont() {
-        return this.font == null ? "default" : this.font;
-    }
-
-    public Set<Tokenizer<?>> getIgnoredTokenizers() {
-        return this.ignoredTokenizers;
-    }
-
-    public boolean shouldRetainColour() {
-        return this.retainColour;
+    /**
+     * @return the highest level parent Token that this Token ultimately belongs to
+     */
+    protected Token getHighestParent() {
+        Token root = this;
+        while (root.parent != null)
+            root = root.parent;
+        return root;
     }
 
     public StringPlaceholders getPlaceholders() {
-        return this.placeholders.build();
+        StringPlaceholders.Builder builder = StringPlaceholders.builder();
+        builder.addAll(this.placeholders);
+        if (this.parent != null)
+            builder.addAll(this.parent.getPlaceholders());
+        return builder.build();
     }
 
-    public void applyInheritance(Token child) {
-        child.ignoredTokenizers.addAll(this.ignoredTokenizers);
-        child.placeholders.addAll(this.getPlaceholders());
-        child.retainColour = this.retainColour;
-
-        if (this.hover != null) {
-            child.hover = this.getHover();
-            child.hoverAction = this.hoverAction;
-        }
-
-        if (this.click != null) {
-            child.click = this.getClick();
-            child.clickAction = this.clickAction;
-        }
+    public static Token text(String value) {
+        return new Builder(TokenType.TEXT, value).build();
     }
 
-    @Override
-    public Token clone() {
-        try {
-            Token clone = (Token) super.clone();
-            clone.ignoredTokenizers = new HashSet<>(this.ignoredTokenizers);
-            clone.children = this.children.stream().map(Token::clone).collect(Collectors.toList());
-            clone.hoverChildren = this.hoverChildren.stream().map(Token::clone).collect(Collectors.toList());
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+    public static Token decorator(TokenDecorator decorator) {
+        return new Builder(TokenType.DECORATOR, null).decorate(decorator).build();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-        Token token = (Token) o;
-        return this.requiresTokenizing == token.requiresTokenizing
-                && this.retainColour == token.retainColour
-                && this.allowsCaching == token.allowsCaching
-                && Objects.equals(this.hover, token.hover)
-                && Objects.equals(this.click, token.click)
-                && Objects.equals(this.font, token.font)
-                && this.hoverAction == token.hoverAction
-                && this.clickAction == token.clickAction
-                && this.ignoredTokenizers.equals(token.ignoredTokenizers);
+    public static Builder group(String rawContent) {
+        return new Builder(TokenType.GROUP, rawContent);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.hover, this.click, this.font, this.hoverAction, this.clickAction, this.requiresTokenizing, this.retainColour, this.ignoredTokenizers, this.allowsCaching);
-    }
+    public static class Builder {
 
-    public static class TokenSettings {
+        private final TokenType tokenType;
+        private final String content;
+        private final List<TokenDecorator> decorators;
+        private boolean containsPlayerInput;
+        private StringPlaceholders.Builder placeholders;
+        private boolean encapsulate;
+        private Set<Tokenizer> ignoredTokenizers;
 
-        private final String originalContent;
-        private String content, hover, click, font;
-        private HoverEvent.Action hoverAction;
-        private ClickEvent.Action clickAction;
-        private boolean requiresTokenizing;
-        private boolean retainColour;
-        private final Set<Tokenizer<?>> ignoredTokenizers;
-        private final StringPlaceholders.Builder placeholders;
-        private boolean allowsCaching;
-
-        public TokenSettings(String originalContent) {
-            this.originalContent = originalContent;
-            this.content = originalContent;
-            this.hover = null;
-            this.click = null;
-            this.font = null;
-            this.hoverAction = null;
-            this.clickAction = null;
-            this.requiresTokenizing = true;
-            this.retainColour = false;
-            this.allowsCaching = true;
-            this.ignoredTokenizers = new HashSet<>();
-            this.placeholders = StringPlaceholders.builder();
+        private Builder(TokenType tokenType, String content) {
+            this.tokenType = tokenType;
+            this.content = content;
+            this.decorators = new ArrayList<>();
+            this.containsPlayerInput = false;
         }
 
-        public TokenSettings content(String text) {
-            this.content = text;
+        public Builder decorate(TokenDecorator decorator) {
+            this.decorators.add(decorator);
             return this;
         }
 
-        public TokenSettings hover(String text) {
-            this.hover = text;
+        public Builder containsPlayerInput() {
+            this.containsPlayerInput = true;
             return this;
         }
 
-        public TokenSettings click(String text) {
-            this.click = text;
+        public Builder placeholder(String placeholder, Object value) {
+            if (this.placeholders == null)
+                this.placeholders = StringPlaceholders.builder();
+            this.placeholders.add(placeholder, value);
             return this;
         }
 
-        public TokenSettings font(String font) {
-            this.font = font;
+        public Builder placeholders(StringPlaceholders placeholders) {
+            if (this.placeholders == null)
+                this.placeholders = StringPlaceholders.builder();
+            this.placeholders.addAll(placeholders);
             return this;
         }
 
-        public TokenSettings hoverAction(HoverEvent.Action action) {
-            this.hoverAction = action;
+        public Builder encapsulate() {
+            this.encapsulate = true;
             return this;
         }
 
-        public TokenSettings clickAction(ClickEvent.Action action) {
-            this.clickAction = action;
-            return this;
-        }
-
-        public TokenSettings requiresTokenizing(boolean tokenizeRecursively) {
-            this.requiresTokenizing = tokenizeRecursively;
-            return this;
-        }
-
-        public TokenSettings retainColour(boolean retainColour) {
-            this.retainColour = retainColour;
-            return this;
-        }
-
-        public TokenSettings ignoreTokenizer(Tokenizer<?> tokenizer) {
+        public Builder ignoreTokenizer(Tokenizer tokenizer) {
+            if (this.ignoredTokenizers == null)
+                this.ignoredTokenizers = new HashSet<>();
             this.ignoredTokenizers.add(tokenizer);
             return this;
         }
 
-        public TokenSettings placeholder(String placeholder, Object value) {
-            this.placeholders.addPlaceholder(placeholder, value);
-            return this;
-        }
-
-        public TokenSettings noCaching() {
-            this.allowsCaching = false;
-            return this;
+        public Token build() {
+            return new Token(
+                    this.tokenType,
+                    this.content,
+                    this.decorators,
+                    this.containsPlayerInput,
+                    this.placeholders == null ? StringPlaceholders.empty() : this.placeholders.build(),
+                    this.encapsulate,
+                    this.ignoredTokenizers == null ? Set.of() : this.ignoredTokenizers
+            );
         }
 
     }

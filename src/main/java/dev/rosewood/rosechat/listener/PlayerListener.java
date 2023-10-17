@@ -5,13 +5,15 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.ChannelCommand;
-import dev.rosewood.rosechat.command.NicknameCommand;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,10 +71,9 @@ public class PlayerListener implements Listener {
             // Set the display name when the player logs in
             if (playerData.getNickname() != null) {
                 RosePlayer rosePlayer = new RosePlayer(player);
-                RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.NICKNAME, playerData.getNickname());
-                message.parse(rosePlayer, null);
-
-                NicknameCommand.setDisplayName(rosePlayer, message);
+                RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
+                MessageTokenizerResults<BaseComponent[]> components = message.parse(rosePlayer, playerData.getNickname());
+                player.setDisplayName(TextComponent.toLegacyText(components.content()));
             }
         });
     }
@@ -105,33 +106,33 @@ public class PlayerListener implements Listener {
     public void onWorldChange(PlayerChangedWorldEvent event) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         Player player = event.getPlayer();
-        api.getPlayerDataManager().getPlayerData(player.getUniqueId(), (playerData) -> {
+        api.getPlayerDataManager().getPlayerData(player.getUniqueId(), (playerData -> {
             World world = player.getWorld();
             Channel currentChannel = playerData.getCurrentChannel();
 
             // Check if the player can leave their current channel first.
-            if (currentChannel.onWorldLeave(player, event.getFrom(), world)) {
-                // Leave the channel
-                currentChannel.onLeave(player);
-                // Temporarily set the current channel to null
-                playerData.setCurrentChannel(null);
-            }
+            boolean leftWorld = currentChannel.onWorldLeave(player, event.getFrom(), world);
 
+            // Find the appropriate channel before removing the player.
             // Loop through the channels to find if the player should join one.
-            boolean foundChannel = false;
+            boolean joinedWorld = false;
             for (Channel channel : api.getChannels()) {
                 // If the player can join a channel, join.
                 if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
+                    currentChannel.onLeave(player);
                     channel.onJoin(player);
                     playerData.setCurrentChannel(channel);
-                    foundChannel = true;
+                    api.getLocaleManager().sendMessage(player, "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+
+                    joinedWorld = true;
                     break;
                 }
-
             }
 
-            // If no suitable channel was found, put the player in the default channel.
-            if (!foundChannel) {
+            // If the player left a world channel and did not find an appropriate channel
+            if (leftWorld && !joinedWorld) {
+                currentChannel.onLeave(player);
+
                 // Force join the default channel as there is no other option
                 Channel defaultChannel = api.getChannelManager().getDefaultChannel();
                 defaultChannel.onJoin(player);
@@ -139,7 +140,7 @@ public class PlayerListener implements Listener {
             }
 
             playerData.save();
-        });
+        }));
     }
 
     @EventHandler
@@ -155,7 +156,7 @@ public class PlayerListener implements Listener {
                     if (input.equalsIgnoreCase("/" + command)) {
                         if (!ChannelCommand.processChannelSwitch(event.getPlayer(), channel.getId())) {
                             RoseChatAPI.getInstance().getLocaleManager()
-                                    .sendComponentMessage(event.getPlayer(), "command-channel-custom-usage", StringPlaceholders.single("channel", channel.getId()));
+                                    .sendComponentMessage(event.getPlayer(), "command-channel-custom-usage", StringPlaceholders.of("channel", channel.getId()));
                         }
                     } else {
                         String message = input.substring(("/" + command + " ").length());

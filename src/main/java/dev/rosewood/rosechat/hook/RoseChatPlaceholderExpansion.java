@@ -2,14 +2,14 @@ package dev.rosewood.rosechat.hook;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
+import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -24,56 +24,6 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         RoseChatAPI api = RoseChatAPI.getInstance();
         PlaceholderManager placeholderSettingManager = api.getPlaceholderManager();
         GroupManager groupManager = api.getGroupManager();
-
-        if (player != null) {
-            PlayerData playerData = api.getPlayerData(player.getUniqueId());
-            if (playerData == null) return null;
-
-            switch (placeholder) {
-                case "chat_color":
-                    return playerData.getColor();
-                case "nickname":
-                    return playerData.getNickname();
-                case "nickname_fallback":
-                    return (playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname());
-                case "current_channel":
-                    return playerData.getCurrentChannel().getId();
-                case "is_muted":
-                    return playerData.isMuted() ? "yes" : "no";
-                case "mute_time":
-                    return String.valueOf(playerData.getMuteExpirationTime());
-                case "has_emojis":
-                    return playerData.hasEmojis() ? "yes" : "no";
-                case "has_message_sounds":
-                    return playerData.hasMessageSounds() ? "yes" : "no";
-                case "has_tag_sounds":
-                    return playerData.hasTagSounds() ? "yes" : "no";
-                case "can_be_messaged":
-                    return playerData.canBeMessaged() ? "yes" : "no";
-                case "has_group_spy":
-                    return playerData.hasGroupSpy() ? "yes" : "no";
-                case "has_channel_spy":
-                    return playerData.hasChannelSpy() ? "yes" : "no";
-                case "has_message_spy":
-                    return playerData.hasMessageSpy() ? "yes" : "no";
-                case "last_messaged":
-                    return playerData.getReplyTo();
-                case "is_group_leader":
-                    return groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
-                case "group":
-                    GroupChannel group = groupManager.getGroupChatByOwner(playerData.getUUID());
-                    return group != null ? group.getId() : null;
-            }
-
-            if (placeholder.startsWith("placeholder_")) {
-                String rcPlaceholderId = placeholder.substring("placeholder_".length());
-                RosePlayer sender = new RosePlayer(player);
-                RoseChatPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
-                if (rcPlaceholder == null) return null;
-
-                return HexUtils.colorify(rcPlaceholder.getText().parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
-            }
-        }
 
         // These placeholders don't require a player.
         if (placeholder.startsWith("group_")) {
@@ -90,14 +40,49 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         if (placeholder.startsWith("emoji_")) {
-            for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
+            for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
+                if (!emoji.getInput().isEmoji()) continue;
                 if (placeholder.equalsIgnoreCase("emoji_" + emoji.getId())) {
-                    return emoji.getReplacement();
+                    return emoji.getOutput().getText();
                 }
             }
         }
 
-        return null;
+        if (player == null) return null;
+        PlayerData playerData = api.getPlayerData(player.getUniqueId());
+        if (playerData == null) return null;
+
+        if (placeholder.startsWith("placeholder_")) {
+            String rcPlaceholderId = placeholder.substring("placeholder_".length());
+            RosePlayer sender = new RosePlayer(player);
+            CustomPlaceholder rcPlaceholder = placeholderSettingManager.getPlaceholder(rcPlaceholderId);
+            if (rcPlaceholder == null) return null;
+
+            return HexUtils.colorify(rcPlaceholder.get("text").parseToString(sender, sender, MessageUtils.getSenderViewerPlaceholders(sender, sender).build()));
+        }
+
+        return switch (placeholder) {
+            case "chat_color" -> playerData.getColor();
+            case "nickname" -> playerData.getNickname();
+            case "nickname_fallback" -> playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname();
+            case "current_channel" -> playerData.getCurrentChannel().getId();
+            case "is_muted" -> playerData.isMuted() ? "yes" : "no";
+            case "mute_time" -> String.valueOf(playerData.getMuteExpirationTime());
+            case "has_emojis" -> playerData.hasEmojis() ? "yes" : "no";
+            case "has_message_sounds" -> playerData.hasMessageSounds() ? "yes" : "no";
+            case "has_tag_sounds" -> playerData.hasTagSounds() ? "yes" : "no";
+            case "can_be_messaged" -> playerData.canBeMessaged() ? "yes" : "no";
+            case "has_group_spy" -> playerData.hasGroupSpy() ? "yes" : "no";
+            case "has_channel_spy" -> playerData.hasChannelSpy() ? "yes" : "no";
+            case "has_message_spy" -> playerData.hasMessageSpy() ? "yes" : "no";
+            case "last_messaged" -> playerData.getReplyTo();
+            case "is_group_leader" -> groupManager.getGroupChatByOwner(playerData.getUUID()) != null ? "yes" : "no";
+            case "group" -> {
+                GroupChannel group = groupManager.getGroupChatByOwner(playerData.getUUID());
+                yield group != null ? group.getId() : null;
+            }
+            default -> null;
+        };
     }
 
     @Override

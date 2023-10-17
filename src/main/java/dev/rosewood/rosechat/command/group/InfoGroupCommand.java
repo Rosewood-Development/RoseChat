@@ -21,7 +21,7 @@ public class InfoGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -30,22 +30,22 @@ public class InfoGroupCommand extends AbstractCommand {
             GroupManager groupManager = this.getAPI().getGroupManager();
             groupManager.getGroupInfo(args[0], info -> {
                 if (info != null) {
-                    if (info.getOwner() == null) {
+                    if (info.owner() == null) {
                         this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
                         return;
                     }
 
-                    String owner = Bukkit.getOfflinePlayer(UUID.fromString(info.getOwner())).getName();
+                    String owner = Bukkit.getOfflinePlayer(UUID.fromString(info.owner())).getName();
 
                     if (sender instanceof Player) {
                         Player player = (Player) sender;
                         if (player.hasPermission("rosechat.group.admin")) {
-                            this.sendInfoMessage(sender, info.getId(), info.getName(), owner, info.getMembers());
+                            this.sendInfoMessage(sender, info.id(), info.name(), owner, info.members());
                         } else {
                             boolean isInGroup = false;
                             for (GroupChannel gc : this.getAPI().getGroupChats(player.getUniqueId()))    {
-                                if (gc.getId().equalsIgnoreCase(info.getId())) {
-                                    this.sendInfoMessage(sender, info.getId(), info.getName(), owner, info.getMembers());
+                                if (gc.getId().equalsIgnoreCase(info.id())) {
+                                    this.sendInfoMessage(sender, info.id(), info.name(), owner, info.members());
                                     isInGroup = true;
                                 }
                             }
@@ -55,7 +55,7 @@ public class InfoGroupCommand extends AbstractCommand {
                             }
                         }
                     } else {
-                        this.sendInfoMessage(sender, info.getId(), info.getName(), owner, info.getMembers());
+                        this.sendInfoMessage(sender, info.id(), info.name(), owner, info.members());
                     }
                 } else {
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
@@ -77,11 +77,11 @@ public class InfoGroupCommand extends AbstractCommand {
     }
 
     public void sendInfoMessage(CommandSender sender, String id, String name, String owner, int members) {
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-info-title", StringPlaceholders.single("group", name), false);
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-info-title", StringPlaceholders.of("group", name), false);
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-info-format", StringPlaceholders.builder()
-                .addPlaceholder("id", id)
-                .addPlaceholder("owner", owner)
-                .addPlaceholder("members", members).build(), false);
+                .add("id", id)
+                .add("owner", owner)
+                .add("members", members).build(), false);
     }
 
     @Override

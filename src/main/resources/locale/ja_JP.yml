@@ -219,12 +219,14 @@ command-gcm-enter-message: '&cメッセージを入力してください！'
 
 #  チャット・カラー ・コマンド
 command-color-description: '&8 - &d/color &7- あなたのデフォルトのチャット色を変更します。'
-command-color-usage: '&e/color <装飾コード>'
+command-color-usage: '&e/color <装飾コード/プレイヤー> [装飾コード/remove]'
 command-color-success: '&e新しいチャット色は&f%color%&e&r。'
 command-color-invalid: '&eこれは有効な装飾コードではありません。'
 command-color-removed: '&eあなたのチャットカラーは外しました。'
 command-color-gradient: 'グラディエント'
 command-color-rainbow: 'レインボー'
+command-color-others: "&e%player%のチャット色を&f%color%&eに設定しました。"
+command-color-others-removed: "&e%player%のチャット色を削除しました。"
 
 # ミュート・コマンド
 command-mute-description: '&8 - &d/mute &7- プレイヤーをミュートします。'
@@ -280,10 +282,12 @@ command-debug-off: '&eデバッグモードは&cオフ&eです。'
 
 # ニックネーム・カラー・コマンド
 command-nickcolor-description: '&8 - &d/nickcolor &7- Cあなたのニックネーム色を変更します。'
-command-nickcolor-usage: '&e/nickcolor <装飾コード>'
+command-nickcolor-usage: '&e/nickcolor <装飾コード/プレイヤー> [装飾コード/remove]'
 command-nickcolor-success: '&e新しいニックネームは&f%name%&e&r。'
 command-nickcolor-invalid: '&eこれは有効な装飾コードではありません。'
 command-nickcolor-removed: '&eあなたのニックネームカラーは外しました。'
+command-nickcolor-others: "&e%player%のニックネームカラーを&f%color%&eに設定しました。"
+command-nickcolor-others-removed: "&e%player%のニックネームカラーを削除しました。"
 
 # チャット・トグル・コマンド
 command-chat-toggle-description: '&8 - &c/chat toggle &7- チャンネルの見えるのをトグルします。'

@@ -11,6 +11,7 @@ import java.util.List;
  * A command to be used within a main command.
  * @deprecated Use {@link dev.rosewood.rosegarden.command.framework.RoseCommand} instead.
  */
+@Deprecated
 public abstract class AbstractCommand {
 
     /**

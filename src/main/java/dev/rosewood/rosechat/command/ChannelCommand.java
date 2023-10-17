@@ -21,10 +21,10 @@ public class ChannelCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
         } else if (args.length == 1) {
             if (!processChannelSwitch(sender, args[0])) {
-                this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+                this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             }
         } else {
             Channel channel = this.getAPI().getChannelById(args[0]);
@@ -93,7 +93,7 @@ public class ChannelCommand extends AbstractCommand {
             playerData.setIsInGroupChannel(false);
             playerData.save();
 
-            api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.single("id", newChannel.getId()));
+            api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.of("id", newChannel.getId()));
             return true;
         } else {
             return false;

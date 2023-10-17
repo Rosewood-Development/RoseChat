@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import java.util.List;
 import java.util.UUID;
@@ -81,29 +80,6 @@ public interface DiscordChatProvider {
      */
     DetectedMention matchPartialChannel(String input);
 
-    class DetectedMention {
-
-        private final String name;
-        private final String mention;
-        private final int consumedTextLength;
-
-        public DetectedMention(String name, String mention, int consumedTextLength) {
-            this.name = name;
-            this.mention = mention;
-            this.consumedTextLength = consumedTextLength;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public String getMention() {
-            return this.mention;
-        }
-
-        public int getConsumedTextLength() {
-            return this.consumedTextLength;
-        }
-    }
+    record DetectedMention(String name, String mention, int consumedTextLength) { }
 
 }

@@ -12,16 +12,14 @@ import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.RoseChatPlaceholder;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
@@ -93,10 +91,9 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    if (group != null) sender.setGroup(group);
-                    else sender.setGroup("default");
+                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
 
-                    BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
+                    BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
 
                     if (deleteClientButton == null) return;
 
@@ -131,7 +128,6 @@ public class PacketListener {
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
                     UUID messageId = UUID.randomUUID();
 
-
                     if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
                         permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
 
@@ -150,10 +146,9 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    if (group != null) sender.setGroup(group);
-                    else sender.setGroup("default");
+                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
 
-                    BaseComponent[] deleteClientButton = appendButton(sender, playerData, messageId.toString(), messageJson);
+                    BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
 
                     if (deleteClientButton == null) return;
 
@@ -167,43 +162,6 @@ public class PacketListener {
                 }
             }
         });
-    }
-
-    // Allow the client message to be deletable.
-    public static BaseComponent[] appendButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
-        ComponentBuilder builder = new ComponentBuilder();
-        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(sender, sender, placeholder,
-                MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                        .addPlaceholder("id", messageId)
-                        .addPlaceholder("type", "client")
-                        .addPlaceholder("message", "").build());
-
-        if (deleteClientButton == null) {
-            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
-            return null;
-        }
-
-        if (shouldSuffixButton(sender, placeholder)) {
-            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
-            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
-        } else {
-            builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
-            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
-        }
-
-        return builder.create();
-    }
-
-    private static boolean shouldSuffixButton(RosePlayer sender, String placeholderId) {
-        if (placeholderId == null || placeholderId.isEmpty()) return false;
-        RoseChatPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-        if (placeholder == null) return false;
-
-        String text = placeholder.getText().parseToString(sender, sender,
-                MessageUtils.getSenderViewerPlaceholders(sender, sender)
-                        .addPlaceholder("type", "client").build());
-        return text.trim().startsWith("%message%");
     }
 
     // Thanks, Nicole!

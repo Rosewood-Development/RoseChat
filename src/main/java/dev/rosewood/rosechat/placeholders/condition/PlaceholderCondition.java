@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -18,8 +19,9 @@ public class PlaceholderCondition {
 
     protected final ConfigurationSection section;
     protected final String condition;
-    protected final Map<String, List<String>> conditionValues;
-    protected  final Map<String, ClickEvent.Action> clickActions;
+    protected final Map<String, List<String>> values;
+    protected ClickEvent.Action clickAction;
+    protected HoverEvent.Action hoverAction;
 
     /**
      * Creates a new placeholder condition.
@@ -30,8 +32,7 @@ public class PlaceholderCondition {
     public PlaceholderCondition(ConfigurationSection section, String condition) {
         this.section = section;
         this.condition = condition;
-        this.conditionValues = new HashMap<>();
-        this.clickActions = new HashMap<>();
+        this.values = new HashMap<>();
     }
 
     /**
@@ -65,42 +66,52 @@ public class PlaceholderCondition {
         return false;
     }
 
-    /**
-     * @param sender The {@link RosePlayer} who sent the message.
-     * @param viewer The {@link RosePlayer} who is viewing the message.
-     * @param placeholders The {@link StringPlaceholders} to use.
-     * @return The parsed condition as a {@link ClickEvent.Action}.
-     */
-    public ClickEvent.Action parseToAction(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        return null;
-    }
-
-    protected String parsePlaceholders(Player player, String placeholder, StringPlaceholders placeholders) {
+    protected String parsePlaceholders(Player player, Player player2, String placeholder, StringPlaceholders placeholders) {
         if (placeholder == null) return null;
-        if (PlaceholderAPIHook.enabled()) return PlaceholderAPIHook.applyPlaceholders(player, placeholders.apply(placeholder));
+        if (PlaceholderAPIHook.enabled()) {
+            placeholder = placeholders.apply(placeholder);
+            placeholder = PlaceholderAPIHook.applyRelationalPlaceholders(player, player2, placeholder);
+            return PlaceholderAPIHook.applyPlaceholders(player, placeholder);
+        }
         else return placeholders.apply(placeholder);
     }
 
     public PlaceholderCondition parseValues() {
-        for (String sub : this.section.getKeys(false)) {
-            if (sub.equals("condition")) continue;
+        for (String valueId : this.section.getKeys(false)) {
+            if (valueId.equalsIgnoreCase("condition")) continue;
+
             try {
-                if (this.section.contains(sub + ".action")) this.clickActions.put(sub + ".action", ClickEvent.Action.valueOf(this.section.getString(sub + ".action")));
+                if (valueId.equalsIgnoreCase("action")) {
+                    if (this.section.getName().equalsIgnoreCase("hover")) {
+                        this.hoverAction = HoverEvent.Action.valueOf(this.section.getString(valueId));
+                    } else if (this.section.getName().equalsIgnoreCase("click")) {
+                        this.clickAction = ClickEvent.Action.valueOf(this.section.getString(valueId));
+                    }
+
+                    continue;
+                }
             } catch (IllegalArgumentException e) {
                 LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
                 localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
-                        "&eThe " + this.section.getString(sub + ".action") + " action is not a valid ClickEvent!");
+                        "&eThe " + this.section.getString(valueId) + " action is not a valid Click or Hover Event!");
             }
 
-            if (this.section.contains(sub + ".value")) this.conditionValues.put(sub + ".value", Collections.singletonList(this.section.getString(sub + ".value")));
-            this.conditionValues.put(sub, this.section.isList(sub) ? this.section.getStringList(sub) : Collections.singletonList(this.section.getString(sub)));
+            if (valueId.equalsIgnoreCase("hover") && this.hoverAction == null)
+                this.hoverAction = HoverEvent.Action.SHOW_TEXT;
+
+            if (valueId.equalsIgnoreCase("click") && this.clickAction == null)
+                this.clickAction = ClickEvent.Action.SUGGEST_COMMAND;
+
+            List<String> value = this.section.isList(valueId) ?
+                    this.section.getStringList(valueId) : Collections.singletonList(this.section.getString(valueId));
+            this.values.put(valueId, value);
         }
 
         return this;
     }
 
     protected String combineConditionValues(String value) {
-        List<String> result = this.conditionValues.get(this.clickActions.isEmpty() ? value : value + ".value");
+        List<String> result = this.values.get(value);
         if (result == null || result.isEmpty()) return "";
 
         StringBuilder resultBuilder = new StringBuilder();
@@ -114,20 +125,20 @@ public class PlaceholderCondition {
         return resultBuilder.toString();
     }
 
-    protected ClickEvent.Action getClickAction(String value) {
-        return this.clickActions.get(value + ".action");
+    public HoverEvent.Action getHoverAction() {
+        return this.hoverAction;
+    }
+
+    public ClickEvent.Action getClickAction() {
+        return this.clickAction;
     }
 
     public String getCondition() {
         return this.condition;
     }
 
-    public Map<String, List<String>> getConditionValues() {
-        return this.conditionValues;
-    }
-
-    public Map<String, ClickEvent.Action> getClickActions() {
-        return this.clickActions;
+    public Map<String, List<String>> getValues() {
+        return this.values;
     }
 
 }

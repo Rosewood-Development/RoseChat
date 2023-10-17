@@ -20,7 +20,7 @@ public class LeaveGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -39,7 +39,7 @@ public class LeaveGroupCommand extends AbstractCommand {
         PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.single("name", groupChat.getName()));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-success", StringPlaceholders.of("name", groupChat.getName()));
 
         groupChat.removeMember(player.getUniqueId());
         this.getAPI().getGroupManager().removeMember(groupChat, player.getUniqueId());
@@ -49,7 +49,7 @@ public class LeaveGroupCommand extends AbstractCommand {
             if (member != null) {
                 this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
                         StringPlaceholders.builder("player", name)
-                                .addPlaceholder("name", groupChat.getName())
+                                .add("name", groupChat.getName())
                                 .build());
             }
         }

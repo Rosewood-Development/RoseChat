@@ -22,7 +22,7 @@ public class RenameGroupCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -36,24 +36,19 @@ public class RenameGroupCommand extends AbstractCommand {
         String name = getAllArgs(1, args);
         if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
 
-        // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = "&f&r" + name + "&f&r";
-
         RosePlayer rosePlayer = new RosePlayer(sender);
-        RoseMessage message = new RoseMessage(rosePlayer, MessageLocation.GROUP, name);
         MessageRules messageRules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyURLFilter();
-        message.applyRules(messageRules);
 
-        if (message.isBlocked()) {
-            if (message.getFilterType() != null) message.getFilterType().sendWarning(rosePlayer);
+        MessageRules.RuleOutputs outputs = messageRules.apply(rosePlayer, MessageLocation.GROUP, name);
+
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null) outputs.getWarning().send(rosePlayer);
             return;
         }
 
-        // Reset colour & formatting so uncoloured names don't take colour from previous words.
-        name = message.getMessage();
         groupChat.setName(name);
         groupChat.save();
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.single("name", name));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-rename-success", StringPlaceholders.of("name", name));
     }
 
     @Override

@@ -219,12 +219,14 @@ command-gcm-enter-message: '&cПожалуйста, введите сообще�
 
 # цвета
 command-color-description: '&8 - &d/color &7- Изменить твой цвет чата'
-command-color-usage: '&e/color <color>'
+command-color-usage: '&e/color <color/игрок> [color/remove]'
 command-color-success: '&eЦвет твоего чата &f%color%&e.'
 command-color-invalid: '&eЭто недопустимый цвет!'
 command-color-removed: '&eЦвет вашего чата был удален.'
 command-color-gradient: 'Жирный'
 command-color-rainbow: 'Радужный'
+command-color-others: "&eВы установили цвет чата игрока &b%player%&e на &f%color%&e."
+command-color-others-removed: "&eВы удалили цвет чата игрока &b%player%&e."
 
 # мут
 command-mute-description: '&8 - &d/mute &7- Выдать мут'
@@ -280,10 +282,12 @@ command-debug-off: '&eРежим отладки теперь &coff&e.'
 
 # Цветной ник
 command-nickcolor-description: '&8 - &d/nickcolor &7- Изменить цвет никнейма.'
-command-nickcolor-usage: '&e/nickcolor <color>'
+command-nickcolor-usage: '&e/nickcolor <color/игрок> [color/remove]'
 command-nickcolor-success: '&eваш новый ник - это: &f%name%&e.'
 command-nickcolor-invalid: '&eЭто недопустимый цвет!'
 command-nickcolor-removed: '&eВаш ник color был удален.'
+command-nickcolor-others: "&eВы установили цвет ника игрока &b%player%&e на &f%color%&e."
+command-nickcolor-others-removed: "&eВы удалили цвет ника игрока &b%player%&e."
 
 # Отключение
 command-chat-toggle-description: '&8 - &c/chat toggle &7- Переключает просмотр канала.'

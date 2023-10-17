@@ -21,6 +21,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
@@ -48,6 +50,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean() || !Setting.EDIT_DISCORD_MESSAGES.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) return;
+
         RoseChatAPI api = RoseChatAPI.getInstance();
         List<PlayerData> updatePlayers = new ArrayList<>();
         api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
@@ -61,8 +65,35 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), true, updatePlayers);
     }
 
+    @Override
+    public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) return;
+
+        RoseChatAPI api = RoseChatAPI.getInstance();
+        List<PlayerData> updatePlayers = new ArrayList<>();
+        AtomicReference<UUID> deletableMessageUUID = new AtomicReference<>();
+        api.getPlayerDataManager().getPlayerData().forEach(((uuid, playerData) -> {
+            for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
+                if (deletableMessage.isClient()) continue;
+                if (deletableMessage.getDiscordId() != null && !deletableMessage.getDiscordId().equals(event.getMessageId())) continue;
+                updatePlayers.add(playerData);
+                deletableMessageUUID.set(deletableMessage.getUUID());
+            }
+        }));
+
+        if (deletableMessageUUID.get() == null) return;
+        for (PlayerData data : updatePlayers) {
+            Player player = Bukkit.getPlayer(data.getUUID());
+            if (player == null) continue;
+
+            api.deleteMessage(new RosePlayer(player), deletableMessageUUID.get());
+        }
+    }
+
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
+        if (!Setting.USE_DISCORD.getBoolean()) return;
+
         event.setCancelled(true);
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
             this.processMessage(event.getChannel(), event.getMember(), event.getMessage(), false, null);
@@ -70,6 +101,8 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     }
 
     public void processMessage(TextChannel discordChannel, Member member, Message message, boolean update, List<PlayerData> updateFor) {
+        if (member == null) return;
+
         for (Channel channel : this.api.getChannels()) {
             if (channel.getDiscordChannel() == null) continue;
             if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel))) continue;
@@ -78,13 +111,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             UUID uuid = this.discord.getAccountLinkManager().getUuid(member.getId());
             String color = getColor(member);
             StringPlaceholders.Builder placeholders = StringPlaceholders.builder()
-                    .addPlaceholder("user_name", member.getUser().getName())
-                    .addPlaceholder("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
-                    .addPlaceholder("user_color", "#" + (color.length() == 5 ? "0" + color : color))
-                    .addPlaceholder("user_tag", member.getUser().getDiscriminator());
+                    .add("user_name", member.getUser().getName())
+                    .add("user_role", member.getRoles().isEmpty() ? "" : member.getRoles().get(0).getName())
+                    .add("user_color", "#" + (color.length() == 5 ? "0" + color : color))
+                    .add("user_tag", member.getUser().getDiscriminator());
 
             // If not using the setting, or the player has never joined, use their discord name.
-            if (!Setting.USE_IGN_WITH_DISCORD.getBoolean() || uuid == null) {
+            if (uuid == null) {
                 this.createMessage(message, null, member.getEffectiveName(), channel, placeholders, update, updateFor);
                 return;
             }
@@ -93,7 +126,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 PlayerData data = this.api.getPlayerData(player.getUniqueId());
-                this.createMessage(message, player, data.getNickname() == null ? player.getDisplayName() : data.getNickname(), channel, placeholders, update, updateFor);
+
+                String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
+                name = Setting.USE_IGN_WITH_DISCORD.getBoolean() ? name : member.getEffectiveName();
+
+                this.createMessage(message, player, name, channel, placeholders, update, updateFor);
                 return;
             }
 
@@ -126,7 +163,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, Channel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
-        RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, "default") : new RosePlayer(offlinePlayer));
+        RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, true) : new RosePlayer(offlinePlayer));
 
         // Add all attachments.
         for (Message.Attachment attachment : message.getAttachments())
@@ -139,21 +176,23 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
             if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt()) return;
             if (!MessageUtils.isMessageEmpty(line)) {
-                RoseMessage messageWrapper = new RoseMessage(sender, channel, line);
-                messageWrapper.setPlaceholders(placeholders.addPlaceholder("user_nickname", name).build());
+                RoseMessage messageWrapper = RoseMessage.forChannel(sender, channel);
+                messageWrapper.setPlaceholders(placeholders.add("user_nickname", name).build());
 
                 MessageRules rules = new MessageRules();
                 if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {
                     // Don't count the message as spam if the message is being edited.
-                    if (update) rules.applyCapsFilter().applyURLFilter().applyLanguageFilter().applySenderChatColor();
-                    else rules.applyAllFilters().applySenderChatColor();
+                    if (update) rules.applyCapsFilter().applyURLFilter().applyLanguageFilter();
+                    else rules.applyAllFilters();
                 }
 
-                messageWrapper.applyRules(rules);
-                if (messageWrapper.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                MessageRules.RuleOutputs outputs = rules.apply(messageWrapper, line);
+                if (outputs.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
                     message.delete().queue();
                     return;
                 }
+
+                messageWrapper.setPlayerInput(outputs.getFilteredMessage());
 
                 if (update) {
                     for (PlayerData playerData : updateFor) {
@@ -164,7 +203,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId())) continue;
                             messageWrapper.setUUID(deletableMessage.getUUID());
-                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId());
+                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
                             deletableMessage.setJson(ComponentSerializer.toString(components));
                             break;
                         }
@@ -175,8 +214,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     }
                 } else {
                     channel.send(messageWrapper, message.getId());
-                    BaseComponent[] messageComponents = messageWrapper.toComponents();
-                    if (messageComponents != null) Bukkit.getConsoleSender().spigot().sendMessage(messageComponents);
                 }
             }
         }

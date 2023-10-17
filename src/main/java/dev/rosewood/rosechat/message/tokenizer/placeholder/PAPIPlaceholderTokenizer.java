@@ -1,57 +1,88 @@
 package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import net.md_5.bungee.api.ChatColor;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PAPIPlaceholderTokenizer implements Tokenizer<Token> {
+public class PAPIPlaceholderTokenizer extends Tokenizer {
 
-    private static final Pattern PAPI_PATTERN = Pattern.compile("\\%(.*?)\\%");
+    private static final Pattern PATTERN = Pattern.compile("%(.*?)%");
     private final boolean isBungee;
 
     public PAPIPlaceholderTokenizer(boolean isBungee) {
+        super(isBungee ? "bungee_papi" : "papi");
         this.isBungee = isBungee;
     }
 
     @Override
-    public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String input = params.getInput();
         if (!input.startsWith("%")) return null;
 
-        Matcher matcher = PAPI_PATTERN.matcher(input);
-        if (matcher.find()) {
-            if (matcher.start() != 0) return null;
-            String placeholder = input.substring(1, matcher.end() - 1);
-            String placeholderPermission = placeholder.replaceFirst("_", ".");
-            if (!ignorePermissions
-                    && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
-                return null;
+        Matcher matcher = PATTERN.matcher(input);
+        if (!matcher.find() || matcher.start() != 0) return null;
 
-            String originalContent = matcher.group();
+        String placeholder = input.substring(1, matcher.end() - 1);
+        String placeholderPermission = placeholder.replaceFirst("_", ".");
+        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
+            return null;
 
-            String content;
-            if (originalContent.startsWith("%other_") && !this.isBungee) {
-                if (!viewer.isPlayer()) content = originalContent;
-                else content = PlaceholderAPIHook.applyPlaceholders(viewer.asPlayer(), originalContent.replaceFirst("other_", ""));
-            } else {
-                content = PlaceholderAPIHook.applyPlaceholders(roseMessage.getSender().asPlayer(), originalContent);
+        String originalContent = matcher.group();
+
+        String content;
+        if (originalContent.startsWith("%other_") && !this.isBungee) {
+            if (!params.getReceiver().isPlayer()) content = originalContent;
+            else {
+                content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
+                content = PlaceholderAPIHook.applyPlaceholders(params.getReceiver().asPlayer(), content.replaceFirst("other_", ""));
             }
-
-            content = content.replace(ChatColor.COLOR_CHAR, '&');
-
-            Token.TokenSettings tokenSettings = new Token.TokenSettings(originalContent).content(content).noCaching();
-            if (originalContent.equals(content))
-                tokenSettings.ignoreTokenizer(this);
-
-            return new Token(tokenSettings);
+        } else {
+            content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent);
+            content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), content);
         }
 
-        return null;
+        // If we haven't changed, don't allow tokenizing this text anymore
+        if (Objects.equals(content, originalContent))
+            return new TokenizerResult(Token.text(content), originalContent.length());
+
+        // Encapsulate if the placeholder only contains a colour
+        boolean encapsulate = true;
+
+        // Ignore everything that definitely isn't a colour.
+        if (content.startsWith(ChatColor.COLOR_CHAR + "") || content.startsWith("&") || content.startsWith("#") || content.startsWith("<") || !content.startsWith("{")) {
+            Matcher legacyMatcher = MessageUtils.VALID_LEGACY_REGEX_COMBINED.matcher(content);
+            if (legacyMatcher.find() && content.equalsIgnoreCase(legacyMatcher.group()))
+                encapsulate = false;
+
+            if (encapsulate) {
+                Matcher hexMatcher = MessageUtils.SPIGOT_HEX_REGEX_COMBINED.matcher(content);
+                if (hexMatcher.find() && content.equalsIgnoreCase(hexMatcher.group()))
+                    encapsulate = false;
+            }
+
+            if (encapsulate) {
+                Matcher gradientMatcher = MessageUtils.GRADIENT_PATTERN.matcher(content);
+                if (gradientMatcher.find() && content.equalsIgnoreCase(gradientMatcher.group()))
+                    encapsulate = false;
+            }
+
+            if (encapsulate) {
+                Matcher rainbowMatcher = MessageUtils.RAINBOW_PATTERN.matcher(content);
+                if (rainbowMatcher.find() && content.equalsIgnoreCase(rainbowMatcher.group()))
+                    encapsulate = false;
+            }
+        }
+
+        Token.Builder token = Token.group(content);
+        if (encapsulate) token.encapsulate();
+        return new TokenizerResult(token.build(), originalContent.length());
     }
 
 }

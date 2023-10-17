@@ -1,10 +1,27 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
+public abstract class Tokenizer {
 
-public interface Tokenizer<T extends Token> {
+    private final String name;
 
-    T tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions);
+    protected Tokenizer(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Tokenizes the input.
+     * This method is called extremely frequently and should break out as early as possible if the input is not valid.
+     *
+     * @param params The {@link TokenizerParams} for this tokenization.
+     * @return A {@link TokenizerResult} or null if the input is invalid.
+     */
+    public abstract TokenizerResult tokenize(TokenizerParams params);
+
+    /**
+     * @return The name of this tokenizer.
+     */
+    public final String getName() {
+        return this.name;
+    }
 
 }

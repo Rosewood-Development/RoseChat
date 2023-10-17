@@ -28,7 +28,7 @@ public class CustomCommand extends Command {
                 if (args.length == 0) {
                     if (!ChannelCommand.processChannelSwitch(sender, channel.getId())) {
                         RoseChatAPI.getInstance().getLocaleManager()
-                                .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.single("channel", cmd.toLowerCase()));
+                                .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.of("channel", cmd.toLowerCase()));
                     }
                 } else {
                     String message = AbstractCommand.getAllArgs(0, args);

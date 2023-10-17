@@ -1,263 +1,204 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
-import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.manager.DebugManager;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.ComponentSimplifier;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
+import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.NMSUtil;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessageTokenizer {
 
-    private static final Cache<TokenKey, List<Token>> TOKEN_CACHE = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build();
+    private static final DebugManager DEBUG_MANAGER = RoseChat.getInstance().getManager(DebugManager.class);
+    private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("#.##");
 
-    private final DebugManager debugManager;
-    private final List<Tokenizer<?>> tokenizers;
+    private final List<Tokenizer> tokenizers;
     private final RoseMessage roseMessage;
     private final RosePlayer viewer;
-    private final List<Token> tokens;
-    private final boolean ignorePermissions;
+    private final Token rootToken;
+    private final MessageOutputs outputs;
+    private int parses = 0;
 
-    public MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message) {
-        this(roseMessage, viewer, message, false, Tokenizers.DEFAULT_BUNDLE);
-    }
-
-    public MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, String... tokenizerBundles) {
-        this(roseMessage, viewer, message, false, tokenizerBundles);
-    }
-
-    public MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String message, boolean ignorePermissions, String... tokenizerBundles) {
-        this.debugManager = RoseChat.getInstance().getManager(DebugManager.class);
-
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, Tokenizers.TokenizerBundle... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
-        this.tokens = new ArrayList<>();
-        this.ignorePermissions = ignorePermissions;
-        this.tokenizers = Arrays.stream(tokenizerBundles).flatMap(x -> Tokenizers.getBundleValues(x).stream()).distinct().collect(Collectors.toList());
-        this.debugManager.addMessage(() -> "Tokenizing New Message: " + message + " for " + viewer.getName());
-        this.tokens.addAll(this.tokenizeContent(parseReplacements(message, ignorePermissions), true, 0, null));
-        this.debugManager.addMessage(() -> "Completed Tokenizing: " + message + " for " + viewer.getName() + "\n\n\n");
+        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
+        this.rootToken = Token.group(format).build();
+        this.outputs = new MessageOutputs();
     }
 
-    // Parse replacements before the tokenizing to allow some replacements, such as custom colours, to work properly.
-    private String parseReplacements(String message, boolean ignorePermissions) {
-        this.debugManager.addMessage(() -> "    Parsing Replacements...");
-        for (ChatReplacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-            if (replacement.isRegex() || !message.contains(replacement.getText())) continue;
-            if (!MessageUtils.isMessageEmpty(replacement.getReplacement())) continue;
-            if (!ignorePermissions && !MessageUtils.hasExtendedTokenPermission(this.roseMessage, "rosechat.replacements", "rosechat.replacement." + replacement.getId())) continue;
-            message = message.replace(replacement.getText(), replacement.getReplacement());
-        }
-
-        return message;
+    public MessageOutputs tokenizeContent() {
+        this.tokenizeContent(this.rootToken, 0);
+        return this.outputs;
     }
 
-    private List<Token> tokenizeContent(String content, boolean tokenizeHover, int depth, Token parent) {
-        content = this.parseReplacements(content, parent != null);
-        this.debugManager.addMessage(() -> "    Tokenizing Content... Parent: " + (parent == null ? "none" : parent.toString()));
+    public void tokenizeContent(Token token, int depth) {
+        if (token.getType() != TokenType.GROUP)
+            throw new IllegalStateException("Cannot tokenize a token that is not of type GROUP");
 
-        // Check cache first
-        TokenKey tokenKey = new TokenKey(content, parent == null ? null : parent.clone());
-        List<Token> cachedResult = TOKEN_CACHE.getIfPresent(tokenKey);
-        if (cachedResult != null) {
-            RosePlayer player = this.roseMessage.getSender();
-
-            for (String permission : tokenKey.getPermissions().keySet()) {
-                if (player.hasPermission(permission) == tokenKey.getPermissions().get(permission))
-                    return cachedResult;
+        if (depth > 15) {
+            Deque<Token> tokens = new ArrayDeque<>();
+            Token current = token;
+            while (current != null) {
+                tokens.addFirst(current);
+                current = current.parent;
             }
+            throw new RuntimeException("Exceeded a depth of 15 when tokenizing message; this is probably due to infinite recursion somewhere. Token stack: " + tokens.stream().map(t -> t.getType().name() + ":" + t.getContent()).collect(Collectors.joining(" -> ")));
         }
 
-        List<Token> added = new ArrayList<>();
-        for (int i = 0; i < content.length(); i++) {
-            String substring = content.substring(i);
+        String content = token.getContent();
 
-            for (Tokenizer<?> tokenizer : this.tokenizers) {
-                if (parent != null && parent.getIgnoredTokenizers().contains(tokenizer))
+        outer:
+        while (!content.isEmpty()) {
+            for (Tokenizer tokenizer : this.tokenizers) {
+                if (token.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
-                this.debugManager.addMessage(() -> "        Starting Tokenizing " + tokenizer.getClass().getSimpleName() + "...");
+                this.parses++;
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
+                TokenizerResult result = tokenizer.tokenize(params);
+                if (result == null)
+                    continue;
 
-                Token token = tokenizer.tokenize(this.roseMessage, this.viewer, substring, parent != null || this.ignorePermissions);
-                if (token != null) {
-                    this.debugManager.addMessage(() -> "        Completed Tokenizing " + tokenizer.getClass().getSimpleName() + ", " + token + ", " + token.getOriginalContent() + " -> " + token.getContent());
-
-
-                    i += token.getOriginalContent().length() - 1;
-                    if (depth > 15) {
-                        RoseChat.getInstance().getLogger().warning("Exceeded a depth of 15 when tokenizing message. This is probably due to infinite recursion somewhere: " + this.roseMessage.getMessage());
-                        this.debugManager.addMessage(() -> "Infinite recursion detected: Message: " + this.roseMessage.getMessage()
-                                + ", Original: " + token.getOriginalContent() + ", Content: " + token.getContent() + ", Token: " + token);
-                        continue;
-                    }
-
-                    if (token.requiresTokenizing()) {
-                        // Inherit things from parent
-                        if (parent != null)
-                            parent.applyInheritance(token);
-
-                        added.add(token);
-                        token.addChildren(this.tokenizeContent(token.getContent(), true, depth + 1, token));
-                    } else {
-                        added.add(token);
-                    }
-
-                    if (tokenizeHover && token.getHover() != null && !token.getHover().isEmpty())
-                        token.addHoverChildren(this.tokenizeContent(token.getHover(), false, depth + 1, token));
-
-                    break;
-                }
+                Token child = result.token();
+                child.parent = token;
+                token.getChildren().add(child);
+                content = content.substring(result.consumed());
+                this.outputs.merge(params.getOutputs());
+                continue outer;
             }
+            throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
 
-        // Cache the result if allowed
-        if (added.stream().allMatch(Token::allowsCaching)) {
-            tokenKey.permissions = this.roseMessage.getSender().getCachedPermissions();
-            this.roseMessage.getSender().getCachedPermissions().clear();
-            TOKEN_CACHE.put(tokenKey, added.stream().map(Token::clone).collect(Collectors.toList()));
-        }
-
-        return added;
+        if (token.getType() == TokenType.GROUP)
+            for (Token child : token.getChildren())
+                if (child.getType() == TokenType.GROUP)
+                    this.tokenizeContent(child, depth + 1);
     }
 
-    public BaseComponent[] toComponents() {
-        ComponentBuilder componentBuilder = new ComponentBuilder();
-        this.toComponents(componentBuilder, new FormattedColorGenerator(null), this.tokens);
-
-        // Appends an empty string to always have something in the component.
-        if (componentBuilder.getParts().isEmpty()) componentBuilder.append("", ComponentBuilder.FormatRetention.FORMATTING);
-        return ComponentSimplifier.simplify(componentBuilder.create());
+    public <T> T toComponents(TokenComposer<T> composer) {
+        return this.toComponents(this.rootToken, composer);
     }
 
-    private void toComponents(ComponentBuilder componentBuilder, FormattedColorGenerator colorGenerator, List<Token> tokens) {
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            if (!token.getChildren().isEmpty()) {
-                this.toComponents(componentBuilder, colorGenerator, token.getChildren());
-                continue;
-            }
+    public <T> T toComponents(Token token, TokenComposer<T> composer) {
+        return composer.compose(token);
+    }
 
-            if (token.hasColorGenerator() || token.hasFormatCodes()) {
-                List<Token> futureTokens = tokens.subList(i, tokens.size());
-                if (token.hasColorGenerator()) {
-                    FormattedColorGenerator newColorGenerator = new FormattedColorGenerator(token.getColorGenerator(futureTokens));
-                    colorGenerator.copyFormatsTo(newColorGenerator);
-                    colorGenerator = newColorGenerator;
-                }
+    public static MessageTokenizerResults<BaseComponent[]> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        return tokenize(roseMessage, viewer, message, null, tokenizerBundles);
+    }
 
-                if (token.hasFormatCodes()) {
-                    PlayerData senderData = this.roseMessage.getSender().getPlayerData();
-                    String color;
-                    if (senderData != null) {
-                        color = senderData.getColor();
-                        if (color == null || color.isEmpty())
-                            color = "&f";
-                    } else {
-                        color = "&f";
-                    }
-
-                    FormattedColorGenerator overrideColorGenerator = token.applyFormatCodes(colorGenerator, color, futureTokens);
-                    if (overrideColorGenerator != null)
-                        colorGenerator = overrideColorGenerator;
-                }
-            }
-
-            if (!colorGenerator.isApplicable()) {
-                componentBuilder.append(token.getContent(), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.FORMATTING : ComponentBuilder.FormatRetention.NONE);
-                if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
-
-                if (token.getHover() != null) {
-                    if (token.getHoverChildren().isEmpty()) {
-                        componentBuilder.event(new HoverEvent(token.getHoverAction(), TextComponent.fromLegacyText(token.getHover())));
-                    } else {
-                        ComponentBuilder hoverBuilder = new ComponentBuilder();
-                        this.toComponents(hoverBuilder, new FormattedColorGenerator(null), token.getHoverChildren());
-                        componentBuilder.event(new HoverEvent(token.getHoverAction(), hoverBuilder.create()));
-                    }
-                }
-
-                if (token.getClick() != null)
-                    componentBuilder.event(new ClickEvent(token.getClickAction(), PlaceholderAPIHook.applyPlaceholders(this.roseMessage.getSender().asPlayer(), MessageUtils.getSenderViewerPlaceholders(this.roseMessage.getSender(), this.viewer).build().apply(token.getClick()))));
+    @SuppressWarnings("unchecked")
+    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        if (message == null) {
+            if (roseMessage.getPlayerInput() != null) {
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                message = RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER;
             } else {
-                // Make sure to apply the color even if there's no content
-                if (token.getContent().isEmpty()) {
-                    componentBuilder.append("", token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.FORMATTING);
-                    colorGenerator.apply(componentBuilder, false);
-                    continue;
-                }
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with an empty string instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                message = "";
+            }
+        }
 
-                for (char c : token.getContent().toCharArray()) {
-                    componentBuilder.append(String.valueOf(c), token.shouldRetainColour() ? ComponentBuilder.FormatRetention.ALL : ComponentBuilder.FormatRetention.FORMATTING);
-                    if (NMSUtil.getVersionNumber() >= 16) componentBuilder.font(token.getEffectiveFont());
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
 
-                    colorGenerator.apply(componentBuilder, Character.isSpaceChar(c));
+        if (composer == null) // a null composer means this will always be BaseComponent[], so this is safe
+            composer = (TokenComposer<T>) TokenComposer.decorated(tokenizer);
 
-                    if (token.getHover() != null) {
-                        if (token.getHoverChildren().isEmpty()) {
-                            componentBuilder.event(new HoverEvent(token.getHoverAction(), TextComponent.fromLegacyText(token.getHover())));
-                        } else {
-                            ComponentBuilder hoverBuilder = new ComponentBuilder();
-                            this.toComponents(hoverBuilder, new FormattedColorGenerator(null), token.getHoverChildren());
-                            componentBuilder.event(new HoverEvent(token.getHoverAction(), hoverBuilder.create()));
-                        }
-                    }
+        MessageOutputs outputs = tokenizer.tokenizeContent();
+        T components = tokenizer.toComponents(composer);
+        DEBUG_MANAGER.addMessage(() -> "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) + "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times");
+        return new MessageTokenizerResults<T>(components, outputs);
+    }
 
-                    if (token.getClick() != null)
-                        componentBuilder.event(new ClickEvent(token.getClickAction(), PlaceholderAPIHook.applyPlaceholders(this.roseMessage.getSender().asPlayer(), MessageUtils.getSenderViewerPlaceholders(this.roseMessage.getSender(), this.viewer).build().apply(token.getClick()))));
+    private static int countTokens(Token token) {
+        if (token.getType() != TokenType.GROUP)
+            return 1;
+
+        int count = 1;
+        for (Token child : token.getChildren())
+            count += countTokens(child);
+        return count;
+    }
+
+    private static <T> List<T> zipperMerge(List<List<T>> listOfLists) {
+        if (listOfLists.isEmpty())
+            return new ArrayList<>();
+
+        if (listOfLists.size() == 1)
+            return listOfLists.get(0);
+
+        Set<T> allValues = new HashSet<>(); // used to disallow duplicates in the final List
+        List<T> mergedList = new ArrayList<>();
+        int maxSize = 0;
+
+        for (List<T> list : listOfLists)
+            if (list.size() > maxSize)
+                maxSize = list.size();
+
+        for (int i = 0; i < maxSize; i++) {
+            for (List<T> list : listOfLists) {
+                if (i < list.size()) {
+                    T value = list.get(i);
+                    if (allValues.add(value))
+                        mergedList.add(list.get(i));
                 }
             }
         }
+
+        return mergedList;
     }
 
-    private static class TokenKey {
-        private final String content;
-        private final Token parent;
-        private Map<String, Boolean> permissions;
+    public int findDecoratorContentLength(Token source, TokenDecorator decorator) {
+        return this.findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
+    }
 
-        public TokenKey(String content, Token parent) {
-            this.content = content;
-            this.parent = parent;
-            this.permissions = new HashMap<>();
+    private int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {
+        if (token.getType() != TokenType.GROUP)
+            throw new IllegalStateException("Cannot find decorator content length of a token that is not of type GROUP");
+
+        int length = 0;
+        for (Token child : token.getChildren()) {
+            switch (child.getType()) {
+                case TEXT -> {
+                    if (counting.get())
+                        length += child.getContent().length();
+                }
+                case DECORATOR -> {
+                    if (counting.get() && child.getDecorators().stream().anyMatch(decorator::isOverwrittenBy)) {
+                        counting.set(false);
+                        return length;
+                    } else if (child.getDecorators().contains(decorator)) {
+                        counting.set(true);
+                    }
+                }
+                case GROUP -> {
+                    boolean countingBefore = counting.get();
+                    length += this.findDecoratorContentLength(child, decorator, counting);
+                    if (child.shouldEncapsulate())
+                        counting.set(countingBefore);
+                }
+            }
         }
 
-        public Map<String, Boolean> getPermissions() {
-            return this.permissions;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || this.getClass() != o.getClass()) return false;
-            TokenKey tokenKey = (TokenKey) o;
-            return this.content.equals(tokenKey.content) && Objects.equals(this.parent, tokenKey.parent);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.content, this.parent);
-        }
+        return length;
     }
 
 }

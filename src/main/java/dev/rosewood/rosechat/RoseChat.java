@@ -22,12 +22,12 @@ import dev.rosewood.rosechat.command.UnmuteCommand;
 import dev.rosewood.rosechat.command.api.CommandManager;
 import dev.rosewood.rosechat.command.api.SeniorCommandManager;
 import dev.rosewood.rosechat.command.chat.ChatCommandManager;
-import dev.rosewood.rosechat.command.chat.InfoChatCommand;
-import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.chat.ClearChatCommand;
+import dev.rosewood.rosechat.command.chat.InfoChatCommand;
 import dev.rosewood.rosechat.command.chat.MoveChatCommand;
 import dev.rosewood.rosechat.command.chat.MuteChatCommand;
 import dev.rosewood.rosechat.command.chat.SudoChatCommand;
+import dev.rosewood.rosechat.command.chat.ToggleChatCommand;
 import dev.rosewood.rosechat.command.group.AcceptGroupCommand;
 import dev.rosewood.rosechat.command.group.CreateGroupCommand;
 import dev.rosewood.rosechat.command.group.DenyGroupCommand;
@@ -45,7 +45,7 @@ import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
 import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
 import dev.rosewood.rosechat.hook.channel.fabledskyblock.FabledSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.factionsuuid.FactionsUUIDChannelProvider;
-import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
+//import dev.rosewood.rosechat.hook.channel.iridiumskyblock.IridiumSkyblockChannelProvider;
 import dev.rosewood.rosechat.hook.channel.kingdomsx.KingdomsXChannelProvider;
 import dev.rosewood.rosechat.hook.channel.marriagemaster.MarriageMasterChannelProvider;
 import dev.rosewood.rosechat.hook.channel.mcmmo.McMMOChannelProvider;
@@ -58,7 +58,6 @@ import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
-import dev.rosewood.rosechat.listener.ChatPreviewListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
@@ -68,18 +67,17 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
-import dev.rosewood.rosechat.manager.EmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
-import dev.rosewood.rosechat.manager.TagManager;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import github.scarsz.discordsrv.DiscordSRV;
+import java.util.concurrent.Executors;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -87,13 +85,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class RoseChat extends RosePlugin {
 
-    public static final ExecutorService MESSAGE_THREAD_POOL = new ThreadPoolExecutor(5, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+    public static final ExecutorService MESSAGE_THREAD_POOL = Executors.newCachedThreadPool();
     private static RoseChat instance;
     private SeniorCommandManager commandManager;
     private Permission vault;
@@ -166,15 +161,14 @@ public class RoseChat extends RosePlugin {
                 .addCommandManager(groupCommand)
                 .addCommandManager(groupChatMessageCommand)
                 .addCommandManager(deleteMessageCommand)
+                .addCommandManager(realnameCommand)
                 .addSubcommand(new DebugCommand(this))
                 .addSubcommand(new ReloadCommand())
                 .addSubcommand(new HelpCommand(this));
 
         // Register Listeners
-        pluginManager.registerEvents(new ChatListener(this), this);
+        pluginManager.registerEvents(new ChatListener(), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
-        if (NMSUtil.getVersionNumber() >= 19 && ConfigurationManager.Setting.CHAT_PREVIEW.getBoolean())
-            pluginManager.registerEvents(new ChatPreviewListener(), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
@@ -192,9 +186,7 @@ public class RoseChat extends RosePlugin {
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
                 ChannelManager.class,
-                EmojiManager.class,
                 ReplacementManager.class,
-                TagManager.class,
                 PlaceholderManager.class,
                 PlayerDataManager.class,
                 GroupManager.class,
@@ -260,8 +252,8 @@ public class RoseChat extends RosePlugin {
         if (pluginManager.getPlugin("SuperiorSkyblock2") != null)
             new SuperiorSkyblockChannelProvider().register();
 
-        if (pluginManager.getPlugin("IridiumSkyblock") != null)
-            new IridiumSkyblockChannelProvider().register();
+//        if (pluginManager.getPlugin("IridiumSkyblock") != null)
+//            new IridiumSkyblockChannelProvider().register();
 
         if (pluginManager.getPlugin("FabledSkyblock") != null)
             new FabledSkyblockChannelProvider().register();

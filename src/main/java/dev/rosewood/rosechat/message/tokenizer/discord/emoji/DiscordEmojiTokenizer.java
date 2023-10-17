@@ -1,43 +1,53 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.emoji;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.ChatReplacement;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import net.md_5.bungee.api.chat.HoverEvent;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import net.md_5.bungee.api.chat.HoverEvent;
 
-public class DiscordEmojiTokenizer implements Tokenizer<Token> {
+public class DiscordEmojiTokenizer extends Tokenizer {
+
+    public static final Pattern PATTERN = Pattern.compile("<a?(:[a-zA-Z0-9_\\-~]+:)[0-9]{18,19}>");
+
+    public DiscordEmojiTokenizer() {
+        super("discord_emoji");
+    }
 
     @Override
-    public Token tokenize(RoseMessage roseMessage, RosePlayer viewer, String input, boolean ignorePermissions) {
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String input = params.getInput();
         if (!input.startsWith("<")) return null;
-        
-        Matcher matcher = MessageUtils.DISCORD_EMOJI_PATTERN.matcher(input);
-        if (matcher.find()) {
-            if (matcher.start() != 0) return null;
-            String originalContent = input.substring(0, matcher.end());
-            String content = matcher.group(1);
 
-            for (ChatReplacement emoji : RoseChatAPI.getInstance().getEmojis()) {
-                if (!emoji.getText().equalsIgnoreCase(content)) continue;
-                if (!ignorePermissions && !MessageUtils.hasExtendedTokenPermission(roseMessage, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
-                    return null;
+        Matcher matcher = PATTERN.matcher(input);
+        if (!matcher.find() || matcher.start() != 0) return null;
 
-                content = emoji.getReplacement();
+        String content = matcher.group(1);
+        for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
+            if (!emoji.getInput().isEmoji()) continue;
+            if (!emoji.getInput().getText().equalsIgnoreCase(content)) continue;
+            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
+                return null;
 
-                return new Token(new Token.TokenSettings(originalContent).content(content).font(emoji.getFont())
-                        .hoverAction(HoverEvent.Action.SHOW_TEXT).hover(emoji.getHoverText()).ignoreTokenizer(this).ignoreTokenizer(Tokenizers.EMOJI));
-            }
+            content = emoji.getOutput().getText();
 
-            return new Token(new Token.TokenSettings(originalContent).content(matcher.group(1)));
+            return new TokenizerResult(Token.group(content)
+                    .decorate(FontDecorator.of(emoji.getOutput().getFont()))
+                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, emoji.getOutput().getHover()))
+                    .ignoreTokenizer(this)
+                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
+                    .build(), matcher.group().length());
         }
 
-        return null;
+        return new TokenizerResult(Token.text(matcher.group(1)), matcher.group().length());
     }
 
 }

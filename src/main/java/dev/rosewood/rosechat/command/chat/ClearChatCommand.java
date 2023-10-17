@@ -7,7 +7,6 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +22,10 @@ public class ClearChatCommand extends AbstractCommand {
         Channel channel = null;
 
         if (args.length == 0) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
+            if (sender instanceof Player player) {
                 channel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
             } else {
-                this.getAPI().getLocaleManager().sendComponentMessage(roseSender, "invalid-arguments", StringPlaceholders.single("syntax", this.getSyntax()));
+                this.getAPI().getLocaleManager().sendComponentMessage(roseSender, "invalid-arguments", StringPlaceholders.of("syntax", this.getSyntax()));
             }
         } else if (args.length == 1) {
             channel = this.getAPI().getChannelById(args[0]);
@@ -38,11 +36,11 @@ public class ClearChatCommand extends AbstractCommand {
             return;
         }
 
-        for (int i = 0; i < 100; i++) channel.flood("\n");
+        for (int i = 0; i < 100; i++) channel.send("\n");
 
-        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
+        this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-chat-clear-cleared", StringPlaceholders.of("channel", channel.getId()));
         if (sender instanceof Player) {
-            this.getAPI().getLocaleManager().sendComponentMessage(Bukkit.getConsoleSender(), "command-chat-clear-cleared", StringPlaceholders.single("channel", channel.getId()));
+            this.getAPI().getLocaleManager().sendComponentMessage(Bukkit.getConsoleSender(), "command-chat-clear-cleared", StringPlaceholders.of("channel", channel.getId()));
         }
     }
 

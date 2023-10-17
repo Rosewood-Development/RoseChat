@@ -19,7 +19,7 @@ public class RealnameCommand extends AbstractCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.single("syntax", getSyntax()));
+            this.getAPI().getLocaleManager().sendComponentMessage(sender, "invalid-arguments", StringPlaceholders.of("syntax", getSyntax()));
             return;
         }
 
@@ -33,8 +33,8 @@ public class RealnameCommand extends AbstractCommand {
         String name = data.getNickname() != null ? data.getNickname() : player.getDisplayName();
 
         this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-realname-success",
-                StringPlaceholders.builder().addPlaceholder("player", player.getName())
-                        .addPlaceholder("name", name).build());
+                StringPlaceholders.builder().add("player", player.getName())
+                        .add("name", name).build());
     }
 
     @Override
