@@ -1,39 +1,32 @@
-package dev.rosewood.rosechat.api.event;
+package dev.rosewood.rosechat.api.event.message.discord;
 
-import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.message.RosePlayer;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MessageEvent extends Event implements Cancellable {
+public class DiscordMessageEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private final MessageDirection messageDirection;
     private final RoseMessage message;
-    private final RosePlayer viewer;
+    private final TextChannel textChannel;
     private boolean cancelled;
 
-    public MessageEvent(RoseMessage message, RosePlayer viewer, MessageDirection messageDirection) {
+    public DiscordMessageEvent(RoseMessage message, TextChannel textChannel) {
         super(!Bukkit.isPrimaryThread());
         this.message = message;
-        this.viewer = viewer;
-        this.messageDirection = messageDirection;
+        this.textChannel = textChannel;
     }
 
     public RoseMessage getMessage() {
         return this.message;
     }
 
-    public RosePlayer getViewer() {
-        return this.viewer;
-    }
-
-    public MessageDirection getMessageDirection() {
-        return this.messageDirection;
+    public TextChannel getTextChannel() {
+        return this.textChannel;
     }
 
     @Override
