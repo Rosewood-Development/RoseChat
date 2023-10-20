@@ -73,11 +73,12 @@ public class RoseChatChannel extends ConditionalChannel {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
 
-        Channel newChannel = Channel.findNextChannel(player);
-        newChannel.forceJoin(uuid);
+        RosePlayer rosePlayer = new RosePlayer(player);
+        Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+        if (currentChannel != this) return;
 
-        RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
-                "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        Channel newChannel = Channel.findNextChannel(player);
+        rosePlayer.changeChannel(currentChannel, newChannel);
     }
 
     @Override

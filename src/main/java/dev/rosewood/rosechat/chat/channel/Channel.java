@@ -105,41 +105,6 @@ public abstract class Channel {
     }
 
     /**
-     * Forces a player into the channel.
-     * @param uuid The {@link UUID} of the player.
-     */
-    public void forceJoin(UUID uuid) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        PlayerData data = api.getPlayerData(uuid);
-        if (data.getCurrentChannel() == this) return;
-
-        data.setCurrentChannel(this);
-
-        Player player = Bukkit.getPlayer(uuid);
-        if (player != null)
-            this.onJoin(player);
-    }
-
-    /**
-     * Forces a player out of the channel.
-     * @param uuid The {@link UUID} of the player.
-     */
-    public void kick(UUID uuid) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        // Remove the player from the channel if they leave the team.
-        PlayerData data = api.getPlayerData(uuid);
-
-        // Return if the player is not in this channel.
-        if (!data.getCurrentChannel().equals(this)) return;
-
-        Player player = Bukkit.getPlayer(uuid);
-        if (player != null)
-            this.onLeave(player);
-    }
-
-    /**
      * Called when a player leaves a channel.
      * @param player The {@link Player} who is leaving the channel.
      */

@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.hook.channel.kingdomsx;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -47,29 +48,34 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onTeamDisband(KingdomDisbandEvent event) {
         for (UUID uuid : event.getKingdom().getMembers()) {
-            this.kick(uuid);
             this.onTeamLeaveGeneric(uuid);
         }
     }
 
     @EventHandler
     public void onTeamKick(KingdomKickEvent event) {
-        this.kick(event.getPlayer().getId());
         this.onTeamLeaveGeneric(event.getPlayer().getId());
     }
 
     @EventHandler
     public void onTeamLeave(KingdomLeaveEvent event) {
-        this.kick(event.getPlayer().getId());
         this.onTeamLeaveGeneric(event.getPlayer().getId());
     }
 
     @EventHandler
     public void onTeamJoin(KingdomJoinEvent event) {
         if (this.autoJoin) {
-            this.forceJoin(event.getPlayer().getId());
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer().getPlayer(),
-                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            Player player = Bukkit.getPlayer(event.getPlayer().getId());
+            if (player == null) return;
+
+            RosePlayer rosePlayer = new RosePlayer(player);
+            Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+            if (currentChannel == this) return;
+
+            if (rosePlayer.changeChannel(currentChannel, this)) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                        "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            }
         }
     }
 

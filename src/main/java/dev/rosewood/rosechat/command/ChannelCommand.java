@@ -65,8 +65,7 @@ public class ChannelCommand extends AbstractCommand {
     public static boolean processChannelSwitch(CommandSender sender, String channel) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player player) {
             Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
             Channel newChannel = api.getChannelById(channel);
 
@@ -85,13 +84,11 @@ public class ChannelCommand extends AbstractCommand {
                 return true;
             }
 
-            oldChannel.onLeave(player);
-            newChannel.onJoin(player);
-
-            PlayerData playerData = api.getPlayerData(player.getUniqueId());
-            playerData.setCurrentChannel(newChannel);
-            playerData.setIsInGroupChannel(false);
-            playerData.save();
+            RosePlayer rosePlayer = new RosePlayer(player);
+            rosePlayer.getPlayerData().setIsInGroupChannel(false);
+            if (!rosePlayer.changeChannel(oldChannel, newChannel)) {
+                return true;
+            }
 
             api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.of("id", newChannel.getId()));
             return true;

@@ -49,7 +49,6 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onIslandReset(IslandPreclearEvent event) {
         for (UUID uuid : event.getIsland().getMemberSet()) {
-            this.kick(uuid);
             this.onTeamLeaveGeneric(uuid);
         }
     }
@@ -57,29 +56,34 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onTeamDisband(TeamDeleteEvent event) {
         for (UUID uuid : event.getIsland().getMemberSet()) {
-            this.kick(uuid);
             this.onTeamLeaveGeneric(uuid);
         }
     }
 
     @EventHandler
     public void onTeamKick(TeamKickEvent event) {
-        this.kick(event.getPlayerUUID());
         this.onTeamLeaveGeneric(event.getPlayerUUID());
     }
 
     @EventHandler
     public void onTeamLeave(TeamLeaveEvent event) {
-        this.kick(event.getPlayerUUID());
         this.onTeamLeaveGeneric(event.getPlayerUUID());
     }
 
     @EventHandler
     public void onTeamJoin(TeamJoinedEvent event) {
         if (this.autoJoin) {
-            this.forceJoin(event.getPlayerUUID());
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(Bukkit.getPlayer(event.getPlayerUUID()),
-                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            Player player = Bukkit.getPlayer(event.getPlayerUUID());
+            if (player == null) return;
+
+            RosePlayer rosePlayer = new RosePlayer(player);
+            Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+            if (currentChannel == this) return;
+
+            if (rosePlayer.changeChannel(currentChannel, this)) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                        "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            }
         }
     }
 

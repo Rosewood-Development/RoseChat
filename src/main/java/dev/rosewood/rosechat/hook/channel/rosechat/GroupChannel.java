@@ -40,16 +40,6 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public void forceJoin(UUID uuid) {
-        // No implementation
-    }
-
-    @Override
-    public void kick(UUID uuid) {
-        // No implementation
-    }
-
-    @Override
     public void send(RosePlayer sender, String message) {
         // Parses the first message synchronously
         // Allows for creating a token storage.

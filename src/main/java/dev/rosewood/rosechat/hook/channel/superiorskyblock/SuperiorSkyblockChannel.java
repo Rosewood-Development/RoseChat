@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -47,7 +48,6 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
     @EventHandler
     public void onTeamDisband(IslandDisbandEvent event) {
         for (SuperiorPlayer sPlayer : event.getIsland().getIslandMembers(true)) {
-            this.kick(sPlayer.getUniqueId());
             this.onTeamLeaveGeneric(sPlayer.getUniqueId());
         }
     }
@@ -55,14 +55,12 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
     // Team Kick
     @EventHandler
     public void onTeamKick(IslandKickEvent event) {
-        this.kick(event.getTarget().getUniqueId());
         this.onTeamLeaveGeneric(event.getTarget().getUniqueId());
     }
 
     // Team Leave
     @EventHandler
     public void onTeamLeave(IslandQuitEvent event) {
-        this.kick(event.getPlayer().getUniqueId());
         this.onTeamLeaveGeneric(event.getPlayer().getUniqueId());
     }
 
@@ -70,9 +68,17 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
     @EventHandler
     public void onTeamJoin(IslandJoinEvent event) {
         if (this.autoJoin) {
-            this.forceJoin(event.getPlayer().getUniqueId());
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer().asPlayer(),
-                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
+            if (player == null) return;
+
+            RosePlayer rosePlayer = new RosePlayer(player);
+            Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+            if (currentChannel == this) return;
+
+            if (rosePlayer.changeChannel(currentChannel, this)) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                        "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            }
         }
     }
 

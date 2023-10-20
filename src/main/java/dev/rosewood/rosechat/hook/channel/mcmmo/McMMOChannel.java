@@ -4,6 +4,7 @@ import com.gmail.nossr50.api.PartyAPI;
 import com.gmail.nossr50.events.party.McMMOPartyChangeEvent;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -39,18 +40,22 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
         switch (event.getReason()) {
             case DISBANDED_PARTY:
                 for (UUID member : PartyAPI.getMembersMap(event.getPlayer()).keySet()) {
-                    this.kick(member);
                     this.onTeamLeaveGeneric(member);
                 }
                 break;
             case KICKED_FROM_PARTY:
             case LEFT_PARTY:
-                this.kick(event.getPlayer().getUniqueId());
                 this.onTeamLeaveGeneric(event.getPlayer().getUniqueId());
                 break;
             case JOINED_PARTY:
                 if (this.autoJoin) {
-                    this.forceJoin(event.getPlayer().getUniqueId());
+                    Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
+                    if (player == null) return;
+
+                    RosePlayer rosePlayer = new RosePlayer(player);
+                    Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+                    if (currentChannel == this) return;
+
                     RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer(),
                             "command-channel-joined", StringPlaceholders.of("id", this.getId()));
                 }
