@@ -73,6 +73,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "rather than when they set their nickname."),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
+        CHAT_EVENT_PRIORITY("chat-settings.chat-event-priority", "LOW", "The event priority for the chat listener.",
+                "This may need to be changed if another plugin does something with chat.",
+                "Valid Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST"),
         ALLOW_BUNGEECORD_MESSAGES("chat-settings.allow-bungeecord-messages", true,
                 "Should players be allowed to message other players on connected servers?", "Requires BungeeCord"),
         BUNGEECORD_MESSAGE_TIMEOUT("chat-settings.bungeecord-message-timeout", 500,
