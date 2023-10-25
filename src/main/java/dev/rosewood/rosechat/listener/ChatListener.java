@@ -36,7 +36,12 @@ public class ChatListener implements Listener {
         RosePlayer sender = new RosePlayer(player);
         PlayerData data = sender.getPlayerData();
 
-        Channel channel = data.getCurrentChannel();
+        // Get the channel that the message should be sent to.
+        Channel channel = data.getActiveChannel();
+        if (channel == null) {
+            channel = data.getCurrentChannel();
+        }
+
         // If the player is somehow not in a channel, find the appropriate channel to put them in.
         if (channel == null) {
             channel = Channel.findNextChannel(player);
