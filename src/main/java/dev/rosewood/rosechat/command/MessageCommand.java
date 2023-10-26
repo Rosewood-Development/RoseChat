@@ -37,7 +37,7 @@ public class MessageCommand extends AbstractCommand {
         if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()
                 && this.getAPI().isBungee()) {
             this.getAPI().getBungeeManager().getPlayers("ALL");
-            if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
+            if (!this.getAPI().getBungeeManager().getBungeePlayers().get("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }
@@ -106,17 +106,14 @@ public class MessageCommand extends AbstractCommand {
     public List<String> onTabComplete(CommandSender sender, String[] args) {
         List<String> tab = new ArrayList<>();
 
-        // Get the players online before the sender starts typing a name.
-        this.getAPI().getBungeeManager().getPlayers("ALL");
-
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player != sender) tab.add(player.getName());
             }
 
             if (ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
-                if (this.getAPI().getPlayerDataManager().getBungeePlayers().containsKey("ALL")) {
-                    Collection<String> players = this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL");
+                if (this.getAPI().getBungeeManager().getBungeePlayers().containsKey("ALL")) {
+                    Collection<String> players = this.getAPI().getBungeeManager().getBungeePlayers().get("ALL");
                     for (String player : players) {
                         if (sender instanceof Player && sender.getName().equalsIgnoreCase(player)) continue;
                         tab.add(player);

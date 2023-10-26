@@ -1,10 +1,13 @@
 package dev.rosewood.rosechat.manager;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -23,11 +26,20 @@ import java.util.function.Consumer;
 
 public class BungeeManager extends Manager {
 
+    private final Multimap<String, String> bungeePlayers;
     private final List<String> checkPluginPlayers;
 
     public BungeeManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+        this.bungeePlayers = ArrayListMultimap.create();
         this.checkPluginPlayers = new ArrayList<>();
+
+        if (Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(rosePlugin, () -> {
+                this.bungeePlayers.get("ALL").clear();
+                this.getPlayers("ALL");
+            }, 0L, 20L * 5L);
+        }
     }
 
     @Override
@@ -78,7 +90,7 @@ public class BungeeManager extends Manager {
     }
 
     public void receivePlayers(String server, String[] players) {
-        RoseChatAPI.getInstance().getPlayerDataManager().getBungeePlayers().putAll(server, Arrays.asList(players));
+        this.bungeePlayers.putAll(server, Arrays.asList(players));
     }
 
     //
@@ -345,6 +357,10 @@ public class BungeeManager extends Manager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             RoseChatAPI.getInstance().deleteMessage(new RosePlayer(player), messageId);
         }
+    }
+
+    public Multimap<String, String> getBungeePlayers() {
+        return this.bungeePlayers;
     }
 
 }
