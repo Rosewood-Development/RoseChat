@@ -34,7 +34,7 @@ public class BungeeManager extends Manager {
         this.bungeePlayers = ArrayListMultimap.create();
         this.checkPluginPlayers = new ArrayList<>();
 
-        if (Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
+        if (RoseChatAPI.getInstance().isBungee() && Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(rosePlugin, () -> {
                 this.bungeePlayers.get("ALL").clear();
                 this.getPlayers("ALL");

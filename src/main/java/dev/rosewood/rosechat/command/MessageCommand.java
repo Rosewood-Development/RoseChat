@@ -1,8 +1,9 @@
 package dev.rosewood.rosechat.command;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
-import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -34,7 +35,7 @@ public class MessageCommand extends AbstractCommand {
 
         String target = args[0];
 
-        if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()
+        if (!target.equalsIgnoreCase("Console") && Bukkit.getPlayer(args[0]) == null && Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()
                 && this.getAPI().isBungee()) {
             this.getAPI().getBungeeManager().getPlayers("ALL");
             if (!this.getAPI().getBungeeManager().getBungeePlayers().get("ALL").contains(target)) {
@@ -111,7 +112,7 @@ public class MessageCommand extends AbstractCommand {
                 if (player != sender) tab.add(player.getName());
             }
 
-            if (ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
+            if (RoseChatAPI.getInstance().isBungee() && Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
                 if (this.getAPI().getBungeeManager().getBungeePlayers().containsKey("ALL")) {
                     Collection<String> players = this.getAPI().getBungeeManager().getBungeePlayers().get("ALL");
                     for (String player : players) {
