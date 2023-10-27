@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupNameEvent;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageLocation;
@@ -8,6 +9,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
@@ -45,6 +47,12 @@ public class RenameGroupCommand extends AbstractCommand {
             if (outputs.getWarning() != null) outputs.getWarning().send(rosePlayer);
             return;
         }
+
+        GroupNameEvent groupNameEvent = new GroupNameEvent(groupChat, name);
+        Bukkit.getPluginManager().callEvent(groupNameEvent);
+        if (groupNameEvent.isCancelled()) return;
+
+        name = groupNameEvent.getName();
 
         groupChat.setName(name);
         groupChat.save();

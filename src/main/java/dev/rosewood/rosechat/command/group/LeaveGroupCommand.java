@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -35,6 +36,10 @@ public class LeaveGroupCommand extends AbstractCommand {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-leave-own");
             return;
         }
+
+        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, player);
+        Bukkit.getPluginManager().callEvent(groupLeaveEvent);
+        if (groupLeaveEvent.isCancelled()) return;
 
         PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupJoinEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -90,6 +91,10 @@ public class AcceptGroupCommand extends AbstractCommand {
         }
 
         data.getGroupInvites().remove(groupChat);
+
+        GroupJoinEvent groupJoinEvent = new GroupJoinEvent(groupChat, player);
+        Bukkit.getPluginManager().callEvent(groupJoinEvent);
+        if (groupJoinEvent.isCancelled()) return;
 
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 

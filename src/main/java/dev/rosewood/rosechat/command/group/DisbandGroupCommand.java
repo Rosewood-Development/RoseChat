@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupDisbandEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
@@ -33,6 +34,10 @@ public class DisbandGroupCommand extends AbstractCommand {
                 return;
             }
 
+            GroupDisbandEvent groupDisbandEvent = new GroupDisbandEvent(groupChat);
+            Bukkit.getPluginManager().callEvent(groupDisbandEvent);
+            if (groupDisbandEvent.isCancelled()) return;
+
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
@@ -52,6 +57,10 @@ public class DisbandGroupCommand extends AbstractCommand {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "gc-does-not-exist");
                 return;
             }
+
+            GroupDisbandEvent groupDisbandEvent = new GroupDisbandEvent(groupChat);
+            Bukkit.getPluginManager().callEvent(groupDisbandEvent);
+            if (groupDisbandEvent.isCancelled()) return;
 
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
