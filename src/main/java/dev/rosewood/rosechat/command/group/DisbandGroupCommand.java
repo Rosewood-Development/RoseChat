@@ -62,15 +62,20 @@ public class DisbandGroupCommand extends AbstractCommand {
             Bukkit.getPluginManager().callEvent(groupDisbandEvent);
             if (groupDisbandEvent.isCancelled()) return;
 
+            List<UUID> toRemove = new ArrayList<>();
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     PlayerData data = this.getAPI().getPlayerData(uuid);
                     data.setCurrentChannel(Channel.findNextChannel(member));
-                    groupChat.removeMember(uuid);
+                    data.setActiveChannel(null);
+                    toRemove.add(uuid);
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
+
+            for (UUID uuid : toRemove)
+                groupChat.removeMember(uuid);
 
             this.getAPI().deleteGroupChat(groupChat);
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.of("name", groupChat.getName()));
