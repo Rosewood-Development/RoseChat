@@ -27,6 +27,7 @@ public class PlayerData {
     private boolean emojis;
     private boolean isCurrentChannelGroupChannel;
     private Channel currentChannel;
+    private Channel activeChannel;
     private String color;
     private String nickname;
     private final List<GroupChannel> groupInvites;
@@ -369,6 +370,21 @@ public class PlayerData {
      */
     public void setIsInGroupChannel(boolean isInGroupChannel) {
         this.isCurrentChannelGroupChannel = isInGroupChannel;
+    }
+
+    /**
+     * @return The channel that the next message should be sent to.
+     */
+    public Channel getActiveChannel() {
+        return this.activeChannel;
+    }
+
+    /**
+     * Updates the active channel, where the next message should go.
+     * @param activeChannel The channel that the next message should be sent to.
+     */
+    public void setActiveChannel(Channel activeChannel) {
+        this.activeChannel = activeChannel;
     }
 
 }

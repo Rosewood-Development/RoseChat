@@ -38,6 +38,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
+        RosePlayer rosePlayer = new RosePlayer(player);
 
         // Ensure group chats are loaded first.
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUniqueId(), (gcs) -> {
@@ -50,7 +51,7 @@ public class PlayerListener implements Listener {
                 // Place the player in the correct channel.
                 for (Channel channel : this.channelManager.getChannels().values()) {
                     if (channel.onLogin(player)) {
-                        playerData.setCurrentChannel(channel);
+                        rosePlayer.changeChannel(null, channel);
                         break;
                     }
                 }
@@ -58,19 +59,15 @@ public class PlayerListener implements Listener {
                 // If no channel was found, force put player in the default channel.
                 if (playerData.getCurrentChannel() == null) {
                     Channel defaultChannel = this.channelManager.getDefaultChannel();
-                    defaultChannel.onJoin(player);
-                    playerData.setCurrentChannel(defaultChannel);
+                    rosePlayer.changeChannel(null, defaultChannel);
                 } else {
                     Channel channel = playerData.getCurrentChannel();
-                    channel.onJoin(player);
+                    rosePlayer.changeChannel(null, channel);
                 }
-
-                playerData.save();
             }
 
             // Set the display name when the player logs in
             if (playerData.getNickname() != null) {
-                RosePlayer rosePlayer = new RosePlayer(player);
                 RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
                 MessageTokenizerResults<BaseComponent[]> components = message.parse(rosePlayer, playerData.getNickname());
                 player.setDisplayName(TextComponent.toLegacyText(components.content()));
@@ -106,6 +103,7 @@ public class PlayerListener implements Listener {
     public void onWorldChange(PlayerChangedWorldEvent event) {
         RoseChatAPI api = RoseChatAPI.getInstance();
         Player player = event.getPlayer();
+        RosePlayer rosePlayer = new RosePlayer(player);
         api.getPlayerDataManager().getPlayerData(player.getUniqueId(), (playerData -> {
             World world = player.getWorld();
             Channel currentChannel = playerData.getCurrentChannel();
@@ -119,24 +117,20 @@ public class PlayerListener implements Listener {
             for (Channel channel : api.getChannels()) {
                 // If the player can join a channel, join.
                 if (channel.onWorldJoin(player, event.getFrom(), event.getPlayer().getWorld())) {
-                    currentChannel.onLeave(player);
-                    channel.onJoin(player);
-                    playerData.setCurrentChannel(channel);
-                    api.getLocaleManager().sendMessage(player, "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+                    if (rosePlayer.changeChannel(currentChannel, channel)) {
+                        api.getLocaleManager().sendMessage(player, "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
 
-                    joinedWorld = true;
+                        joinedWorld = true;
+                    }
+
                     break;
                 }
             }
 
             // If the player left a world channel and did not find an appropriate channel
             if (leftWorld && !joinedWorld) {
-                currentChannel.onLeave(player);
-
-                // Force join the default channel as there is no other option
                 Channel defaultChannel = api.getChannelManager().getDefaultChannel();
-                defaultChannel.onJoin(player);
-                playerData.setCurrentChannel(defaultChannel);
+                rosePlayer.changeChannel(currentChannel, defaultChannel);
             }
 
             playerData.save();

@@ -12,6 +12,7 @@ import com.google.common.cache.CacheBuilder;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -52,6 +53,8 @@ public class PacketListener {
 
             @Override
             public void onPacketSending(PacketEvent event) {
+                if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean()) return;
+
                 if (event.getPacketType() == PacketType.Play.Server.CHAT) {
                     Player player = event.getPlayer();
                     PlayerData playerData = this.api.getPlayerData(player.getUniqueId());

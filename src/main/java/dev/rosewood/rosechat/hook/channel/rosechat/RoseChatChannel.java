@@ -3,8 +3,8 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.PostParseMessageEvent;
-import dev.rosewood.rosechat.api.event.PreParseMessageEvent;
+import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
+import dev.rosewood.rosechat.api.event.message.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
@@ -73,11 +73,12 @@ public class RoseChatChannel extends ConditionalChannel {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
 
-        Channel newChannel = Channel.findNextChannel(player);
-        newChannel.forceJoin(uuid);
+        RosePlayer rosePlayer = new RosePlayer(player);
+        Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+        if (currentChannel != this) return;
 
-        RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
-                "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+        Channel newChannel = Channel.findNextChannel(player);
+        rosePlayer.changeChannel(currentChannel, newChannel);
     }
 
     @Override

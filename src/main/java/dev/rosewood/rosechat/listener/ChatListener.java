@@ -1,9 +1,11 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.RosePlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,7 +14,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
 
@@ -34,7 +36,23 @@ public class ChatListener implements Listener {
         RosePlayer sender = new RosePlayer(player);
         PlayerData data = sender.getPlayerData();
 
-        Channel channel = data.getCurrentChannel();
+        // Get the channel that the message should be sent to.
+        Channel channel = data.getActiveChannel();
+        if (channel == null) {
+            channel = data.getCurrentChannel();
+        }
+
+        // If the player is somehow not in a channel, find the appropriate channel to put them in.
+        if (channel == null) {
+            channel = Channel.findNextChannel(player);
+
+            ChannelChangeEvent channelChangeEvent = new ChannelChangeEvent(null, channel, player);
+            Bukkit.getPluginManager().callEvent(channelChangeEvent);
+            // This event is not cancellable as the player has to be in a channel to send a message.
+
+            sender.changeChannel(null, channel);
+        }
+
         api.sendToChannel(player, message, channel, true);
     }
 

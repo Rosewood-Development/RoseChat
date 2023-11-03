@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.command.CustomCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -200,18 +201,23 @@ public class ChannelManager extends Manager {
      */
     public void updatePlayerRegions() {
         for (Player player : Bukkit.getOnlinePlayers()) {
+            RosePlayer rosePlayer = new RosePlayer(player);
 
             for (WorldGuardChannel channel : this.getWorldGuardChannels()) {
                 // If the player is in the channel and not in the region, then kick them from the channel.
                 if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(player)) {
-                    channel.kick(player.getUniqueId());
+                    Channel newChannel = Channel.findNextChannel(player);
+                    rosePlayer.changeChannel(channel, newChannel);
                     break;
                 }
 
                 if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(player)) {
-                    channel.forceJoin(player.getUniqueId());
-                    this.localeManager.sendMessage(player,
-                            "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+                    Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+                    if (rosePlayer.changeChannel(currentChannel, channel)) {
+                        this.localeManager.sendMessage(player,
+                                "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+                    }
+
                     break;
                 }
             }

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -57,6 +58,14 @@ public class NicknameCommand extends AbstractCommand {
 
         if ((args.length == 1 && (args[0].equalsIgnoreCase("off")) || (args.length == 2 && (args[1].equals("off"))) || target == sender)) {
             Player player = target == null ? (Player) sender : target;
+
+            nickname = null;
+            PlayerNicknameEvent playerNicknameEvent = new PlayerNicknameEvent(player, nickname);
+            Bukkit.getPluginManager().callEvent(playerNicknameEvent);
+            if (playerNicknameEvent.isCancelled()) return;
+
+            nickname = playerNicknameEvent.getNickname();
+
             PlayerData data = this.getAPI().getPlayerData(player.getUniqueId());
             data.setNickname(null);
             player.setDisplayName(null);
@@ -90,6 +99,12 @@ public class NicknameCommand extends AbstractCommand {
                 nickname = getAllArgs(1, args);
             }
         }
+
+        PlayerNicknameEvent playerNicknameEvent = new PlayerNicknameEvent(target, nickname);
+        Bukkit.getPluginManager().callEvent(playerNicknameEvent);
+        if (playerNicknameEvent.isCancelled()) return;
+
+        nickname = playerNicknameEvent.getNickname();
 
         // Ignore shader colours in the nickname.
         if (nickname.contains("#")) {

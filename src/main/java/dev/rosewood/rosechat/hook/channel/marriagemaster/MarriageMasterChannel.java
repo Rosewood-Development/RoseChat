@@ -6,6 +6,7 @@ import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriageMasterPlugin;
 import at.pcgamingfreaks.MarriageMaster.Bukkit.API.MarriagePlayer;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -40,12 +41,10 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onTeamLeave(DivorcedEvent event) {
         if (!event.getPlayer1().isMarried()) {
-            this.kick(event.getPlayer1().getUUID());
             this.onTeamLeaveGeneric(event.getPlayer1().getUUID());
         }
 
         if (!event.getPlayer2().isMarried()) {
-            this.kick(event.getPlayer2().getUUID());
             this.onTeamLeaveGeneric(event.getPlayer2().getUUID());
         }
     }
@@ -53,12 +52,31 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
     @EventHandler
     public void onTeamJoin(MarriedEvent event) {
         if (this.autoJoin) {
-            this.forceJoin(event.getPlayer1().getUUID());
-            this.forceJoin(event.getPlayer2().getUUID());
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer1().getPlayerOnline(),
-                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
-            RoseChatAPI.getInstance().getLocaleManager().sendMessage(event.getPlayer2().getPlayerOnline(),
-                    "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            // Player 1
+            Player player = Bukkit.getPlayer(event.getPlayer1().getUUID());
+            if (player == null) return;
+
+            RosePlayer rosePlayer = new RosePlayer(player);
+            Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+            if (currentChannel == this) return;
+
+            if (rosePlayer.changeChannel(currentChannel, this)) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                        "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            }
+
+            // Player 2
+            player = Bukkit.getPlayer(event.getPlayer2().getUUID());
+            if (player == null) return;
+
+            rosePlayer = new RosePlayer(player);
+            currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
+            if (currentChannel == this) return;
+
+            if (rosePlayer.changeChannel(currentChannel, this)) {
+                RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
+                        "command-channel-joined", StringPlaceholders.of("id", this.getId()));
+            }
         }
     }
 

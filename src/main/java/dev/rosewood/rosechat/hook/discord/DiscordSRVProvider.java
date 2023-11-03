@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.message.discord.PostParseDiscordMessageEvent;
+import dev.rosewood.rosechat.api.event.message.discord.PreParseDiscordMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
@@ -49,6 +51,11 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
         if (textChannel == null) return;
 
+        PreParseDiscordMessageEvent preParseDiscordMessageEvent = new PreParseDiscordMessageEvent(roseMessage, textChannel);
+        Bukkit.getPluginManager().callEvent(preParseDiscordMessageEvent);
+
+        if (preParseDiscordMessageEvent.isCancelled()) return;
+
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
         DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholder();
         if (embedPlaceholder != null) {
@@ -64,6 +71,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).content();
 
             if (text == null) return;
+
+            PostParseDiscordMessageEvent postParseDiscordMessageEvent = new PostParseDiscordMessageEvent(roseMessage, textChannel, text);
+            Bukkit.getPluginManager().callEvent(postParseDiscordMessageEvent);
+
+            if (postParseDiscordMessageEvent.isCancelled()) return;
+
+            text = postParseDiscordMessageEvent.getOutput();
+
             if (Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) {
                 this.discord.processChatMessage(roseMessage.getSender().asPlayer(), this.emojiManager.formatUnicode(text), channel, false);
             } else {
@@ -92,6 +107,17 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         if (description != null)
             description = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).content();
+
+        PostParseDiscordMessageEvent postParseDiscordMessageEvent = new PostParseDiscordMessageEvent(roseMessage, channel,
+                title != null && title.contains("{message}") ? title : description);
+        Bukkit.getPluginManager().callEvent(postParseDiscordMessageEvent);
+
+        if (postParseDiscordMessageEvent.isCancelled()) return;
+        if (title != null && title.contains("{message}")) {
+            title = postParseDiscordMessageEvent.getOutput();
+        } else {
+            description = postParseDiscordMessageEvent.getOutput();
+        }
 
         // URL
         placeholderCondition = embedPlaceholder.get("url");

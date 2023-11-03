@@ -1,7 +1,9 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
@@ -290,8 +292,19 @@ public class RosePlayer {
         return this.player != null ? this.api.getPlayerData(this.player.getUniqueId()) : null;
     }
 
-    public boolean isDiscordUser() {
-        return this.isDiscordUser;
+    public boolean changeChannel(Channel oldChannel, Channel channel) {
+        if (!this.isPlayer()) return false;
+
+        ChannelChangeEvent channelChangeEvent = new ChannelChangeEvent(oldChannel, channel, this.asPlayer());
+        Bukkit.getPluginManager().callEvent(channelChangeEvent);
+        if (channelChangeEvent.isCancelled()) return false;
+
+        if (oldChannel != null) oldChannel.onLeave(this.asPlayer());
+        channel.onJoin(this.asPlayer());
+        this.getPlayerData().setActiveChannel(channel);
+        this.getPlayerData().setCurrentChannel(channel);
+        this.getPlayerData().save();
+        return true;
     }
 
 }

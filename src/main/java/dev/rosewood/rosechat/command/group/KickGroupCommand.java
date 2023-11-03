@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -42,6 +43,10 @@ public class KickGroupCommand extends AbstractCommand {
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-kick-invalid-player");
             return;
         }
+
+        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, target);
+        Bukkit.getPluginManager().callEvent(groupLeaveEvent);
+        if (groupLeaveEvent.isCancelled()) return;
 
         PlayerData data = this.getAPI().getPlayerData(target.getUniqueId());
         String name = data.getNickname() == null ? target.getName() : data.getNickname();

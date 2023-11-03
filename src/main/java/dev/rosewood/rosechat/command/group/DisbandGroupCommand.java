@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
+import dev.rosewood.rosechat.api.event.group.GroupDisbandEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
@@ -33,6 +34,10 @@ public class DisbandGroupCommand extends AbstractCommand {
                 return;
             }
 
+            GroupDisbandEvent groupDisbandEvent = new GroupDisbandEvent(groupChat);
+            Bukkit.getPluginManager().callEvent(groupDisbandEvent);
+            if (groupDisbandEvent.isCancelled()) return;
+
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
@@ -53,15 +58,24 @@ public class DisbandGroupCommand extends AbstractCommand {
                 return;
             }
 
+            GroupDisbandEvent groupDisbandEvent = new GroupDisbandEvent(groupChat);
+            Bukkit.getPluginManager().callEvent(groupDisbandEvent);
+            if (groupDisbandEvent.isCancelled()) return;
+
+            List<UUID> toRemove = new ArrayList<>();
             for (UUID uuid : groupChat.getMembers()) {
                 Player member = Bukkit.getPlayer(uuid);
                 if (member != null) {
                     PlayerData data = this.getAPI().getPlayerData(uuid);
                     data.setCurrentChannel(Channel.findNextChannel(member));
-                    groupChat.removeMember(uuid);
+                    data.setActiveChannel(null);
+                    toRemove.add(uuid);
                     this.getAPI().getLocaleManager().sendComponentMessage(member, "command-gc-disband-success", StringPlaceholders.of("name", groupChat.getName()));
                 }
             }
+
+            for (UUID uuid : toRemove)
+                groupChat.removeMember(uuid);
 
             this.getAPI().deleteGroupChat(groupChat);
             this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-gc-disband-admin", StringPlaceholders.of("name", groupChat.getName()));

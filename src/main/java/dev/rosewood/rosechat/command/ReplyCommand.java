@@ -37,7 +37,7 @@ public class ReplyCommand extends AbstractCommand {
         }
 
         if (!target.equalsIgnoreCase("Console") && ConfigurationManager.Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean() && this.getAPI().isBungee()) {
-            if (!this.getAPI().getPlayerDataManager().getPlayersOnServer("ALL").contains(target)) {
+            if (!this.getAPI().getBungeeManager().getBungeePlayers().get("ALL").contains(target)) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "player-not-found");
                 return;
             }

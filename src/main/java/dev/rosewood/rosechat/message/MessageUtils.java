@@ -2,6 +2,8 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
+import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -238,10 +240,16 @@ public class MessageUtils {
             });
         }
 
+        PlayerSendMessageEvent playerSendMessageEvent = new PlayerSendMessageEvent(sender, messageTarget, roseMessage);
+        Bukkit.getPluginManager().callEvent(playerSendMessageEvent);
+        if (playerSendMessageEvent.isCancelled()) return;
+
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SENT_FORMAT.getString()).content();
-            BaseComponent[] parsedReceivedMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString()).content();
+
+            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
+            BaseComponent[] parsedReceivedMessage = receivedMessageOutput.content();
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
@@ -263,6 +271,12 @@ public class MessageUtils {
             } else {
                 // The sender should receive the message first.
                 sender.send(parsedSentMessage);
+
+                PlayerReceiveMessageEvent playerReceiveMessageEvent = new PlayerReceiveMessageEvent(sender, messageTarget, roseMessage, receivedMessageOutput);
+                Bukkit.getPluginManager().callEvent(playerReceiveMessageEvent);
+                if (playerReceiveMessageEvent.isCancelled()) return;
+
+                parsedReceivedMessage = playerReceiveMessageEvent.getMessageComponents().content();
 
                 // If the target is online, send the message.
                 messageTarget.send(parsedReceivedMessage);

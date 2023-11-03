@@ -21,14 +21,12 @@ public class PlayerDataManager extends Manager {
 
     private final DataManager dataManager;
     private final Map<UUID, PlayerData> playerData;
-    private final Multimap<String, String> bungeePlayers;
     private final List<Channel> mutedChannels;
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         this.playerData = new HashMap<>();
         this.dataManager = rosePlugin.getManager(DataManager.class);
-        this.bungeePlayers = ArrayListMultimap.create();
         this.mutedChannels = new ArrayList<>();
 
         // Need to make sure this always gets loaded before the PlayerDataManager
@@ -178,14 +176,6 @@ public class PlayerDataManager extends Manager {
         }
 
         return spies;
-    }
-
-    public Multimap<String, String> getBungeePlayers() {
-        return this.bungeePlayers;
-    }
-
-    public Collection<String> getPlayersOnServer(String server) {
-        return this.bungeePlayers.get(server);
     }
 
 }

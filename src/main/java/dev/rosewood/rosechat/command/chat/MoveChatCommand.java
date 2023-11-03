@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.chat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -40,10 +41,10 @@ public class MoveChatCommand extends AbstractCommand {
         Channel oldChannel = this.getAPI().getPlayerData(player.getUniqueId()).getCurrentChannel();
         Channel channel = this.getAPI().getChannelById(channelStr);
 
-        oldChannel.onLeave(player);
-        channel.onJoin(player);
-        data.setCurrentChannel(channel);
-        data.save();
+        RosePlayer rosePlayer = new RosePlayer(player);
+        if (!rosePlayer.changeChannel(oldChannel, channel)) {
+            return;
+        }
 
         String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
 

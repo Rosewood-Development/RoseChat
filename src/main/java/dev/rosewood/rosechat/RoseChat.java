@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.example.HeldItemTokenizer;
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
@@ -65,6 +66,7 @@ import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.*;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -80,6 +82,9 @@ import github.scarsz.discordsrv.DiscordSRV;
 import java.util.concurrent.Executors;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.Arrays;
@@ -93,6 +98,7 @@ public class RoseChat extends RosePlugin {
     private SeniorCommandManager commandManager;
     private Permission vault;
     private DiscordChatProvider discord;
+    private ChatListener chatListener;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
@@ -167,13 +173,36 @@ public class RoseChat extends RosePlugin {
                 .addSubcommand(new HelpCommand(this));
 
         // Register Listeners
-        pluginManager.registerEvents(new ChatListener(), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener(this));
 
         new HeldItemTokenizer();
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        try {
+            EventPriority priority = EventPriority.valueOf(Setting.CHAT_EVENT_PRIORITY.getString());
+            if (this.chatListener != null) {
+                HandlerList.unregisterAll(this.chatListener);
+            } else {
+                this.chatListener = new ChatListener();
+            }
+
+            Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, priority, (listener, event) -> {
+                if (event instanceof AsyncPlayerChatEvent chatEvent) {
+                    this.chatListener = (ChatListener) listener;
+                    this.chatListener.onChat(chatEvent);
+                }
+            }, this, true);
+        } catch (IllegalArgumentException e) {
+            LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                    "&eThe chat-event-priority is not a valid EventPriority");
+        }
     }
 
     @Override

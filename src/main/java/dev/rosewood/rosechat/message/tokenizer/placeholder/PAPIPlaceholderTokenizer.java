@@ -52,31 +52,44 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         if (Objects.equals(content, originalContent))
             return new TokenizerResult(Token.text(content), originalContent.length());
 
-        // Encapsulate if the placeholder only contains a colour
+        // Encapsulate if the placeholder only contains a colour or ends with a colour
         boolean encapsulate = true;
 
         // Ignore everything that definitely isn't a colour.
-        if (content.startsWith(ChatColor.COLOR_CHAR + "") || content.startsWith("&") || content.startsWith("#") || content.startsWith("<") || !content.startsWith("{")) {
+        if (content.contains(ChatColor.COLOR_CHAR + "") || content.contains("&") || content.contains("#") || content.contains("<") || content.contains("{")) {
             Matcher legacyMatcher = MessageUtils.VALID_LEGACY_REGEX_COMBINED.matcher(content);
-            if (legacyMatcher.find() && content.equalsIgnoreCase(legacyMatcher.group()))
-                encapsulate = false;
+
+            while (legacyMatcher.find()) {
+                if (content.trim().equalsIgnoreCase(legacyMatcher.group()) || content.trim().endsWith(legacyMatcher.group())) {
+                    encapsulate = false;
+                }
+            }
 
             if (encapsulate) {
                 Matcher hexMatcher = MessageUtils.SPIGOT_HEX_REGEX_COMBINED.matcher(content);
-                if (hexMatcher.find() && content.equalsIgnoreCase(hexMatcher.group()))
-                    encapsulate = false;
+                while (hexMatcher.find()) {
+                    if (content.trim().equalsIgnoreCase(hexMatcher.group()) || content.trim().endsWith(hexMatcher.group())) {
+                        encapsulate = false;
+                    }
+                }
             }
 
             if (encapsulate) {
                 Matcher gradientMatcher = MessageUtils.GRADIENT_PATTERN.matcher(content);
-                if (gradientMatcher.find() && content.equalsIgnoreCase(gradientMatcher.group()))
-                    encapsulate = false;
+                while (gradientMatcher.find()) {
+                    if (content.trim().equalsIgnoreCase(gradientMatcher.group()) || content.trim().endsWith(gradientMatcher.group())) {
+                        encapsulate = false;
+                    }
+                }
             }
 
             if (encapsulate) {
                 Matcher rainbowMatcher = MessageUtils.RAINBOW_PATTERN.matcher(content);
-                if (rainbowMatcher.find() && content.equalsIgnoreCase(rainbowMatcher.group()))
-                    encapsulate = false;
+                while (rainbowMatcher.find()) {
+                    if (content.trim().equals(rainbowMatcher.group()) || content.trim().endsWith(rainbowMatcher.group())) {
+                        encapsulate = false;
+                    }
+                }
             }
         }
 

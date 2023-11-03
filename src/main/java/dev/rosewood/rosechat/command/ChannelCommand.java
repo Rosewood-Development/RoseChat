@@ -1,15 +1,16 @@
 package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ChannelCommand extends AbstractCommand {
@@ -34,8 +35,18 @@ public class ChannelCommand extends AbstractCommand {
             }
 
             String message = getAllArgs(1, args);
+
             RosePlayer rosePlayer = new RosePlayer(sender);
-            channel.send(rosePlayer, message);
+            if (sender instanceof Player player) {
+                rosePlayer.getPlayerData().setActiveChannel(channel);
+
+                AsyncPlayerChatEvent asyncPlayerChatEvent = new AsyncPlayerChatEvent(!Bukkit.isPrimaryThread(), player, message, Collections.emptySet());
+                Bukkit.getPluginManager().callEvent(asyncPlayerChatEvent);
+
+                rosePlayer.getPlayerData().setActiveChannel(null);
+            } else {
+                channel.send(rosePlayer, message);
+            }
         }
     }
 
@@ -65,8 +76,7 @@ public class ChannelCommand extends AbstractCommand {
     public static boolean processChannelSwitch(CommandSender sender, String channel) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player player) {
             Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
             Channel newChannel = api.getChannelById(channel);
 
@@ -85,13 +95,11 @@ public class ChannelCommand extends AbstractCommand {
                 return true;
             }
 
-            oldChannel.onLeave(player);
-            newChannel.onJoin(player);
-
-            PlayerData playerData = api.getPlayerData(player.getUniqueId());
-            playerData.setCurrentChannel(newChannel);
-            playerData.setIsInGroupChannel(false);
-            playerData.save();
+            RosePlayer rosePlayer = new RosePlayer(player);
+            rosePlayer.getPlayerData().setIsInGroupChannel(false);
+            if (!rosePlayer.changeChannel(oldChannel, newChannel)) {
+                return true;
+            }
 
             api.getLocaleManager().sendMessage(sender, "command-channel-joined", StringPlaceholders.of("id", newChannel.getId()));
             return true;

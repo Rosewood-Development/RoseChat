@@ -50,7 +50,7 @@ player:
     default: "/msg %player_name% "
 
 # This custom placeholder is the last one used before the {message} placeholder.
-# This means that the last color in this custom placeholder will be the default colour of the message.
+# This means that the last color in this custom placeholder will be the default color of the message.
 separator:
   text:
     default: " &e» &f"

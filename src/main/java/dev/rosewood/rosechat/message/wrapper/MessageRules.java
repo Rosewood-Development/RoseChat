@@ -1,12 +1,14 @@
 package dev.rosewood.rosechat.message.wrapper;
 
+import dev.rosewood.rosechat.api.event.message.MessageBlockedEvent;
+import dev.rosewood.rosechat.api.event.message.MessageFilteredEvent;
 import dev.rosewood.rosechat.chat.FilterWarning;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
@@ -97,7 +99,7 @@ public class MessageRules {
             return;
         }
 
-        outputs.setBlocked();
+        outputs.setBlocked(true);
     }
 
     private void filterSpam(RoseMessage message, RuleOutputs outputs) {
@@ -108,7 +110,7 @@ public class MessageRules {
         if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(outputs.getFilteredMessage())) return;
         if (Setting.WARN_ON_SPAM_SENT.getBoolean()) outputs.setWarning(FilterWarning.SPAM);
 
-        outputs.setBlocked();
+        outputs.setBlocked(true);
     }
 
     private void filterURLs(RoseMessage message, RuleOutputs outputs) {
@@ -127,7 +129,7 @@ public class MessageRules {
         if (Setting.WARN_ON_URL_SENT.getBoolean()) outputs.setWarning(FilterWarning.URL);
 
         if (!Setting.URL_CENSORING_ENABLED.getBoolean())
-            outputs.setBlocked();
+            outputs.setBlocked(true);
     }
 
     private void filterLanguage(RoseMessage message, RuleOutputs outputs) {
@@ -140,7 +142,7 @@ public class MessageRules {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
                     if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) outputs.setWarning(FilterWarning.SWEAR);
-                    outputs.setBlocked();
+                    outputs.setBlocked(true);
                     return;
                 }
             }
@@ -170,6 +172,17 @@ public class MessageRules {
         if (this.filterCaps) this.filterCaps(message, outputs);
         if (this.filterURLs) this.filterURLs(message, outputs);
         if (this.filterLanguage) this.filterLanguage(message, outputs);
+
+        if (outputs.blocked) {
+            MessageBlockedEvent messageBlockedEvent = new MessageBlockedEvent(message, originalMessage, outputs);
+            Bukkit.getPluginManager().callEvent(messageBlockedEvent);
+        }
+
+        if (!outputs.getFilteredMessage().equals(originalMessage)) {
+            MessageFilteredEvent messageFilteredEvent = new MessageFilteredEvent(message, originalMessage, outputs);
+            Bukkit.getPluginManager().callEvent(messageFilteredEvent);
+        }
+
         return outputs;
     }
 
@@ -198,8 +211,8 @@ public class MessageRules {
             return this.blocked;
         }
 
-        public void setBlocked() {
-            this.blocked = true;
+        public void setBlocked(boolean blocked) {
+            this.blocked = blocked;
         }
 
         public FilterWarning getWarning() {
