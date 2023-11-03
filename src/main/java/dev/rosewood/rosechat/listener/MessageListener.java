@@ -17,6 +17,7 @@ public class MessageListener implements Listener {
 
     @EventHandler
     public void onPostParseMessage(PostParseMessageEvent event) {
+        if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean()) return;
         if (event.getMessageDirection() == MessageDirection.TO_DISCORD || event.getMessageDirection() == MessageDirection.TO_BUNGEE_SERVER) return;
         if (event.getViewer().isConsole()) return;
 

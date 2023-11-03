@@ -55,6 +55,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         SWEAR_REPLACEMENTS("moderation-settings.swear-replacements", Arrays.asList("fuck:f***", "ass:butt"),
                 "If a player sends a message that contains one of these words, then the word will be replaced.",
                 "Note: This does not affect words like 'assassin'.", "Format: 'contains:replaced'"),
+        ENABLE_DELETING_MESSAGES("moderation-settings.enable-deleting-messages", true,
+                "Should deleting messages be enabled?", "Requires ProtocolLib"),
 
         NICKNAME_SETTINGS("nickname-settings", null, "Nickname Settings"),
         MINIMUM_NICKNAME_LENGTH("nickname-settings.minimum-nickname-length", 3,
