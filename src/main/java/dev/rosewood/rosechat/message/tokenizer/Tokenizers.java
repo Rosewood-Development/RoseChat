@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.message.tokenizer.character.CharacterTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.discord.ToDiscordURLTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.FromDiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.ToDiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownCodeTokenizer;
@@ -32,6 +33,7 @@ import java.util.List;
 
 public class Tokenizers {
 
+    public static final Tokenizer TO_DISCORD_URL = new ToDiscordURLTokenizer();
     public static final Tokenizer TO_DISCORD_SPOILER = new ToDiscordSpoilerTokenizer();
     public static final Tokenizer FROM_DISCORD_SPOILER = new FromDiscordSpoilerTokenizer();
     public static final Tokenizer DISCORD_EMOJI = new DiscordEmojiTokenizer();
@@ -111,6 +113,7 @@ public class Tokenizers {
             MARKDOWN_CODE,
             MARKDOWN_BLOCK_QUOTE);
     public static final TokenizerBundle TO_DISCORD_BUNDLE = new TokenizerBundle("to_discord",
+            TO_DISCORD_URL,
             TO_DISCORD_SPOILER,
             TO_DISCORD_TAG,
             TO_DISCORD_CHANNEL,
