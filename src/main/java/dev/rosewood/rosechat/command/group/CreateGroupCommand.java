@@ -56,7 +56,7 @@ public class CreateGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupPreCreateEvent groupPreCreateEvent = new GroupPreCreateEvent(player, name);
+        GroupPreCreateEvent groupPreCreateEvent = new GroupPreCreateEvent(player, id, name);
         Bukkit.getPluginManager().callEvent(groupPreCreateEvent);
         if (groupPreCreateEvent.isCancelled()) return;
 
