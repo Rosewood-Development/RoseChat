@@ -125,7 +125,7 @@ public class PacketListener {
                         messageJson = getMessageReflectively(packet);
                     }
 
-                    if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
+                    if (messageJson == null || messageJson.isEmpty() || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
 
                     // Ensures chat messages are added separately, to differentiate between client and server messages.
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;

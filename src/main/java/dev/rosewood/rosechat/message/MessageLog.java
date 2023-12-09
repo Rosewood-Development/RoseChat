@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -10,13 +11,13 @@ public class MessageLog {
 
     private UUID owner;
     private List<String> messages;
-    private final LinkedList<DeletableMessage> deletableMessages;
+    private final List<DeletableMessage> deletableMessages;
     private int cleanupAmount;
 
     public MessageLog(UUID sender) {
         this.owner = sender;
         this.messages = new ArrayList<>();
-        this.deletableMessages = new LinkedList<>();
+        this.deletableMessages = Collections.synchronizedList(new LinkedList<>());
     }
 
     public MessageLog(UUID sender, boolean doCleanup) {
