@@ -43,6 +43,13 @@ public class BungeeListener implements PluginMessageListener {
 
             switch (command) {
                 case "channel_message" -> {
+                    long timestamp = data.readLong();
+                    long currentTime = System.currentTimeMillis();
+
+                    // Discard all messages sent a long time ago.
+                    if (timestamp + 2000 < currentTime)
+                        return;
+
                     String rcChannel = data.readUTF();
                     String sender = data.readUTF();
                     String uuidStr = data.readUTF();
