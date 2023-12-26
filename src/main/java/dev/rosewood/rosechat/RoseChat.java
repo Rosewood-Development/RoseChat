@@ -240,16 +240,17 @@ public class RoseChat extends RosePlugin {
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
         else new RoseChatPlaceholderExpansion().register();
 
-        if (pluginManager.getPlugin("DiscordSRV") != null) {
-            Bukkit.getScheduler().runTaskLater(this, () -> {
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (pluginManager.isPluginEnabled("DiscordSRV")) {
                 this.discord = new DiscordSRVProvider();
                 DiscordSRVListener discordListener = new DiscordSRVListener();
                 DiscordSRV.api.subscribe(discordListener);
                 DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
-            }, 60L);
-        }
+            }
+        }, 60L);
 
-        if (pluginManager.getPlugin("ProtocolLib") != null && NMSUtil.getVersionNumber() >= 17) {
+        if (pluginManager.isPluginEnabled("ProtocolLib") && NMSUtil.getVersionNumber() >= 17) {
             new PacketListener(this);
             pluginManager.registerEvents(new MessageListener(), this);
         }
