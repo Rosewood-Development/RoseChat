@@ -92,8 +92,7 @@ public class MessageGroupCommand extends AbstractCommand {
     public static boolean processChannelSwitch(CommandSender sender, String group) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player player) {
             Channel oldChannel = api.getPlayerData(player.getUniqueId()).getCurrentChannel();
             GroupChannel newChannel = api.getGroupChatById(group);
 
@@ -107,11 +106,10 @@ public class MessageGroupCommand extends AbstractCommand {
                 return true;
             }
 
-            oldChannel.onLeave(player);
-            // Don't join the channel if it is a group channel, as the player is already in it.
+            RosePlayer rosePlayer = new RosePlayer(player);
+            rosePlayer.changeChannel(oldChannel, newChannel);
 
             PlayerData playerData = api.getPlayerData(player.getUniqueId());
-            playerData.setCurrentChannel(newChannel);
             playerData.setIsInGroupChannel(true);
             playerData.save();
 
