@@ -30,6 +30,7 @@ public abstract class Channel {
     private List<String> commands;
     private List<String> overrideCommands;
     private List<String> shoutCommands;
+    private boolean sendBungeeMessagesToDiscord;
 
     public Channel(ChannelProvider provider) {
         this.members = new ArrayList<>();
@@ -50,6 +51,7 @@ public abstract class Channel {
         if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
         if (config.contains("override-commands")) this.setOverrideCommands(config.getStringList("override-commands"));
         if (config.contains("shout-commands")) this.setShoutCommands(config.getStringList("shout-commands"));
+        if (config.contains("send-bungee-messages-to-discord")) this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
     }
 
     /**
@@ -272,6 +274,14 @@ public abstract class Channel {
 
     public void setShoutCommands(List<String> shoutCommands) {
         this.shoutCommands = shoutCommands;
+    }
+
+    public boolean shouldSendBungeeMessagesToDiscord() {
+        return this.sendBungeeMessagesToDiscord;
+    }
+
+    public void setShouldSendBungeeMessagesToDiscord(boolean sendBungeeMessagesToDiscord) {
+        this.sendBungeeMessagesToDiscord = sendBungeeMessagesToDiscord;
     }
 
     /**

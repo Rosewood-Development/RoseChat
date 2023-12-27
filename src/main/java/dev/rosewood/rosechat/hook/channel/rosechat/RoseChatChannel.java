@@ -261,6 +261,10 @@ public class RoseChatChannel extends ConditionalChannel {
     private void sendToDiscord(RoseMessage message, MessageDirection direction) {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
+        // Don't send the message to discord if the setting is disabled and the message comes from another server.
+        if (!this.shouldSendBungeeMessagesToDiscord() && direction == MessageDirection.FROM_BUNGEE_SERVER)
+            return;
+
         // Send the message to discord, if not sent from discord.
         // Json messages are unsupported
         if (direction != MessageDirection.FROM_DISCORD && direction != MessageDirection.FROM_BUNGEE_RAW) {
