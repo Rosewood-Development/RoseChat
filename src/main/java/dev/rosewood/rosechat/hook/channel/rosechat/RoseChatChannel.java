@@ -440,6 +440,11 @@ public class RoseChatChannel extends ConditionalChannel {
 
     @Override
     public void send(RosePlayer sender, String message) {
+        this.send(sender, message, this.getFormat());
+    }
+
+    @Override
+    public void send(RosePlayer sender, String message, String format) {
         RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
 
         // Create the rules for this message.
@@ -456,7 +461,7 @@ public class RoseChatChannel extends ConditionalChannel {
         roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // Send the message to the members.
-        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, this.getFormat(), null, rules);
+        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, format, null, rules);
     }
 
     @Override

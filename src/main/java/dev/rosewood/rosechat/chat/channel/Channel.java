@@ -30,6 +30,7 @@ public abstract class Channel {
     private List<String> commands;
     private List<String> overrideCommands;
     private List<String> shoutCommands;
+    private String shoutFormat;
     private boolean sendBungeeMessagesToDiscord;
 
     public Channel(ChannelProvider provider) {
@@ -52,6 +53,7 @@ public abstract class Channel {
         if (config.contains("override-commands")) this.setOverrideCommands(config.getStringList("override-commands"));
         if (config.contains("shout-commands")) this.setShoutCommands(config.getStringList("shout-commands"));
         if (config.contains("send-bungee-messages-to-discord")) this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
+        if (config.contains("shout-format")) this.setShoutFormat(config.getString("shout-format"));
     }
 
     /**
@@ -120,6 +122,14 @@ public abstract class Channel {
      * @param message The message to be sent.
      */
     public abstract void send(RosePlayer sender, String message);
+
+    /**
+     * Called when a message is sent to the channel.
+     * @param sender The {@link RosePlayer} who is sending the message.
+     * @param message The message to be sent.
+     * @param format The format of the message.
+     */
+    public abstract void send(RosePlayer sender, String message, String format);
 
     /**
      * Called when a message is sent to the channel from Discord.
@@ -274,6 +284,14 @@ public abstract class Channel {
 
     public void setShoutCommands(List<String> shoutCommands) {
         this.shoutCommands = shoutCommands;
+    }
+
+    public String getShoutFormat() {
+        return this.shoutFormat;
+    }
+
+    public void setShoutFormat(String shoutFormat) {
+        this.shoutFormat = shoutFormat;
     }
 
     public boolean shouldSendBungeeMessagesToDiscord() {
