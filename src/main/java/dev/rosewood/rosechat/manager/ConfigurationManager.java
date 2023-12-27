@@ -102,6 +102,9 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         CAN_JOIN_GROUP_CHANNELS("chat-settings.can-join-group-channels", true,
                 "Should players be allowed to join group channels, like normal channels?",
                 "A player can use /gcmsg <channel> without a message to join the channel."),
+        ADD_GROUP_CHANNELS_TO_CHANNEL_LIST("chat-settings.add-group-channels-to-channel-list", false,
+                "Should group channels be accessible using /channel instead of /gcm?",
+                "The can-join-group-channels setting will not take affect."),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings", "Requires DiscordSRV"),
         USE_DISCORD("discord-settings.use-discord", true, "Should DiscordSRV support be enabled?"),
