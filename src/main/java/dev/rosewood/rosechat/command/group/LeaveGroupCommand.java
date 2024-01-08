@@ -37,7 +37,7 @@ public class LeaveGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, player);
+        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, player, false);
         Bukkit.getPluginManager().callEvent(groupLeaveEvent);
         if (groupLeaveEvent.isCancelled()) return;
 

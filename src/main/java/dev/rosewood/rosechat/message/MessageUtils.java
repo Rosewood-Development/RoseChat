@@ -490,16 +490,22 @@ public class MessageUtils {
         return components;
     }
 
-
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
-        ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
+        if (placeholder == null || placeholder.trim().isEmpty())
+            return null;
+
+        if (RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder) == null)
+            return null;
+
+        ComponentBuilder builder = new ComponentBuilder();
+
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)
                         .add("id", messageId)
                         .add("type", "client").build());
 
-        if (deleteClientButton == null) {
+        if (deleteClientButton == null || deleteClientButton.length == 0) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
             return null;
         }

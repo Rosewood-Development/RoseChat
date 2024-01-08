@@ -25,7 +25,7 @@ public class HoverDecorator extends TokenDecorator {
         if (this.content == null) return;
 
         if (this.action != HoverEvent.Action.SHOW_TEXT) {
-            component.setHoverEvent(new HoverEvent(this.action, new ComponentBuilder(this.content).create()));
+            component.setHoverEvent(new HoverEvent(this.action, new ComponentBuilder(parent.getPlaceholders().apply(this.content)).create()));
             return;
         }
 

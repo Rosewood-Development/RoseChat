@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.api.example;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -12,10 +13,12 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.apache.commons.text.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -77,13 +80,14 @@ public class HeldItemTokenizer extends Tokenizer {
                     .encapsulate()
                     .build(), replacement.getInput().getText().length());
 
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return null;
         }
     }
 
     private void initialiseNMSClasses() {
         Map<String, String> saveMethods = new HashMap<>() {{
+            this.put("v1_20_R3", "b");
             this.put("v1_20_R2", "b");
             this.put("v1_20_R1", "b");
             this.put("v1_19_R3", "b");
@@ -106,9 +110,13 @@ public class HeldItemTokenizer extends Tokenizer {
                 nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
                 this.nbtTagCompoundClass = Class.forName("net.minecraft.nbt.NBTTagCompound");
             }
+
             this.saveNmsItemStack = nmsItemStackClass.getMethod(saveMethods.get(NMSUtil.getVersion()), this.nbtTagCompoundClass);
-        } catch (ReflectiveOperationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                    "&eNo NMS save method was found for " + NMSUtil.getVersion() + ". [item] has been disabled.");
         }
     }
 

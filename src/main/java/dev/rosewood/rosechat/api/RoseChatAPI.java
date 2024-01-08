@@ -109,6 +109,18 @@ public final class RoseChatAPI {
      * @param checkPermissions Whether to check permissions of the player before sending.
      */
     public void sendToChannel(Player sender, String message, Channel channel, boolean checkPermissions) {
+        this.sendToChannel(sender, message, channel, channel.getFormat(), checkPermissions);
+    }
+
+    /**
+     * Sends a message directly to a channel, from a player.
+     * @param sender The {@link Player} who is sending the message.
+     * @param message The message.
+     * @param channel The {@link Channel} to send the message in.
+     * @param format The format for the message.
+     * @param checkPermissions Whether to check permissions of the player before sending.
+     */
+    public void sendToChannel(Player sender, String message, Channel channel, String format, boolean checkPermissions) {
         RosePlayer player = new RosePlayer(sender);
         PlayerData data = player.getPlayerData();
 
@@ -154,7 +166,7 @@ public final class RoseChatAPI {
         }
 
         // Send the message.
-        channel.send(player, message);
+        channel.send(player, message, format);
 
         // Update the player's display name if the setting is enabled.
         if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && data.getNickname() != null) {

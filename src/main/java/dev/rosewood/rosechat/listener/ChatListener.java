@@ -27,7 +27,8 @@ public class ChatListener implements Listener {
             if (channel.getShoutCommands().isEmpty()) continue;
             for (String command : channel.getShoutCommands()) {
                 if (message.startsWith(command)) {
-                    api.sendToChannel(event.getPlayer(), message.substring(command.length()).trim(), channel, true);
+                    String format = channel.getShoutFormat() == null ? channel.getFormat() : channel.getShoutFormat();
+                    api.sendToChannel(event.getPlayer(), message.substring(command.length()).trim(), channel, format, true);
                     return;
                 }
             }

@@ -434,3 +434,6 @@ permissions:
     rosechat.helditem:
       description: Allows using the held item replacement.
       default: op
+    rosechat.url:
+      description: Allows using url markdown to Discord.
+      default: op

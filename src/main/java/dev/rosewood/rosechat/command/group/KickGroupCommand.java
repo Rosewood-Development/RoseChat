@@ -44,7 +44,7 @@ public class KickGroupCommand extends AbstractCommand {
             return;
         }
 
-        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, target);
+        GroupLeaveEvent groupLeaveEvent = new GroupLeaveEvent(groupChat, target, true);
         Bukkit.getPluginManager().callEvent(groupLeaveEvent);
         if (groupLeaveEvent.isCancelled()) return;
 

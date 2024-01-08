@@ -90,6 +90,11 @@ public class GroupChannel extends Channel {
     }
 
     @Override
+    public void send(RosePlayer sender, String message, String format) {
+        this.send(sender, message);
+    }
+
+    @Override
     public void send(RoseMessage message, String discordId) {
         // No discord support for GroupChats
     }

@@ -126,6 +126,7 @@ public class BungeeManager extends Manager {
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
+            out.writeLong(System.currentTimeMillis());
             out.writeUTF(channel);
             out.writeUTF(sender.getName());
             out.writeUTF(sender.getUUID() == null ? "null" : sender.getUUID().toString());

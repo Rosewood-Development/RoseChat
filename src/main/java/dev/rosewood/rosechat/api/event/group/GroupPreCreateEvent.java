@@ -9,12 +9,18 @@ public class GroupPreCreateEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
+    private final String id;
     private String name;
     private boolean cancelled;
 
-    public GroupPreCreateEvent(Player player, String name) {
+    public GroupPreCreateEvent(Player player, String id, String name) {
         super(player);
+        this.id = id;
         this.name = name;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public String getName() {
