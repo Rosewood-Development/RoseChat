@@ -30,8 +30,11 @@ import java.util.regex.Matcher;
 
 public class NicknameCommand extends AbstractCommand {
 
-    public NicknameCommand() {
+    private final RoseChat plugin;
+
+    public NicknameCommand(RoseChat plugin) {
         super(false, "nickname", "nick");
+        this.plugin = plugin;
     }
 
     @Override
@@ -70,6 +73,10 @@ public class NicknameCommand extends AbstractCommand {
             data.setNickname(null);
             player.setDisplayName(null);
             data.save();
+
+            if (this.plugin.getNicknameProvider() != null) {
+                this.plugin.getNicknameProvider().setNickname(player, null);
+            }
 
             if (player == sender) {
                 this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.of("name", player.getName()));
@@ -143,6 +150,11 @@ public class NicknameCommand extends AbstractCommand {
                 roseTarget.asPlayer().setDisplayName(TextComponent.toLegacyText(components.content()));
                 data.setNickname(outputs.getFilteredMessage());
                 data.save();
+
+                if (this.plugin.getNicknameProvider() != null) {
+                    Player player = roseTarget.asPlayer();
+                    this.plugin.getNicknameProvider().setNickname(player, player.getDisplayName());
+                }
 
                 if (roseTarget.getUUID().equals(roseSender.getUUID())) {
                     this.getAPI().getLocaleManager().sendComponentMessage(sender, "command-nickname-success", StringPlaceholders.of("name", data.getNickname()));

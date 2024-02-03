@@ -298,6 +298,11 @@ public class MessageUtils {
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, MessageLocation.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
                 sender.setDisplayName(TextComponent.toLegacyText(components.content()));
+
+                if (RoseChat.getInstance().getNicknameProvider() != null) {
+                    Player player = sender.asPlayer();
+                    RoseChat.getInstance().getNicknameProvider().setNickname(player, player.getDisplayName());
+                }
             });
         }
     }

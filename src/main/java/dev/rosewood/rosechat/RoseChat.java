@@ -57,6 +57,8 @@ import dev.rosewood.rosechat.hook.channel.towny.TownyChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannelProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.hook.discord.DiscordSRVProvider;
+import dev.rosewood.rosechat.hook.nickname.EssentialsHook;
+import dev.rosewood.rosechat.hook.nickname.NicknameProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
@@ -98,6 +100,7 @@ public class RoseChat extends RosePlugin {
     private SeniorCommandManager commandManager;
     private Permission vault;
     private DiscordChatProvider discord;
+    private NicknameProvider nicknameProvider;
     private ChatListener chatListener;
 
     public RoseChat() {
@@ -122,8 +125,8 @@ public class RoseChat extends RosePlugin {
         CommandManager groupChatMessageCommand = new CommandManager(new MessageGroupCommand());
         CommandManager muteCommand = new CommandManager(new MuteCommand());
         CommandManager unmuteCommand = new CommandManager(new UnmuteCommand());
-        CommandManager nicknameCommand = new CommandManager(new NicknameCommand());
-        CommandManager nickColorCommand = new CommandManager(new NickColorCommand());
+        CommandManager nicknameCommand = new CommandManager(new NicknameCommand(this));
+        CommandManager nickColorCommand = new CommandManager(new NickColorCommand(this));
         CommandManager ignoreCommand = new CommandManager(new IgnoreCommand());
         CommandManager deleteMessageCommand = new CommandManager(new DeleteMessageCommand());
         CommandManager realnameCommand = new CommandManager(new RealnameCommand());
@@ -255,6 +258,10 @@ public class RoseChat extends RosePlugin {
             pluginManager.registerEvents(new MessageListener(), this);
         }
 
+        if (pluginManager.isPluginEnabled("Essentials")) {
+            this.nicknameProvider = new EssentialsHook();
+        }
+
         // Channel Hooks
         new RoseChatChannelProvider().register();
 
@@ -298,6 +305,10 @@ public class RoseChat extends RosePlugin {
 
     public DiscordChatProvider getDiscord() {
         return this.discord;
+    }
+
+    public NicknameProvider getNicknameProvider() {
+        return this.nicknameProvider;
     }
 
     public SeniorCommandManager getCommandManager() {

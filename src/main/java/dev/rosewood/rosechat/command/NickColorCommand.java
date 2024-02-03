@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -22,8 +23,11 @@ import java.util.UUID;
 
 public class NickColorCommand extends AbstractCommand {
 
-    public NickColorCommand() {
+    private final RoseChat plugin;
+
+    public NickColorCommand(RoseChat plugin) {
         super(true, "nickcolor", "nickcolour");
+        this.plugin = plugin;
     }
 
     @Override
@@ -71,10 +75,14 @@ public class NickColorCommand extends AbstractCommand {
 
                     RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
                     MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
-                    rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
+                    target.setDisplayName(TextComponent.toLegacyText(components.content()));
                 }
 
                 targetData.save();
+
+                if (this.plugin.getNicknameProvider() != null) {
+                    this.plugin.getNicknameProvider().setNickname(target, null);
+                }
             }
 
             if (sender == target) {
@@ -103,7 +111,7 @@ public class NickColorCommand extends AbstractCommand {
             targetData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
             MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
-            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
+            target.setDisplayName(TextComponent.toLegacyText(components.content()));
         } else {
             // If the player already has a nickname, remove the colour and apply the new colour.
             nickname = ChatColor.stripColor(HexUtils.colorify(targetData.getNickname()));
@@ -111,7 +119,11 @@ public class NickColorCommand extends AbstractCommand {
             targetData.setNickname(nickname);
             RoseMessage nicknameMessage = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
             MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(rosePlayer, nickname);
-            rosePlayer.setDisplayName(TextComponent.toLegacyText(components.content()));
+            target.setDisplayName(TextComponent.toLegacyText(components.content()));
+        }
+
+        if (this.plugin.getNicknameProvider() != null) {
+            this.plugin.getNicknameProvider().setNickname(target, target.getDisplayName());
         }
 
         targetData.save();

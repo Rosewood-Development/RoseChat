@@ -71,6 +71,10 @@ public class PlayerListener implements Listener {
                 RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.NICKNAME);
                 MessageTokenizerResults<BaseComponent[]> components = message.parse(rosePlayer, playerData.getNickname());
                 player.setDisplayName(TextComponent.toLegacyText(components.content()));
+
+                if (RoseChat.getInstance().getNicknameProvider() != null) {
+                    RoseChat.getInstance().getNicknameProvider().setNickname(player, player.getDisplayName());
+                }
             }
         });
     }

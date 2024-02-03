@@ -179,6 +179,10 @@ public final class RoseChatAPI {
                 String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).content());
                 player.asPlayer().setDisplayName(displayName);
                 player.setDisplayName(displayName);
+
+                if (this.plugin.getNicknameProvider() != null) {
+                    this.plugin.getNicknameProvider().setNickname(player.asPlayer(), player.asPlayer().getDisplayName());
+                }
             });
         }
     }
