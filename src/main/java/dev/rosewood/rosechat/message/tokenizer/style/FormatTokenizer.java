@@ -37,7 +37,7 @@ public class FormatTokenizer extends Tokenizer {
 
             // Reset reapplies the player's chat color
             PlayerData playerData = params.getSender().getPlayerData();
-            String chatColor = playerData != null ? playerData.getColor() : "";
+            String chatColor = playerData != null && params.containsPlayerInput() ? playerData.getColor() : "";
             return new TokenizerResult(Token.group("&R" + chatColor).build(), content.length());
         }
 
