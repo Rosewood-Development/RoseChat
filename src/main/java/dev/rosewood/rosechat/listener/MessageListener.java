@@ -43,15 +43,15 @@ public class MessageListener implements Listener {
 
     private void appendButton(PostParseMessageEvent event, BaseComponent[] components, String placeholder) {
         BaseComponent[] deleteButton = this.getButton(event, placeholder);
-        if (deleteButton == null)
-            return;
 
         ComponentBuilder componentBuilder = new ComponentBuilder();
         if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
-            componentBuilder.append(deleteButton);
+            if (deleteButton != null)
+                componentBuilder.append(deleteButton);
         } else {
-            componentBuilder.append(deleteButton);
+            if (deleteButton != null)
+                componentBuilder.append(deleteButton);
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
         }
 
@@ -59,9 +59,6 @@ public class MessageListener implements Listener {
     }
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {
-        if (RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder) == null)
-            return null;
-
         return RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(), placeholder,
                 MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
                         .add("id", event.getMessage().getUUID())

@@ -502,14 +502,8 @@ public class MessageUtils {
     }
 
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
-        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
-        if (placeholder == null || placeholder.trim().isEmpty())
-            return null;
-
-        if (RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholder) == null)
-            return null;
-
         ComponentBuilder builder = new ComponentBuilder();
+        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
 
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 MessageUtils.getSenderViewerPlaceholders(sender, sender)

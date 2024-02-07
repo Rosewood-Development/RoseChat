@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
+import dev.rosewood.rosechat.message.HoverEventWrapper;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;

@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.JsonSyntaxException;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -118,14 +119,32 @@ public class PacketListener {
 
                     String messageJson;
 
-                    String jsonString = packet.getStrings().readSafely(0);
-                    if (jsonString != null) {
-                        messageJson = jsonString;
+                    // Use a chat component on 1.20.4
+                    if (NMSUtil.getVersionNumber() == 20) {
+                        WrappedChatComponent chatComponent = packet.getChatComponents().readSafely(0);
+                        if (chatComponent == null) {
+                            messageJson = getMessageReflectively(packet);
+                        } else {
+                            messageJson = chatComponent.getJson();
+                        }
                     } else {
-                        messageJson = getMessageReflectively(packet);
+                        String jsonString = packet.getStrings().readSafely(0);
+                        if (jsonString != null) {
+                            messageJson = jsonString;
+                        } else {
+                            messageJson = getMessageReflectively(packet);
+                        }
                     }
 
-                    if (messageJson == null || messageJson.isEmpty() || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
+                    // Ignore bug with bungeecord chat until it's fixed.
+                    // https://hub.spigotmc.org/jira/browse/SPIGOT-7563
+                    BaseComponent[] components = null;
+                    try {
+                        components = messageJson == null ? null : ComponentSerializer.parse(messageJson);
+                    } catch (JsonSyntaxException ignored) {}
+
+                    if (components == null || components.length == 0 || components[0].toPlainText().trim().isEmpty())
+                        return;
 
                     // Ensures chat messages are added separately, to differentiate between client and server messages.
                     if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
@@ -151,7 +170,12 @@ public class PacketListener {
                     String group = groupCache.getIfPresent(player.getUniqueId());
                     sender.setGroup(Objects.requireNonNullElse(group, "default"));
 
-                    BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
+                    // Ignore bug with bungeecord chat until it's fixed.
+                    // https://hub.spigotmc.org/jira/browse/SPIGOT-7563
+                    BaseComponent[] deleteClientButton = null;
+                    try {
+                         deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
+                    } catch (JsonSyntaxException ignored) {}
 
                     if (deleteClientButton == null) return;
 
@@ -160,7 +184,14 @@ public class PacketListener {
 
                     // Overwrite the packet since packet fields are final in 1.19
                     PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-                    newPacket.getStrings().write(0, messageJson);
+
+                    if (NMSUtil.getVersionNumber() == 20) {
+                        newPacket.getChatComponents().write(0, WrappedChatComponent.fromJson(messageJson));
+                    } else {
+                        newPacket.getStrings().write(0, messageJson);
+                    }
+
+
                     event.setPacket(newPacket);
                 }
             }

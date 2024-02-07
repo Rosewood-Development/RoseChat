@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -83,9 +85,27 @@ public class MessageLog {
     }
 
     public boolean containsDeletableMessage(String json) {
-        for (DeletableMessage message : this.deletableMessages) {
-            if (json.equalsIgnoreCase(message.getJson())) return true;
+        if (this.deletableMessages.isEmpty())
+            return false;
+
+        BaseComponent[] one = ComponentSerializer.parse(json);
+        if (one.length == 0)
+            return false;
+        BaseComponent componentOne = one[0];
+
+        for (int i = this.deletableMessages.size() - 1; i >= 0; i--) {
+            DeletableMessage message = this.deletableMessages.get(i);
+
+            BaseComponent[] two = ComponentSerializer.parse(message.getJson());
+            if (two.length == 0)
+                continue;
+
+            BaseComponent componentTwo = two[0];
+
+            if (componentOne.toLegacyText().equalsIgnoreCase(componentTwo.toLegacyText()))
+                return true;
         }
+
         return false;
     }
 

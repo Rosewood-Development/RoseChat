@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.message.HoverEventWrapper;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -89,11 +90,11 @@ public class InviteGroupCommand extends AbstractCommand {
         componentBuilder.append("          ");
         componentBuilder.append(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-accept"))
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc accept " + groupChat.getId()))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-hover"))));
+                .event(HoverEventWrapper.of(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-accept-hover"))));
         componentBuilder.append("          ").retain(ComponentBuilder.FormatRetention.NONE);
         componentBuilder.append(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-deny"))
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gc deny " + groupChat.getId()))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-hover"))));
+                .event((HoverEventWrapper.of(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(this.getAPI().getLocaleManager().getLocaleMessage("command-gc-deny-hover")))));
         player.spigot().sendMessage(componentBuilder.create());
     }
 
