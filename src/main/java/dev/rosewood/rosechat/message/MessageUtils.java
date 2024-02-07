@@ -30,6 +30,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -469,13 +470,18 @@ public class MessageUtils {
         components = api.parse(sender, viewer, text);
 
         if (placeholder.get("hover") != null) {
-            String hover = placeholder.get("hover").parseToString(sender, viewer, placeholders);
-            if (hover != null) {
-                if (hover.equalsIgnoreCase("%original%")) {
-                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentSerializer.parse(deletableMessage.getJson()));
-                } else {
-                    hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, api.parse(sender, viewer, hover));
+            List<String> hover = placeholder.get("hover").parseToStringList(sender, viewer, placeholders);
+            if (hover != null && !hover.isEmpty()) {
+                ComponentBuilder builder = new ComponentBuilder();
+                for (String s : hover) {
+                    if (s.contains("%original%")) {
+                        builder.append(ComponentSerializer.parse(deletableMessage.getJson()));
+                    } else {
+                        builder.append(s);
+                    }
                 }
+
+                hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create());
             }
         }
 

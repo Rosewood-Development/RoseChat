@@ -44,12 +44,4 @@ public class StringPlaceholderCondition extends PlaceholderCondition  {
         return resultBuilder.toString();
     }
 
-
-    @Override
-    public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        String parsed = this.parse(sender, viewer, placeholders);
-        String result = this.combineConditionValues(parsed);
-        return result == null || result.isEmpty() ? this.combineConditionValues("default") : result;
-    }
-
 }

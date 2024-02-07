@@ -25,13 +25,6 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
     }
 
     @Override
-    public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        String parsed = this.parse(sender, viewer, placeholders);
-        String result = this.combineConditionValues(parsed);
-        return result == null || result.isEmpty() ? this.combineConditionValues("default") : result;
-    }
-
-    @Override
     public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
         Player singlePlayer = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String singleCondition = this.condition.replace("other_", "");

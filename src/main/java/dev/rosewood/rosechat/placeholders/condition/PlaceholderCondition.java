@@ -53,7 +53,27 @@ public class PlaceholderCondition {
      * @return The parsed condition as a string.
      */
     public String parseToString(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        return null;
+        String parsed = this.parse(sender, viewer, placeholders);
+        List<String> results = this.values.get(parsed);
+        if (results == null || results.isEmpty())
+            return this.values.containsKey("default") ? this.values.get("default").get(0) : "";
+
+        return results.get(0);
+    }
+
+    /**
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param viewer The {@link RosePlayer} who is viewing the message.
+     * @param placeholders The {@link StringPlaceholders} to use.
+     * @return The parsed condition as a string list, typically used for hover events.
+     */
+    public List<String> parseToStringList(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
+        String parsed = this.parse(sender, viewer, placeholders);
+        List<String> results = this.values.get(parsed);
+        if (results == null || results.isEmpty())
+            return this.values.getOrDefault("default", Collections.emptyList());
+
+        return results;
     }
 
     /**
@@ -108,21 +128,6 @@ public class PlaceholderCondition {
         }
 
         return this;
-    }
-
-    protected String combineConditionValues(String value) {
-        List<String> result = this.values.get(value);
-        if (result == null || result.isEmpty()) return "";
-
-        StringBuilder resultBuilder = new StringBuilder();
-        int index = 0;
-        for (String s : result) {
-            if (index != 0) resultBuilder.append("\n");
-            resultBuilder.append(s);
-            index++;
-        }
-
-        return resultBuilder.toString();
     }
 
     public HoverEvent.Action getHoverAction() {

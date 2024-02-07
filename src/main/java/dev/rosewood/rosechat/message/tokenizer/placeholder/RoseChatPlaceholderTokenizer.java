@@ -11,6 +11,8 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -58,13 +60,21 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
         String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), params.getReceiver(), placeholders));
-        String hover = roseChatPlaceholder.get("hover") == null ? null : placeholders.apply(roseChatPlaceholder.get("hover").parseToString(params.getSender(), params.getReceiver(), placeholders));
+
+        List<String> formattedHover = new ArrayList<>();
+        if (roseChatPlaceholder.get("hover") != null) {
+            List<String> hover = roseChatPlaceholder.get("hover").parseToStringList(params.getSender(), params.getReceiver(), placeholders);
+            for (String s : hover) {
+                formattedHover.add(placeholders.apply(s));
+            }
+        }
+
         String click = roseChatPlaceholder.get("click") == null ? null : placeholders.apply(roseChatPlaceholder.get("click").parseToString(params.getSender(), params.getReceiver(), placeholders));
         ClickEvent.Action clickAction = roseChatPlaceholder.get("click") == null ? null : roseChatPlaceholder.get("click").getClickAction();
         HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ? null : roseChatPlaceholder.get("hover").getHoverAction();
 
         Token.Builder tokenBuilder = Token.group(content);
-        if (hover != null) tokenBuilder.decorate(HoverDecorator.of(hoverAction, hover));
+        if (!formattedHover.isEmpty()) tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
         if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
         if (params.containsPlayerInput()) tokenBuilder.encapsulate();
 

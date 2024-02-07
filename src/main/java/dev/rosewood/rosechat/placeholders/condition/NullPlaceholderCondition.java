@@ -15,7 +15,7 @@ public class NullPlaceholderCondition extends PlaceholderCondition {
 
     @Override
     public String parse(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        return this.combineConditionValues("default");
+        return this.values.get("default").get(0);
     }
 
     @Override

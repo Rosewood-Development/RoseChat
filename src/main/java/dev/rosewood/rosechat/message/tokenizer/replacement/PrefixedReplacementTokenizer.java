@@ -19,6 +19,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,14 +115,21 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 .add("group_1", content).build();
 
         if (placeholder != null) {
-            String hover = placeholder.get("hover") == null ? null : placeholders.apply(placeholder.get("hover").parseToString(params.getSender(), params.getReceiver(), placeholders));
-            HoverEvent.Action hoverAction = placeholder.get("hover") == null ? null : placeholder.get("hover").getHoverAction();
+            List<String> formattedHover = new ArrayList<>();
+            if (placeholder.get("hover") != null) {
+                List<String> hover = placeholder.get("hover").parseToStringList(params.getSender(), params.getReceiver(), placeholders);
+                for (String s : hover) {
+                    formattedHover.add(placeholders.apply(s));
+                }
+            }
+
+            HoverEvent.Action hoverAction = formattedHover.isEmpty() ? null : placeholder.get("hover").getHoverAction();
 
             StringBuilder contentBuilder = new StringBuilder();
             content = placeholders.apply(placeholder.get("text").parseToString(params.getSender(), placeholderViewer, placeholders));
             if (replacement.getOutput().shouldMatchLength()) {
-                if (hover != null) {
-                    String colorlessHover = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), hover));
+                if (!formattedHover.isEmpty()) {
+                    String colorlessHover = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), formattedHover.get(0)));
                     contentBuilder.append(String.valueOf(content).repeat(colorlessHover.length()));
                 }
             } else {
@@ -154,8 +163,8 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     .encapsulate()
                     .ignoreTokenizer(this);
 
-            if (hover != null)
-                tokenBuilder.decorate(HoverDecorator.of(hoverAction, hover));
+            if (!formattedHover.isEmpty())
+                tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
             if (click != null)
                 tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
 
