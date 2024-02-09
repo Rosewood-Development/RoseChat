@@ -29,6 +29,14 @@ public class CustomCommand extends Command {
                 }
 
                 if (args.length == 0) {
+                    // Return the player to the global channel if they type the command again.
+                    RosePlayer player = new RosePlayer(sender);
+                    Channel currentChannel = player.getPlayerData().getCurrentChannel();
+                    if (currentChannel == channel) {
+                        ChannelCommand.processChannelSwitch(sender, RoseChatAPI.getInstance().getDefaultChannel().getId());
+                        return true;
+                    }
+
                     if (!ChannelCommand.processChannelSwitch(sender, channel.getId())) {
                         RoseChatAPI.getInstance().getLocaleManager()
                                 .sendComponentMessage(sender, "command-channel-custom-usage", StringPlaceholders.of("channel", cmd.toLowerCase()));

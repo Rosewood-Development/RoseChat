@@ -34,6 +34,7 @@ public class HeldItemTokenizer extends Tokenizer {
     public HeldItemTokenizer() {
         super("held_item");
 
+        // Example of how to register tokenizers
         if (HELD_ITEM_TOKENIZER == null) {
             HELD_ITEM_TOKENIZER = this;
             Tokenizers.DEFAULT_BUNDLE.registerBefore(Tokenizers.ROSECHAT_PLACEHOLDER, this);
