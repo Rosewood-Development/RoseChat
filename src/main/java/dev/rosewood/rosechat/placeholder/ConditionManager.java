@@ -1,14 +1,14 @@
-package dev.rosewood.rosechat.placeholders;
+package dev.rosewood.rosechat.placeholder;
 
 import dev.rosewood.rosechat.hook.channel.condition.ChannelCondition;
 import dev.rosewood.rosechat.hook.channel.condition.CompoundChannelCondition;
 import dev.rosewood.rosechat.hook.channel.condition.MultipleChannelCondition;
-import dev.rosewood.rosechat.placeholders.condition.BooleanPlaceholderCondition;
-import dev.rosewood.rosechat.placeholders.condition.CompoundPlaceholderCondition;
-import dev.rosewood.rosechat.placeholders.condition.NullPlaceholderCondition;
-import dev.rosewood.rosechat.placeholders.condition.NumberPlaceholderCondition;
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
-import dev.rosewood.rosechat.placeholders.condition.StringPlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.BooleanPlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.CompoundPlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.NullPlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.NumberPlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.StringPlaceholderCondition;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class ConditionManager {

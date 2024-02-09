@@ -1,15 +1,12 @@
 package dev.rosewood.rosechat.hook.channel.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.condition.Operator;
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.Operator;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChannelCondition extends PlaceholderCondition {
 

@@ -1,10 +1,10 @@
 package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.placeholders.ConditionManager;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosechat.placeholders.DiscordEmbedPlaceholder;
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.ConditionManager;
+import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholder.DiscordEmbedPlaceholder;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;

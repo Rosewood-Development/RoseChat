@@ -12,14 +12,11 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
@@ -30,7 +27,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import java.text.Normalizer;
-import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -451,54 +447,6 @@ public class MessageUtils {
         boolean hasPermission = params.getSender().hasPermission(permission);
         if (!hasPermission) params.getOutputs().getMissingPermissions().add(permission);
         return hasPermission;
-    }
-
-    public static BaseComponent[] parseDeletedMessagePlaceholder(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders, DeletableMessage deletableMessage) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        String placeholderId = Setting.DELETED_MESSAGE_FORMAT.getString();
-        CustomPlaceholder placeholder = api.getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-        if (placeholder == null) return null;
-
-        BaseComponent[] components;
-        HoverEvent hoverEvent = null;
-        ClickEvent clickEvent = null;
-
-        if (placeholder.get("text") == null) return null;
-        String text = placeholder.get("text").parseToString(sender, viewer, placeholders);
-        if (text == null) return null;
-        components = api.parse(sender, viewer, text);
-
-        if (placeholder.get("hover") != null) {
-            List<String> hover = placeholder.get("hover").parseToStringList(sender, viewer, placeholders);
-            if (hover != null && !hover.isEmpty()) {
-                ComponentBuilder builder = new ComponentBuilder();
-                for (String s : hover) {
-                    if (s.contains("%original%")) {
-                        builder.append(ComponentSerializer.parse(deletableMessage.getJson()));
-                    } else {
-                        builder.append(s);
-                    }
-                }
-
-                hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create());
-            }
-        }
-
-        if (placeholder.get("click") != null) {
-            String click = placeholder.get("click").parseToString(sender, viewer, placeholders);
-            ClickEvent.Action action = placeholder.get("click").getClickAction();
-            if (click != null && action != null) {
-                clickEvent = new ClickEvent(action, TextComponent.toPlainText(api.parse(sender, viewer, click)));
-            }
-        }
-
-        for (BaseComponent component : components) {
-            component.setHoverEvent(hoverEvent);
-            component.setClickEvent(clickEvent);
-        }
-
-        return components;
     }
 
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {

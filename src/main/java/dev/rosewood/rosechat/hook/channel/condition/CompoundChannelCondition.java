@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.hook.channel.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;

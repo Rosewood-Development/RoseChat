@@ -22,12 +22,14 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -202,11 +204,13 @@ public final class RoseChatAPI {
 
         if (messageToDelete == null) return;
 
-        // Get the deleted message placeholder.
-        BaseComponent[] deletedMessageFormat = MessageUtils.parseDeletedMessagePlaceholder(player, player,
+        // Get the deleted message format.
+        BaseComponent[] deletedMessageFormat = RoseChatAPI.getInstance().parse(player, player, Setting.DELETED_MESSAGE_FORMAT.getString(),
                 MessageUtils.getSenderViewerPlaceholders(player, player)
                         .add("id", uuid.toString())
-                        .add("type", messageToDelete.isClient() ? "client" : "server").build(), messageToDelete);
+                        .add("type", messageToDelete.isClient() ? "client" : "server")
+                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(messageToDelete.getJson())))
+                        .build());
 
         boolean updated = false;
         if (deletedMessageFormat != null && !TextComponent.toPlainText(deletedMessageFormat).isEmpty()) {

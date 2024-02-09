@@ -12,9 +12,9 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosechat.placeholders.CustomPlaceholder;
-import dev.rosewood.rosechat.placeholders.DiscordEmbedPlaceholder;
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholder.DiscordEmbedPlaceholder;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
@@ -61,15 +61,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (embedPlaceholder != null) {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
         } else {
-            String placeholderId = Setting.MINECRAFT_TO_DISCORD_FORMAT.getString();
-            CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderId.substring(1, placeholderId.length() - 1));
-
-            PlaceholderCondition textPlaceholder = placeholder.get("text");
-            if (textPlaceholder == null) return;
-
-            String text = textPlaceholder.parseToString(roseMessage.getSender(), roseMessage.getSender(), placeholders);
-            text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), text).content();
-
+            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), Setting.MINECRAFT_TO_DISCORD_FORMAT.getString()).content();
             if (text == null) return;
 
             PostParseDiscordMessageEvent postParseDiscordMessageEvent = new PostParseDiscordMessageEvent(roseMessage, textChannel, text);

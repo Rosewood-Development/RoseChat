@@ -1,6 +1,6 @@
-package dev.rosewood.rosechat.placeholders;
+package dev.rosewood.rosechat.placeholder;
 
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
+import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import java.util.HashMap;
 import java.util.Map;
 

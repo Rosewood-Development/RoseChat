@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.hook.channel.condition;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.placeholders.ConditionManager;
+import dev.rosewood.rosechat.placeholder.ConditionManager;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;

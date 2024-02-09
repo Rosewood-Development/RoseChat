@@ -1,8 +1,6 @@
-package dev.rosewood.rosechat.placeholders;
+package dev.rosewood.rosechat.placeholder;
 
-import dev.rosewood.rosechat.placeholders.condition.PlaceholderCondition;
 import org.bukkit.configuration.ConfigurationSection;
-
 import java.util.LinkedList;
 import java.util.List;
 

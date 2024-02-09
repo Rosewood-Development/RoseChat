@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.placeholders.condition;
+package dev.rosewood.rosechat.placeholder.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
