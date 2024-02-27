@@ -27,6 +27,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Role;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import java.awt.Color;
 import java.time.OffsetDateTime;
@@ -326,6 +327,22 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             int matchLength = this.getMatchLength(input, member.getEffectiveName());
             if (matchLength != -1)
                 return new DetectedMention(this.getUserFromId(member.getId()), member.getAsMention(), matchLength);
+        }
+
+        // Attempt to match linked accounts if the Discord username is invalid.
+        for (String accountId : this.discord.getAccountLinkManager().getLinkedAccounts().keySet()) {
+            UUID uuid = this.discord.getAccountLinkManager().getLinkedAccounts().get(accountId);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+
+            if (player == null)
+                break;
+
+            int matchLength = this.getMatchLength(input, player.getName());
+            if (matchLength != -1) {
+                Member member = this.discord.getMainGuild().getMemberById(accountId);
+                return new DetectedMention(this.getUserFromId(accountId), member.getAsMention(), matchLength);
+            }
+
         }
 
         return null;
