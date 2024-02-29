@@ -109,6 +109,9 @@ public class MessageCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 if (player != sender) tab.add(player.getName());
             }
 

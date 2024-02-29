@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -50,6 +51,9 @@ public class SudoChatCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 if (player != sender) tab.add(player.getName());
             }
         } else if (args.length == 2) {

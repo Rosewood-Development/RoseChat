@@ -166,6 +166,9 @@ public class NickColorCommand extends AbstractCommand {
 
         if (sender.hasPermission("rosechat.nickcolor.others")) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 if (player != sender) tab.add(player.getName());
             }
         }

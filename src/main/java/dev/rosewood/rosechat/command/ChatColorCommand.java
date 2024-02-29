@@ -109,6 +109,9 @@ public class ChatColorCommand extends AbstractCommand {
 
         if (sender.hasPermission("rosechat.chatcolor.others")) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 if (player != sender) tab.add(player.getName());
             }
 

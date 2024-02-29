@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import java.text.Normalizer;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -472,5 +473,12 @@ public class MessageUtils {
         }
 
         return builder.create();
+    }
+
+    public static boolean isPlayerVanished(Player player) {
+        for (MetadataValue value : player.getMetadata("vanished"))
+            if (value.asBoolean()) return true;
+
+        return false;
     }
 }

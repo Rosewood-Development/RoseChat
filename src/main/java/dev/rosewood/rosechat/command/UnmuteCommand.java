@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -46,6 +47,9 @@ public class UnmuteCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 tab.add(player.getName());
             }
         }

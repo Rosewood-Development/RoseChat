@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -81,6 +82,9 @@ public class KickGroupCommand extends AbstractCommand {
             if (groupChat != null) {
                 for (UUID uuid : groupChat.getMembers()) {
                     Player member = Bukkit.getPlayer(uuid);
+                    if (MessageUtils.isPlayerVanished(member))
+                        continue;
+
                     if (member != null && member != sender) tab.add(member.getName());
                 }
             }

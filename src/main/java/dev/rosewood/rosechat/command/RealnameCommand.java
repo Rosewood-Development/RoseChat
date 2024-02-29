@@ -43,6 +43,9 @@ public class RealnameCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 tab.add(player.getName());
             }
 

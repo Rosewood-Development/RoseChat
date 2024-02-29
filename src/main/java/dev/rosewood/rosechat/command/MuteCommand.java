@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.api.AbstractCommand;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -120,6 +121,9 @@ public class MuteCommand extends AbstractCommand {
 
         if (args.length == 1) {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
                 if (player != sender) tab.add(player.getName());
             }
         } else if (args.length == 2) {
