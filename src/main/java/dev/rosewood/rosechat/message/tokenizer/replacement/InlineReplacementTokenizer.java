@@ -10,8 +10,6 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.apache.commons.text.StringEscapeUtils;
-import org.bukkit.Bukkit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,16 +59,19 @@ public class InlineReplacementTokenizer extends Tokenizer {
                 if (!inlineMatcher.find()) return null;
             }
 
-            return new TokenizerResult(Token.group(replacement.getOutput().getText())
-                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()))
+            Token.Builder token = Token.group(replacement.getOutput().getText())
                     .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                     .placeholder("group_0", originalContent)
                     .placeholder("message", originalContent)
                     .placeholder("group_1", matcher.group(1))
                     .placeholder("group_2", matcher.group(2))
                     .encapsulate()
-                    .ignoreTokenizer(this)
-                    .build(), originalContent.length());
+                    .ignoreTokenizer(this);
+
+            if (replacement.getOutput().getHover() != null)
+                token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
+
+            return new TokenizerResult(token.build(), originalContent.length());
         }
 
         return null;

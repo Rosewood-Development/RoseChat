@@ -199,16 +199,19 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
             }
         }
 
-        return new TokenizerResult(Token.group(content)
-                .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover))
+        Token.Builder token = Token.group(content)
                 .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                 .placeholder("message", originalContent)
                 .placeholder("extra", originalContent)
                 .placeholder("tagged", "%group_1%")
                 .placeholders(groupPlaceholders.build())
                 .encapsulate()
-                .ignoreTokenizer(this)
-                .build(), originalContent.length());
+                .ignoreTokenizer(this);
+
+        if (hover != null)
+            token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));
+
+        return new TokenizerResult(token.build(), originalContent.length());
     }
 
     private DetectedPlayer matchPartialPlayer(String input, String id) {

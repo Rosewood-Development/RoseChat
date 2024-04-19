@@ -49,13 +49,15 @@ public class ReplacementTokenizer extends Tokenizer {
                 }
 
                 Token.Builder token = Token.group(content)
-                        .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()))
                         .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                         .placeholder("message", originalContent)
                         .placeholder("extra", originalContent)
                         .placeholder("tagged", "%group_1%")
                         .placeholders(groupPlaceholders.build())
                         .ignoreTokenizer(this);
+
+                if (replacement.getOutput().getHover() != null)
+                    token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
 
                 if (!replacement.getOutput().hasColorRetention()) token.encapsulate();
 
@@ -78,9 +80,11 @@ public class ReplacementTokenizer extends Tokenizer {
                 String content = replacement.getOutput().getText();
 
                 Token.Builder token = Token.group(content)
-                        .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()))
                         .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                         .ignoreTokenizer(this);
+
+                if (replacement.getOutput().getHover() != null)
+                    token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
 
                 if (!replacement.getOutput().hasColorRetention()) token.encapsulate();
 
