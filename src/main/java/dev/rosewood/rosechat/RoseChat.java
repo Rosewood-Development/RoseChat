@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.example.HeldItemTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
 import dev.rosewood.rosechat.command.ChannelCommand;
 import dev.rosewood.rosechat.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.DebugCommand;
