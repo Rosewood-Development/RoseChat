@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'dev.rosewood'
-version 'Beta-22'
+version 'Beta-23'
 
 java {
     toolchain {
