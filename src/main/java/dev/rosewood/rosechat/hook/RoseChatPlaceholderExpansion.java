@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
@@ -65,6 +66,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             case "chat_color" -> playerData.getColor();
             case "nickname" -> playerData.getNickname();
             case "nickname_fallback" -> playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname();
+            case "nickname_stripped" -> playerData.getNickname() == null ? null : ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             case "current_channel" -> playerData.getCurrentChannel().getId();
             case "is_muted" -> playerData.isMuted() ? "yes" : "no";
             case "mute_time" -> String.valueOf(playerData.getMuteExpirationTime());
