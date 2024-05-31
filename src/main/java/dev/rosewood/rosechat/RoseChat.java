@@ -102,6 +102,7 @@ public class RoseChat extends RosePlugin {
     private DiscordChatProvider discord;
     private NicknameProvider nicknameProvider;
     private ChatListener chatListener;
+    private PacketListener packetListener;
 
     public RoseChat() {
         super(-1, 5608, ConfigurationManager.class, DataManager.class, LocaleManager.class, null);
@@ -206,6 +207,14 @@ public class RoseChat extends RosePlugin {
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
                     "&eThe chat-event-priority is not a valid EventPriority");
         }
+
+        // Remove and add to reset the priority.
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        if (pluginManager.isPluginEnabled("ProtocolLib") && NMSUtil.getVersionNumber() >= 17) {
+            this.packetListener = new PacketListener(this);
+            this.packetListener.removeListeners();
+            this.packetListener.addListener();
+        }
     }
 
     @Override
@@ -243,6 +252,9 @@ public class RoseChat extends RosePlugin {
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
         else new RoseChatPlaceholderExpansion().register();
 
+        if (pluginManager.isPluginEnabled("ProtocolLib") && NMSUtil.getVersionNumber() >= 17) {
+            pluginManager.registerEvents(new MessageListener(), this);
+        }
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (pluginManager.isPluginEnabled("DiscordSRV")) {
@@ -252,11 +264,6 @@ public class RoseChat extends RosePlugin {
                 DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
             }
         }, 60L);
-
-        if (pluginManager.isPluginEnabled("ProtocolLib") && NMSUtil.getVersionNumber() >= 17) {
-            new PacketListener(this);
-            pluginManager.registerEvents(new MessageListener(), this);
-        }
 
         if (pluginManager.isPluginEnabled("Essentials")) {
             this.nicknameProvider = new EssentialsHook();

@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 public class PacketListener {
 
+    private final RoseChat plugin;
+
     private static Field componentsArrayField;
     private static Field adventureMessageField;
 
@@ -41,15 +43,32 @@ public class PacketListener {
     private final Cache<UUID, String> groupCache;
 
     public PacketListener(RoseChat plugin) {
+        this.plugin = plugin;
+
         this.permissionsCache = CacheBuilder.newBuilder()
                         .expireAfterWrite(5, TimeUnit.SECONDS).build();
         this.groupCache = CacheBuilder.newBuilder()
                         .expireAfterWrite(5, TimeUnit.SECONDS).build();
 
+        this.addListener();
+    }
+
+    public void removeListeners() {
+        ProtocolLibrary.getProtocolManager().removePacketListeners(this.plugin);
+    }
+
+    public void addListener() {
         PacketType[] legacyTypes = new PacketType[]{ PacketType.Play.Server.CHAT };
         PacketType[] types = new PacketType[]{ PacketType.Play.Server.CHAT, PacketType.Play.Server.SYSTEM_CHAT };
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
+        ListenerPriority priority =  ListenerPriority.NORMAL;
+        try {
+            priority = ListenerPriority.valueOf(Setting.PACKET_EVENT_PRIORITY.getString());
+        } catch (IllegalArgumentException ignored) {
+
+        }
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, priority, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
             final RoseChatAPI api = RoseChatAPI.getInstance();
 
             @Override
@@ -174,7 +193,7 @@ public class PacketListener {
                     // https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] deleteClientButton = null;
                     try {
-                         deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
+                        deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
                     } catch (JsonSyntaxException ignored) {}
 
                     if (deleteClientButton == null) return;
