@@ -43,9 +43,11 @@ public class CreateGroupCommand extends AbstractCommand {
 
         String name = getAllArgs(1, args);
 
-        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
-
         RosePlayer rosePlayer = new RosePlayer(player);
+        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) {
+            rosePlayer.sendLocaleMessage("no-permission");
+            return;
+        }
 
         RoseMessage message = RoseMessage.forLocation(rosePlayer, MessageLocation.GROUP);
         MessageRules messageRules = new MessageRules().applyAllFilters();

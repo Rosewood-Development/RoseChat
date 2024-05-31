@@ -67,7 +67,11 @@ public class ChatColorCommand extends AbstractCommand {
             return;
         }
 
-        if (!MessageUtils.canColor(new RosePlayer(sender), color, MessageLocation.CHATCOLOR.toString().toLowerCase())) return;
+        RosePlayer rosePlayer = new RosePlayer(sender);
+        if (!MessageUtils.canColor(rosePlayer, color, MessageLocation.CHATCOLOR.toString().toLowerCase())) {
+            rosePlayer.sendLocaleMessage("no-permission");
+            return;
+        }
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {

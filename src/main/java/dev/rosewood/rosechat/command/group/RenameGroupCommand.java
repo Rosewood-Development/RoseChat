@@ -36,9 +36,13 @@ public class RenameGroupCommand extends AbstractCommand {
         }
 
         String name = getAllArgs(1, args);
-        if (!MessageUtils.canColor(new RosePlayer(sender), name, "group")) return;
-
         RosePlayer rosePlayer = new RosePlayer(sender);
+
+        if (!MessageUtils.canColor(rosePlayer, name, "group")) {
+            rosePlayer.sendLocaleMessage("no-permission");
+            return;
+        }
+
         MessageRules messageRules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyURLFilter();
 
         MessageRules.RuleOutputs outputs = messageRules.apply(rosePlayer, MessageLocation.GROUP, name);

@@ -360,12 +360,7 @@ public class MessageUtils {
         boolean canGradient = !gradientMatcher.find() || sender.hasPermission("rosechat.gradient." + permissionArea);
         boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + permissionArea);
 
-        if (!(canColor && canMagic && canFormat && canHex && canGradient && canRainbow)) {
-            sender.sendLocaleMessage("no-permission");
-            return false;
-        }
-
-        return true;
+        return canColor && canMagic && canFormat && canHex && canGradient && canRainbow;
     }
 
     /**

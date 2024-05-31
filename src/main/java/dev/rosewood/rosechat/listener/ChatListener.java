@@ -4,6 +4,8 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,6 +21,12 @@ public class ChatListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
+
+        // Remove the chat colour if the player no longer has permission for it.
+        RosePlayer sender = new RosePlayer(player);
+        if (!MessageUtils.canColor(sender, sender.getPlayerData().getColor(), MessageLocation.CHATCOLOR.toString().toLowerCase()))
+            sender.getPlayerData().setColor("");
+
         String message = event.getMessage();
 
         RoseChatAPI api = RoseChatAPI.getInstance();
@@ -34,7 +42,6 @@ public class ChatListener implements Listener {
             }
         }
 
-        RosePlayer sender = new RosePlayer(player);
         PlayerData data = sender.getPlayerData();
 
         // Get the channel that the message should be sent to.

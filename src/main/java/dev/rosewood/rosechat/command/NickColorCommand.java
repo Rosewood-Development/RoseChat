@@ -95,7 +95,10 @@ public class NickColorCommand extends AbstractCommand {
             return;
         }
 
-        if (!MessageUtils.canColor(new RosePlayer(sender), color, MessageLocation.NICKNAME.toString().toLowerCase())) return;
+        if (!MessageUtils.canColor(new RosePlayer(sender), color, MessageLocation.NICKNAME.toString().toLowerCase())) {
+            rosePlayer.sendLocaleMessage("no-permission");
+            return;
+        }
 
         String colorified = HexUtils.colorify(color);
         if (colorified.equals(color) || !ChatColor.stripColor(colorified).isEmpty() || color.contains("&r")) {
