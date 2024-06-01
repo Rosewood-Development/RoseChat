@@ -79,7 +79,7 @@ public class PlayerListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         this.playerDataManager.getPlayerData(player.getUniqueId()).save();
