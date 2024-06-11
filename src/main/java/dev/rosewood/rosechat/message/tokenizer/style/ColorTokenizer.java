@@ -73,7 +73,9 @@ public class ColorTokenizer extends Tokenizer {
     private ColorToken parseMatcher(Pattern pattern, String input) {
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
-            if (matcher.start() != 0) return null;
+            if (matcher.start() != 0)
+                return null;
+
             String content = input.substring(0, matcher.end());
             return new ColorToken(content, this.fromString(content));
         }
@@ -89,6 +91,7 @@ public class ColorTokenizer extends Tokenizer {
         int hashIndex = string.indexOf('#');
         if (hashIndex == -1)
             return ChatColor.getByChar(string.charAt(1));
+
         return HexUtils.translateHex(string.substring(hashIndex, hashIndex + 7));
     }
 

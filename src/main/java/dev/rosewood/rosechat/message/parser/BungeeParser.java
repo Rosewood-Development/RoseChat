@@ -28,7 +28,7 @@ public class BungeeParser implements MessageParser<BaseComponent[]> {
 
     @Override
     public MessageDirection getMessageDirection() {
-        return MessageDirection.FROM_BUNGEE_SERVER;
+        return MessageDirection.SERVER_TO_SERVER;
     }
 
 }

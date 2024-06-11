@@ -15,6 +15,10 @@ import java.util.LinkedList;
 
 public class DebugManager extends Manager {
 
+    // TODO do once message, make this a bit better
+    // TODO should output to console,
+    // TODO send msg when done
+
     private boolean enabled;
     private boolean writeToFile;
     private boolean timerEnabled;

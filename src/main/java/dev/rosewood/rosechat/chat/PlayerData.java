@@ -301,6 +301,7 @@ public class PlayerData {
             this.activeMuteTask.cancel();
             this.activeMuteTask = null;
         }
+
         this.muteTime = 0;
     }
 

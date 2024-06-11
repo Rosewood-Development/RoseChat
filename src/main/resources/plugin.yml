@@ -24,76 +24,6 @@ softdepend:
   - FabledSkyblock
   - MarriageMaster
   - InteractiveChat
-commands:
-  rosechat:
-    aliases: [rc]
-    description: Main command for RoseChat.
-  message:
-    aliases: [msg, whisper, tell, pm, m, w, t]
-    description: Send a message to another player.
-    permission: rosechat.message
-  reply:
-    aliases: [r]
-    description: Replies to a message from another player.
-    permission: rosechat.reply
-  socialspy:
-    aliases: [ss, spy]
-    description: Allows a player to see private messages.
-    permission: rosechat.spy
-  togglemessage:
-    aliases: [togglemessages, togglepm, togglemsg, togglemsgs, togglepms]
-    description: Toggles receiving messages.
-    permission: rosechat.togglemessage
-  togglesound:
-    aliases: [togglesounds, toggleping, toggletag]
-    description: Toggles receiving sounds on messages or tags.
-    permission: rosechat.togglesound
-  toggleemoji:
-    aliases: [toggleemojis]
-    description: Toggles automatically creating emojis.
-    permission: rosechat.toggleemoji
-  channel:
-    aliases: [c]
-    description: Accesses a chat channel.
-    permission: rosechat.channel
-  chat:
-    aliases: [cc, chatchannel]
-    description: Displays commands for chat channels.
-  color:
-    aliases: [chatcolor, colour, chatcolour]
-    description: Set a default chat color.
-    permission: rosechat.chatcolor
-  mute:
-    description: Mute a player.
-    permission: rosechat.mute
-  unmute:
-    description: Removes a mute from a player.
-    permission: rosechat.unmute
-  gc:
-    aliases: [group, groupchat]
-    description: Displays group chat commands.
-  gcm:
-    aliases: [gcm, gcmsg, gmsg]
-    description: Send a message in a group chat.
-    permission: rosechat.group.message
-  nickname:
-    aliases: [nick]
-    description: Set a nickname.
-    permission: rosechat.nickname
-  nickcolor:
-    aliases: [nickcolour]
-    description: Set a nickname color.
-    permission: rosechat.nickcolor
-  ignore:
-    description: Ignore a player.
-    permission: rosechat.ignore
-  delmsg:
-    description: Delete a message.
-    permission: rosechat.deletemessage
-  realname:
-    description: See a player's real name.
-    permission: rosechat.realname
-
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
@@ -120,7 +50,6 @@ permissions:
       rosechat.spy: true
       rosechat.togglemessage: true
       rosechat.togglesound: true
-      rosechat.toggleemoji: true
       rosechat.mute: true
       rosechat.unmute: true
       rosechat.channel: true

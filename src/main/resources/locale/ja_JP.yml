@@ -3,299 +3,59 @@
 prefix: '&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] '
 
 # コマンド・メッセージ
-no-permission: '&cこれをするのは許可がありません！'
-player-not-found: '&cこのプレイヤーはオンラインではありません！'
-player-only: '&cコンソールはこのコマンドを使うことができません！'
-invalid-arguments: '&c使用方法： &b%syntax%&c。'
-not-a-number: '&cこれはナンバーではありません。'
-message-blank: '&cメッセージを入力してください！'
+no-permission: "&cこれをするのは許可がありません！"
+only-player: "&cプレイヤーだけはこのコマンドを使えます！"
+invalid-argument: "&c%message%"
+message-blank: "&cメッセージを入力してください！"
+
+# アーギュメントハンドラー・エラー・メッセージ
+argument-handler-player: "このプレイヤーはオンラインではありません！"
+argument-handler-channel: "このチャンネルがありません！"
+argument-handler-chatcolor: "これは有効な色がありません！"
+argument-handler-timescale: "これは有効なタイムスケールがありません！"
+argument-handler-integer: "これはナンバーではありません！"
+argument-handler-group: "このグループチャットがありません！"
+argument-handler-group-member: "このグループチャットにこのプレイヤーがありません！"
+argument-handler-member-group: "このグループチャットにあなたがありません！"
+
+# モデレーション・メッセージ
+blocked-caps: "&c大文字をすぎるのは入りますからあなたのメッセージをセンドすることができませんでした！"
+blocked-spam: "&cスパムしないでください！"
+blocked-language: "&c&c無礼な言葉を使いました (;_;)"
+blocked-url: "&cURLかIPをセンドしないでください！"
 
 # メイン・コマンド・メッセージ
-base-command-help: '&eコマンドインフォメーションには&b/rc help &eを使います。'
+base-command-color: "&e"
+base-command-help: '&eコマンドインフォメーションには&b/%cmd% &eを使います。'
 
 # ヘルプ・コマンド
-command-help-description: '&8 - &d/rc help &7- ヘルプメニューを見せます…現在地。'
-command-help-title: '&e使用可能コマンド：'
-command-help-usage: '&e/rc help'
+command-help-description: "ヘルプメニューを見せます…現在地"
+command-help-title: "&e使用可能コマンド："
+command-help-list-description: "&8 - &d/%cmd% %subcmd% &7- %desc%"
+command-help-list-description-no-sub: "&8 - &d/%cmd% &7- %desc%"
 
 # リロード・コマンド
-command-reload-description: '&8 - &d/rc reload &7- プラグインをリロードします。'
-command-reload-usage: '&e/rc reload'
-command-reload-reloaded: '&eプラグインのデータとコンフィグファイルとロケールファイルはリロードしました。'
-
-# モデレーション・コマンド
-blocked-caps: '&c大文字をすぎるのは入りますからあなたのメッセージをセンドすることができませんでした！'
-blocked-spam: '&cスパムしないでください！'
-blocked-language: '&c醜語を使いました (;_;)'
-blocked-url: '&cURLかIPをセンドしないでください！'
-
-# メッセージ・コマンド
-command-message-description: '&8 - &d/msg &7- プレイヤーにメッセージします。'
-command-message-usage: '&e/msg <プレイヤー> <メッセージ>'
-command-message-enter-message: '&cメッセージを入力してください！'
-
-# 答えコマンド
-command-reply-description: '&8 - &d/reply &7- プレイヤーのメッセージに答えます。'
-command-reply-usage: '&e/reply'
-command-reply-enter-message: '&cメッセージを入力してください！'
-command-reply-no-one: '&cここでは誰もいません…'
-
-# ソーシャルスパイ・コマンド
-command-socialspy-description: '&8 - &d/socialspy &7- プライベートメッセージを見せるのをトグルします。'
-command-socialspy-usage: '&e/socialspy <タイプ>'
-command-socialspy-enabled: '&b%type%&eスパイを&aエネーブルしました&e。'
-command-socialspy-disabled: '&b%type%&eスパイを&cディセーブルしました&e。'
-command-socialspy-message: 'メッセージ'
-command-socialspy-channel: 'チャンネル'
-command-socialspy-group: 'グループ'
-command-socialspy-all: 'メッセージとチャンネルとグループ'
-
-# トグルメッセージ・コマンド
-command-togglemessage-description: '&8 - &d/togglemessage &7- メッセージを受けるのをトグルします。'
-command-togglemessage-usage: '&e/togglemessage'
-command-togglemessage-on: '&eメッセージを受けるのを&aエネーブルしました&e。'
-command-togglemessage-off: '&eメッセージを受けるのを&cディセーブルしました&e。'
-command-togglemessage-cannot-message: '&cこのプレイヤーにメッセージすることができません！'
-
-# トグルサウンド ・コマンド
-command-togglesound-description: '&8 - &d/togglesound &7- メッセージ音とタッグ音をトグルします。'
-command-togglesound-usage: '&e/togglesound <messages/tags/all>'
-command-togglesound-on: '&b%type%&e音を&aエネーブルしました&e。'
-command-togglesound-off: '&b%type%&e音を&cディセーブルしました&e。'
-command-togglesound-messages: 'メッセージ'
-command-togglesound-tags: 'タッグ'
-command-togglesound-all: 'オール'
-
-# トグルえもじ・コマンド
-command-toggleemoji-description: '&8 - &d/toggleemoji &7- えもじのフォーマットをトグルします。'
-command-toggleemoji-usage: '&e/toggleemoji'
-command-toggleemoji-on: '&eえもじのフォーマットを&aエネーブルしました&e。'
-command-toggleemoji-off: '&eえもじのフォーマットを&cディセーブルしました&e。'
-
-# チャンネル・コマンド
-command-channel-description: '&8 - &d/channel &7- チャットチャンネルにメッセージをセンドします。'
-command-channel-usage: '&e/channel <チャンネル> [メッセージ]'
-command-channel-not-found: '&cこのチャンネルがありません。'
-command-channel-joined: '&e今、&b%id%&eチャンネルを使っています。'
-command-channel-custom-usage: '&e/%channel% &e<メッセージ>'
-command-channel-not-joinable: '&cこのチャンネルを参加することができません。'
-command-channel-cannot-message: '&cこのチャンネルにメッセージをセンドすることができません！'
-
-# チャット・コマンド
-command-chat-description: '&8 - &d/chat &7- アドミンのヘルプメニューを見せます。'
-command-chat-usage: '&e/chat help'
-
-# チャットヘルプ・コマンド
-command-chat-help-description: '&8 - &c/chat help &7- アドミンのヘルプメニューを見せます…現在地。'
-command-chat-help-usage: '&8 - &e/chat help'
-command-chat-help-title: '&e使用可能コマンド：'
-
-# チャットクリア・コマンド
-command-chat-clear-description: '&8 - &c/chat clear &7- チャットをクリアします。'
-command-chat-clear-usage: '&e/chat clear [チャンネル]'
-command-chat-clear-cleared: '&b%channel%&eチャンネルをクリアしました。'
-
-# チャットムーブ・コマンド
-command-chat-move-description: '&8 - &c/chat move &7- プレイヤーをチャンネルに乗り換えます。'
-command-chat-move-usage: '&e/chat move <プレイヤー> <チャンネル>'
-command-chat-move-success: '&b%player%&eを&b%channel%&eに乗り換えました。'
-command-chat-move-moved: '&b%channel%&eに乗り換えました。'
-
-# チャットミュート・コマンド
-command-chat-mute-description: '&8 - &c/chat mute &7- チャットチャンネルをミュートします。'
-command-chat-mute-usage: '&e/chat mute <チャンネル>'
-command-chat-mute-muted: '&b%channel%&eチャンネルをミュートしました。'
-command-chat-mute-unmuted: '&b%channel%&eチャンネルはミュートを解除しました。'
-channel-muted: '&cこのチャンネルはミュートだからこのチャンネルにメッセージをセンドすることができません。'
-
-# チャットSudo・コマンド
-command-chat-sudo-description: '&8 - &c/chat sudo &7- あなたは他のプレイヤーからメッセージをセンドします。'
-command-chat-sudo-usage: '&e/chat sudo <プレイヤー> <チャンネル> <メッセージ>'
-
-# チャット・インフォ・コマンド
-command-chat-info-description: '&8 - &c/chat info &7- チャットチャンネルのインフォメーションを見せます。'
-command-chat-info-usage: '&e/chat info <チャンネル>'
-command-chat-info-title: '&7[&c%id% インフォ&7]'
-command-chat-info-format: "| &eデフォルト： &b%default% &7| &eミュート： &b%muted% &7| &eコマンド： &c%commands% &7| &eワールド： &a%worlds% &7| &e参加できる： &b%joinable% &7| &eディスコード： &b%discord% &eプレイヤー： &b%players% &7| &eサーバー： &b%servers%"
-command-chat-info-true: '真'
-command-chat-info-false: '偽'
-command-chat-info-none: '無'
-
-# グループチャット・コマンド
-command-gc-description: '&8 - &d/gc &7- グループチャットのヘルプメニューを見せます。'
-command-gc-usage: '&e/gc help'
-no-gc: '&cグループチャットを持っていません！'
-gc-invalid: '&cあなたはこのグループチャットにありません！'
-gc-does-not-exist: '&cこのグループチャットはありません！'
-gc-limit: '&cグループチャットをもっと参加することができません！'
-
-# グループチャット・ヘルプ・コマンド
-command-gc-help-description: '&8 - &b/gc help &7- グループチャットのヘルプメニューを見せます…現在地。'
-command-gc-help-usage: '&e/gc help'
-
-# グループチャット・クリエイト・コマンド
-command-gc-create-description: '&8 - &b/gc create &7- 新しいグループチャットを作ります。'
-command-gc-create-usage: '&e/gc create <id> <名前>'
-command-gc-create-success: '&e新しいグループチャットを作りました、名前は&b%name%&eです。 プレイヤーを招待に&b/gc invite&eを使います。'
-command-gc-create-fail: '&cグループチャットをもう持っています！'
-command-gc-already-exists: '&cこの名前のグループ チャットはもうあります！'
-
-# グループチャット・インバイト・コマンド
-command-gc-invite-description: '&8 - &b/gc invite &7- プレイヤーをグループチャットに招待します。'
-command-gc-invite-usage: '&e/gc invite <プレイヤー>'
-command-gc-invite-full: '&bあなたのグループチャットは１２８人のメンバーがもういます！'
-command-gc-invite-success: '&b%player%&eを&b%name%&eグループチャットに招待しました。'
-command-gc-invite-invited: '&b%player%&eは&b%name%&eグループチャットに招待しました。'
-command-gc-invite-member: '&cこのプレイヤーはあなたのグループチャットにもういます！'
-
-# グループチャット・キック・コマンド
-command-gc-kick-description: '&8 - &b/gc kick &7- プレイヤーをグループチャットから取り除きます。'
-command-gc-kick-usage: '&e/gc kick <プレイヤー>'
-command-gc-kick-success: '&b%player%&eを&b%name%&eグループチャットから取り除きました。'
-command-gc-kick-kicked: '&eあなたを&b%name%&eグループチャットから取り除きました。'
-command-gc-kick-invalid-player: '&cこのプレイヤーがあなたのグループチャットにいません！'
-command-gc-kick-self: '&c自分を取り除くことができません！'
-
-# グループチャット・アクセプト・コマンド
-command-gc-accept-description: '&8 - &b/gc accept &7- グループチャットの招待を応じます。'
-command-gc-accept-usage: '&e/gc accept [プレイヤー]'
-command-gc-accept-success: '&eあなたは&b%name%&eグループチャットを参加しました。'
-command-gc-accept-accepted: '&b%player%&eは&b%name%&eグループチャットを参加しました。'
-command-gc-accept-no-invites: '&cグループチャットの招待がありません (;_;)'
-command-gc-accept-not-invited: '&cあなたをこのグループチャットは招待しませんでした。'
-command-gc-accept-hover: '&a招待を応するにクリックします'
-command-gc-accept-accept: '&a&l応じます'
-
-# グループチャット・デナイ・コマンド
-command-gc-deny-description: '&8 - &b/gc deny &7- グループチャット招待を却下します。'
-command-gc-deny-usage: '&e/gc deny [プレイヤー]'
-command-gc-deny-success: '&b%name%&eの招待を却下しました。'
-command-gc-deny-denied: '&b%player%&eはあなたの招待を却下しました。'
-command-gc-deny-hover: '&c招待を却下するにクリックします'
-command-gc-deny-deny: '&c&l却下します'
-
-# グループチャット・リーブ・コマンド
-command-gc-leave-description: '&8 - &b/gc leave &7- グループチャットから離れます。'
-command-gc-leave-usage: '&e/gc leave <グループチャット>'
-command-gc-leave-success: '&eあなたは&b%name%&eグループチャットから離れました。'
-command-gc-leave-left: '&b%player%&eは&b%name%&eグループチャットから離れました。'
-command-gc-leave-own: '&cあなたのグループチャットから離れることができません！ グループチャットを解散するに&b/gc disband&cを使います。'
-
-# グループチャット・ディスバンド・コマンド
-command-gc-disband-description: '&8 - &b/gc disband &7- グループチャットを解散します。'
-command-gc-disband-usage: '&e/gc disband [グループチャット]'
-command-gc-disband-success: '&b%name%&eグループチャットを解散しました…'
-command-gc-disband-admin: '&eあなたは&b%name%&eグループチャットを解散しました。'
-
-# グループチャット・メンバー・コマンド
-command-gc-members-description: '&8 - &b/gc members &7- グループチャットのメンバーを見せます。'
-command-gc-members-usage: '&e/gc members <グループチャット>'
-command-gc-members-title: '&8[&b%name% &bメンバーズ&8]'
-command-gc-members-owner: '&8- &e:star: &b%player%'
-command-gc-members-member: '&8- &b%player%'
-
-# グループチャット・リネーム・コマンド
-command-gc-rename-description: '&8 - &b/gc rename &7- グループチャットをリネームします。'
-command-gc-rename-usage: '&e/gc rename <グループチャット> <新しい名前>'
-command-gc-rename-success: '&eグループチャットの名前は今&b%name%&e。'
-
-# グループチャット・インフォ・コマンド
-command-gc-info-description: '&8 - &b/gc info &7- グループチャットのインフォメーションを見せます。'
-command-gc-info-usage: '&e/gc info <グループチャット>'
-command-gc-info-title: '&7[&b%group% &bインフォ&7]'
-command-gc-info-format: '&eID: &b%id% &7| &eオーナー: &b%owner% &7| &eメンバー: &b%members%'
-
-# グループチャット・リスト・コマンド
-command-gc-list-description: '&8 - &b/gc list &7- すべてグループチャットを見せます。'
-command-gc-list-usage: '&e/gc list'
-command-gc-list-title: '&7[&bグループ&7]'
-command-gc-list-format: '&8- &8[%group%&8] &eID: &b%id%'
-command-gc-list-more: '&eもっとインフォに&b/gc info <group>&eを使います。'
-
-# グループチャット・メッセージ・コマンド
-command-gcm-description: '&8 - &d/gcm &7- グループチャットにメッセージをセンドします。'
-command-gcm-usage: '&e/gcm <グループチャット> <メッセージ>'
-command-gcm-enter-message: '&cメッセージを入力してください！'
-
-#  チャット・カラー ・コマンド
-command-color-description: '&8 - &d/color &7- あなたのデフォルトのチャット色を変更します。'
-command-color-usage: '&e/color <装飾コード/プレイヤー> [装飾コード/remove]'
-command-color-success: '&e新しいチャット色は&f%color%&e&r。'
-command-color-invalid: '&eこれは有効な装飾コードではありません。'
-command-color-removed: '&eあなたのチャットカラーは外しました。'
-command-color-gradient: 'グラディエント'
-command-color-rainbow: 'レインボー'
-command-color-others: "&e%player%のチャット色を&f%color%&eに設定しました。"
-command-color-others-removed: "&e%player%のチャット色を削除しました。"
-
-# ミュート・コマンド
-command-mute-description: '&8 - &d/mute &7- プレイヤーをミュートします。'
-command-mute-usage: '&e/mute <プレイヤー> [時間] [days/months/years]'
-command-mute-success: '&b%player%&eを&b%time%&b%scale%&eにミュートしました。'
-command-mute-indefinite: '&b%player%&eを無限の間にミュートしました。'
-command-mute-muted: '&eあなたをミュートしました。'
-command-mute-cannot-be-muted: '&cこのプレイヤーをミュートすることができません！'
-command-mute-cannot-send: '&cあなたをミュートしましたからメッセージをセンドすることができません！'
-command-mute-unmuted: '&eミュートを解除しました。'
-command-mute-second: '秒間'
-command-mute-minute: '分間'
-command-mute-hour: '時間'
-command-mute-day: '日間'
-command-mute-month: 'か月間'
-command-mute-year: '年間'
-command-mute-seconds: '秒間'
-command-mute-minutes: '分間'
-command-mute-days: '日間'
-command-mute-hours: '時間'
-command-mute-months: 'か月間'
-command-mute-years: '年間'
-
-# アンミュート・コマンド
-command-unmute-description: '&8 - &d/unmute &7- プレイヤーのミュートを解除しました。'
-command-unmute-usage: '&e/unmute <player>'
-command-unmute-success: '&eミュートを解除しました。'
-
-# ニックネーム・コマンド
-command-nickname-description: '&8 - &d/nickname &7- ニックネームを変更します。'
-command-nickname-usage: '&e/nickname <ニックネーム/プレイヤー> [ニックネーム/off]'
-command-nickname-success: '&e新しいニックネームは&f%name%&eです。'
-command-nickname-other: '&b%player%&eの新しいニックネームは&f%name%&eです。'
-command-nickname-too-short: '&cこのニックネームは短すぎます！'
-command-nickname-too-long: '&cこのニックネームは長すぎます！'
-command-nickname-not-allowed: '&cこのニックネームを使うことができません！'
-command-nickname-colors-only: '&cニックネームには色のだけを含めることができます！'
-
-# イグノア・コマンド
-command-ignore-description: '&8 - &d/ignore &7- 他のプレイヤーのメッセージを見るのをやめます。'
-command-ignore-usage: '&e/ignore <プレイヤー>'
-command-ignore-ignored: '&b%player%&eを無視しています。'
-command-ignore-unignored: '&b%player%&eを無視していません。'
-command-ignore-list-title: '&eプレイヤーたちを%amount%人無視しています：'
-command-ignore-list-color: '&e'
-command-ignore-list-separator: '&7、 &e'
+command-reload-description: "プラグインをリロードします"
+command-reload-reloaded: "&eプラグインのデータとコンフィグファイルとロケールファイルはリロードしました。"
 
 # デバッグ・コマンド
-command-debug-description: '&8 - &d/rc debug &7- デバッグモードをトグルします。'
-command-debug-usage: '&e/rc debug'
-command-debug-on: '&eデバッグモードは今&aオン&eです。 デバッグインフォをセーブにまた&b/rc debugを使います。'
-command-debug-off: '&eデバッグモードは&cオフ&eです。'
+command-debug-description: "デバッグモードをトグルします"
+command-debug-on: "&eデバッグモードは今&aオン&eです。 デバッグインフォをセーブにまた&b/rc debugを使います。"
+command-debug-off: "&eデバッグモードは&cオフ&eです。"
+command-debug-once: "&eデバッグモードは今&aオン&eです。 メッセージをセンドしての後、ひとりでにディセーブルする。"
 
-# ニックネーム・カラー・コマンド
-command-nickcolor-description: '&8 - &d/nickcolor &7- Cあなたのニックネーム色を変更します。'
-command-nickcolor-usage: '&e/nickcolor <装飾コード/プレイヤー> [装飾コード/remove]'
-command-nickcolor-success: '&e新しいニックネームは&f%name%&e&r。'
-command-nickcolor-invalid: '&eこれは有効な装飾コードではありません。'
-command-nickcolor-removed: '&eあなたのニックネームカラーは外しました。'
-command-nickcolor-others: "&e%player%のニックネームカラーを&f%color%&eに設定しました。"
-command-nickcolor-others-removed: "&e%player%のニックネームカラーを削除しました。"
+# チャンネル・コマンド
+command-channel-description: "チャンネルに参加かかチャンネルにメッセージをセンドする"
+command-channel-joined: "&e今&b%id%&eチャンネルを使っています。"
+command-channel-custom-usage: "&e/%channel% &e[メッセージ]"
+command-channel-not-joinable: "&c&cこのチャンネルを参加することができません。"
+command-channel-cannot-message: "&cこのチャンネルにメッセージをセンドすることができません！"
 
-# チャット・トグル・コマンド
-command-chat-toggle-description: '&8 - &c/chat toggle &7- チャンネルの見えるのをトグルします。'
-command-chat-toggle-usage: '&e/chat toggle <チャンネル>'
-command-chat-toggle-on: '&b%channel%&eチャンネルを今見れます。'
-command-chat-toggle-off: '&b%channel%&eチャンネルを今見れません。'
-
-# リアルネーム・コマンド
-command-realname-description: "&8 - &d/realname &7- プレイヤーのリアルネームを見せます。"
-command-realname-usage: '&e/realname <プレイヤー>'
-command-realname-success: "&e%name%&r&eのリアルネームは&b%player%&e。"
+# Chat Color Command
+command-chatcolor-description: "あなたのデフォルトのチャット色を変更します"
+command-chatcolor-success: "&eYour new chat color is &f%color%&e."
+command-chatcolor-removed: "&eYour chat color has been removed."
+command-chatcolor-player: "&eYou have set &b%player%&e's chat color to &f%color%&e."
+command-chatcolor-removed-player: "&eYou have removed &b%player%&e's chat color."
+command-chatcolor-gradient: "Gradient"
+command-chatcolor-rainbow: "Rainbow"

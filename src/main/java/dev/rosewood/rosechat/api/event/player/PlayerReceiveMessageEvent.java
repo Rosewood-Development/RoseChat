@@ -7,26 +7,34 @@ import net.md_5.bungee.api.chat.BaseComponent;
 
 public class PlayerReceiveMessageEvent extends PlayerMessageEvent {
 
-    private MessageTokenizerResults<BaseComponent[]> messageComponents;
+    private MessageTokenizerResults<BaseComponent[]> components;
 
-    public PlayerReceiveMessageEvent(RosePlayer sender, RosePlayer receiver, RoseMessage message, MessageTokenizerResults<BaseComponent[]> messageComponents) {
+    /**
+     * Called when a player receives a private message.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param receiver The {@link RosePlayer} who is receiving the message.
+     * @param message The {@link RoseMessage} that is being sent.
+     * @param components The {@link MessageTokenizerResults} for the message.
+     */
+    public PlayerReceiveMessageEvent(RosePlayer sender, RosePlayer receiver, RoseMessage message, MessageTokenizerResults<BaseComponent[]> components) {
         super(sender, receiver, message);
-        this.messageComponents = messageComponents;
+
+        this.components = components;
     }
 
     /**
      * @return The {@link MessageTokenizerResults} for the parsed message.
      */
-    public MessageTokenizerResults<BaseComponent[]> getMessageComponents() {
-        return this.messageComponents;
+    public MessageTokenizerResults<BaseComponent[]> getComponents() {
+        return this.components;
     }
 
     /**
      * Sets the {@link MessageTokenizerResults} for the parsed message.
-     * @param messageComponents The {@link MessageTokenizerResults} for the parsed message.
+     * @param components The {@link MessageTokenizerResults} to use.
      */
-    public void setMessageComponents(MessageTokenizerResults<BaseComponent[]> messageComponents) {
-        this.messageComponents = messageComponents;
+    public void setComponents(MessageTokenizerResults<BaseComponent[]> components) {
+        this.components = components;
     }
 
 }

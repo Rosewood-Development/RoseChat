@@ -39,9 +39,14 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = TownyChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (config.contains("use-allies")) this.useAllies = config.getBoolean("use-allies");
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = TownyChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (config.contains("use-allies"))
+            this.useAllies = config.getBoolean("use-allies");
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         if (this.channelType == null)
             this.channelType = TownyChannelType.TOWN;
@@ -75,13 +80,15 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(TownAddResidentEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getResident().getUUID());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -91,10 +98,7 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     private boolean hasTeam(Player player) {
         Town town = TownyAPI.getInstance().getTown(player);
         Nation nation = TownyAPI.getInstance().getNation(player);
-        if ((this.channelType == TownyChannelType.TOWN && town == null) || (this.channelType == TownyChannelType.NATION && nation == null))
-            return false;
-
-        return true;
+        return (this.channelType != TownyChannelType.TOWN || town != null) && (this.channelType != TownyChannelType.NATION || nation != null);
     }
 
     @Override
@@ -105,39 +109,46 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
 
         if (this.channelType == TownyChannelType.TOWN) {
             Town town = TownyAPI.getInstance().getTown(sender.asPlayer());
-            if (town == null) return recipients;
+            if (town == null)
+                return recipients;
 
             for (Resident resident : town.getResidents()) {
                 Player player = Bukkit.getPlayer(resident.getUUID());
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
 
             if (this.useAllies) {
                 for (Town ally : town.getAllies()) {
                     for (Resident resident : ally.getResidents()) {
                         Player player = Bukkit.getPlayer(resident.getUUID());
-                        if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                        if (player != null && this.getReceiveCondition(sender, player))
+                            recipients.add(player);
                     }
                 }
             }
         } else {
             Nation nation = TownyAPI.getInstance().getNation(sender.asPlayer());
-            if (nation == null) return recipients;
+            if (nation == null)
+                return recipients;
 
             for (Resident resident : nation.getResidents()) {
                 Player player = Bukkit.getPlayer(resident.getUUID());
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
 
             if (this.useAllies) {
                 for (Nation ally : nation.getAllies()) {
                     for (Resident resident : ally.getResidents()) {
                         Player player = Bukkit.getPlayer(resident.getUUID());
-                        if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                        if (player != null && this.getReceiveCondition(sender, player))
+                            recipients.add(player);
                     }
                 }
             }

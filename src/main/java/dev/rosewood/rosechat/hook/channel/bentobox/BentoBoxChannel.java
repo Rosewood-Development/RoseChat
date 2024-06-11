@@ -39,8 +39,11 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = BentoBoxChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = BentoBoxChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         if (this.channelType == null)
             this.channelType = BentoBoxChannelType.TEAM;
@@ -74,13 +77,15 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(TeamJoinedEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getPlayerUUID());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -101,23 +106,29 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
+
         Island island = BentoBox.getInstance().getIslandsManager().getIsland(sender.asPlayer().getWorld(), sender.getUUID());
-        if (island == null) return recipients;
+        if (island == null)
+            return recipients;
 
         if (this.channelType == BentoBoxChannelType.TEAM) {
             for (UUID uuid : island.getMemberSet()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         } else if (this.channelType == BentoBoxChannelType.LOCAL) {
             for (Player player : island.getPlayersOnIsland()) {
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         } else if (this.channelType == BentoBoxChannelType.COOP) {
             for (UUID uuid : island.getMemberSet(RanksManager.COOP_RANK)) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         }
 

@@ -14,6 +14,7 @@ public class MultipleChannelCondition extends ChannelCondition {
 
     public MultipleChannelCondition(ConfigurationSection section, List<String> conditions) {
         super(section, null);
+
         this.conditionStrs = conditions;
         this.conditions = new ArrayList<>();
     }

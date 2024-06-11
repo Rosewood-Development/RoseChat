@@ -23,6 +23,7 @@ public class DiscordEmojiManager extends Manager {
 
     public DiscordEmojiManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.discordEmojis = new HashMap<>();
     }
 
@@ -31,7 +32,8 @@ public class DiscordEmojiManager extends Manager {
         this.discordEmojis.clear();
 
         File emojiFile = new File(this.rosePlugin.getDataFolder(), "discord-emoji.json");
-        if (!emojiFile.exists()) this.rosePlugin.saveResource("discord-emoji.json", false);
+        if (!emojiFile.exists())
+            this.rosePlugin.saveResource("discord-emoji.json", false);
 
         try {
             Reader reader = Files.newBufferedReader(Paths.get(emojiFile.getAbsolutePath()));
@@ -49,7 +51,9 @@ public class DiscordEmojiManager extends Manager {
                     String surrogates = emojiObject.get("surrogates").getAsString();
 
                     List<String> names = new ArrayList<>();
-                    for (JsonElement name : namesArray) names.add(name.getAsString());
+                    for (JsonElement name : namesArray)
+                        names.add(name.getAsString());
+
                     this.discordEmojis.put(surrogates, names);
                 }
             }
@@ -71,7 +75,9 @@ public class DiscordEmojiManager extends Manager {
         for (String unicode : this.discordEmojis.keySet()) {
             List<String> names = this.discordEmojis.get(unicode);
             for (String name : names) {
-                if (!message.contains(":" + name + ":")) continue;
+                if (!message.contains(":" + name + ":"))
+                    continue;
+
                 message = message.replace(":" + name + ":", unicode);
             }
         }

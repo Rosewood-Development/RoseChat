@@ -18,13 +18,19 @@ public class ToDiscordTagTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!Setting.CAN_TAG_MEMBERS.getBoolean()) return null;
-        if (!input.startsWith("@")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.tag")) return null;
+        if (!Setting.CAN_TAG_MEMBERS.getBoolean())
+            return null;
+
+        if (!input.startsWith("@"))
+            return null;
+
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.tag"))
+            return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
         DiscordChatProvider.DetectedMention member = discord.matchPartialMember(input.substring(1));
-        if (member == null) return null;
+        if (member == null)
+            return null;
 
         return new TokenizerResult(Token.text(member.mention()), member.consumedTextLength() + 1);
     }

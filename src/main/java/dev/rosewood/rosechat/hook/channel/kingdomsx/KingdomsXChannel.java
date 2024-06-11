@@ -38,8 +38,11 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = KingdomsChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = KingdomsChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         if (this.channelType == null)
             this.channelType = KingdomsChannelType.KINGDOM;
@@ -66,13 +69,15 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(KingdomJoinEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getPlayer().getId());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -95,7 +100,8 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
         for (Kingdom k : kingdom.getKingdomsWithRelation(relation)) {
             for (UUID uuid : k.getMembers()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         }
 
@@ -106,15 +112,19 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
+
         Kingdom kingdom = KingdomPlayer.getKingdomPlayer(sender.getUUID()).getKingdom();
-        if (kingdom == null) return recipients;
+        if (kingdom == null)
+            return recipients;
 
         switch (this.channelType) {
             case KINGDOM: {
                 for (UUID uuid : kingdom.getMembers()) {
                     Player player = Bukkit.getPlayer(uuid);
-                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                    if (player != null && this.getReceiveCondition(sender, player))
+                        recipients.add(player);
                 }
 
                 return recipients;
@@ -125,7 +135,8 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
                 for (Kingdom nation : kingdom.getNation().getKingdoms()) {
                     for (UUID uuid : nation.getMembers()) {
                         Player player = Bukkit.getPlayer(uuid);
-                        if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                        if (player != null && this.getReceiveCondition(sender, player))
+                            recipients.add(player);
                     }
                 }
 

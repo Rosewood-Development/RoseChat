@@ -30,7 +30,7 @@ public class FromDiscordParser implements MessageParser<BaseComponent[]> {
 
     @Override
     public MessageDirection getMessageDirection() {
-        return MessageDirection.FROM_DISCORD;
+        return MessageDirection.DISCORD_TO_MINECRAFT;
     }
 
 }

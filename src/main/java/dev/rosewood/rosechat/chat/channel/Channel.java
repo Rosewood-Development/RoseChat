@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -46,14 +45,29 @@ public abstract class Channel {
      */
     public void onLoad(String id, ConfigurationSection config) {
         this.id = id;
-        if (config.contains("default") && config.getBoolean("default")) this.setDefault();
-        if (config.contains("format")) this.setFormat(config.getString("format"));
-        if (config.contains("discord")) this.setDiscordChannel(config.getString("discord"));
-        if (config.contains("commands")) this.setCommands(config.getStringList("commands"));
-        if (config.contains("override-commands")) this.setOverrideCommands(config.getStringList("override-commands"));
-        if (config.contains("shout-commands")) this.setShoutCommands(config.getStringList("shout-commands"));
-        if (config.contains("send-bungee-messages-to-discord")) this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
-        if (config.contains("shout-format")) this.setShoutFormat(config.getString("shout-format"));
+        if (config.contains("default") && config.getBoolean("default"))
+            this.setDefault();
+
+        if (config.contains("format"))
+            this.setFormat(config.getString("format"));
+
+        if (config.contains("discord"))
+            this.setDiscordChannel(config.getString("discord"));
+
+        if (config.contains("commands"))
+            this.setCommands(config.getStringList("commands"));
+
+        if (config.contains("override-commands"))
+            this.setOverrideCommands(config.getStringList("override-commands"));
+
+        if (config.contains("shout-commands"))
+            this.setShoutCommands(config.getStringList("shout-commands"));
+
+        if (config.contains("send-bungee-messages-to-discord"))
+            this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
+
+        if (config.contains("shout-format"))
+            this.setShoutFormat(config.getString("shout-format"));
     }
 
     /**
@@ -320,7 +334,10 @@ public abstract class Channel {
             }
         }
 
-        if (foundChannel == null) foundChannel = api.getDefaultChannel();
+        if (foundChannel == null)
+            foundChannel = api.getDefaultChannel();
+
         return foundChannel;
     }
+
 }

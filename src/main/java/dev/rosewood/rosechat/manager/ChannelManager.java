@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.command.CustomCommand;
+import dev.rosewood.rosechat.command.command.CustomChannelCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
@@ -34,6 +34,7 @@ public class ChannelManager extends Manager {
 
     public ChannelManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
         this.channelProviders = new HashMap<>();
         this.channels = new HashMap<>();
@@ -43,7 +44,8 @@ public class ChannelManager extends Manager {
     @Override
     public void reload() {
         File channelsFile = new File(this.rosePlugin.getDataFolder(), "channels.yml");
-        if (!channelsFile.exists()) this.rosePlugin.saveResource("channels.yml", false);
+        if (!channelsFile.exists())
+            this.rosePlugin.saveResource("channels.yml", false);
 
         this.channelsConfig = CommentedFileConfiguration.loadConfiguration(channelsFile);
         this.registerCommands(this.channelsConfig);
@@ -80,7 +82,9 @@ public class ChannelManager extends Manager {
                 for (Class<? extends Channel> channelClass : channelProvider.getChannels()) {
                     Channel channel = channelClass.getDeclaredConstructor(ChannelProvider.class).newInstance(channelProvider);
                     channel.onLoad();
-                    if (channel.isDefaultChannel()) this.defaultChannel = channel;
+                    if (channel.isDefaultChannel())
+                        this.defaultChannel = channel;
+
                     this.channels.put(channel.getId(), channel);
 
                     if (channelProvider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
@@ -123,7 +127,8 @@ public class ChannelManager extends Manager {
 
         // If a channel does not have a format, set the format to the same as the default channel.
         for (Channel channel : this.channels.values()) {
-            if (channel.getFormat() == null) channel.setFormat(this.defaultChannel.getFormat());
+            if (channel.getFormat() == null)
+                channel.setFormat(this.defaultChannel.getFormat());
 
             if (!loadedChannels.containsKey(channel.getProvider().getSupportedPlugin()))
                 loadedChannels.put(channel.getProvider().getSupportedPlugin(), new ArrayList<>());
@@ -152,7 +157,9 @@ public class ChannelManager extends Manager {
             try {
                 Channel channel = base.getDeclaredConstructor(ChannelProvider.class).newInstance(provider);
                 channel.onLoad(id, this.channelsConfig.getConfigurationSection(id));
-                if (channel.isDefaultChannel()) this.defaultChannel = channel;
+                if (channel.isDefaultChannel())
+                    this.defaultChannel = channel;
+
                 this.channels.put(id, channel);
 
                 if (provider.getSupportedPlugin().equalsIgnoreCase("WorldGuard"))
@@ -190,7 +197,7 @@ public class ChannelManager extends Manager {
             Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
             CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            commandMap.register(command, new CustomCommand(command));
+            commandMap.register(command, new CustomChannelCommand(command));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -207,13 +214,12 @@ public class ChannelManager extends Manager {
                 // If the player is in the channel and not in the region, then kick them from the channel.
                 if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(player)) {
                     Channel newChannel = Channel.findNextChannel(player);
-                    rosePlayer.changeChannel(channel, newChannel);
+                    rosePlayer.switchChannel(newChannel);
                     break;
                 }
 
                 if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(player)) {
-                    Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-                    if (rosePlayer.changeChannel(currentChannel, channel)) {
+                    if (rosePlayer.switchChannel(channel)) {
                         this.localeManager.sendMessage(player,
                                 "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
                     }

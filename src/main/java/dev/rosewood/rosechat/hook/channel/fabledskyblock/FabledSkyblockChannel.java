@@ -38,8 +38,11 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = FabledSkyblockChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = FabledSkyblockChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         if (this.channelType == null)
             this.channelType = FabledSkyblockChannelType.TEAM;
@@ -71,13 +74,15 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(PlayerIslandJoinEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -98,9 +103,12 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
+
         Island island = SkyBlockAPI.getIslandManager().getIsland(sender.asPlayer());
-        if (island == null) return recipients;
+        if (island == null)
+            return recipients;
 
         if (this.channelType == FabledSkyblockChannelType.TEAM) {
             List<UUID> members = new ArrayList<>();
@@ -110,16 +118,19 @@ public class FabledSkyblockChannel extends RoseChatChannel implements Listener {
 
             for (UUID uuid : members) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         } else if (this.channelType == FabledSkyblockChannelType.LOCAL) {
             for (Player player : SkyBlockAPI.getIslandManager().getPlayersAtIsland(island)) {
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         } else {
             for (UUID uuid : island.getCoopPlayers().keySet()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         }
 

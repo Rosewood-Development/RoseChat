@@ -18,19 +18,29 @@ public class PlayerMessageEvent extends Event implements Cancellable {
 
     public PlayerMessageEvent(RosePlayer sender, RosePlayer receiver, RoseMessage message) {
         super(!Bukkit.isPrimaryThread());
+
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
     }
 
+    /**
+     * @return The {@link RosePlayer} sending the message.
+     */
     public RosePlayer getSender() {
         return this.sender;
     }
 
+    /**
+     * @return The {@link RosePlayer} receiving the message.
+     */
     public RosePlayer getReceiver() {
         return this.receiver;
     }
 
+    /**
+     * @return The {@link RoseMessage} that was sent.
+     */
     public RoseMessage getMessage() {
         return this.message;
     }

@@ -3,10 +3,10 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import java.awt.Color;
-import java.util.function.Function;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import java.awt.Color;
+import java.util.function.Function;
 
 public class ColorDecorator extends TokenDecorator {
 
@@ -15,12 +15,14 @@ public class ColorDecorator extends TokenDecorator {
 
     private ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
         super(DecoratorType.STYLING);
+
         this.colorGeneratorFunction = colorGeneratorFunction;
         this.colorGenerator = null;
     }
 
     private ColorDecorator(HexUtils.ColorGenerator colorGenerator) {
         super(DecoratorType.STYLING);
+
         this.colorGeneratorFunction = null;
         this.colorGenerator = colorGenerator;
     }
@@ -44,6 +46,7 @@ public class ColorDecorator extends TokenDecorator {
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
         if (newDecorator instanceof FormatDecorator formatDecorator)
             return formatDecorator.chatColor == ChatColor.RESET;
+
         return super.isOverwrittenBy(newDecorator);
     }
 

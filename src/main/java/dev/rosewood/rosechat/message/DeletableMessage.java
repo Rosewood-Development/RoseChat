@@ -15,12 +15,14 @@ public class DeletableMessage {
 
     public DeletableMessage(UUID uuid, String json, boolean isClient) {
         this(uuid);
+
         this.json = json;
         this.isClient = isClient;
     }
 
     public DeletableMessage(UUID uuid, String json, boolean isClient, String discordId) {
         this(uuid, json, isClient);
+
         this.discordId = discordId;
     }
 

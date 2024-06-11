@@ -24,10 +24,12 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("%")) return null;
+        if (!input.startsWith("%"))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String placeholder = input.substring(1, matcher.end() - 1);
         String placeholderPermission = placeholder.replaceFirst("_", ".");
@@ -94,7 +96,9 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         }
 
         Token.Builder token = Token.group(content);
-        if (encapsulate) token.encapsulate();
+        if (encapsulate)
+            token.encapsulate();
+
         return new TokenizerResult(token.build(), originalContent.length());
     }
 

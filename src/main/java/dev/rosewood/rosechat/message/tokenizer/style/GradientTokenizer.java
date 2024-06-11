@@ -22,10 +22,12 @@ public class GradientTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("<")) return null;
+        if (!input.startsWith("<"))
+            return null;
 
         Matcher matcher = MessageUtils.GRADIENT_PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         List<Color> hexSteps = Arrays.stream(MessageUtils.getCaptureGroup(matcher, "hex").substring(1).split(":"))
                 .map(x -> x.length() != 4 ? x : String.format("#%s%s%s%s%s%s", x.charAt(1), x.charAt(1), x.charAt(2), x.charAt(2), x.charAt(3), x.charAt(3)))
@@ -48,6 +50,7 @@ public class GradientTokenizer extends Tokenizer {
             } else {
                 generator = new HexUtils.Gradient(hexSteps, contentLength);
             }
+
             return generator;
         };
 

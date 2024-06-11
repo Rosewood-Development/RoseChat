@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.message.wrapper;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.DeletableMessage;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.parser.BungeeParser;
 import dev.rosewood.rosechat.message.parser.FromDiscordParser;
@@ -11,8 +11,8 @@ import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import java.util.UUID;
 import net.md_5.bungee.api.chat.BaseComponent;
+import java.util.UUID;
 
 /**
  * A wrapper for chat messages which can be used to parse a message for a given receiver.
@@ -22,7 +22,7 @@ public class RoseMessage {
     private UUID uuid;
     private String discordId;
     private final RosePlayer sender;
-    private final MessageLocation location;
+    private final PermissionArea location;
     private String playerInput;
     private Channel channel;
     private StringPlaceholders placeholders;
@@ -34,17 +34,18 @@ public class RoseMessage {
      * @param channel The {@link Channel} that the message is being sent in.
      */
     private RoseMessage(RosePlayer sender, Channel channel) {
-        this(sender, MessageLocation.CHANNEL);
+        this(sender, PermissionArea.CHANNEL);
+
         this.channel = channel;
     }
 
     /**
-     * Creates a new RoseMessage, using a {@link MessageLocation} instead of a {@link Channel}, to be parsed later.
+     * Creates a new RoseMessage, using a {@link PermissionArea} instead of a {@link Channel}, to be parsed later.
      * This should be parsed using {@link #parse(RosePlayer, String)}.
      * @param sender The {@link RosePlayer} who is sending the message.
-     * @param location The {@link MessageLocation} that the message is being sent in.
+     * @param location The {@link PermissionArea} that the message is being sent in.
      */
-    private RoseMessage(RosePlayer sender, MessageLocation location) {
+    private RoseMessage(RosePlayer sender, PermissionArea location) {
         this.sender = sender;
         this.location = location;
         this.uuid = UUID.randomUUID();
@@ -168,9 +169,9 @@ public class RoseMessage {
     }
 
     /**
-     * @return The {@link MessageLocation} that the message was sent in.
+     * @return The {@link PermissionArea} that the message was sent in.
      */
-    public MessageLocation getLocation() {
+    public PermissionArea getLocation() {
         return this.location;
     }
 
@@ -225,7 +226,7 @@ public class RoseMessage {
         return new RoseMessage(sender, channel);
     }
 
-    public static RoseMessage forLocation(RosePlayer sender, MessageLocation location) {
+    public static RoseMessage forLocation(RosePlayer sender, PermissionArea location) {
         return new RoseMessage(sender, location);
     }
 

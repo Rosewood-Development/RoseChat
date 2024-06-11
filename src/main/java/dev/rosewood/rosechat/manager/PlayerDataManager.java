@@ -1,21 +1,18 @@
 package dev.rosewood.rosechat.manager;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
+import org.bukkit.Bukkit;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
-import org.bukkit.Bukkit;
 
 public class PlayerDataManager extends Manager {
 
@@ -25,6 +22,7 @@ public class PlayerDataManager extends Manager {
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+        
         this.playerData = new HashMap<>();
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.mutedChannels = new ArrayList<>();

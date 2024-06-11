@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -14,7 +14,7 @@ public class TokenizerParams {
     private final String input;
     private final boolean containsPlayerInput;
     private final String playerInput;
-    private final MessageLocation location;
+    private final PermissionArea location;
     private final String locationPermission;
     private final Channel channel;
     private final StringPlaceholders placeholders;
@@ -56,7 +56,7 @@ public class TokenizerParams {
         return this.playerInput;
     }
 
-    public MessageLocation getLocation() {
+    public PermissionArea getLocation() {
         return this.location;
     }
 

@@ -44,17 +44,21 @@ public class WorldGuardChannel extends RoseChatChannel {
         this.whitelist = config.contains("whitelist") ? config.getStringList("whitelist") : new ArrayList<>();
         this.blacklist = config.contains("blacklist") ? config.getStringList("blacklist") : new ArrayList<>();
         this.useMembers = config.getBoolean("use-members") && config.getBoolean("use-members");
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
     }
 
     public boolean onEnterArea(Player player) {
-        if (!this.getJoinCondition(player) || !this.autoJoin) return false;
+        if (!this.getJoinCondition(player) || !this.autoJoin)
+            return false;
 
         Location location = player.getLocation();
-        if (location.getWorld() == null) return false;
+        if (location.getWorld() == null)
+            return false;
 
         RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(location.getWorld()));
-        if (regionManager == null) return false;
+        if (regionManager == null)
+            return false;
 
         ApplicableRegionSet regions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         for (ProtectedRegion region : regions.getRegions()) {
@@ -84,17 +88,20 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     public Set<ProtectedRegion> getPlayerRegion(Player player) {
         RegionManager regionManager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
-        if (regionManager == null) return null;
+        if (regionManager == null)
+            return null;
 
         return regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())).getRegions();
     }
 
     public boolean isInWhitelistedRegion(Player player) {
         Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
-        if (regionSet == null) return false;
+        if (regionSet == null)
+            return false;
 
         for (ProtectedRegion region : regionSet) {
-            if (this.whitelist.contains(region.getId())) return true;
+            if (this.whitelist.contains(region.getId()))
+                return true;
         }
 
         return false;
@@ -102,10 +109,12 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     public boolean isInBlacklistedRegion(Player player) {
         Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
-        if (regionSet == null) return false;
+        if (regionSet == null)
+            return false;
 
         for (ProtectedRegion region : regionSet) {
-            if (this.blacklist.contains(region.getId())) return true;
+            if (this.blacklist.contains(region.getId()))
+                return true;
         }
 
         return false;
@@ -125,14 +134,17 @@ public class WorldGuardChannel extends RoseChatChannel {
 
             for (String regionStr : this.whitelist) {
                 RegionManager manager = this.regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
-                if (manager == null) return recipients;
+                if (manager == null)
+                    return recipients;
 
                 ProtectedRegion region = manager.getRegion(regionStr);
-                if (region == null) return recipients;
+                if (region == null)
+                    return recipients;
 
                 for (UUID memberUUID : region.getMembers().getUniqueIds()) {
                     Player member = Bukkit.getPlayer(memberUUID);
-                    if (member != null && this.getReceiveCondition(sender, member)) recipients.add(member);
+                    if (member != null && this.getReceiveCondition(sender, member))
+                        recipients.add(member);
                 }
             }
 
@@ -169,7 +181,9 @@ public class WorldGuardChannel extends RoseChatChannel {
         List<Player> players = new ArrayList<>();
         for (UUID uuid : this.members) {
             Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
+            if (player == null)
+                continue;
+
             players.add(player);
         }
 
@@ -182,9 +196,11 @@ public class WorldGuardChannel extends RoseChatChannel {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.whitelist.isEmpty()) {
-                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player)) count++;
+                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player))
+                    count++;
             } else {
-                if (this.getReceiveCondition(sender, player) && this.isInBlacklistedRegion(player)) count--;
+                if (this.getReceiveCondition(sender, player) && this.isInBlacklistedRegion(player))
+                    count--;
             }
         }
 

@@ -4,7 +4,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
@@ -21,10 +21,10 @@ public class ChatListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-
-        // Remove the chat colour if the player no longer has permission for it.
         RosePlayer sender = new RosePlayer(player);
-        if (!MessageUtils.canColor(sender, sender.getPlayerData().getColor(), MessageLocation.CHATCOLOR.toString().toLowerCase()))
+
+        // Remove the chat color if the player no longer has permission for it.
+        if (!MessageUtils.canColor(sender, sender.getPlayerData().getColor(), PermissionArea.CHATCOLOR))
             sender.getPlayerData().setColor("");
 
         String message = event.getMessage();
@@ -32,7 +32,9 @@ public class ChatListener implements Listener {
         RoseChatAPI api = RoseChatAPI.getInstance();
         // Check if the message is using a shout command and send the message if they are.
         for (Channel channel : api.getChannels()) {
-            if (channel.getShoutCommands().isEmpty()) continue;
+            if (channel.getShoutCommands().isEmpty())
+                continue;
+
             for (String command : channel.getShoutCommands()) {
                 if (message.startsWith(command)) {
                     String format = channel.getShoutFormat() == null ? channel.getFormat() : channel.getShoutFormat();
@@ -58,7 +60,7 @@ public class ChatListener implements Listener {
             Bukkit.getPluginManager().callEvent(channelChangeEvent);
             // This event is not cancellable as the player has to be in a channel to send a message.
 
-            sender.changeChannel(null, channel);
+            sender.switchChannel(channel);
         }
 
         api.sendToChannel(player, message, channel, true);

@@ -26,17 +26,21 @@ public class ShaderTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("#")) return null;
+        if (!input.startsWith("#"))
+            return null;
 
         Matcher matcher = MessageUtils.HEX_REGEX.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String match = input.substring(0, matcher.end());
-        if (!input.startsWith(match)) return null;
+        if (!input.startsWith(match))
+            return null;
 
-        if (!this.shaderColors.contains(match.toLowerCase())) return null;
+        if (!this.shaderColors.contains(match.toLowerCase()))
+            return null;
+
         String freeHex = findFreeHex(match.substring(1));
-
         return new TokenizerResult(Token.group("#" + freeHex).build(), match.length());
     }
 

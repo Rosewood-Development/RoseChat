@@ -19,11 +19,15 @@ public class ToDiscordURLTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.url")) return null;
-        if (!input.startsWith("[")) return null;
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.url"))
+            return null;
+
+        if (!input.startsWith("["))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String markdown = matcher.group();
         return new TokenizerResult(Token.text(markdown), markdown.length());

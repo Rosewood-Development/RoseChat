@@ -22,7 +22,9 @@ public class FromDiscordTagTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("<")) return null;
+        if (!input.startsWith("<"))
+            return null;
+
         Matcher matcher = TAG_PATTERN.matcher(input);
         Matcher roleMatcher = ROLE_TAG_PATTERN.matcher(input);
 
@@ -41,7 +43,8 @@ public class FromDiscordTagTokenizer extends Tokenizer {
             isRole = true;
         }
 
-        if (originalContent == null) return null;
+        if (originalContent == null)
+            return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
         String prefix = "@";
@@ -51,9 +54,15 @@ public class FromDiscordTagTokenizer extends Tokenizer {
 
             // Format and play the tag sound appropriately if a role is tagged.
             for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-                if (replacement.getInput().getPrefix() == null) continue;
-                if (!replacement.getInput().getPrefix().equals(prefix)) continue;
-                if (!replacement.getOutput().shouldTagOnlinePlayers()) break;
+                if (replacement.getInput().getPrefix() == null)
+                    continue;
+
+                if (!replacement.getInput().getPrefix().equals(prefix))
+                    continue;
+
+                if (!replacement.getOutput().shouldTagOnlinePlayers())
+                    break;
+
                 if (replacement.getOutput().getSound() != null)
                     params.getOutputs().setTagSound(replacement.getOutput().getSound());
             }

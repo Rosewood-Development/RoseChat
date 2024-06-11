@@ -17,12 +17,16 @@ public class ToDiscordChannelTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("#")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.discordchannel")) return null;
+        if (!input.startsWith("#"))
+            return null;
+
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.discordchannel"))
+            return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
         DiscordChatProvider.DetectedMention channel = discord.matchPartialChannel(input.substring(1));
-        if (channel == null) return null;
+        if (channel == null)
+            return null;
 
         return new TokenizerResult(Token.text(channel.mention()), input.length());
     }

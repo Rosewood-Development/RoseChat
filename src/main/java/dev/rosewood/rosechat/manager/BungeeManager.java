@@ -20,6 +20,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -31,6 +32,7 @@ public class BungeeManager extends Manager {
 
     public BungeeManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.bungeePlayers = ArrayListMultimap.create();
         this.checkPluginPlayers = new ArrayList<>();
 
@@ -67,7 +69,8 @@ public class BungeeManager extends Manager {
         try {
             out.writeUTF(command);
             out.writeUTF(to);
-            if (channel != null) out.writeUTF(channel);
+            if (channel != null)
+                out.writeUTF(channel);
 
             if (msgBytes != null && msgOut != null) {
                 out.writeShort(msgBytes.toByteArray().length);
@@ -75,7 +78,8 @@ public class BungeeManager extends Manager {
             }
 
             Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-            if (player != null) player.sendPluginMessage(RoseChat.getInstance(), "BungeeCord", outputStream.toByteArray());
+            if (player != null)
+                player.sendPluginMessage(RoseChat.getInstance(), "BungeeCord", outputStream.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,11 +102,14 @@ public class BungeeManager extends Manager {
     //
 
     private String getPlayerPermissions(RosePlayer sender) {
-        if ((sender.isPlayer() && sender.asPlayer().isOp())) return "*";
+        if ((sender.isPlayer() && sender.asPlayer().isOp()))
+            return "*";
 
         StringBuilder stringBuilder = new StringBuilder();
         for (String permission : sender.getPermissions()) {
-            if (stringBuilder.length() != 0) stringBuilder.append(",");
+            if (stringBuilder.length() != 0)
+                stringBuilder.append(",");
+
             stringBuilder.append(permission);
         }
 
@@ -128,9 +135,9 @@ public class BungeeManager extends Manager {
         try {
             out.writeLong(System.currentTimeMillis());
             out.writeUTF(channel);
-            out.writeUTF(sender.getName());
+            out.writeUTF(sender.getRealName());
             out.writeUTF(sender.getUUID() == null ? "null" : sender.getUUID().toString());
-            out.writeUTF(sender.getGroup());
+            out.writeUTF(sender.getPermissionGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
             out.writeUTF(messageId == null ? "null" : messageId.toString());
             out.writeBoolean(isJson);
@@ -155,7 +162,9 @@ public class BungeeManager extends Manager {
                                       UUID messageId, boolean isJson, String message) {
         Channel channel = this.rosePlugin.getManager(ChannelManager.class).getChannel(channelStr);
 
-        if (channel == null) return;
+        if (channel == null)
+            return;
+
         RosePlayer sender = new RosePlayer(senderUUID, senderStr, senderGroup);
         sender.setIgnoredPermissions(permissions);
 
@@ -181,16 +190,16 @@ public class BungeeManager extends Manager {
         DataOutputStream out = new DataOutputStream(outputStream);
 
         try {
-            out.writeUTF(sender.getName());
+            out.writeUTF(sender.getRealName());
             out.writeUTF(sender.getUUID().toString());
-            out.writeUTF(sender.getGroup());
+            out.writeUTF(sender.getPermissionGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
             out.writeUTF(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        this.sendPluginCheck(sender.getName(), receiver, "RoseChat", (hasPlugin) -> {
+        this.sendPluginCheck(sender.getRealName(), receiver, "RoseChat", (hasPlugin) -> {
            if (hasPlugin)
                this.send("ForwardToPlayer", receiver, "rosechat:direct_message", outputStream, out);
 
@@ -209,7 +218,8 @@ public class BungeeManager extends Manager {
      */
     public void receiveDirectMessage(Player player, String senderStr, UUID senderUUID, String group, List<String> permissions, String message) {
         PlayerData playerData = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
-        if (playerData.getIgnoringPlayers().contains(senderUUID)) return;
+        if (playerData.getIgnoringPlayers().contains(senderUUID))
+            return;
 
         RosePlayer sender = new RosePlayer(senderStr, group);
         sender.setIgnoredPermissions(permissions);
@@ -289,7 +299,8 @@ public class BungeeManager extends Manager {
      * @param hasPlugin True if the server has the plugin.
      */
     public void receivePluginCheckConfirmation(String player, boolean hasPlugin) {
-        if (hasPlugin) this.checkPluginPlayers.add(player);
+        if (hasPlugin)
+            this.checkPluginPlayers.add(player);
     }
 
     //
@@ -358,6 +369,10 @@ public class BungeeManager extends Manager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             RoseChatAPI.getInstance().deleteMessage(new RosePlayer(player), messageId);
         }
+    }
+
+    public Collection<String> getAllPlayers() {
+        return this.bungeePlayers.get("ALL");
     }
 
     public Multimap<String, String> getBungeePlayers() {

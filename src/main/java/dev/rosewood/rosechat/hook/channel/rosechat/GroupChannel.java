@@ -2,23 +2,27 @@ package dev.rosewood.rosechat.hook.channel.rosechat;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.api.event.group.GroupDisbandEvent;
+import dev.rosewood.rosechat.api.event.group.GroupJoinEvent;
+import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
+import dev.rosewood.rosechat.api.event.group.GroupNameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.GroupManager;
-import dev.rosewood.rosechat.message.MessageLocation;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class GroupChannel extends Channel {
 
@@ -43,7 +47,7 @@ public class GroupChannel extends Channel {
     public void send(RosePlayer sender, String message) {
         // Parses the first message synchronously
         // Allows for creating a token storage.
-        RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.GROUP);
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.GROUP);
         roseMessage.setPlayerInput(message);
         roseMessage.setPlaceholders(this.getInfoPlaceholders(sender, null, null, null).build());
 
@@ -64,7 +68,8 @@ public class GroupChannel extends Channel {
         for (RosePlayer receiver : receivers) {
             // Clone the message for viewer-specific placeholders.
             PlayerData playerData = receiver.getPlayerData();
-            if (playerData != null && !this.canPlayerReceiveMessage(receiver, playerData, sender.getUUID())) continue;
+            if (playerData != null && !this.canPlayerReceiveMessage(receiver, playerData, sender.getUUID()))
+                continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 receiver.send(roseMessage.parse(receiver, this.getFormat()).content());
@@ -72,16 +77,19 @@ public class GroupChannel extends Channel {
         }
 
         for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getGroupSpies()) {
-            if (this.members.contains(uuid)) continue;
+            if (this.members.contains(uuid))
+                continue;
 
             Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
+            if (player == null)
+                continue;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(uuid);
 
             // Don't send the message if the receiver can't receive it.
-            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID())) continue;
+            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID()))
+                continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content());
@@ -120,11 +128,11 @@ public class GroupChannel extends Channel {
         // No implementation
     }
 
-    public void addMember(UUID uuid) {
+    private void addMember(UUID uuid) {
         this.members.add(uuid);
     }
 
-    public void removeMember(UUID uuid) {
+    private void removeMember(UUID uuid) {
         this.members.remove(uuid);
     }
 
@@ -164,6 +172,54 @@ public class GroupChannel extends Channel {
                 .add("group_name", this.name);
     }
 
+    // Group Methods
+
+    public boolean rename(String name) {
+        GroupNameEvent event = new GroupNameEvent(this, name);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled())
+            return false;
+
+        name = event.getName();
+
+        this.setName(name);
+        this.save();
+
+        return true;
+    }
+
+    public boolean join(UUID uuid) {
+        GroupJoinEvent event = new GroupJoinEvent(this, Bukkit.getPlayer(uuid));
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled())
+            return false;
+
+        this.addMember(uuid);
+        RoseChatAPI.getInstance().getGroupManager().addMember(this, uuid);
+        return true;
+    }
+
+    public boolean kick(UUID uuid, boolean wasKicked) {
+        GroupLeaveEvent event = new GroupLeaveEvent(this, Bukkit.getOfflinePlayer(uuid), wasKicked);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled())
+            return false;
+
+        this.removeMember(uuid);
+        RoseChatAPI.getInstance().getGroupManager().removeMember(this, uuid);
+        return true;
+    }
+
+    public boolean disband() {
+        GroupDisbandEvent event = new GroupDisbandEvent(this);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled())
+            return false;
+
+        RoseChatAPI.getInstance().deleteGroupChat(this);
+        return true;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -178,6 +234,10 @@ public class GroupChannel extends Channel {
 
     public UUID getOwner() {
         return this.owner;
+    }
+
+    public void setMembers(List<UUID> members) {
+        this.members.addAll(members);
     }
 
 }

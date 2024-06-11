@@ -18,7 +18,6 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.NMSUtil;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -26,12 +25,11 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PacketListener {
-
-    private final RoseChat plugin;
 
     private static Field componentsArrayField;
     private static Field adventureMessageField;
@@ -42,6 +40,8 @@ public class PacketListener {
     private final Cache<UUID, Boolean> permissionsCache;
     private final Cache<UUID, String> groupCache;
 
+    private final RoseChat plugin;
+
     public PacketListener(RoseChat plugin) {
         this.plugin = plugin;
 
@@ -49,8 +49,6 @@ public class PacketListener {
                         .expireAfterWrite(5, TimeUnit.SECONDS).build();
         this.groupCache = CacheBuilder.newBuilder()
                         .expireAfterWrite(5, TimeUnit.SECONDS).build();
-
-        this.addListener();
     }
 
     public void removeListeners() {
@@ -73,12 +71,14 @@ public class PacketListener {
 
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean()) return;
+                if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean())
+                    return;
 
                 if (event.getPacketType() == PacketType.Play.Server.CHAT) {
                     Player player = event.getPlayer();
                     PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
-                    if (playerData == null) return;
+                    if (playerData == null)
+                        return;
 
                     PacketContainer packet = event.getPacket();
                     String messageJson;
@@ -114,11 +114,12 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
+                    sender.setPermissionGroup(Objects.requireNonNullElse(group, "default"));
 
                     BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
 
-                    if (deleteClientButton == null) return;
+                    if (deleteClientButton == null)
+                        return;
 
                     messageJson = ComponentSerializer.toString(deleteClientButton);
                     playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
@@ -130,7 +131,8 @@ public class PacketListener {
                 } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT) {
                     Player player = event.getPlayer();
                     PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
-                    if (playerData == null) return;
+                    if (playerData == null)
+                        return;
 
                     PacketContainer packet = event.getPacket();
                     if (packet.getBooleans().size() == 0 || packet.getBooleans().readSafely(0)) // Ignore hotbar messages
@@ -155,8 +157,7 @@ public class PacketListener {
                         }
                     }
 
-                    // Ignore bug with bungeecord chat until it's fixed.
-                    // https://hub.spigotmc.org/jira/browse/SPIGOT-7563
+                    // Work around for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] components = null;
                     try {
                         components = messageJson == null ? null : ComponentSerializer.parse(messageJson);
@@ -166,7 +167,8 @@ public class PacketListener {
                         return;
 
                     // Ensures chat messages are added separately, to differentiate between client and server messages.
-                    if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
+                    if (playerData.getMessageLog().containsDeletableMessage(messageJson))
+                        return;
                     UUID messageId = UUID.randomUUID();
 
                     if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
@@ -187,16 +189,16 @@ public class PacketListener {
                     }
 
                     String group = groupCache.getIfPresent(player.getUniqueId());
-                    sender.setGroup(Objects.requireNonNullElse(group, "default"));
+                    sender.setPermissionGroup(Objects.requireNonNullElse(group, "default"));
 
-                    // Ignore bug with bungeecord chat until it's fixed.
-                    // https://hub.spigotmc.org/jira/browse/SPIGOT-7563
+                    // Work around for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] deleteClientButton = null;
                     try {
                         deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
                     } catch (JsonSyntaxException ignored) {}
 
-                    if (deleteClientButton == null) return;
+                    if (deleteClientButton == null)
+                        return;
 
                     messageJson = ComponentSerializer.toString(deleteClientButton);
                     playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));

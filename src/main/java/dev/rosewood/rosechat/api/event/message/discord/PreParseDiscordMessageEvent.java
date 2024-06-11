@@ -13,4 +13,5 @@ public class PreParseDiscordMessageEvent extends DiscordMessageEvent {
     public PreParseDiscordMessageEvent(RoseMessage message, TextChannel textChannel) {
         super(message, textChannel);
     }
+
 }

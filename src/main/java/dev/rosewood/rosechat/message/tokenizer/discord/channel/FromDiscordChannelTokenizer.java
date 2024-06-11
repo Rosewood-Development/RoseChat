@@ -8,7 +8,6 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,13 +22,17 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("<")) return null;
+        if (!input.startsWith("<"))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();
-        if (discord == null) return null;
+        if (discord == null)
+            return null;
+
         String channelName = discord.getChannelName(matcher.group(1));
         String serverId = discord.getServerId();
         String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();

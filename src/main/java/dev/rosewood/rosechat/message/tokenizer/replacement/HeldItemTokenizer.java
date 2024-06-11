@@ -51,14 +51,17 @@ public class HeldItemTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         Replacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());
-        if (replacement == null) return null;
+        if (replacement == null)
+            return null;
 
         String input = params.getInput();
-        if (!input.startsWith(replacement.getInput().getText())) return null;
+        if (!input.startsWith(replacement.getInput().getText()))
+            return null;
 
         if (!params.getSender().isPlayer()
                 || !MessageUtils.hasTokenPermission(params, "rosechat.helditem")
-                || params.getSender().asPlayer().getEquipment() == null) return new TokenizerResult(Token.text(input), input.length());
+                || params.getSender().asPlayer().getEquipment() == null)
+            return new TokenizerResult(Token.text(input), input.length());
 
         try {
             ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();

@@ -74,16 +74,19 @@ public class Tokenizers {
             PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
+
     public static final TokenizerBundle COLORS_BUNDLE = new TokenizerBundle("colors",
             GRADIENT,
             RAINBOW,
             COLOR,
             FORMAT);
+
     public static final TokenizerBundle MARKDOWN_BUNDLE = new TokenizerBundle("markdown",
             MARKDOWN_BOLD,
             MARKDOWN_ITALIC,
             MARKDOWN_UNDERLINE,
             MARKDOWN_STRIKETHROUGH);
+
     public static final TokenizerBundle BUNGEE_BUNDLE = new TokenizerBundle("bungee",
             ROSECHAT_PLACEHOLDER,
             BUNGEE_PAPI_PLACEHOLDER,
@@ -96,6 +99,7 @@ public class Tokenizers {
             PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
+
     public static final TokenizerBundle DEFAULT_DISCORD_BUNDLE = new TokenizerBundle("default_discord",
             ROSECHAT_PLACEHOLDER,
             PAPI_PLACEHOLDER,
@@ -108,20 +112,24 @@ public class Tokenizers {
             PREFIXED_REPLACEMENT,
             REPLACEMENT,
             CHARACTER);
+
     public static final TokenizerBundle DISCORD_FORMATTING_BUNDLE = new TokenizerBundle("discord_formatting",
             MARKDOWN_CODE_BLOCK,
             MARKDOWN_CODE,
             MARKDOWN_BLOCK_QUOTE);
+
     public static final TokenizerBundle TO_DISCORD_BUNDLE = new TokenizerBundle("to_discord",
             TO_DISCORD_URL,
             TO_DISCORD_SPOILER,
             TO_DISCORD_TAG,
             TO_DISCORD_CHANNEL,
             DISCORD_CUSTOM_EMOJI);
+
     public static final TokenizerBundle FROM_DISCORD_BUNDLE = new TokenizerBundle("from_discord",
             FROM_DISCORD_SPOILER,
             FROM_DISCORD_TAG,
             FROM_DISCORD_CHANNEL);
+
     public static final TokenizerBundle DISCORD_EMOJI_BUNDLE = new TokenizerBundle("discord_emoji",
             DISCORD_EMOJI);
 
@@ -134,6 +142,7 @@ public class Tokenizers {
             int index = this.tokenizers.indexOf(target);
             if (index == -1)
                 throw new IllegalArgumentException("Could not find tokenizer with name " + target + " in bundle " + this.name);
+
             this.tokenizers.add(index, tokenizer);
         }
 
@@ -145,6 +154,7 @@ public class Tokenizers {
             int index = this.tokenizers.indexOf(after);
             if (index == -1)
                 throw new IllegalArgumentException("Could not find tokenizer with name " + after + " in bundle " + this.name);
+
             this.tokenizers.add(index + 1, tokenizer);
         }
 

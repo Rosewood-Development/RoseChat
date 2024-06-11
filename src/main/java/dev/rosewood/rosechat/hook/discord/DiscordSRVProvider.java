@@ -50,12 +50,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     @Override
     public void sendMessage(RoseMessage roseMessage, Channel group, String channel) {
         TextChannel textChannel = this.discord.getDestinationTextChannelForGameChannelName(channel);
-        if (textChannel == null) return;
+        if (textChannel == null)
+            return;
 
         PreParseDiscordMessageEvent preParseDiscordMessageEvent = new PreParseDiscordMessageEvent(roseMessage, textChannel);
         Bukkit.getPluginManager().callEvent(preParseDiscordMessageEvent);
 
-        if (preParseDiscordMessageEvent.isCancelled()) return;
+        if (preParseDiscordMessageEvent.isCancelled())
+            return;
 
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
         DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholder();
@@ -63,12 +65,14 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
         } else {
             String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), Setting.MINECRAFT_TO_DISCORD_FORMAT.getString()).content();
-            if (text == null) return;
+            if (text == null)
+                return;
 
             PostParseDiscordMessageEvent postParseDiscordMessageEvent = new PostParseDiscordMessageEvent(roseMessage, textChannel, text);
             Bukkit.getPluginManager().callEvent(postParseDiscordMessageEvent);
 
-            if (postParseDiscordMessageEvent.isCancelled()) return;
+            if (postParseDiscordMessageEvent.isCancelled())
+                return;
 
             text = postParseDiscordMessageEvent.getOutput();
 
@@ -105,7 +109,9 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 title != null && title.contains("{message}") ? title : description);
         Bukkit.getPluginManager().callEvent(postParseDiscordMessageEvent);
 
-        if (postParseDiscordMessageEvent.isCancelled()) return;
+        if (postParseDiscordMessageEvent.isCancelled())
+            return;
+
         if (title != null && title.contains("{message}")) {
             title = postParseDiscordMessageEvent.getOutput();
         } else {
@@ -273,7 +279,8 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     public String getUserFromId(String id) {
         UUID uuid = this.discord.getAccountLinkManager().getUuid(id);
         Member member = this.discord.getMainGuild().getMemberById(id);
-        if (member == null) return this.getRoleFromId(id);
+        if (member == null)
+            return this.getRoleFromId(id);
 
         String color = DiscordSRVListener.getColor(member);
         return uuid == null ? "#" + (color.length() == 5 ? "0" + color : color) + member.getEffectiveName() : Bukkit.getOfflinePlayer(uuid).getName();
@@ -282,17 +289,21 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     @Override
     public String getRoleFromId(String id) {
         Role role = this.discord.getMainGuild().getRoleById(id);
-        if (role == null) return null;
+        if (role == null)
+            return null;
 
         String color = "FFFFFF";
-        if (role.getColor() != null) return "#" + Integer.toHexString(role.getColorRaw()) + role.getName().replace(" ", "_");
+        if (role.getColor() != null)
+            return "#" + Integer.toHexString(role.getColorRaw()) + role.getName().replace(" ", "_");
+
         return "#" + (color.length() == 5 ? "0" + color : color) + role.getName().replace(" ", "_");
     }
 
     @Override
     public List<UUID> getPlayersWithRole(String id) {
         Role role = this.discord.getMainGuild().getRoleById(id);
-        if (role == null) return null;
+        if (role == null)
+            return null;
 
         List<UUID> players = new ArrayList<>();
         for (Member member : this.discord.getMainGuild().getMembers()) {

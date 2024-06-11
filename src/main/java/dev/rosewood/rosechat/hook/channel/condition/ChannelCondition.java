@@ -20,15 +20,27 @@ public class ChannelCondition extends PlaceholderCondition {
 
     @Override
     public boolean parseToBoolean(RosePlayer sender, RosePlayer viewer, StringPlaceholders placeholders) {
-        Player singlePlayer = this.condition.startsWith("%receiver_") ? viewer.asPlayer() : sender.asPlayer();
+        Player singlePlayer = this.condition.startsWith("%receiver_") ?
+                viewer.asPlayer() : sender.asPlayer();
+
         String singleCondition = this.condition.replace("receiver_", "").replace("sender_", "");
-        String singleParsed = this.parsePlaceholders(singlePlayer, viewer == null ? null : viewer.asPlayer(), singleCondition, placeholders);
-        Player leftPlayer = this.left == null ? null : (this.left.startsWith("%receiver_") ? viewer.asPlayer() : sender.asPlayer());
-        Player rightPlayer = this.right == null ? null : (this.right.startsWith("%receiver_") ? viewer.asPlayer() : sender.asPlayer());
-        String leftCondition = this.left == null ? null : this.left.replace("receiver_", "").replace("sender_", "");
-        String rightCondition = this.right == null ? null : this.right.replace("receiver_", "").replace("sender_", "");
-        String leftParsed = this.left == null ? null : this.parsePlaceholders(leftPlayer, viewer == null ? null : viewer.asPlayer(), leftCondition, placeholders);
-        String rightParsed = this.right == null ? null : this.parsePlaceholders(rightPlayer, viewer == null ? null : viewer.asPlayer(), rightCondition, placeholders);
+        String singleParsed = this.parsePlaceholders(singlePlayer, viewer == null ?
+                null : viewer.asPlayer(), singleCondition, placeholders);
+
+        Player leftPlayer = this.left == null ?
+                null : (this.left.startsWith("%receiver_") ? viewer.asPlayer() : sender.asPlayer());
+        Player rightPlayer = this.right == null ?
+                null : (this.right.startsWith("%receiver_") ? viewer.asPlayer() : sender.asPlayer());
+
+        String leftCondition = this.left == null ?
+                null : this.left.replace("receiver_", "").replace("sender_", "");
+        String rightCondition = this.right == null ?
+                null : this.right.replace("receiver_", "").replace("sender_", "");
+
+        String leftParsed = this.left == null ?
+                null : this.parsePlaceholders(leftPlayer, viewer == null ? null : viewer.asPlayer(), leftCondition, placeholders);
+        String rightParsed = this.right == null ?
+                null : this.parsePlaceholders(rightPlayer, viewer == null ? null : viewer.asPlayer(), rightCondition, placeholders);
 
         boolean result;
         if (this.operator != null) {

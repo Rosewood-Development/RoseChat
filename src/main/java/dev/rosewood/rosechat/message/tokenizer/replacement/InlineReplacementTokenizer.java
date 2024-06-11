@@ -27,15 +27,15 @@ public class InlineReplacementTokenizer extends Tokenizer {
             if (replacement.getInput().getInlinePrefix() == null
                     || replacement.getInput().getInlineSuffix() == null
                     || replacement.getInput().getPrefix() == null
-                    || replacement.getInput().getSuffix() == null) continue;
+                    || replacement.getInput().getSuffix() == null)
+                continue;
 
             String prefix = replacement.getInput().getPrefix();
             String suffix = replacement.getInput().getSuffix();
             String inlinePrefix = replacement.getInput().getInlinePrefix();
             String inlineSuffix = replacement.getInput().getInlineSuffix();
-            if (!input.startsWith(prefix)) {
+            if (!input.startsWith(prefix))
                 continue;
-            }
 
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
@@ -43,7 +43,8 @@ public class InlineReplacementTokenizer extends Tokenizer {
             String outerRegex = "(?:" + Pattern.quote(prefix) + "(.*?)" + Pattern.quote(suffix) + ")"
                     + Pattern.quote(inlinePrefix) + "(.*?)" + Pattern.quote(inlineSuffix);
             Matcher matcher = Pattern.compile(outerRegex).matcher(input);
-            if (!matcher.find() || matcher.start() != 0) return null;
+            if (!matcher.find() || matcher.start() != 0)
+                return null;
 
             String originalContent = matcher.group();
             String content = matcher.group(1);
@@ -51,12 +52,14 @@ public class InlineReplacementTokenizer extends Tokenizer {
 
             if (replacement.getInput().isContentRegex()) {
                 Matcher contentMatcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-text").matcher(content);
-                if (!contentMatcher.find()) return null;
+                if (!contentMatcher.find())
+                    return null;
             }
 
             if (replacement.getInput().isInlineRegex()) {
                 Matcher inlineMatcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-text").matcher(inline);
-                if (!inlineMatcher.find()) return null;
+                if (!inlineMatcher.find())
+                    return null;
             }
 
             Token.Builder token = Token.group(replacement.getOutput().getText())
