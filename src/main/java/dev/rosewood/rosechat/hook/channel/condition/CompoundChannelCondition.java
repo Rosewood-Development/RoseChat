@@ -13,6 +13,7 @@ public class CompoundChannelCondition extends ChannelCondition {
 
     public CompoundChannelCondition(ConfigurationSection section, String condition) {
         super(section, condition);
+
         this.conditions = new ArrayList<>();
     }
 

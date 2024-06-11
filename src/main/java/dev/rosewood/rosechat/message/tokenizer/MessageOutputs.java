@@ -1,11 +1,11 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
+import org.bukkit.Sound;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.Sound;
 
 public class MessageOutputs {
 
@@ -38,6 +38,7 @@ public class MessageOutputs {
         this.taggedPlayers.addAll(newOutputs.getTaggedPlayers());
         if (newOutputs.getTagSound() != null)
             this.tagSound = newOutputs.getTagSound();
+
         this.missingPermissions.addAll(newOutputs.getMissingPermissions());
     }
 

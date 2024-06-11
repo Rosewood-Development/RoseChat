@@ -35,8 +35,11 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
         String input = params.getInput();
         for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             // Ignore non-prefixed and inline replacements.
-            if (replacement.getInput().getPrefix() == null) continue;
-            if (replacement.getInput().getInlinePrefix() != null) continue;
+            if (replacement.getInput().getPrefix() == null)
+                continue;
+
+            if (replacement.getInput().getInlinePrefix() != null)
+                continue;
 
             String prefix = replacement.getInput().getPrefix();
             String suffix = replacement.getInput().getSuffix();
@@ -44,11 +47,15 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 if (replacement.getInput().isRegex()) {
                     // Match for the prefix.
                     Matcher matcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-prefix").matcher(input);
-                    if (!matcher.find() || !input.startsWith(matcher.group())) continue;
+                    if (!matcher.find() || !input.startsWith(matcher.group()))
+                        continue;
+
                     prefix = matcher.group();
 
                     Matcher suffixMatcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-suffix").matcher(input);
-                    if (!suffixMatcher.find()) continue;
+                    if (!suffixMatcher.find())
+                        continue;
+
                     suffix = suffixMatcher.group();
                 } else {
                     continue;
@@ -59,7 +66,9 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 return null;
 
             if (suffix != null) {
-                if (!input.contains(suffix)) continue;
+                if (!input.contains(suffix))
+                    continue;
+
                 int endIndex = input.lastIndexOf(suffix) + suffix.length();
                 String originalContent = input.substring(0, endIndex);
                 String content = input.substring(prefix.length(), input.lastIndexOf(suffix));
@@ -146,7 +155,9 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 Matcher matcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-prefix").matcher(replacement.getInput().getPrefix());
                 if (matcher.find() && matcher.groupCount() != 0) {
                     for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                        if (matcher.group(i) == null) continue;
+                        if (matcher.group(i) == null)
+                            continue;
+
                         content = content.replace("%group_" + i + "%", matcher.group(i));
                         groupPlaceholders.add("group_" + i, matcher.group(i));
                     }
@@ -192,7 +203,9 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
             Matcher matcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-prefix").matcher(replacement.getInput().getPrefix());
             if (matcher.find() && matcher.groupCount() != 0) {
                 for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                    if (matcher.group(i) == null) continue;
+                    if (matcher.group(i) == null)
+                        continue;
+
                     content = content.replace("%group_" + i + "%", matcher.group(i));
                     groupPlaceholders.add("group_" + i, matcher.group(i));
                 }

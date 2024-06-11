@@ -7,8 +7,9 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import net.md_5.bungee.api.chat.BaseComponent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayDeque;
@@ -21,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 public class MessageTokenizer {
 
@@ -59,6 +59,7 @@ public class MessageTokenizer {
                 tokens.addFirst(current);
                 current = current.parent;
             }
+
             throw new RuntimeException("Exceeded a depth of 15 when tokenizing message; this is probably due to infinite recursion somewhere. Token stack: " + tokens.stream().map(t -> t.getType().name() + ":" + t.getContent()).collect(Collectors.joining(" -> ")));
         }
 
@@ -83,6 +84,7 @@ public class MessageTokenizer {
                 this.outputs.merge(params.getOutputs());
                 continue outer;
             }
+
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
 
@@ -100,12 +102,15 @@ public class MessageTokenizer {
         return composer.compose(token);
     }
 
-    public static MessageTokenizerResults<BaseComponent[]> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static MessageTokenizerResults<BaseComponent[]> tokenize(RoseMessage roseMessage, RosePlayer viewer,
+                                                                    String message,
+                                                                    Tokenizers.TokenizerBundle... tokenizerBundles) {
         return tokenize(roseMessage, viewer, message, null, tokenizerBundles);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message,
+                                                          TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
         if (message == null) {
             if (roseMessage.getPlayerInput() != null) {
                 new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
@@ -124,7 +129,10 @@ public class MessageTokenizer {
 
         MessageOutputs outputs = tokenizer.tokenizeContent();
         T components = tokenizer.toComponents(composer);
-        DEBUG_MANAGER.addMessage(() -> "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) + "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times");
+        DEBUG_MANAGER.addMessage(() ->
+                "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
+                        "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times");
+
         return new MessageTokenizerResults<T>(components, outputs);
     }
 
@@ -135,6 +143,7 @@ public class MessageTokenizer {
         int count = 1;
         for (Token child : token.getChildren())
             count += countTokens(child);
+
         return count;
     }
 

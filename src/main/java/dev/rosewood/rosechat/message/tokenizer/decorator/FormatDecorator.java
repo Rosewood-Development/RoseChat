@@ -21,15 +21,19 @@ public class FormatDecorator extends TokenDecorator {
         if (this.chatColor == ChatColor.BOLD) {
             if (this.value)
                 component.setBold(true);
+
         } else if (this.chatColor == ChatColor.ITALIC) {
             if (this.value)
                 component.setItalic(true);
+
         } else if (this.chatColor == ChatColor.UNDERLINE) {
             if (this.value)
                 component.setUnderlined(true);
+
         } else if (this.chatColor == ChatColor.STRIKETHROUGH) {
             if (this.value)
                 component.setStrikethrough(true);
+
         } else if (this.chatColor == ChatColor.MAGIC) {
             if (this.value)
                 component.setObfuscated(true);

@@ -11,12 +11,12 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 
 public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
@@ -30,14 +30,17 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("{")) return null;
+        if (!input.startsWith("{"))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find()) return null;
+        if (!matcher.find())
+            return null;
 
         String placeholder = matcher.group();
         String placeholderValue = matcher.group(1);
-        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue)) return null;
+        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue))
+            return null;
 
         // Hardcoded special {message} placeholder to inject the player's message
         // Do not let the {message} placeholder be used if the message contains player input
@@ -56,7 +59,8 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         }
 
         CustomPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
-        if (roseChatPlaceholder == null) return null;
+        if (roseChatPlaceholder == null)
+            return null;
 
         StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
         String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), params.getReceiver(), placeholders));
@@ -74,9 +78,14 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ? null : roseChatPlaceholder.get("hover").getHoverAction();
 
         Token.Builder tokenBuilder = Token.group(content);
-        if (!formattedHover.isEmpty()) tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
-        if (click != null) tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
-        if (params.containsPlayerInput()) tokenBuilder.encapsulate();
+        if (!formattedHover.isEmpty())
+            tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
+
+        if (click != null)
+            tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
+
+        if (params.containsPlayerInput())
+            tokenBuilder.encapsulate();
 
         if (content.contains(placeholder)) {
             // If we contain ourselves, avoid infinite recursion by disallowing tokenizing this again.

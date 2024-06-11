@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-public class StringPlaceholderCondition extends PlaceholderCondition  {
+public class StringPlaceholderCondition extends PlaceholderCondition {
 
     public StringPlaceholderCondition(ConfigurationSection section, String condition) {
         super(section, condition);
@@ -30,12 +30,14 @@ public class StringPlaceholderCondition extends PlaceholderCondition  {
                 parsed = parsed.equalsIgnoreCase("no") ? "false" : parsed;
             }
 
-            if (resultBuilder.length() != 0) resultBuilder.append(",");
+            if (resultBuilder.length() != 0)
+                resultBuilder.append(",");
 
             boolean hasCondition = false;
             for (String conditionValue : this.values.keySet()) {
                 hasCondition = conditionValue.toLowerCase().contains(ChatColor.stripColor(resultBuilder.toString().toLowerCase() + parsed.toLowerCase()));
-                if (hasCondition) break;
+                if (hasCondition)
+                    break;
             }
 
             resultBuilder.append(hasCondition ? ChatColor.stripColor(parsed.toLowerCase()) : "default");

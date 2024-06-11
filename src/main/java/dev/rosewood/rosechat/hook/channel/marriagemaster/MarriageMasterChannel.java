@@ -26,8 +26,8 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
 
     public MarriageMasterChannel(ChannelProvider provider) {
         super(provider);
-        this.marriageMaster = (MarriageMasterPlugin) Bukkit.getPluginManager().getPlugin("MarriageMaster");
 
+        this.marriageMaster = (MarriageMasterPlugin) Bukkit.getPluginManager().getPlugin("MarriageMaster");
         Bukkit.getPluginManager().registerEvents(this, RoseChat.getInstance());
     }
 
@@ -35,7 +35,8 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
     }
 
     @EventHandler
@@ -54,26 +55,30 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
         if (this.autoJoin) {
             // Player 1
             Player player = Bukkit.getPlayer(event.getPlayer1().getUUID());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
 
             // Player 2
             player = Bukkit.getPlayer(event.getPlayer2().getUUID());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             rosePlayer = new RosePlayer(player);
             currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -92,11 +97,13 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
     @Override
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
 
         MarriagePlayer mp = this.marriageMaster.getPlayerData(sender.getUUID());
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (mp.isPartner(player) && this.getReceiveCondition(sender, player)) recipients.add(player);
+            if (mp.isPartner(player) && this.getReceiveCondition(sender, player))
+                recipients.add(player);
         }
 
         return recipients;

@@ -3,12 +3,12 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("deprecation")
 public class HoverDecorator extends TokenDecorator {
@@ -18,13 +18,15 @@ public class HoverDecorator extends TokenDecorator {
 
     protected HoverDecorator(HoverEvent.Action action, List<String> content) {
         super(DecoratorType.CONTENT);
+
         this.action = action;
         this.content = content;
     }
 
     @Override
     public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
-        if (this.content == null || this.content.isEmpty()) return;
+        if (this.content == null || this.content.isEmpty())
+            return;
 
         if (this.action != HoverEvent.Action.SHOW_TEXT) {
             component.setHoverEvent(new HoverEvent(this.action, new ComponentBuilder(parent.getPlaceholders().apply(this.content.get(0))).create()));

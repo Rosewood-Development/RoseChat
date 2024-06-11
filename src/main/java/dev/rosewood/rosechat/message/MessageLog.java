@@ -24,6 +24,7 @@ public class MessageLog {
 
     public MessageLog(UUID sender, boolean doCleanup) {
         this(sender);
+
         if (doCleanup) {
             this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
         }
@@ -110,7 +111,9 @@ public class MessageLog {
     }
 
     public void addDeletableMessage(DeletableMessage deletableMessage) {
-        if (this.deletableMessages.size() >= 100) this.deletableMessages.remove(0);
+        if (this.deletableMessages.size() >= 100)
+            this.deletableMessages.remove(0);
+
         this.deletableMessages.add(deletableMessage);
     }
 

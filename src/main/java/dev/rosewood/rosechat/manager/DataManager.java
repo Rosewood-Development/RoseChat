@@ -24,6 +24,7 @@ public class DataManager extends AbstractDataManager {
 
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.channelManager = rosePlugin.getManager(ChannelManager.class);
     }
 
@@ -72,7 +73,10 @@ public class DataManager extends AbstractDataManager {
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     playerData.setIsInGroupChannel(isCurrentlyChannelGroupChannel);
-                    if (muteTime > 0) playerData.mute(muteTime);
+
+                    if (muteTime > 0)
+                        playerData.mute(muteTime);
+
                     value.set(playerData);
                 } else {
                     value.set(new PlayerData(uuid));
@@ -213,6 +217,26 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
+    public GroupChannel getGroupChannel(String id) {
+        AtomicReference<GroupChannel> value = new AtomicReference<>(null);
+        this.getDatabaseConnector().connect(connection -> {
+            String query = "SELECT * FROM " + this.getTablePrefix() + "group_chat WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, id);
+                ResultSet result = statement.executeQuery();
+
+                while (result.next()) {
+                    GroupChannel group = new GroupChannel(id);
+                    group.setName(result.getString("name"));
+                    group.setOwner(UUID.fromString(result.getString("owner")));
+                    value.set(group);
+                }
+            }
+        });
+
+        return value.get();
+    }
+
     public List<GroupChannel> getMemberGroupChats(UUID member) {
         List<GroupChannel> groupChats = new ArrayList<>();
         this.getDatabaseConnector().connect(connection -> {
@@ -239,7 +263,7 @@ public class DataManager extends AbstractDataManager {
                         current.setOwner(UUID.fromString(result.getString(3)));
                     }
 
-                    current.addMember(UUID.fromString(result.getString(4)));
+                    current.getMembers().add(UUID.fromString(result.getString(4)));
                     previousId = id;
                 }
 

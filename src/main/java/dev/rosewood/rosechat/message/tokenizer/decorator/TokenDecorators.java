@@ -2,10 +2,10 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TokenDecorators {
 
@@ -45,6 +45,7 @@ public class TokenDecorators {
         for (TokenDecorator decorator : this.decorators)
             if (decorator.blocksTextStitching())
                 return true;
+
         return false;
     }
 

@@ -25,18 +25,21 @@ public class ReplacementTokenizer extends Tokenizer {
         String input = params.getInput();
         for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
             // Ignore prefixed and inline replacements.
-            if (replacement.getInput().getPrefix() != null || replacement.getInput().getInlinePrefix() != null) continue;
+            if (replacement.getInput().getPrefix() != null || replacement.getInput().getInlinePrefix() != null)
+                continue;
 
             if (replacement.getInput().isRegex()) {
                 Matcher matcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-text").matcher(input);
-                if (!matcher.find()) continue;
+                if (!matcher.find())
+                    continue;
 
                 // Check permissions
                 if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                     return null;
 
                 String originalContent = matcher.group();
-                if (!input.startsWith(originalContent)) continue;
+                if (!input.startsWith(originalContent))
+                    continue;
 
                 String content = replacement.getOutput().getText();
 
@@ -64,7 +67,8 @@ public class ReplacementTokenizer extends Tokenizer {
                 return new TokenizerResult(token.build(), originalContent.length());
             } else {
                 // Continue if the input is not the replacement
-                if (!params.getInput().startsWith(replacement.getInput().getText())) continue;
+                if (!params.getInput().startsWith(replacement.getInput().getText()))
+                    continue;
 
                 // Check permissions
                 if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
@@ -73,7 +77,8 @@ public class ReplacementTokenizer extends Tokenizer {
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.
                 if (replacement.getInput().isEmoji()) {
                     PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(params.getSender().getUUID());
-                    if (playerData != null && !playerData.hasEmojis()) return null;
+                    if (playerData != null && !playerData.hasEmojis())
+                        return null;
                 }
 
                 String originalContent = replacement.getInput().getText();

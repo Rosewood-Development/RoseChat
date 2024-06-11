@@ -20,6 +20,7 @@ public class ReplacementManager extends Manager {
 
     public ReplacementManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.replacements = new HashMap<>();
         this.compiledPatterns = new HashMap<>();
     }
@@ -35,7 +36,8 @@ public class ReplacementManager extends Manager {
         CommentedFileConfiguration replacementsConfiguration = CommentedFileConfiguration.loadConfiguration(replacementsFile);
 
         for (String id : replacementsConfiguration.getKeys(false)) {
-            if (!replacementsConfiguration.contains(id + ".input") || !replacementsConfiguration.contains(id + ".output")) continue;
+            if (!replacementsConfiguration.contains(id + ".input") || !replacementsConfiguration.contains(id + ".output"))
+                continue;
 
             ReplacementInput input = new ReplacementInput();
             CommentedConfigurationSection inputSection = replacementsConfiguration.getConfigurationSection(id + ".input");
@@ -77,31 +79,31 @@ public class ReplacementManager extends Manager {
             // Precompile regex strings.
             if (input.isRegex() || input.isContentRegex() || input.isInlineRegex()) {
                 if (input.getText() != null) {
-                    compiledPatterns.put(id + "-text", Pattern.compile(input.getText()));
+                    this.compiledPatterns.put(id + "-text", Pattern.compile(input.getText()));
                 }
             }
 
             if (input.isRegex()) {
                 if (input.getPrefix() != null) {
-                    compiledPatterns.put(id + "-prefix", Pattern.compile(input.getPrefix()));
+                    this.compiledPatterns.put(id + "-prefix", Pattern.compile(input.getPrefix()));
                 }
 
                 if (input.getSuffix() != null) {
-                    compiledPatterns.put(id + "-suffix", Pattern.compile(input.getSuffix()));
+                    this.compiledPatterns.put(id + "-suffix", Pattern.compile(input.getSuffix()));
                 }
 
                 if (input.getInlinePrefix() != null) {
-                    compiledPatterns.put(id + "-inline-prefix", Pattern.compile(input.getInlinePrefix()));
+                    this.compiledPatterns.put(id + "-inline-prefix", Pattern.compile(input.getInlinePrefix()));
                 }
 
                 if (input.getInlineSuffix() != null) {
-                    compiledPatterns.put(id + "-inline-suffix", Pattern.compile(input.getInlineSuffix()));
+                    this.compiledPatterns.put(id + "-inline-suffix", Pattern.compile(input.getInlineSuffix()));
                 }
             }
 
             // The stop should always be parsed as regex.
             if (input.getStop() != null) {
-                compiledPatterns.put(id + "-stop", Pattern.compile(input.getStop()));
+                this.compiledPatterns.put(id + "-stop", Pattern.compile(input.getStop()));
             }
 
             Replacement replacement = new Replacement(id);

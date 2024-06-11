@@ -16,25 +16,45 @@ public class ChannelChangeEvent extends Event implements Cancellable {
     private Channel channel;
     private boolean cancelled;
 
+    /**
+     * Called when a player changes their chat channel.
+     * @param oldChannel The previous {@link Channel} that the player was in.
+     * @param channel The new {@link Channel} that the player will be moved to.
+     * @param player The {@link Player} who is changing channel.
+     */
     public ChannelChangeEvent(Channel oldChannel, Channel channel, Player player) {
         super(!Bukkit.isPrimaryThread());
+
         this.player = player;
         this.oldChannel = oldChannel;
         this.channel = channel;
     }
 
+    /**
+     * @return The player who is changing channel.
+     */
     public Player getPlayer() {
         return this.player;
     }
 
+    /**
+     * @return The previous channel that the player was in.
+     */
     public Channel getOldChannel() {
         return this.oldChannel;
     }
 
+    /**
+     * @return The new channel that the player will be moved to.
+     */
     public Channel getChannel() {
         return this.channel;
     }
 
+    /**
+     * Updates the channel that the player will be moved to.
+     * @param channel The channel that the player will be moved to.
+     */
     public void setChannel(Channel channel) {
         this.channel = channel;
     }

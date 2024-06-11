@@ -36,8 +36,11 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = SimpleClansChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = SimpleClansChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         if (this.channelType == null)
             this.channelType = SimpleClansChannelType.CLAN;
@@ -62,13 +65,15 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(PlayerJoinedClanEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getClanPlayer().getUniqueId());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -89,21 +94,30 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
+
         Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(sender.getUUID());
-        if (clan == null) return recipients;
+        if (clan == null)
+            return recipients;
 
         if (this.channelType == SimpleClansChannelType.CLAN) {
             for (ClanPlayer clanPlayer : clan.getMembers()) {
-                if (clanPlayer == null) continue;
+                if (clanPlayer == null)
+                    continue;
+
                 Player player = clanPlayer.toPlayer();
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         } else {
             for (ClanPlayer clanPlayer : clan.getAllAllyMembers()) {
-                if (clanPlayer == null) continue;
+                if (clanPlayer == null)
+                    continue;
+
                 Player player = clanPlayer.toPlayer();
-                if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                if (player != null && this.getReceiveCondition(sender, player))
+                    recipients.add(player);
             }
         }
 

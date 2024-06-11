@@ -87,7 +87,9 @@ public class PlaceholderCondition {
     }
 
     protected String parsePlaceholders(Player player, Player player2, String placeholder, StringPlaceholders placeholders) {
-        if (placeholder == null) return null;
+        if (placeholder == null)
+            return null;
+
         if (PlaceholderAPIHook.enabled()) {
             placeholder = placeholders.apply(placeholder);
             placeholder = PlaceholderAPIHook.applyRelationalPlaceholders(player, player2, placeholder);

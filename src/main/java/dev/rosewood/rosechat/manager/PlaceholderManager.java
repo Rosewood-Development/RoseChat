@@ -24,6 +24,7 @@ public class PlaceholderManager extends Manager {
 
     public PlaceholderManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.placeholders = new HashMap<>();
         this.chatFormats = new HashMap<>();
         this.parsedFormats = new HashMap<>();
@@ -37,7 +38,8 @@ public class PlaceholderManager extends Manager {
         this.discordEmbedPlaceholder = null;
 
         File placeholderFile = new File(this.rosePlugin.getDataFolder(), "custom-placeholders.yml");
-        if (!placeholderFile.exists()) this.rosePlugin.saveResource("custom-placeholders.yml", false);
+        if (!placeholderFile.exists())
+            this.rosePlugin.saveResource("custom-placeholders.yml", false);
 
         CommentedFileConfiguration placeholderConfiguration = CommentedFileConfiguration.loadConfiguration(placeholderFile);
 
@@ -46,7 +48,8 @@ public class PlaceholderManager extends Manager {
             CustomPlaceholder placeholder = new CustomPlaceholder(id);
 
             ConfigurationSection placeholderSection = placeholderConfiguration.getConfigurationSection(id);
-            if (placeholderSection == null) continue;
+            if (placeholderSection == null)
+                continue;
 
             if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)
                     && (placeholderSection.contains("title") || placeholderSection.contains("description"))) {
@@ -90,7 +93,9 @@ public class PlaceholderManager extends Manager {
         List<String> parsed = new ArrayList<>();
 
         for (String s : sections) {
-            if (s.isEmpty()) continue;
+            if (s.isEmpty())
+                continue;
+
             parsed.add(s);
         }
 

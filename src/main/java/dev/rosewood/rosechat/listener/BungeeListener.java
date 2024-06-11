@@ -21,7 +21,8 @@ public class BungeeListener implements PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-        if (!channel.equalsIgnoreCase("BungeeCord")) return;
+        if (!channel.equalsIgnoreCase("BungeeCord"))
+            return;
 
         ByteArrayInputStream bytes = new ByteArrayInputStream(message);
         DataInputStream in = new DataInputStream(bytes);
@@ -34,7 +35,9 @@ public class BungeeListener implements PluginMessageListener {
             }
 
             // Make sure RoseChat is sending the message.
-            if (!command.startsWith("rosechat")) return;
+            if (!command.startsWith("rosechat"))
+                return;
+
             command = command.substring("rosechat:".length());
 
             byte[] msgBytes = new byte[in.readShort()];

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.api.event.group;
 
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -13,9 +14,13 @@ public class GroupEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public GroupEvent(GroupChannel group) {
+        super(!Bukkit.isPrimaryThread());
         this.group = group;
     }
 
+    /**
+     * @return The {@link GroupChannel} being used.
+     */
     public GroupChannel getGroup() {
         return this.group;
     }

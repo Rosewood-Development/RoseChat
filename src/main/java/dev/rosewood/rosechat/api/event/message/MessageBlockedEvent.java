@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.api.event.message;
 
-
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -13,25 +12,41 @@ public class MessageBlockedEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final RoseMessage message;
-    private final String originalMessage;
-    private final MessageRules.RuleOutputs outputs;
+    private final String rawMessage;
+    private final RuleOutputs outputs;
 
-    public MessageBlockedEvent(RoseMessage message, String originalMessage, MessageRules.RuleOutputs outputs) {
+    /**
+     * Called when a message has been blocked by a filter.
+     * @param message The {@link RoseMessage} that was blocked.
+     * @param rawMessage The raw message that was sent by the player.
+     * @param outputs The {@link RuleOutputs} containing why the message was blocked.
+     */
+    public MessageBlockedEvent(RoseMessage message, String rawMessage, RuleOutputs outputs) {
         super(!Bukkit.isPrimaryThread());
+
         this.message = message;
-        this.originalMessage = originalMessage;
+        this.rawMessage = rawMessage;
         this.outputs = outputs;
     }
 
+    /**
+     * @return The {@link RoseMessage} that was blocked.
+     */
     public RoseMessage getMessage() {
         return this.message;
     }
 
-    public String getOriginalMessage() {
-        return this.originalMessage;
+    /**
+     * @return The raw message that was sent by the player.
+     */
+    public String getRawMessage() {
+        return this.rawMessage;
     }
 
-    public MessageRules.RuleOutputs getOutputs() {
+    /**
+     * @return The {@link RuleOutputs} containing why the message was blocked.
+     */
+    public RuleOutputs getOutputs() {
         return this.outputs;
     }
 

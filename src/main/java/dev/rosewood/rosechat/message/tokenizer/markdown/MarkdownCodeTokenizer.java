@@ -16,8 +16,11 @@ public class MarkdownCodeTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("`")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.code")) return null;
+        if (!input.startsWith("`"))
+            return null;
+
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.code"))
+            return null;
 
         int lastIndex = 0;
 
@@ -29,7 +32,9 @@ public class MarkdownCodeTokenizer extends Tokenizer {
             }
         }
 
-        if (lastIndex == 0) return null;
+        if (lastIndex == 0)
+            return null;
+
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(1, lastIndex);
 

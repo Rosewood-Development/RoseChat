@@ -15,7 +15,8 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("||")) return null;
+        if (!input.startsWith("||"))
+            return null;
         int lastIndex = 0;
 
         char[] chars = input.toCharArray();
@@ -26,7 +27,9 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
             }
         }
 
-        if (lastIndex == 0) return null;
+        if (lastIndex == 0)
+            return null;
+
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(2, lastIndex - 1);
 

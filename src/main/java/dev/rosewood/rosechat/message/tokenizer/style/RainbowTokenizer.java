@@ -53,6 +53,7 @@ public class RainbowTokenizer extends Tokenizer {
             } else {
                 generator = new HexUtils.Rainbow(contentLength, rainbowValues.saturation, rainbowValues.brightness);
             }
+
             return generator;
         };
 

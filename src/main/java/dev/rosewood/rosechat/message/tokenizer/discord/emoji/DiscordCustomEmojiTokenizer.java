@@ -20,14 +20,20 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith(":")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.emojis")) return null;
+        if (!input.startsWith(":"))
+            return null;
+
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.emojis"))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String content = matcher.group(1);
-        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji." + content)) return null;
+        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji." + content))
+            return null;
+
         content = RoseChatAPI.getInstance().getDiscord().getCustomEmoji(content);
         return new TokenizerResult(Token.text(content), matcher.group().length());
     }

@@ -18,16 +18,19 @@ public class FormatTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        if (!params.getInput().startsWith("&")) return null;
+        if (!params.getInput().startsWith("&"))
+            return null;
 
         Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(params.getInput());
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String content = matcher.group();
         char formatCharacter = content.charAt(1);
         char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
         boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
-        if (!hasPermission) return new TokenizerResult(Token.text(content), content.length());
+        if (!hasPermission)
+            return new TokenizerResult(Token.text(content), content.length());
 
         ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
         boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format

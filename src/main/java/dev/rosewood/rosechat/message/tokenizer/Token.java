@@ -47,6 +47,7 @@ public class Token {
     public String getContent() {
         if (this.type == TokenType.DECORATOR)
             throw new IllegalStateException("Cannot get content of a token that is of type DECORATOR");
+
         return this.getPlaceholders().apply(this.content);
     }
 
@@ -59,6 +60,7 @@ public class Token {
     public List<Token> getChildren() {
         if (this.type != TokenType.GROUP)
             throw new IllegalStateException("Cannot get children of a token that is not of type GROUP");
+
         return this.children;
     }
 
@@ -68,6 +70,7 @@ public class Token {
     public List<TokenDecorator> getDecorators() {
         if (this.type == TokenType.TEXT)
             throw new IllegalStateException("Cannot get decorators of a token that is of type TEXT");
+
         return this.decorators;
     }
 
@@ -99,6 +102,7 @@ public class Token {
         Set<Tokenizer> ignoredTokenizers = new HashSet<>(this.ignoredTokenizers);
         if (this.parent != null)
             ignoredTokenizers.addAll(this.parent.getIgnoredTokenizers());
+
         return ignoredTokenizers;
     }
 
@@ -109,6 +113,7 @@ public class Token {
         Token root = this;
         while (root.parent != null)
             root = root.parent;
+
         return root;
     }
 
@@ -117,6 +122,7 @@ public class Token {
         builder.addAll(this.placeholders);
         if (this.parent != null)
             builder.addAll(this.parent.getPlaceholders());
+
         return builder.build();
     }
 
@@ -162,6 +168,7 @@ public class Token {
         public Builder placeholder(String placeholder, Object value) {
             if (this.placeholders == null)
                 this.placeholders = StringPlaceholders.builder();
+
             this.placeholders.add(placeholder, value);
             return this;
         }
@@ -169,6 +176,7 @@ public class Token {
         public Builder placeholders(StringPlaceholders placeholders) {
             if (this.placeholders == null)
                 this.placeholders = StringPlaceholders.builder();
+
             this.placeholders.addAll(placeholders);
             return this;
         }
@@ -181,6 +189,7 @@ public class Token {
         public Builder ignoreTokenizer(Tokenizer tokenizer) {
             if (this.ignoredTokenizers == null)
                 this.ignoredTokenizers = new HashSet<>();
+
             this.ignoredTokenizers.add(tokenizer);
             return this;
         }

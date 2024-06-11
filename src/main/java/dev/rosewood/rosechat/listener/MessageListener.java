@@ -17,9 +17,14 @@ public class MessageListener implements Listener {
 
     @EventHandler
     public void onPostParseMessage(PostParseMessageEvent event) {
-        if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean()) return;
-        if (event.getMessageDirection() == MessageDirection.TO_DISCORD || event.getMessageDirection() == MessageDirection.TO_BUNGEE_SERVER) return;
-        if (event.getViewer().isConsole()) return;
+        if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean())
+            return;
+
+        if (event.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD)
+            return;
+
+        if (event.getViewer().isConsole())
+            return;
 
         String permission;
         String format;
@@ -36,7 +41,7 @@ public class MessageListener implements Listener {
         if (!event.getViewer().hasPermission(permission))
             return;
 
-        BaseComponent[] components = event.getMessageComponents().content();
+        BaseComponent[] components = event.getComponents().content();
         if (components != null && components.length > 0)
             this.appendButton(event, components, format);
     }
@@ -55,7 +60,7 @@ public class MessageListener implements Listener {
             componentBuilder.append(components, ComponentBuilder.FormatRetention.NONE);
         }
 
-        event.setMessageComponents(new MessageTokenizerResults<>(componentBuilder.create(), event.getMessageComponents().outputs()));
+        event.setComponents(new MessageTokenizerResults<>(componentBuilder.create(), event.getComponents().outputs()));
     }
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {

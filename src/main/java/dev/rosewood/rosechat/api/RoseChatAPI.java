@@ -19,22 +19,21 @@ import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
-import dev.rosewood.rosechat.message.MessageLocation;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +54,9 @@ public final class RoseChatAPI {
      * @return The instance of the RoseChatAPI.
      */
     public static RoseChatAPI getInstance() {
-        if (instance == null) instance = new RoseChatAPI();
+        if (instance == null)
+            instance = new RoseChatAPI();
+
         return instance;
     }
 
@@ -68,38 +69,39 @@ public final class RoseChatAPI {
 
     /**
      * Parses a string allowing for hex color, tags and emoji in other text.
-     * @param sender The person sending the message.
-     * @param viewer The person receiving the message.
+     * @param sender The {@link RosePlayer} sending the message.
+     * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
      * @param placeholders A set of {@link StringPlaceholders} to be parsed in the message.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
-        RoseMessage roseMessage = RoseMessage.forLocation(sender, MessageLocation.NONE);
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.NONE);
         roseMessage.setPlaceholders(placeholders);
+
         return roseMessage.parse(viewer, format).content();
     }
 
     /**
      * Parses a string allowing for hex color, tags and emoji in other text.
-     * @param sender The person sending the message.
-     * @param viewer The person receiving the message.
+     * @param sender The {@link RosePlayer} sending the message.
+     * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
     public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format) {
-        return RoseMessage.forLocation(sender, MessageLocation.NONE).parse(viewer, format).content();
+        return RoseMessage.forLocation(sender, PermissionArea.NONE).parse(viewer, format).content();
     }
 
     /**
      * Parses a string allowing for hex color, tags and emoji in other text.
-     * @param sender The person sending the message.
-     * @param viewer The person receiving the message.
+     * @param sender The {@link RosePlayer} sending the message.
+     * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
      * @param location The location that the chat message is in.
      * @return A {@link BaseComponent} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, MessageLocation location) {
+    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, PermissionArea location) {
         return RoseMessage.forLocation(sender, location).parse(viewer, format).content();
     }
 
@@ -177,21 +179,19 @@ public final class RoseChatAPI {
                 return;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                RoseMessage roseMessage = RoseMessage.forLocation(player, MessageLocation.NICKNAME);
+                RoseMessage roseMessage = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
                 String displayName = TextComponent.toLegacyText(roseMessage.parse(player, nickname).content());
-                player.asPlayer().setDisplayName(displayName);
                 player.setDisplayName(displayName);
 
-                if (this.plugin.getNicknameProvider() != null) {
-                    this.plugin.getNicknameProvider().setNickname(player.asPlayer(), player.asPlayer().getDisplayName());
-                }
+                if (this.plugin.getNicknameProvider() != null)
+                    this.plugin.getNicknameProvider().setNickname(player.asPlayer(), player.getDisplayName());
             });
         }
     }
 
     /**
      * Deletes a chat message with the given UUID.
-     * @param player The {@link Player} to delete the message for.
+     * @param player The {@link RosePlayer} to delete the message for.
      * @param uuid The {@link UUID} of the message.
      */
     public void deleteMessage(RosePlayer player, UUID uuid) {
@@ -199,13 +199,15 @@ public final class RoseChatAPI {
 
         // Find the message.
         for (DeletableMessage message : player.getPlayerData().getMessageLog().getDeletableMessages()) {
-            if (message.getUUID().equals(uuid)) messageToDelete = message;
+            if (message.getUUID().equals(uuid))
+                messageToDelete = message;
         }
 
-        if (messageToDelete == null) return;
+        if (messageToDelete == null)
+            return;
 
         // Get the deleted message format.
-        BaseComponent[] deletedMessageFormat = RoseChatAPI.getInstance().parse(player, player, Setting.DELETED_MESSAGE_FORMAT.getString(),
+        BaseComponent[] format = this.parse(player, player, Setting.DELETED_MESSAGE_FORMAT.getString(),
                 MessageUtils.getSenderViewerPlaceholders(player, player)
                         .add("id", uuid.toString())
                         .add("type", messageToDelete.isClient() ? "client" : "server")
@@ -213,10 +215,12 @@ public final class RoseChatAPI {
                         .build());
 
         boolean updated = false;
-        if (deletedMessageFormat != null && !TextComponent.toPlainText(deletedMessageFormat).isEmpty()) {
-            String json = ComponentSerializer.toString(deletedMessageFormat);
+        if (format != null && !TextComponent.toPlainText(format).isEmpty()) {
+            String json = ComponentSerializer.toString(format);
+
             if (player.hasPermission("rosechat.deletemessages.client")) {
                 BaseComponent[] withDeleteButton = MessageUtils.appendDeleteButton(player, player.getPlayerData(), uuid.toString(), json);
+
                 if (withDeleteButton != null) {
                     messageToDelete.setJson(ComponentSerializer.toString(withDeleteButton));
                 } else {
@@ -232,10 +236,12 @@ public final class RoseChatAPI {
         }
 
         // Remove the original message if it was not changed.
-        if (!updated) player.getPlayerData().getMessageLog().getDeletableMessages().remove(messageToDelete);
+        if (!updated)
+            player.getPlayerData().getMessageLog().getDeletableMessages().remove(messageToDelete);
 
         // Send blank lines to clear the chat.
-        for (int i = 0; i < 100; i++) player.send("\n");
+        for (int i = 0; i < 100; i++)
+            player.send("\n");
 
         // Resend the messages!
         for (DeletableMessage message : player.getPlayerData().getMessageLog().getDeletableMessages())
@@ -243,8 +249,12 @@ public final class RoseChatAPI {
 
         // If the message is not a client message, delete it from Discord too.
         if (!messageToDelete.isClient()) {
-            if (updated) messageToDelete.setClient(true);
-            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean()) return;
+            if (updated)
+                messageToDelete.setClient(true);
+
+            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean())
+                return;
+
             if (this.getDiscord() != null && messageToDelete.getDiscordId() != null)
                 this.getDiscord().deleteMessage(messageToDelete.getDiscordId());
         }
@@ -252,6 +262,7 @@ public final class RoseChatAPI {
 
     /**
      * Creates a new chat channel.
+     * @param provider The {@link ChannelProvider} for the channel.
      * @param id The ID to use.
      * @return The new chat channel, may return null if failed to register properly.
      */
@@ -290,6 +301,9 @@ public final class RoseChatAPI {
         return new ArrayList<>(this.getChannelManager().getChannels().keySet());
     }
 
+    /**
+     * @return The default chat channel.
+     */
     public Channel getDefaultChannel() {
         return this.getChannelManager().getDefaultChannel();
     }
@@ -297,8 +311,8 @@ public final class RoseChatAPI {
     /**
      * Creates a new replacement.
      * @param id The ID to use.
-     * @param input The input for the replacement.
-     * @param output The output of the replacement.
+     * @param input The {@link ReplacementInput} for the replacement.
+     * @param output The {@link ReplacementOutput} of the replacement.
      * @return The new chat replacement.
      */
     public Replacement createReplacement(String id, ReplacementInput input, ReplacementOutput output) {
@@ -311,7 +325,7 @@ public final class RoseChatAPI {
 
     /**
      * Deletes a replacement.
-     * @param replacement The replacement to delete.
+     * @param replacement The {@link Replacement} to delete.
      */
     public void deleteReplacement(Replacement replacement) {
         this.getReplacementManager().deleteReplacement(replacement);
@@ -346,43 +360,22 @@ public final class RoseChatAPI {
      * @return The new group chat.
      */
     public GroupChannel createGroupChat(String id, Player owner) {
-        GroupChannel groupChat = new GroupChannel(id);
-        groupChat.setOwner(owner.getUniqueId());
-        groupChat.addMember(owner.getUniqueId());
+        GroupChannel group = new GroupChannel(id);
+        group.setOwner(owner.getUniqueId());
+        group.getMembers().add(owner.getUniqueId());
 
-        this.getGroupManager().addGroupChat(groupChat);
-        this.getGroupManager().addMember(groupChat, owner.getUniqueId());
+        this.getGroupManager().addGroupChat(group);
+        this.getGroupManager().addMember(group, owner.getUniqueId());
 
-        return groupChat;
+        return group;
     }
 
     /**
      * Deletes a group chat.
-     * @param groupChat The group chat to delete.
+     * @param group The {@link GroupChannel} to delete.
      */
-    public void deleteGroupChat(GroupChannel groupChat) {
-        this.getGroupManager().removeGroupChat(groupChat);
-        this.getGroupManager().deleteGroupChat(groupChat);
-    }
-
-    /**
-     * Adds a player to a group chat.
-     * @param groupChat The group chat to be added to.
-     * @param member The player to be added.
-     */
-    public void addGroupChatMember(GroupChannel groupChat, Player member) {
-        groupChat.addMember(member.getUniqueId());
-        this.getGroupManager().addMember(groupChat, member.getUniqueId());
-    }
-
-    /**
-     * Removes a player from a group chat.
-     * @param groupChat The group chat to be removed from.
-     * @param member The player to be removed.
-     */
-    public void removeGroupChatMember(GroupChannel groupChat, Player member) {
-        groupChat.removeMember(member.getUniqueId());
-        this.getGroupManager().removeMember(groupChat, member.getUniqueId());
+    public void deleteGroupChat(GroupChannel group) {
+        this.getGroupManager().deleteGroupChat(group);
     }
 
     /**
@@ -420,14 +413,8 @@ public final class RoseChatAPI {
      * @return A list of all group chats that the player is in.
      */
     public List<GroupChannel> getGroupChats(UUID player) {
-        return this.getGroupManager().getGroupChats().values().stream().filter(gc -> gc.getMembers().contains(player)).collect(Collectors.toList());
-    }
-
-    /**
-     * @return A list of all group chat IDs.
-     */
-    public List<String> getGroupChatIDs() {
-        return new ArrayList<>(this.getGroupManager().getGroupChats().keySet());
+        return this.getGroupManager().getGroupChats().values().stream().filter(gc ->
+                gc.getMembers().contains(player)).collect(Collectors.toList());
     }
 
     /**
@@ -436,6 +423,14 @@ public final class RoseChatAPI {
      */
     public PlayerData getPlayerData(UUID uuid) {
         return this.getPlayerDataManager().getPlayerData(uuid);
+    }
+
+    /**
+     * @param uuid The uuid of the player whose data should be got.
+     * @param callback A consumer containing the PlayerData.
+     */
+    public void getPlayerData(UUID uuid, Consumer<PlayerData> callback) {
+        this.getPlayerDataManager().getPlayerData(uuid, callback);
     }
 
     /**
@@ -517,6 +512,7 @@ public final class RoseChatAPI {
             try {
                 this.spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
                 this.bungeeField = this.spigotConfigClass.getDeclaredField("bungee");
+
                 return this.bungeeField.getBoolean(null);
             } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();

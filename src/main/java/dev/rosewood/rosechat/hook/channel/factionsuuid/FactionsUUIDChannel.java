@@ -39,8 +39,11 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
     public void onLoad(String id, ConfigurationSection config) {
         super.onLoad(id, config);
 
-        if (config.contains("channel-type")) this.channelType = FactionsChannelType.valueOf(config.getString("channel-type").toUpperCase());
-        if (!config.contains("visible-anywhere")) this.visibleAnywhere = true;
+        if (config.contains("channel-type"))
+            this.channelType = FactionsChannelType.valueOf(config.getString("channel-type").toUpperCase());
+
+        if (!config.contains("visible-anywhere"))
+            this.visibleAnywhere = true;
 
         FactionsPlugin.getInstance().setHandlingChat(RoseChat.getInstance(), true);
 
@@ -64,13 +67,15 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
     public void onTeamJoin(FPlayerJoinEvent event) {
         if (this.autoJoin) {
             Player player = Bukkit.getPlayer(event.getfPlayer().getOfflinePlayer().getUniqueId());
-            if (player == null) return;
+            if (player == null)
+                return;
 
             RosePlayer rosePlayer = new RosePlayer(player);
             Channel currentChannel = rosePlayer.getPlayerData().getCurrentChannel();
-            if (currentChannel == this) return;
+            if (currentChannel == this)
+                return;
 
-            if (rosePlayer.changeChannel(currentChannel, this)) {
+            if (rosePlayer.switchChannel(this)) {
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
             }
@@ -91,15 +96,19 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
 
-        if (!sender.isPlayer()) return recipients;
+        if (!sender.isPlayer())
+            return recipients;
+
         Faction faction = FPlayers.getInstance().getByPlayer(sender.asPlayer()).getFaction();
-        if (faction == null) return recipients;
+        if (faction == null)
+            return recipients;
 
         switch (this.channelType) {
             case FACTION: {
                 for (FPlayer fPlayer : faction.getFPlayers()) {
                     Player player = fPlayer.getPlayer();
-                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                    if (player != null && this.getReceiveCondition(sender, player))
+                        recipients.add(player);
                 }
 
                 return recipients;
@@ -107,10 +116,12 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
             case ALLY: {
                 for (FPlayer fPlayer : FPlayers.getInstance().getOnlinePlayers()) {
-                    if (faction.getRelationTo(fPlayer) != Relation.ALLY) continue;
+                    if (faction.getRelationTo(fPlayer) != Relation.ALLY)
+                        continue;
 
                     Player player = fPlayer.getPlayer();
-                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                    if (player != null && this.getReceiveCondition(sender, player))
+                        recipients.add(player);
                 }
 
                 return recipients;
@@ -118,10 +129,12 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
             case TRUCE: {
                 for (FPlayer fPlayer : FPlayers.getInstance().getOnlinePlayers()) {
-                    if (faction.getRelationTo(fPlayer) != Relation.TRUCE) continue;
+                    if (faction.getRelationTo(fPlayer) != Relation.TRUCE)
+                        continue;
 
                     Player player = fPlayer.getPlayer();
-                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                    if (player != null && this.getReceiveCondition(sender, player))
+                        recipients.add(player);
                 }
 
                 return recipients;
@@ -129,10 +142,12 @@ public class FactionsUUIDChannel extends RoseChatChannel implements Listener {
 
             case MOD: {
                 for (FPlayer fPlayer : faction.getFPlayers()) {
-                    if (!fPlayer.getRole().isAtLeast(Role.MODERATOR)) continue;
+                    if (!fPlayer.getRole().isAtLeast(Role.MODERATOR))
+                        continue;
 
                     Player player = fPlayer.getPlayer();
-                    if (player != null && this.getReceiveCondition(sender, player)) recipients.add(player);
+                    if (player != null && this.getReceiveCondition(sender, player))
+                        recipients.add(player);
                 }
 
                 return recipients;

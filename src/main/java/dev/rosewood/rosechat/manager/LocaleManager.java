@@ -15,7 +15,8 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, boolean prefix) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         if (!prefix) {
             RosePlayer rosePlayer = new RosePlayer(sender);
@@ -26,7 +27,8 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders, boolean prefix) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         if (!prefix) {
             RosePlayer rosePlayer = new RosePlayer(sender);
@@ -37,26 +39,30 @@ public class LocaleManager extends AbstractLocaleManager {
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }
 
     public void sendComponentMessage(CommandSender sender, String messageKey, StringPlaceholders stringPlaceholders) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         RosePlayer rosePlayer = new RosePlayer(sender);
         this.sendComponentMessage(rosePlayer, messageKey, stringPlaceholders);
     }
 
     public void sendComponentMessage(RosePlayer sender, String messageKey) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         this.sendComponentMessage(sender, messageKey, StringPlaceholders.empty());
     }
 
     public void sendComponentMessage(RosePlayer sender, String messageKey, StringPlaceholders stringPlaceholders) {
-        if (this.getMessage(messageKey).isEmpty()) return;
+        if (this.getMessage(messageKey).isEmpty())
+            return;
 
         sender.send(RoseChatAPI.getInstance().parse(sender, sender, this.getMessage("prefix") + this.getMessage(messageKey, stringPlaceholders)));
     }

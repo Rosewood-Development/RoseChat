@@ -21,6 +21,7 @@ public class GroupManager extends Manager {
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.channelProvider = new GroupChannelProvider();
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
@@ -45,10 +46,20 @@ public class GroupManager extends Manager {
 
     public GroupChannel getGroupChatByOwner(UUID owner) {
         for (GroupChannel groupChat : this.groupChats.values()) {
-            if (groupChat.getOwner().equals(owner)) return groupChat;
+            if (groupChat.getOwner().equals(owner))
+                return groupChat;
         }
 
         return null;
+    }
+
+    public void loadGroupChat(String id, Consumer<GroupChannel> callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            GroupChannel group = this.dataManager.getGroupChannel(id);
+            List<UUID> members = this.dataManager.getGroupChatMembers(id);
+            group.setMembers(members);
+            callback.accept(group);
+        });
     }
 
     public void loadMemberGroupChats(UUID member, Consumer<List<GroupChannel>> callback) {
@@ -93,6 +104,7 @@ public class GroupManager extends Manager {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             this.dataManager.deleteGroupChat(groupChat);
             this.groupChats.remove(groupChat.getId());
+            this.groupChatNames.remove(groupChat.getId());
         });
     }
 
@@ -112,6 +124,7 @@ public class GroupManager extends Manager {
 
     public void addGroupChat(GroupChannel groupChat) {
         this.groupChats.put(groupChat.getId(), groupChat);
+        this.groupChatNames.add(groupChat.getId());
         groupChat.save();
     }
 

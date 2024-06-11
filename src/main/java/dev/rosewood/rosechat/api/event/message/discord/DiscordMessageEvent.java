@@ -21,10 +21,16 @@ public class DiscordMessageEvent extends Event implements Cancellable {
         this.textChannel = textChannel;
     }
 
+    /**
+     * @return The {@link RoseMessage} being sent.
+     */
     public RoseMessage getMessage() {
         return this.message;
     }
 
+    /**
+     * @return The {@link TextChannel} for the message.
+     */
     public TextChannel getTextChannel() {
         return this.textChannel;
     }

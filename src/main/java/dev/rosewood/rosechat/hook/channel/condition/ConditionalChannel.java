@@ -23,12 +23,14 @@ public abstract class ConditionalChannel extends Channel {
 
         if (config.contains("join-conditions")) {
             this.joinCondition = ConditionManager.getChannelCondition(config, "join-conditions");
-            if (this.joinCondition != null) this.joinCondition.parseValues();
+            if (this.joinCondition != null)
+                this.joinCondition.parseValues();
         }
 
         if (config.contains("receive-conditions")) {
             this.receiveCondition = ConditionManager.getChannelCondition(config, "receive-conditions");
-            if (this.receiveCondition != null) this.receiveCondition.parseValues();
+            if (this.receiveCondition != null)
+                this.receiveCondition.parseValues();
         }
     }
 

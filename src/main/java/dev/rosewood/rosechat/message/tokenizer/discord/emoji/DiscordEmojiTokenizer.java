@@ -10,9 +10,9 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.chat.HoverEvent;
 
 public class DiscordEmojiTokenizer extends Tokenizer {
 
@@ -25,15 +25,21 @@ public class DiscordEmojiTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("<")) return null;
+        if (!input.startsWith("<"))
+            return null;
 
         Matcher matcher = PATTERN.matcher(input);
-        if (!matcher.find() || matcher.start() != 0) return null;
+        if (!matcher.find() || matcher.start() != 0)
+            return null;
 
         String content = matcher.group(1);
         for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
-            if (!emoji.getInput().isEmoji()) continue;
-            if (!emoji.getInput().getText().equalsIgnoreCase(content)) continue;
+            if (!emoji.getInput().isEmoji())
+                continue;
+
+            if (!emoji.getInput().getText().equalsIgnoreCase(content))
+                continue;
+
             if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
                 return null;
 

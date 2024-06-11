@@ -27,7 +27,7 @@ public class ToDiscordParser implements MessageParser<String> {
 
     @Override
     public MessageDirection getMessageDirection() {
-        return MessageDirection.TO_DISCORD;
+        return MessageDirection.MINECRAFT_TO_DISCORD;
     }
 
 }

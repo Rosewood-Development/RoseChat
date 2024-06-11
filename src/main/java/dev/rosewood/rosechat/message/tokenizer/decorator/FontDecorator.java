@@ -10,6 +10,7 @@ public class FontDecorator extends TokenDecorator {
 
     private FontDecorator(String font) {
         super(DecoratorType.STYLING);
+
         this.font = font;
     }
 

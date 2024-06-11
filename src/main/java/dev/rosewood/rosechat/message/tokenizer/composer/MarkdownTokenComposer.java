@@ -63,6 +63,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
                     String markdown = CHAT_COLOR_TO_MARKDOWN.get(chatColor);
                     format.append(markdown);
                 }
+
                 continue;
             }
 
@@ -86,6 +87,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
             ChatColor chatColor = existingDecorators.removeLast();
             format.append(CHAT_COLOR_TO_MARKDOWN.get(chatColor));
         }
+
         return format.toString();
     }
 

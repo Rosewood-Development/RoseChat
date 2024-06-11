@@ -16,11 +16,15 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String playerInput = params.getPlayerInput();
-        if (playerInput == null || !params.getPlayerInput().startsWith("> ")) return null;
+        if (playerInput == null || !params.getPlayerInput().startsWith("> "))
+            return null;
 
         String input = params.getInput();
-        if (!input.startsWith("> ")) return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.quote")) return null;
+        if (!input.startsWith("> "))
+            return null;
+
+        if (!MessageUtils.hasTokenPermission(params, "rosechat.quote"))
+            return null;
 
         String content = input.substring(2);
 
