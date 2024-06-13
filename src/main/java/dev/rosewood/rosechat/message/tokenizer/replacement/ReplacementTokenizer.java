@@ -91,7 +91,8 @@ public class ReplacementTokenizer extends Tokenizer {
                 if (replacement.getOutput().getHover() != null)
                     token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
 
-                if (!replacement.getOutput().hasColorRetention()) token.encapsulate();
+                if (!replacement.getOutput().hasColorRetention())
+                    token.encapsulate();
 
                 return new TokenizerResult(token.build(), originalContent.length());
             }

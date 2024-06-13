@@ -32,14 +32,8 @@ public class ColorDecorator extends TokenDecorator {
         if (this.colorGenerator == null && this.colorGeneratorFunction != null)
             this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(parent, this));
 
-        if (this.colorGenerator != null) {
+        if (this.colorGenerator != null)
             component.setColor(this.colorGenerator.nextChatColor());
-            component.setBold(false);
-            component.setItalic(false);
-            component.setUnderlined(false);
-            component.setStrikethrough(false);
-            component.setObfuscated(false);
-        }
     }
 
     @Override

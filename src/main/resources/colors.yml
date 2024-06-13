@@ -1,0 +1,292 @@
+# This file serves as an extra space to add custom colors.
+# The color-retention setting is enabled by default.
+# Adding these colors as a chat color is as simple as giving the permissions
+#  "rosechat.replacements.chatcolor" and "rosechat.replacement.<id>"
+# The following permission is also required to send a message with a replacement in chat.
+#  "rosechat.replacements.channel.<channel>"
+
+black-tag:
+  input:
+    prefix: "<black>"
+    suffix: "</black>"
+  output:
+    text: "&0%group_1%"
+
+black:
+  input:
+    text: "<black>"
+  output:
+    text: "&0"
+
+dark_blue-tag:
+  input:
+    prefix: "<dark_blue>"
+    suffix: "</dark_blue>"
+  output:
+    text: "&1%group_1%"
+
+dark_blue:
+  input:
+    text: "<dark_blue>"
+  output:
+    text: "&1"
+
+dark_green-tag:
+  input:
+    prefix: "<dark_green>"
+    suffix: "</dark_green>"
+  output:
+    text: "&2%group_1%"
+
+dark_green:
+  input:
+    text: "<dark_green>"
+  output:
+    text: "&2"
+
+dark_aqua-tag:
+  input:
+    prefix: "<dark_aqua>"
+    suffix: "</dark_aqua>"
+  output:
+    text: "&3%group_1%"
+
+dark_aqua:
+  input:
+    text: "<dark_aqua>"
+  output:
+    text: "&3"
+
+dark_red-tag:
+  input:
+    prefix: "<dark_red>"
+    suffix: "</dark_red>"
+  output:
+    text: "&4%group_1%"
+
+dark_red:
+  input:
+    text: "<dark_red>"
+  output:
+    text: "&4"
+
+dark_purple-tag:
+  input:
+    prefix: "<dark_purple>"
+    suffix: "</dark_purple>"
+  output:
+    text: "&5%group_1%"
+
+dark_purple:
+  input:
+    text: "<dark_purple>"
+  output:
+    text: "&5"
+
+gold-tag:
+  input:
+    prefix: "<gold>"
+    suffix: "</gold>"
+  output:
+    text: "&6%group_1%"
+
+gold:
+  input:
+    text: "<gold>"
+  output:
+    text: "&6"
+
+gray-tag:
+  input:
+    prefix: "<gray>"
+    suffix: "</gray>"
+  output:
+    text: "&7%group_1%"
+
+gray:
+  input:
+    text: "<gray>"
+  output:
+    text: "&7"
+
+dark_gray-tag:
+  input:
+    prefix: "<dark_gray>"
+    suffix: "</dark_gray>"
+  output:
+    text: "&8%group_1%"
+
+dark_gray:
+  input:
+    text: "<dark_gray>"
+  output:
+    text: "&8"
+
+blue-tag:
+  input:
+    prefix: "<blue>"
+    suffix: "</blue>"
+  output:
+    text: "&9%group_1%"
+
+blue:
+  input:
+    text: "<blue>"
+  output:
+    text: "&9"
+
+green-tag:
+  input:
+    prefix: "<green>"
+    suffix: "</green>"
+  output:
+    text: "&a%group_1%"
+
+green:
+  input:
+    text: "<green>"
+  output:
+    text: "&a"
+
+aqua-tag:
+  input:
+    prefix: "<aqua>"
+    suffix: "</aqua>"
+  output:
+    text: "&b%group_1%"
+
+aqua:
+  input:
+    text: "<aqua>"
+  output:
+    text: "&b"
+
+red-tag:
+  input:
+    prefix: "<red>"
+    suffix: "</red>"
+  output:
+    text: "&c%group_1%"
+
+red:
+  input:
+    text: "<red>"
+  output:
+    text: "&c"
+
+light_purple-tag:
+  input:
+    prefix: "<light_purple>"
+    suffix: "</light_purple>"
+  output:
+    text: "&d%group_1%"
+
+light_purple:
+  input:
+    text: "<light_purple>"
+  output:
+    text: "&d"
+
+yellow-tag:
+  input:
+    prefix: "<yellow>"
+    suffix: "</yellow>"
+  output:
+    text: "&e%group_1%"
+
+yellow:
+  input:
+    text: "<yellow>"
+  output:
+    text: "&e"
+
+white-tag:
+  input:
+    prefix: "<white>"
+    suffix: "</white>"
+  output:
+    text: "&f%group_1%"
+
+white:
+  input:
+    text: "<white>"
+  output:
+    text: "&f"
+
+olive-tag:
+  input:
+    prefix: "<olive>"
+    suffix: "</olive>"
+  output:
+    text: "#808000%group_1%"
+
+olive:
+  input:
+    text: "<olive>"
+  output:
+    text: "#808000"
+
+obfuscated-tag:
+  input:
+    prefix: "<obfuscated>"
+    suffix: "</obfuscated>"
+  output:
+    text: "&k%group_1%"
+
+obfuscated:
+  input:
+    text: "<obfuscated>"
+  output:
+    text: "&k"
+
+bold-tag:
+  input:
+    prefix: "<bold>"
+    suffix: "</bold>"
+  output:
+    text: "&l%group_1%"
+
+bold:
+  input:
+    text: "<bold>"
+  output:
+    text: "&l"
+
+strikethrough-tag:
+  input:
+    prefix: "<strikethrough>"
+    suffix: "</strikethrough>"
+  output:
+    text: "&m%group_1%"
+
+strikethrough:
+  input:
+    text: "<strikethrough>"
+  output:
+    text: "&m"
+
+underlined-tag:
+  input:
+    prefix: "<underlined>"
+    suffix: "</underlined>"
+  output:
+    text: "&n%group_1%"
+
+underlined:
+  input:
+    text: "<underlined>"
+  output:
+    text: "&n"
+
+italic-tag:
+  input:
+    prefix: "<italic>"
+    suffix: "</italic>"
+  output:
+    text: "&o%group_1%"
+
+italic:
+  input:
+    text: "<italic>"
+  output:
+    text: "&o"

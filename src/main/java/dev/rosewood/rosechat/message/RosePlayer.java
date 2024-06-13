@@ -279,6 +279,9 @@ public class RosePlayer {
      * @param color The color to use.
      */
     public boolean setNicknameColor(String color) {
+        // Remove the current colour before setting the new one.
+        this.removeNicknameColor();
+
         String nickname = ChatColor.stripColor(HexUtils.colorify(this.getName()));
         nickname = color + nickname;
 

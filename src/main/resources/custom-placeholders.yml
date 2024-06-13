@@ -197,6 +197,13 @@ spoiler-tag:
     default:
       - "%group_1%"
 
+hover-tag:
+  text:
+    default: "%group_2%"
+  hover:
+    default:
+      - "%group_1%"
+
 url:
   text:
     default: "&9&n%group_1%"

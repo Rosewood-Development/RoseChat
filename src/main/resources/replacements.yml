@@ -100,3 +100,17 @@ url:
     is-inline-regex: true
   output:
     text: '{url}'
+
+hover-tag:
+  input:
+    text: "<hover:(.*)>(.*)</hover>"
+    is-regex: true
+  output:
+    text: '{hover-tag}'
+
+hover:
+  input:
+    text: "<hover:(.*)>(.*)"
+    is-regex: true
+  output:
+    text: '{hover-tag}'

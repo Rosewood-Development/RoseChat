@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.command.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -93,17 +94,32 @@ public class ChatColorCommand extends RoseChatCommand {
 
     private void setColor(RosePlayer player, RosePlayer target, String color) {
         PlayerData targetData = target.getPlayerData();
+        String colorStr = color;
+
+        // Allow color replacements.
+        Replacement replacement = this.getAPI().getReplacementById(color);
+        if (replacement != null) {
+            if (!player.hasPermission("rosechat.replacement." + replacement.getId())
+                    || !player.hasPermission("rosechat.replacements.chatcolor")) {
+                player.sendLocaleMessage("no-permission");
+                return;
+            }
+
+            color = replacement.getInput().getText();
+        }
 
         targetData.setColor(color);
         targetData.save();
 
-        String colorStr = color;
+
         if (colorStr.startsWith("<r")) {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-rainbow");
         } else if (colorStr.startsWith("<g")) {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-gradient");
-        } else {
+        } else if (replacement == null) {
             colorStr = colorStr.substring(1);
+        } else {
+            colorStr = colorStr.replace('_', ' ');
         }
 
         if (!player.getUUID().equals(target.getUUID()))

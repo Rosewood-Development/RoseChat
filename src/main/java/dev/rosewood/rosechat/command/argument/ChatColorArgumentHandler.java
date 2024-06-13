@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.command.argument;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosegarden.command.framework.Argument;
@@ -8,6 +10,7 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.InputIterator;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +31,11 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
 
         if (input.equalsIgnoreCase("remove") || input.equalsIgnoreCase("off"))
             return "";
+
+        for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
+            if (replacement.getOutput().hasColorRetention() && replacement.getId().equalsIgnoreCase(input))
+                return input;
+        }
 
         // Return if the colorized string contains no color.
         String colorized = HexUtils.colorify(input);
@@ -62,6 +70,15 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
         if (this.permissionArea == null ||
                 context.getSender().hasPermission("rosechat.gradient." + this.permissionArea))
             suggestions.add("<g:#FFFFFF:#000000>");
+
+        if (this.permissionArea == null ||
+                context.getSender().hasPermission("rosechat.replacements." + this.permissionArea.toLowerCase())) {
+            for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
+                if (replacement.getOutput().hasColorRetention()
+                        && context.getSender().hasPermission("rosechat.replacement." + replacement.getId()))
+                    suggestions.add(replacement.getId());
+            }
+        }
 
         return suggestions;
     }
