@@ -50,7 +50,7 @@ public class GroupArgumentHandler extends ArgumentHandler<GroupChannel> {
         boolean isConsole = (context.getSender() instanceof ConsoleCommandSender);
 
         if (!this.checkPermissions || (hasAdminPermission || isConsole))
-            return RoseChatAPI.getInstance().getGroupChatNames();
+            return RoseChatAPI.getInstance().getGroupChatIDs();
 
         return RoseChatAPI.getInstance().getGroupChats(((Player) context).getUniqueId()).stream()
                 .map(GroupChannel::getId).collect(Collectors.toList());

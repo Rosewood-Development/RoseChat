@@ -68,7 +68,7 @@ public class FromDiscordTagTokenizer extends Tokenizer {
             }
         }
 
-        // TODO: Allow spaces in names
+        // TODO: Allow spaces in names - Requires tokenizer recursion fix
         String finalTag = prefix + (isRole ? discord.getRoleFromId(content) : discord.getUserFromId(content));
         return new TokenizerResult(Token.group(finalTag).build(), originalContent.length());
     }

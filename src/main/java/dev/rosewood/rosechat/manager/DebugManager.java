@@ -15,14 +15,7 @@ import java.util.LinkedList;
 
 public class DebugManager extends Manager {
 
-    // TODO do once message, make this a bit better
-    // TODO should output to console,
-    // TODO send msg when done
-
     private boolean enabled;
-    private boolean writeToFile;
-    private boolean timerEnabled;
-    private boolean doOnce;
     private final LinkedList<String> messages;
 
     public DebugManager(RosePlugin rosePlugin) {
@@ -31,8 +24,8 @@ public class DebugManager extends Manager {
     }
 
     public void addMessage(Supplier<String> message) {
-        if (!this.enabled || !this.writeToFile)
-            return;
+        // Log to console.
+        Bukkit.getConsoleSender().sendMessage(message.get());
 
         LocalDateTime now = LocalDateTime.now();
         String prefix = "[" + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond() + ":" + now.getNano() + "]";
@@ -50,7 +43,7 @@ public class DebugManager extends Manager {
     }
 
     public void save() {
-        if (!this.enabled || !this.writeToFile)
+        if (!this.enabled)
             return;
 
         Bukkit.getScheduler().runTaskAsynchronously(RoseChat.getInstance(), () -> {
@@ -60,11 +53,13 @@ public class DebugManager extends Manager {
             File debugFile = new File(this.rosePlugin.getDataFolder() + "/debug", "debug-" + time + ".log");
 
             try {
-                if (!debugFile.createNewFile()) return;
+                if (!debugFile.createNewFile())
+                    return;
 
                 Writer writer = Files.newBufferedWriter(Paths.get(debugFile.getAbsolutePath()));
                 for (String message : this.messages) {
-                    if (message != null) writer.write(message);
+                    if (message != null)
+                        writer.write(message);
                 }
 
                 writer.close();
@@ -86,26 +81,6 @@ public class DebugManager extends Manager {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public void setWriteToFile(boolean writeToFile) {
-        this.writeToFile = writeToFile;
-    }
-
-    public void setTimerEnabled(boolean timerEnabled) {
-        this.timerEnabled = timerEnabled;
-    }
-
-    public boolean isTimerEnabled() {
-        return this.timerEnabled;
-    }
-
-    public void setDoOnce(boolean doOnce) {
-        this.doOnce = doOnce;
-    }
-
-    public boolean doOnce() {
-        return this.doOnce;
     }
 
 }

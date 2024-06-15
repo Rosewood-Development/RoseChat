@@ -32,7 +32,7 @@ public class ColorTokenizer extends Tokenizer {
         ColorToken spigotHexToken = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX, input);
         if (spigotHexToken != null) {
             int length = spigotHexToken.content().length();
-            return (MessageUtils.hasTokenPermission(params, "rosechat.color"))
+            return (this.hasTokenPermission(params, "rosechat.color"))
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(spigotHexToken.color())), length)
                     : new TokenizerResult(Token.text(spigotHexToken.content()), length);
         }
@@ -40,9 +40,9 @@ public class ColorTokenizer extends Tokenizer {
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) {
             int length = legacyToken.content().length();
-            boolean canUseColors = MessageUtils.hasTokenPermission(params, "rosechat.color");
+            boolean canUseColors = this.hasTokenPermission(params, "rosechat.color");
             boolean hasColorPerm = !Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()
-                    || MessageUtils.hasTokenPermission(params, "rosechat." + legacyToken.color().getName().toLowerCase());
+                    || this.hasTokenPermission(params, "rosechat." + legacyToken.color().getName().toLowerCase());
 
             return canUseColors && hasColorPerm
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(legacyToken.color())), length)
@@ -52,7 +52,7 @@ public class ColorTokenizer extends Tokenizer {
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
         if (hexToken != null) {
             int length = hexToken.content().length();
-            return MessageUtils.hasTokenPermission(params, "rosechat.hex")
+            return this.hasTokenPermission(params, "rosechat.hex")
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(hexToken.color())), length)
                     : new TokenizerResult(Token.text(hexToken.content()), length);
         }

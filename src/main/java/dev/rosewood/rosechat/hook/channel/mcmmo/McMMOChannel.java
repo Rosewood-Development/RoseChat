@@ -68,12 +68,12 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        return PartyAPI.inParty(player);
+    private boolean hasTeam(RosePlayer player) {
+        return PartyAPI.inParty(player.asPlayer());
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -89,7 +89,11 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
 
         for (UUID member : members.keySet()) {
             Player player = Bukkit.getPlayer(member);
-            if (player != null && this.getReceiveCondition(sender, player))
+            if (player == null)
+                continue;
+
+            RosePlayer rosePlayer = new RosePlayer(player);
+            if (this.getReceiveCondition(sender, rosePlayer))
                 recipients.add(player);
         }
 
@@ -97,7 +101,7 @@ public class McMMOChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 

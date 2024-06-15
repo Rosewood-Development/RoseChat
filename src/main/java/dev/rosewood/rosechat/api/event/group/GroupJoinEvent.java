@@ -14,6 +14,7 @@ public class GroupJoinEvent extends GroupEvent {
      */
     public GroupJoinEvent(GroupChannel group, Player player) {
         super(group);
+
         this.player = player;
     }
 

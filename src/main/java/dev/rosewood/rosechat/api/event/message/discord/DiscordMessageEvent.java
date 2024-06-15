@@ -7,6 +7,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+@SuppressWarnings("unused")
 public class DiscordMessageEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -17,6 +18,7 @@ public class DiscordMessageEvent extends Event implements Cancellable {
 
     public DiscordMessageEvent(RoseMessage message, TextChannel textChannel) {
         super(!Bukkit.isPrimaryThread());
+
         this.message = message;
         this.textChannel = textChannel;
     }

@@ -290,3 +290,107 @@ italic:
     text: "<italic>"
   output:
     text: "&o"
+
+pride-tag:
+  input:
+    prefix: "<pride>"
+    suffix: "</pride>"
+  output:
+    text: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>%group_1%"
+
+pride:
+  input:
+    text: "<pride>"
+  output:
+    text: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+
+progress-tag:
+  input:
+    prefix: "<progress>"
+    suffix: "</progress>"
+  output:
+    text: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>%group_1%"
+
+progress:
+  input:
+    text: "<progress>"
+  output:
+    text: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+
+trans-tag:
+  input:
+    prefix: "<trans>"
+    suffix: "</trans>"
+  output:
+    text: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>%group_1%"
+
+trans:
+  input:
+    text: "<trans>"
+  output:
+    text: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>"
+
+bi-tag:
+  input:
+    prefix: "<bi>"
+    suffix: "</bi>"
+  output:
+    text: "<g:#D60270:#9B4F96:#0037A7>%group_1%"
+
+bi:
+  input:
+    text: "<bi>"
+  output:
+    text: "<g:#D60270:#9B4F96:#0037A7>"
+
+pan-tag:
+  input:
+    prefix: "<pan>"
+    suffix: "</pan>"
+  output:
+    text: "<g:#FF1C8D:#FFD700:#1AB3FF>%group_1%"
+
+pan:
+  input:
+    text: "<pan>"
+  output:
+    text: "<g:#FF1C8D:#FFD700:#1AB3FF>"
+
+nb-tag:
+  input:
+    prefix: "<nb>"
+    suffix: "</nb>"
+  output:
+    text: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>%group_1%"
+
+nb:
+  input:
+    text: "<nb>"
+  output:
+    text: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>"
+
+lesbian-tag:
+  input:
+    prefix: "<lesbian>"
+    suffix: "</lesbian>"
+  output:
+    text: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>%group_1%"
+
+lesbian:
+  input:
+    text: "<lesbian>"
+  output:
+    text: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>"
+
+ace-tag:
+  input:
+    prefix: "<ace>"
+    suffix: "</ace>"
+  output:
+    text: "<g:#000000:#A4A4A4:#FFFFFF:#810081>%group_1%"
+
+ace:
+  input:
+    text: "<ace>"
+  output:
+    text: "<g:#000000:#A4A4A4:#FFFFFF:#810081>"

@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.discord.emoji;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -40,7 +39,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
             if (!emoji.getInput().getText().equalsIgnoreCase(content))
                 continue;
 
-            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
                 return null;
 
             content = emoji.getOutput().getText();

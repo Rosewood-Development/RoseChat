@@ -237,12 +237,6 @@ discord-player:
     default:
       - "&7Discord: &f%user_name%"
 
-# This is a unique custom placeholder.
-# These options will do nothing in-game, they are only for Discord.
-discord:
-  text:
-    default: "{channel-prefix}{prefix}{player}{separator}{message}"
-
 from-discord:
   text:
     default: "&dDiscord &7| "
@@ -256,3 +250,9 @@ discord-channel-link:
   click:
     action: OPEN_URL
     default: "https://discord.com/channels/%server_id%/%channel_id%"
+
+# This is a unique custom placeholder.
+# These options will do nothing in-game, they are only for Discord.
+discord:
+  text:
+    default: "{channel-prefix}{prefix}{player}{separator}{message}"

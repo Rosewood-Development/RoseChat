@@ -10,6 +10,7 @@ public class DiscordEmbedPlaceholder extends CustomPlaceholder {
 
     public DiscordEmbedPlaceholder(String id) {
         super(id);
+
         this.fields = new LinkedList<>();
     }
 

@@ -8,8 +8,10 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
@@ -48,11 +50,11 @@ public class WorldGuardChannel extends RoseChatChannel {
             this.visibleAnywhere = true;
     }
 
-    public boolean onEnterArea(Player player) {
+    public boolean onEnterArea(RosePlayer player) {
         if (!this.getJoinCondition(player) || !this.autoJoin)
             return false;
 
-        Location location = player.getLocation();
+        Location location = player.asPlayer().getLocation();
         if (location.getWorld() == null)
             return false;
 
@@ -63,7 +65,7 @@ public class WorldGuardChannel extends RoseChatChannel {
         ApplicableRegionSet regions = regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         for (ProtectedRegion region : regions.getRegions()) {
             if (this.whitelist.contains(region.getId())) {
-                return !this.useMembers || region.getMembers().contains(player.getUniqueId());
+                return !this.useMembers || region.getMembers().contains(player.getUUID());
             }
         }
 
@@ -71,17 +73,17 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return this.onEnterArea(player);
     }
 
     @Override
-    public boolean onWorldJoin(Player player, World from, World to) {
+    public boolean onWorldJoin(RosePlayer player, World from, World to) {
         return this.onEnterArea(player);
     }
 
     @Override
-    public boolean onWorldLeave(Player player, World from, World to) {
+    public boolean onWorldLeave(RosePlayer player, World from, World to) {
         // Always leave the channel if auto-join is enabled.
         return this.autoJoin;
     }
@@ -94,8 +96,8 @@ public class WorldGuardChannel extends RoseChatChannel {
         return regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())).getRegions();
     }
 
-    public boolean isInWhitelistedRegion(Player player) {
-        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
+    public boolean isInWhitelistedRegion(RosePlayer player) {
+        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player.asPlayer());
         if (regionSet == null)
             return false;
 
@@ -107,8 +109,8 @@ public class WorldGuardChannel extends RoseChatChannel {
         return false;
     }
 
-    public boolean isInBlacklistedRegion(Player player) {
-        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player);
+    public boolean isInBlacklistedRegion(RosePlayer player) {
+        Set<ProtectedRegion> regionSet = this.getPlayerRegion(player.asPlayer());
         if (regionSet == null)
             return false;
 
@@ -122,8 +124,8 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     @Override
     public List<Player> getSpies(Predicate<Player> condition) {
-        return super.getSpies(condition.or(player -> ((!this.whitelist.isEmpty() && !isInWhitelistedRegion(player))
-                || (this.whitelist.isEmpty() && isInBlacklistedRegion(player)))));
+        return super.getSpies(condition.or(player -> ((!this.whitelist.isEmpty() && !isInWhitelistedRegion(new RosePlayer(player)))
+                || (this.whitelist.isEmpty() && isInBlacklistedRegion(new RosePlayer(player))))));
     }
 
     public List<Player> getRecipients(RosePlayer sender, List<Player> globalRecipients) {
@@ -143,7 +145,7 @@ public class WorldGuardChannel extends RoseChatChannel {
 
                 for (UUID memberUUID : region.getMembers().getUniqueIds()) {
                     Player member = Bukkit.getPlayer(memberUUID);
-                    if (member != null && this.getReceiveCondition(sender, member))
+                    if (member != null && this.getReceiveCondition(sender, new RosePlayer(member)))
                         recipients.add(member);
                 }
             }
@@ -154,7 +156,8 @@ public class WorldGuardChannel extends RoseChatChannel {
         if (!this.whitelist.isEmpty()) {
             // If using a whitelist, send to all players in the region.
             for (Player player : globalRecipients) {
-                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player)) {
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer) && this.isInWhitelistedRegion(rosePlayer)) {
                     recipients.add(player);
                 }
             }
@@ -162,7 +165,8 @@ public class WorldGuardChannel extends RoseChatChannel {
         } else {
             // If using a blacklist, send to everyone EXCEPT players in the region.
             for (Player player : globalRecipients) {
-                if (this.getReceiveCondition(sender, player) && !this.isInBlacklistedRegion(player)) {
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer) && !this.isInBlacklistedRegion(rosePlayer)) {
                     recipients.add(player);
                 }
             }
@@ -191,15 +195,17 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     @Override
-    public int getMemberCount(RosePlayer sender) {
+    public int getMemberCount() {
         int count = this.whitelist.isEmpty() ? Bukkit.getOnlinePlayers().size() : 0;
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            RosePlayer rosePlayer = new RosePlayer(player);
+
             if (!this.whitelist.isEmpty()) {
-                if (this.getReceiveCondition(sender, player) && this.isInWhitelistedRegion(player))
+                if (this.getReceiveCondition(rosePlayer, rosePlayer) && this.isInWhitelistedRegion(rosePlayer))
                     count++;
             } else {
-                if (this.getReceiveCondition(sender, player) && this.isInBlacklistedRegion(player))
+                if (this.getReceiveCondition(rosePlayer, rosePlayer) && this.isInBlacklistedRegion(rosePlayer))
                     count--;
             }
         }
@@ -208,14 +214,18 @@ public class WorldGuardChannel extends RoseChatChannel {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return player.hasPermission("rosechat.channelbypass") ||
                 (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.getJoinCondition(player) && this.isInWhitelistedRegion(player));
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
+        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
+
+        return super.getInfoPlaceholders()
                 .add("regions", this.whitelist.isEmpty() ? this.blacklist.toString() : this.whitelist.toString())
                 .add("use-members", this.useMembers ? trueValue : falseValue);
     }

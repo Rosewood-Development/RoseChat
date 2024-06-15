@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -10,6 +9,7 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -39,7 +39,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
         String placeholder = matcher.group();
         String placeholderValue = matcher.group(1);
-        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue))
+        if (!this.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue))
             return null;
 
         // Hardcoded special {message} placeholder to inject the player's message
@@ -62,7 +62,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         if (roseChatPlaceholder == null)
             return null;
 
-        StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
+        StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
         String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), params.getReceiver(), placeholders));
 
         List<String> formattedHover = new ArrayList<>();

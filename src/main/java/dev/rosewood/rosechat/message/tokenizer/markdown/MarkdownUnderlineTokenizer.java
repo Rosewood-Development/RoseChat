@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -20,7 +19,7 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.underline"))
+        if (!this.hasTokenPermission(params, "rosechat.underline"))
             return null;
 
         if (!input.startsWith("__"))

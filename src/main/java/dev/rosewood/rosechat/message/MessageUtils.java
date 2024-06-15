@@ -5,18 +5,13 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.manager.LocaleManager;
-import dev.rosewood.rosechat.message.parser.RoseChatParser;
-import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
-import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
-import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -24,7 +19,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
@@ -37,6 +31,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("deprecation")
 public class MessageUtils {
 
     public static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
@@ -45,7 +40,7 @@ public class MessageUtils {
     public static final Pattern VALID_LEGACY_REGEX_PARSED = Pattern.compile("§[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING_PARSED = Pattern.compile("§[k-oK-OrR]");
-    public static final Pattern VALID_LEGACY_REGEX_COMBINED = Pattern.compile("(&|§)[0-9a-fA-F]|(&|§)[k-oK-OrR]");
+    public static final Pattern VALID_LEGACY_REGEX_COMBINED = Pattern.compile("([&§])[0-9a-fA-F]|([&§])[k-oK-OrR]");
     public static final Pattern HEX_REGEX = Pattern.compile("<#([A-Fa-f0-9]){6}>|\\{#([A-Fa-f0-9]){6}}|&#([A-Fa-f0-9]){6}|#([A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX = Pattern.compile("&x(&[A-Fa-f0-9]){6}");
     public static final Pattern SPIGOT_HEX_REGEX_PARSED = Pattern.compile("#(§[A-Fa-f0-9]){6}|§x(§[A-Fa-f0-9]){6}");
@@ -101,11 +96,11 @@ public class MessageUtils {
      * @param cs The {@link CharSequence} to check.
      * @return True if the {@link CharSequence} is alphanumeric or a space.
      */
-    public static boolean isAlphanumericSpace(final CharSequence cs) {
+    public static boolean isAlphanumericSpace(CharSequence cs) {
         if (cs == null)
             return false;
 
-        final int sz = cs.length();
+        int sz = cs.length();
         for (int i = 0; i < sz; i++) {
             if (!Character.isLetterOrDigit(cs.charAt(i)) && cs.charAt(i) != ' ')
                 return false;
@@ -114,91 +109,20 @@ public class MessageUtils {
         return true;
     }
 
-    /**
-     * @param sender The {@link RosePlayer} who will send these placeholders.
-     * @param viewer The {@link RosePlayer} who will view these placeholders.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer) {
-        StringPlaceholders.Builder builder = StringPlaceholders.builder()
-                .add("player_name", sender.getRealName())
-                .add("player_displayname", sender.getDisplayName())
-                .add("player_nickname", sender.getName());
+    public static String stripShaderColors(String str) {
+        if (!str.contains("#"))
+            return str;
 
-        if (viewer != null) {
-            builder.add("other_player_name", viewer.getRealName())
-                    .add("other_player_displayname", viewer.getDisplayName())
-                    .add("other_player_nickname", viewer.getName());
+        Matcher matcher = HEX_REGEX.matcher(str);
+        while (matcher.find()) {
+            String match = str.substring(matcher.start(), matcher.end());
+            if (Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
+                String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
+                str = str.replace(match, "#" + freeHex);
+            }
         }
 
-        Permission vault = RoseChatAPI.getInstance().getVault();
-        if (vault != null)
-            builder.add("vault_rank", sender.getPermissionGroup());
-
-        return builder;
-    }
-
-    /**
-     * @param sender The {@link RosePlayer} who will send these placeholders.
-     * @param viewer The {@link RosePlayer} who will view these placeholders.
-     * @param channel The {@link Channel} that these placeholders will be sent in.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel) {
-        if (channel == null)
-            return getSenderViewerPlaceholders(sender, viewer);
-
-        else if (channel.getId().equalsIgnoreCase("group"))
-            return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
-
-        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.add("channel", channel.getId());
-
-        return builder;
-    }
-
-    /**
-     * @param sender The {@link RosePlayer} who will send these placeholders.
-     * @param viewer The {@link RosePlayer} who will view these placeholders.
-     * @param channel The {@link Channel} that these placeholders will be sent in.
-     * @param extra More {@link StringPlaceholders} to use.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, Channel channel, StringPlaceholders extra) {
-        StringPlaceholders.Builder builder;
-        if (channel == null)
-            builder =  getSenderViewerPlaceholders(sender, viewer);
-        else if (channel.getId().equalsIgnoreCase("group"))
-            return getSenderViewerPlaceholders(sender, viewer, (GroupChannel) channel);
-        else
-            builder = getSenderViewerPlaceholders(sender, viewer, channel);
-
-        return extra == null ? builder : builder.addAll(extra);
-    }
-
-    /**
-     * @param sender The {@link RosePlayer} who will send these placeholders.
-     * @param viewer The {@link RosePlayer} who will view these placeholders.
-     * @param group The {@link GroupChannel} that these placeholders will be sent in.
-     * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
-     */
-    public static StringPlaceholders.Builder getSenderViewerPlaceholders(RosePlayer sender, RosePlayer viewer, GroupChannel group) {
-        StringPlaceholders.Builder builder = getSenderViewerPlaceholders(sender, viewer);
-        builder.add("group", group.getId())
-                .add("group_name", group.getName())
-                .add("group_owner", Bukkit.getOfflinePlayer(group.getOwner()).getName());
-
-        return builder;
-    }
-
-    /**
-     * Sends a message to a Discord channel.
-     * @param message The message to send.
-     * @param channel The {@link Channel} that the message was sent from.
-     * @param discordChannel The channel to send the message to.
-     */
-    public static void sendDiscordMessage(RoseMessage message, Channel channel, String discordChannel) {
-        RoseChatAPI.getInstance().getDiscord().sendMessage(message, channel, discordChannel);
+        return str;
     }
 
     /**
@@ -213,20 +137,29 @@ public class MessageUtils {
         Player target = MessageUtils.getPlayerExact(targetName);
         RosePlayer messageTarget = target == null ? new RosePlayer(targetName, "default") : new RosePlayer(target);
 
-        // todo bungee test
         // Quickly return if the player isn't online on any connected servers.
-        if (!targetName.equalsIgnoreCase("Console") && (!api.isBungee() && target == null) ||
-                (!api.getBungeeManager().getAllPlayers().isEmpty() && api.getBungeeManager().getAllPlayers().contains(messageTarget.getRealName()))) {
-            sender.sendLocaleMessage("invalid-argument",
-                    StringPlaceholders.of("message",
-                            RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
-            return;
+        if (!targetName.equalsIgnoreCase("Console")) {
+            if (!api.isBungee() && target == null) {
+                sender.sendLocaleMessage("invalid-argument",
+                        StringPlaceholders.of("message",
+                                RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
+                return;
+            }
+
+            if (api.isBungee()) {
+                if (api.getBungeeManager().getAllPlayers().isEmpty() || !api.getBungeeManager().getAllPlayers().contains(messageTarget.getRealName())) {
+                    sender.sendLocaleMessage("invalid-argument",
+                            StringPlaceholders.of("message",
+                                    RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
+                    return;
+                }
+            }
         }
 
         RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.MESSAGE);
 
         MessageRules rules = new MessageRules().applyAllFilters();
-        MessageRules.RuleOutputs outputs = rules.apply(roseMessage, message);
+        RuleOutputs outputs = rules.apply(roseMessage, message);
         roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // If the message is blocked, send a warning to the player.
@@ -400,6 +333,14 @@ public class MessageUtils {
         return null;
     }
 
+    public static boolean isPlayerVanished(Player player) {
+        for (MetadataValue value : player.getMetadata("vanished"))
+            if (value.asBoolean())
+                return true;
+
+        return false;
+    }
+
     /**
      * Checks if a message can be coloured by the given sender.
      * @param sender The {@link RosePlayer} who is sending the string.
@@ -429,73 +370,12 @@ public class MessageUtils {
         return canColor && canMagic && canFormat && canHex && canGradient && canRainbow;
     }
 
-    public static String getCaptureGroup(Matcher matcher, String group) {
-        try {
-            return matcher.group(group);
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Checks if the sender of a message has the specified permission.
-     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
-     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'.
-     * @return True if the sender has the permission
-     */
-    public static boolean hasTokenPermission(TokenizerParams params, String permission) {
-        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (params == null || params.getSender() == null
-                || params.getLocation() == PermissionArea.NONE || (params.getSender().isConsole())
-                || !params.containsPlayerInput())
-            return true;
-
-        // Gets the full permission, e.g. rosechat.emoji.channel.global
-        String fullPermission = permission + "." + params.getLocationPermission();
-
-        return params.getSender().getIgnoredPermissions().contains(fullPermission.replace("rosechat.", ""))
-                || params.getSender().getIgnoredPermissions().contains("*")
-                || checkAndLogPermission(params, fullPermission);
-    }
-
-    /**
-     * Checks if the sender of a message has the specified permission.
-     * Checks against the first permission, for example, 'rosechat.emojis', and extended permissions such as 'rosechat.emoji.smile'.
-     * @param params The {@link TokenizerParams} to get information from, such as the sender and message location.
-     * @param permission The permission to check, should not contain the location information. For example, 'rosechat.emojis'
-     * @param extendedPermission The extended permission, should not contain the location information. For example, 'rosechat.emoji.smile'.
-     * @return True if the sender has permission.
-     */
-    public static boolean hasExtendedTokenPermission(TokenizerParams params, String permission, String extendedPermission) {
-        // If the message doesn't exist, sent from the console, or has a location of 'NONE', then the sender should have permission.
-        if (params == null || params.getSender() == null
-                || params.getLocation() == PermissionArea.NONE || (params.getSender().isConsole())
-                || !params.containsPlayerInput())
-            return true;
-
-        // The sender will not have an extended permission if they do not have the base permission.
-        if (!hasTokenPermission(params, permission))
-            return false;
-
-        return params.getSender().getIgnoredPermissions().contains(extendedPermission.replace("rosechat.", ""))
-                || params.getSender().getIgnoredPermissions().contains("*")
-                || checkAndLogPermission(params, extendedPermission);
-    }
-
-    private static boolean checkAndLogPermission(TokenizerParams params, String permission) {
-        boolean hasPermission = params.getSender().hasPermission(permission);
-        if (!hasPermission)
-            params.getOutputs().getMissingPermissions().add(permission);
-
-        return hasPermission;
-    }
-
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
 
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
-                MessageUtils.getSenderViewerPlaceholders(sender, sender)
+                DefaultPlaceholders.getFor(sender, sender)
                         .add("id", messageId)
                         .add("type", "client").build());
 
@@ -513,72 +393,6 @@ public class MessageUtils {
         }
 
         return builder.create();
-    }
-
-    public static boolean isPlayerVanished(Player player) {
-        for (MetadataValue value : player.getMetadata("vanished"))
-            if (value.asBoolean())
-                return true;
-
-        return false;
-    }
-
-    public static String stripShaderColors(String str) {
-        if (!str.contains("#"))
-            return str;
-
-        Matcher matcher = HEX_REGEX.matcher(str);
-        while (matcher.find()) {
-            String match = str.substring(matcher.start(), matcher.end());
-            if (Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
-                String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
-                str = str.replace(match, "#" + freeHex);
-            }
-        }
-
-        return str;
-    }
-
-    /**
-     * Checks if a nickname is allowed based on the configurable rules, length, spaces, and non alpha chars.
-     * @param player The player who is setting this nickname.
-     * @param target The player who is receiving this nickname.
-     * @param message A {@link RoseMessage} containing the nickname.
-     * @return True, if the nickname is allowed.
-     */
-    public static boolean isNicknameAllowed(RosePlayer player, RosePlayer target, RoseMessage message) {
-        String nickname = message.getPlayerInput();
-        String strippedNickname = ChatColor.stripColor(HexUtils.colorify(nickname));
-
-        if (strippedNickname.length() < Math.max(1, Setting.MINIMUM_NICKNAME_LENGTH.getInt())) {
-            player.sendLocaleMessage("command-nickname-too-short");
-            return false;
-        }
-
-        if (strippedNickname.length() > Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
-            player.sendLocaleMessage("command-nickname-too-long");
-            return false;
-        }
-
-        if (!Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean() && strippedNickname.contains(" ")) {
-            player.sendLocaleMessage("command-nickname-not-allowed");
-            return false;
-        }
-
-        if (!Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean() && !isAlphanumericSpace(strippedNickname)) {
-            player.sendLocaleMessage("command-nickname-not-allowed");
-            return false;
-        }
-
-        // Parse the nickname to make sure the player isn't missing any permissions.
-        MessageTokenizerResults<BaseComponent[]> results = new RoseChatParser().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER);
-        MessageOutputs outputs = results.outputs();
-        if (!outputs.getMissingPermissions().isEmpty()) {
-            player.sendLocaleMessage("no-permission");
-            return false;
-        }
-
-        return true;
     }
 
 }

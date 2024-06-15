@@ -167,7 +167,9 @@ public class MessageRules {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
 
                 if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
-                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean()) outputs.setWarning(FilterWarning.SWEAR);
+                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean())
+                        outputs.setWarning(FilterWarning.SWEAR);
+
                     outputs.setBlocked(true);
                     return;
                 }

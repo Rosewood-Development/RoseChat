@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.command;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
+import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
@@ -46,7 +47,7 @@ public class ChannelCommand extends RoseChatCommand {
         }
 
         // Return if the player can't join the channel.
-        if (!channel.canJoinByCommand(player.asPlayer())) {
+        if (!channel.canJoinByCommand(player)) {
             player.sendLocaleMessage("command-channel-not-joinable");
             return;
         }
@@ -55,7 +56,9 @@ public class ChannelCommand extends RoseChatCommand {
         if (channel.getId().equals(player.getPlayerData().getCurrentChannel().getId()))
             channel = this.getAPI().getDefaultChannel();
 
-        player.switchChannel(channel, true);
+        boolean success = player.switchChannel(channel, channel instanceof GroupChannel);
+        if (!success)
+            return;
 
         player.sendLocaleMessage("command-channel-joined",
                 StringPlaceholders.of("id", channel.getId()));

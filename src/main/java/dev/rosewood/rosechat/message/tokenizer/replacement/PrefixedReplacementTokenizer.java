@@ -12,6 +12,7 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -62,7 +63,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 }
             }
 
-            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
 
             if (suffix != null) {
@@ -119,7 +120,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
         if (placeholderViewer == null)
             placeholderViewer = new RosePlayer(content, "default");
 
-        StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(params.getSender(), placeholderViewer, params.getChannel())
+        StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), placeholderViewer, params.getChannel())
                 .add("tagged", content)
                 .add("group_0", originalContent)
                 .add("group_1", content).build();
@@ -165,7 +166,6 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 }
             }
 
-            // "tagged" placeholder
             Token.Builder tokenBuilder = Token.group(content)
                     .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                     .placeholder("message", originalContent)

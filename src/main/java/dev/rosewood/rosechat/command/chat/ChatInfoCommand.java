@@ -47,14 +47,10 @@ public class ChatInfoCommand extends RoseChatCommand {
     }
 
     private void execute(RosePlayer player, Channel channel) {
-        String localeTrue = this.getLocaleManager().getLocaleMessage("command-chat-info-true");
-        String localeFalse = this.getLocaleManager().getLocaleMessage("command-chat-info-false");
-        String localeNone = this.getLocaleManager().getLocaleMessage("command-chat-info-none");
-
         player.sendLocaleMessage("command-chat-info-title",
                 StringPlaceholders.of("id", channel.getId()));
         player.sendLocaleMessage("command-chat-info-format",
-                channel.getInfoPlaceholders(player, localeTrue, localeFalse, localeNone).build());
+                channel.getInfoPlaceholders().build());
     }
 
 }

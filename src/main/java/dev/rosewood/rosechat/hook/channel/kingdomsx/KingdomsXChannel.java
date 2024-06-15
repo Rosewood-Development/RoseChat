@@ -84,13 +84,13 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        Kingdom kingdom = KingdomPlayer.getKingdomPlayer(player.getUniqueId()).getKingdom();
+    private boolean hasTeam(RosePlayer player) {
+        Kingdom kingdom = KingdomPlayer.getKingdomPlayer(player.getUUID()).getKingdom();
         return kingdom != null;
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -100,7 +100,11 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
         for (Kingdom k : kingdom.getKingdomsWithRelation(relation)) {
             for (UUID uuid : k.getMembers()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         }
@@ -123,7 +127,11 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
             case KINGDOM: {
                 for (UUID uuid : kingdom.getMembers()) {
                     Player player = Bukkit.getPlayer(uuid);
-                    if (player != null && this.getReceiveCondition(sender, player))
+                    if (player == null)
+                        continue;
+
+                    RosePlayer rosePlayer = new RosePlayer(player);
+                    if (this.getReceiveCondition(sender, rosePlayer))
                         recipients.add(player);
                 }
 
@@ -135,7 +143,11 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
                 for (Kingdom nation : kingdom.getNation().getKingdoms()) {
                     for (UUID uuid : nation.getMembers()) {
                         Player player = Bukkit.getPlayer(uuid);
-                        if (player != null && this.getReceiveCondition(sender, player))
+                        if (player == null)
+                            continue;
+
+                        RosePlayer rosePlayer = new RosePlayer(player);
+                        if (this.getReceiveCondition(sender, rosePlayer))
                             recipients.add(player);
                     }
                 }
@@ -164,13 +176,13 @@ public class KingdomsXChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        return super.getInfoPlaceholders()
                 .add("type", this.channelType.toString().toLowerCase());
     }
 

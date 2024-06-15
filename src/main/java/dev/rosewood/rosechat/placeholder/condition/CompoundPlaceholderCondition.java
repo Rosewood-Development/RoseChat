@@ -15,6 +15,7 @@ public class CompoundPlaceholderCondition extends PlaceholderCondition {
 
     public CompoundPlaceholderCondition(ConfigurationSection section, String condition) {
         super(section, condition);
+
         this.conditions = new ArrayList<>();
     }
 

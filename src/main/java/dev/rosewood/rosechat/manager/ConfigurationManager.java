@@ -173,6 +173,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The format of a message that was sent from discord.", "Requires DiscordSRV"),
         HELD_ITEM_REPLACEMENT("chat-formats.held-item-replacement", "item",
                 "The ID of the replacement, found in replacements.yml, for held items in chat."),
+        BROADCAST_FORMAT("chat-formats.broadcast", "{broadcast}{message}",
+                "The format of a message that was sent via broadcast."),
 
         MARKDOWN_FORMATS("markdown-formats", null, "Discord Format Settings"),
         MARKDOWN_FORMAT_BOLD("markdown-formats.bold", "&l%message%&L"),

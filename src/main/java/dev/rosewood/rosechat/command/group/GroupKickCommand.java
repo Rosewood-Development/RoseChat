@@ -65,7 +65,7 @@ public class GroupKickCommand extends RoseChatCommand {
             return;
 
         if (target.getChannel() == group)
-            target.switchChannel(Channel.findNextChannel(target.asPlayer()));
+            target.switchChannel(target.findChannel());
 
         target.sendLocaleMessage("command-gc-kick-kicked",
                 StringPlaceholders.of("name", group.getName()));

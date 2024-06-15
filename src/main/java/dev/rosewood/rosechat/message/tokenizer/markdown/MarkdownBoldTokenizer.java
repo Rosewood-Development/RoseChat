@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -11,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class MarkdownBoldTokenizer extends Tokenizer {
 
-    public static final Pattern PATTERN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
+    public static final Pattern PATTERN = Pattern.compile("\\*ó\\*([\\s\\S]+?)\\*\\*(?!\\*)");
 
     public MarkdownBoldTokenizer() {
         super("markdown_bold");
@@ -20,7 +19,7 @@ public class MarkdownBoldTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.bold"))
+        if (!this.hasTokenPermission(params, "rosechat.bold"))
             return null;
 
         if (!input.startsWith("**"))

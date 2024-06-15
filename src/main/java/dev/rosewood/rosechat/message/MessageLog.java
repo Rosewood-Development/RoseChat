@@ -22,14 +22,6 @@ public class MessageLog {
         this.deletableMessages = Collections.synchronizedList(new LinkedList<>());
     }
 
-    public MessageLog(UUID sender, boolean doCleanup) {
-        this(sender);
-
-        if (doCleanup) {
-            this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
-        }
-    }
-
     /**
      * @param messageToAdd The message that was sent.
      * @return True if it is seen as spam.
@@ -46,9 +38,8 @@ public class MessageLog {
                 String message = this.messages.get((this.messages.size() - 1) - i);
                 double difference = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if ((1 - difference) <= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100)) {
+                if ((1 - difference) <= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100))
                     similarMessages++;
-                }
             }
 
             // Let's maybe not have an array size of... BIG.

@@ -61,7 +61,6 @@ public class RoseChat extends RosePlugin {
     private DiscordChatProvider discord;
     private NicknameProvider nicknameProvider;
     private ChatListener chatListener;
-    private PacketListener packetListener;
 
     public RoseChat() {
         super(-1, 5608,
@@ -198,9 +197,6 @@ public class RoseChat extends RosePlugin {
 
         if (pluginManager.getPlugin("SuperiorSkyblock2") != null)
             new SuperiorSkyblockChannelProvider().register();
-
-//        if (pluginManager.getPlugin("IridiumSkyblock") != null)
-//            new IridiumSkyblockChannelProvider().register();
 
         if (pluginManager.getPlugin("FabledSkyblock") != null)
             new FabledSkyblockChannelProvider().register();

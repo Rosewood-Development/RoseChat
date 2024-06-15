@@ -4,11 +4,9 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,54 +14,83 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
 
+    private final RoseChatAPI api;
+
+    public ChatListener() {
+        this.api = RoseChatAPI.getInstance();
+    }
+
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
 
-        Player player = event.getPlayer();
-        RosePlayer sender = new RosePlayer(player);
-
-        // Remove the chat color if the player no longer has permission for it.
-        if (!MessageUtils.canColor(sender, sender.getPlayerData().getColor(), PermissionArea.CHATCOLOR))
-            sender.getPlayerData().setColor("");
+        RosePlayer player = new RosePlayer(event.getPlayer());
+        PlayerData data = player.getPlayerData();
 
         String message = event.getMessage();
 
-        RoseChatAPI api = RoseChatAPI.getInstance();
+        player.validateMuteExpiry();
+        player.validateChatColor();
+
+        // Don't send the message if the player doesn't have permission.
+        if (!player.hasPermission("rosechat.chat")) {
+            player.sendLocaleMessage("no-permission");
+            return;
+        }
+
+        if (MessageUtils.isMessageEmpty(message)) {
+            player.sendLocaleMessage("message-blank");
+            return;
+        }
+
+        // Check if the player is muted.
+        if (data.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+            player.sendLocaleMessage("command-mute-cannot-send");
+            return;
+        }
+
         // Check if the message is using a shout command and send the message if they are.
-        for (Channel channel : api.getChannels()) {
+        for (Channel channel : this.api.getChannels()) {
             if (channel.getShoutCommands().isEmpty())
                 continue;
 
             for (String command : channel.getShoutCommands()) {
-                if (message.startsWith(command)) {
-                    String format = channel.getShoutFormat() == null ? channel.getFormat() : channel.getShoutFormat();
-                    api.sendToChannel(event.getPlayer(), message.substring(command.length()).trim(), channel, format, true);
+                if (!message.startsWith(command))
+                    continue;
+
+                if (channel.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+                    player.sendLocaleMessage("channel-muted");
                     return;
                 }
+
+                String format = channel.getShoutFormat() == null ?
+                        channel.getFormat() : channel.getShoutFormat();
+
+                channel.send(player, message.substring(command.length()).trim(), format);
+
+                player.updateDisplayName();
+                return;
             }
         }
 
-        PlayerData data = sender.getPlayerData();
-
         // Get the channel that the message should be sent to.
         Channel channel = data.getActiveChannel();
-        if (channel == null) {
+        if (channel == null)
             channel = data.getCurrentChannel();
-        }
 
         // If the player is somehow not in a channel, find the appropriate channel to put them in.
         if (channel == null) {
-            channel = Channel.findNextChannel(player);
-
-            ChannelChangeEvent channelChangeEvent = new ChannelChangeEvent(null, channel, player);
-            Bukkit.getPluginManager().callEvent(channelChangeEvent);
-            // This event is not cancellable as the player has to be in a channel to send a message.
-
-            sender.switchChannel(channel);
+            channel = player.findChannel();
+            player.switchChannel(channel);
         }
 
-        api.sendToChannel(player, message, channel, true);
+        if (channel.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
+            player.sendLocaleMessage("channel-muted");
+            return;
+        }
+
+        channel.send(player, message);
+        player.updateDisplayName();
     }
 
 }

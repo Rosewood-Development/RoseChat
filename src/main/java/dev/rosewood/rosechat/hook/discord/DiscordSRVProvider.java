@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholder.DiscordEmbedPlaceholder;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -59,7 +60,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (preParseDiscordMessageEvent.isCancelled())
             return;
 
-        StringPlaceholders placeholders = MessageUtils.getSenderViewerPlaceholders(roseMessage.getSender(), roseMessage.getSender(), group).build();
+        StringPlaceholders placeholders = DefaultPlaceholders.getFor(roseMessage.getSender(), roseMessage.getSender(), group).build();
         DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholder();
         if (embedPlaceholder != null) {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);

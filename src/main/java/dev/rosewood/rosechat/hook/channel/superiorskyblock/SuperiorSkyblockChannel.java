@@ -87,13 +87,13 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
         }
     }
 
-    private boolean hasTeam(Player player) {
-        Island island = SuperiorSkyblockAPI.getPlayer(player.getUniqueId()).getIsland();
+    private boolean hasTeam(RosePlayer player) {
+        Island island = SuperiorSkyblockAPI.getPlayer(player.getUUID()).getIsland();
         return island != null;
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -113,7 +113,11 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
                     continue;
 
                 Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         } else if (this.channelType == SuperiorSkyblockChannelType.COOP) {
@@ -122,7 +126,11 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
                     continue;
 
                 Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         } else {
@@ -131,7 +139,11 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
                     continue;
 
                 Player player = Bukkit.getPlayer(sPlayer.getUniqueId());
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         }
@@ -140,13 +152,13 @@ public class SuperiorSkyblockChannel extends RoseChatChannel implements Listener
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        return super.getInfoPlaceholders()
                 .add("type", this.channelType.toString().toLowerCase());
     }
 

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+@SuppressWarnings("unused")
 public class MessageFilteredEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();

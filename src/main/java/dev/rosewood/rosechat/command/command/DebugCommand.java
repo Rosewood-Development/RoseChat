@@ -20,13 +20,10 @@ public class DebugCommand extends RoseChatCommand {
         return CommandInfo.builder("debug")
                 .descriptionKey("command-debug-description")
                 .permission("rosechat.debug")
-                .arguments(ArgumentsDefinition.builder()
-                        .optional("options", RoseChatArgumentHandlers.DEBUG_OPTIONS)
-                        .build())
+                .arguments(ArgumentsDefinition.builder().build())
                 .build();
     }
 
-    // todo wait for rg update
     @RoseExecutable
     public void execute(CommandContext context) {
         DebugManager debugManager = this.rosePlugin.getManager(DebugManager.class);
@@ -41,29 +38,6 @@ public class DebugCommand extends RoseChatCommand {
 
         debugManager.setEnabled(true);
         this.getLocaleManager().sendComponentMessage(context.getSender(), "command-debug-on");
-    }
-
-    @RoseExecutable
-    public void execute(CommandContext context, String options) {
-        options = options.toLowerCase();
-
-        DebugManager debugManager = this.rosePlugin.getManager(DebugManager.class);
-        if (debugManager.isEnabled()) {
-            debugManager.save();
-            debugManager.setEnabled(false);
-            this.getLocaleManager().sendComponentMessage(context.getSender(), "command-debug-off");
-        }
-
-        debugManager.setWriteToFile(options.contains("-log"));
-        debugManager.setTimerEnabled(options.contains("-timer"));
-        debugManager.setDoOnce(options.contains("-doonce"));
-
-        debugManager.setEnabled(true);
-        if (options.contains("-doonce")) {
-            this.getLocaleManager().sendComponentMessage(context.getSender(), "command-debug-once");
-        } else {
-            this.getLocaleManager().sendComponentMessage(context.getSender(), "command-debug-on");
-        }
     }
 
 }

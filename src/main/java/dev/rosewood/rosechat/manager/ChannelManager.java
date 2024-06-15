@@ -212,13 +212,13 @@ public class ChannelManager extends Manager {
 
             for (WorldGuardChannel channel : this.getWorldGuardChannels()) {
                 // If the player is in the channel and not in the region, then kick them from the channel.
-                if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(player)) {
-                    Channel newChannel = Channel.findNextChannel(player);
+                if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(rosePlayer)) {
+                    Channel newChannel = rosePlayer.findChannel();
                     rosePlayer.switchChannel(newChannel);
                     break;
                 }
 
-                if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(player)) {
+                if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(rosePlayer)) {
                     if (rosePlayer.switchChannel(channel)) {
                         this.localeManager.sendMessage(player,
                                 "command-channel-joined", StringPlaceholders.of("id", channel.getId()));

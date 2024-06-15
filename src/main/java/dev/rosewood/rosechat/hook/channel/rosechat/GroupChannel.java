@@ -49,7 +49,7 @@ public class GroupChannel extends Channel {
         // Allows for creating a token storage.
         RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.GROUP);
         roseMessage.setPlayerInput(message);
-        roseMessage.setPlaceholders(this.getInfoPlaceholders(sender, null, null, null).build());
+        roseMessage.setPlaceholders(this.getInfoPlaceholders().build());
 
         // Create the rules for this message.
         MessageRules rules = new MessageRules().applyAllFilters();
@@ -119,12 +119,12 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public void onJoin(Player player) {
+    public void onJoin(RosePlayer player) {
         // No implementation
     }
 
     @Override
-    public void onLeave(Player player) {
+    public void onLeave(RosePlayer player) {
         // No implementation
     }
 
@@ -152,7 +152,7 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean();
     }
 
@@ -162,8 +162,8 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        return super.getInfoPlaceholders()
                 .add("owner", Bukkit.getOfflinePlayer(this.owner).getName())
                 .add("name", this.name)
                 .add("group_id", this.getId())

@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.emoji;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -23,7 +22,7 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
         if (!input.startsWith(":"))
             return null;
 
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.emojis"))
+        if (!this.hasTokenPermission(params, "rosechat.emojis"))
             return null;
 
         Matcher matcher = PATTERN.matcher(input);
@@ -31,7 +30,7 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
             return null;
 
         String content = matcher.group(1);
-        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji." + content))
+        if (!this.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji." + content))
             return null;
 
         content = RoseChatAPI.getInstance().getDiscord().getCustomEmoji(content);

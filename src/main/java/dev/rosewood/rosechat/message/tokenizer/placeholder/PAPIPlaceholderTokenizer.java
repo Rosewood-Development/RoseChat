@@ -33,7 +33,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         String placeholder = input.substring(1, matcher.end() - 1);
         String placeholderPermission = placeholder.replaceFirst("_", ".");
-        if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
+        if (!this.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
             return null;
 
         String originalContent = matcher.group();

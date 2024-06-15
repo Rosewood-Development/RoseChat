@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.discord.channel;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -20,7 +19,7 @@ public class ToDiscordChannelTokenizer extends Tokenizer {
         if (!input.startsWith("#"))
             return null;
 
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.discordchannel"))
+        if (!this.hasTokenPermission(params, "rosechat.discordchannel"))
             return null;
 
         DiscordChatProvider discord = RoseChatAPI.getInstance().getDiscord();

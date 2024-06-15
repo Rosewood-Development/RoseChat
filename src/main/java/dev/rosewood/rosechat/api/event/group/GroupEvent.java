@@ -6,6 +6,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+@SuppressWarnings("unused")
 public class GroupEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -15,6 +16,7 @@ public class GroupEvent extends Event implements Cancellable {
 
     public GroupEvent(GroupChannel group) {
         super(!Bukkit.isPrimaryThread());
+
         this.group = group;
     }
 

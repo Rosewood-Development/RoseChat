@@ -3,7 +3,6 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -34,7 +33,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     continue;
 
                 // Check permissions
-                if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                     return null;
 
                 String originalContent = matcher.group();
@@ -71,7 +70,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     continue;
 
                 // Check permissions
-                if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                     return null;
 
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.

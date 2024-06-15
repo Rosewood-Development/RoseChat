@@ -29,7 +29,7 @@ public class GradientTokenizer extends Tokenizer {
         if (!matcher.find() || matcher.start() != 0)
             return null;
 
-        List<Color> hexSteps = Arrays.stream(MessageUtils.getCaptureGroup(matcher, "hex").substring(1).split(":"))
+        List<Color> hexSteps = Arrays.stream(this.getCaptureGroup(matcher, "hex").substring(1).split(":"))
                 .map(x -> x.length() != 4 ? x : String.format("#%s%s%s%s%s%s", x.charAt(1), x.charAt(1), x.charAt(2), x.charAt(2), x.charAt(3), x.charAt(3)))
                 .map(Color::decode)
                 .toList();
@@ -55,7 +55,7 @@ public class GradientTokenizer extends Tokenizer {
         };
 
         String content = matcher.group();
-        return MessageUtils.hasTokenPermission(params, "rosechat.gradient")
+        return this.hasTokenPermission(params, "rosechat.gradient")
                 ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)), content.length())
                 : new TokenizerResult(Token.text(content), content.length());
     }

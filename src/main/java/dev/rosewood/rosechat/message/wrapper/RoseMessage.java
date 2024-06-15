@@ -1,7 +1,8 @@
 package dev.rosewood.rosechat.message.wrapper;
 
-import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -19,10 +20,11 @@ import java.util.UUID;
  */
 public class RoseMessage {
 
-    private UUID uuid;
-    private String discordId;
     private final RosePlayer sender;
     private final PermissionArea location;
+
+    private UUID uuid;
+    private String discordId;
     private String playerInput;
     private Channel channel;
     private StringPlaceholders placeholders;
@@ -63,6 +65,13 @@ public class RoseMessage {
      */
     public <T> MessageTokenizerResults<T> parse(MessageParser<T> parser, RosePlayer viewer, String format, String discordId) {
         this.discordId = discordId;
+
+        DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
+        if (debugManager.isEnabled())
+            debugManager.addMessage(() ->
+                    "[" + parser.getClass().getSimpleName() + "] Starting to Parse Message: " +
+                            (this.playerInput == null ? format : (this.playerInput + " with Format: " + format)));
+
         return parser.parse(this, viewer, format);
     }
 
@@ -137,13 +146,6 @@ public class RoseMessage {
      */
     public RosePlayer getSender() {
         return this.sender;
-    }
-
-    /**
-     * @return The {@link PlayerData} of the {@link RosePlayer} who sent the message.
-     */
-    public PlayerData getSenderData() {
-        return this.sender.getPlayerData();
     }
 
     /**

@@ -17,7 +17,7 @@ public class GroupManager extends Manager {
     private final GroupChannelProvider channelProvider;
     private final DataManager dataManager;
     private final Map<String, GroupChannel> groupChats;
-    private final List<String> groupChatNames;
+    private final List<String> groupChatIDs;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -25,7 +25,7 @@ public class GroupManager extends Manager {
         this.channelProvider = new GroupChannelProvider();
         this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
-        this.groupChatNames = new ArrayList<>();
+        this.groupChatIDs = new ArrayList<>();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class GroupManager extends Manager {
     @Override
     public void disable() {
         this.groupChats.clear();
-        this.groupChatNames.clear();
+        this.groupChatIDs.clear();
     }
 
     public GroupChannel getGroupChatById(String id) {
@@ -77,7 +77,7 @@ public class GroupManager extends Manager {
     public void loadNames() {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             List<String> groupChatNames = this.dataManager.getGroupChatNames();
-            this.groupChatNames.addAll(groupChatNames);
+            this.groupChatIDs.addAll(groupChatNames);
         });
     }
 
@@ -104,7 +104,7 @@ public class GroupManager extends Manager {
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
             this.dataManager.deleteGroupChat(groupChat);
             this.groupChats.remove(groupChat.getId());
-            this.groupChatNames.remove(groupChat.getId());
+            this.groupChatIDs.remove(groupChat.getId());
         });
     }
 
@@ -124,7 +124,7 @@ public class GroupManager extends Manager {
 
     public void addGroupChat(GroupChannel groupChat) {
         this.groupChats.put(groupChat.getId(), groupChat);
-        this.groupChatNames.add(groupChat.getId());
+        this.groupChatIDs.add(groupChat.getId());
         groupChat.save();
     }
 
@@ -136,8 +136,8 @@ public class GroupManager extends Manager {
         return this.groupChats;
     }
 
-    public List<String> getGroupChatNames() {
-        return this.groupChatNames;
+    public List<String> getGroupChatIDs() {
+        return this.groupChatIDs;
     }
 
     public GroupChannelProvider getChannelProvider() {

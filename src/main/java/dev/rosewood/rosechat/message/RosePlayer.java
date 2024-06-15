@@ -7,7 +7,6 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.hook.nickname.NicknameProvider;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
@@ -31,13 +30,14 @@ import java.util.function.Consumer;
 /**
  * Class for managing players and console messages.
  */
+@SuppressWarnings({"deprecation", "unused"})
 public class RosePlayer {
 
     private final RoseChatAPI api;
     private List<String> ignoredPermissions;
     private boolean isDiscordProxy;
     private OfflinePlayer offlinePlayer;
-    private String displayName;
+    private String name;
     private String group;
 
     private RosePlayer() {
@@ -49,7 +49,7 @@ public class RosePlayer {
         this();
 
         this.offlinePlayer = player;
-        this.displayName = player.getName();
+        this.name = player.getName();
         this.group = this.api.getVault() == null ? "default": this.api.getVault().getPrimaryGroup(player);
     }
 
@@ -62,10 +62,10 @@ public class RosePlayer {
 
         if (commandSender instanceof Player player) {
             this.offlinePlayer = player;
-            this.displayName = player.getName();
+            this.name = player.getName();
             this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
-            this.displayName = "Console";
+            this.name = "Console";
             this.group = "default";
         }
     }
@@ -80,11 +80,11 @@ public class RosePlayer {
         Player player = offlinePlayer.getPlayer();
         if (player != null) {
             this.offlinePlayer = player;
-            this.displayName = player.getName();
+            this.name = player.getName();
             this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.offlinePlayer = offlinePlayer;
-            this.displayName = offlinePlayer.getName();
+            this.name = offlinePlayer.getName();
             this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(null, offlinePlayer);
         }
     }
@@ -97,7 +97,7 @@ public class RosePlayer {
     public RosePlayer(String name, boolean isDiscordUser) {
         this();
 
-        this.displayName = name;
+        this.name = name;
         this.group = "default";
         this.isDiscordProxy = isDiscordUser;
     }
@@ -110,7 +110,7 @@ public class RosePlayer {
     public RosePlayer(String name, String group) {
         this();
 
-        this.displayName = name;
+        this.name = name;
         this.group = group;
     }
 
@@ -124,7 +124,7 @@ public class RosePlayer {
         this();
 
         this.offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-        this.displayName = name;
+        this.name = name;
         this.group = group;
     }
 
@@ -134,39 +134,39 @@ public class RosePlayer {
      * @return The player's username, or display name if the player doesn't exist.
      */
     public String getRealName() {
-        return this.offlinePlayer == null ? this.displayName : this.offlinePlayer.getName();
+        return this.offlinePlayer == null ? this.name : this.offlinePlayer.getName();
     }
 
     /**
      * @return The display name.
      */
     public String getDisplayName() {
-        return this.displayName;
+        return this.isPlayer() ? this.asPlayer().getDisplayName() : this.name;
     }
 
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-
         if (this.isPlayer())
             this.asPlayer().setDisplayName(displayName);
+        else
+            this.name = displayName;
     }
 
     /**
      * @return A nickname or display name if the player is online. If not, then the player's username.
      */
     public String getName() {
-        if (this.offlinePlayer == null || this.offlinePlayer.getPlayer() == null)
-            return this.displayName;
+        if (!this.isPlayer())
+            return this.name;
 
         String nickname = this.getPlayerData().getNickname();
-        return nickname == null ? this.displayName : nickname;
+        return nickname == null ? this.name : nickname;
     }
 
     /**
      * @return The nickname of a player, will return null if the player has no nickname.
      */
     public String getNickname() {
-        if (this.offlinePlayer == null || this.offlinePlayer.getPlayer() == null)
+        if (!this.isPlayer())
             return null;
 
         return this.getPlayerData().getNickname();
@@ -176,21 +176,20 @@ public class RosePlayer {
      * @param callback A callback containing the player's saved nickname.
      */
     public void getName(Consumer<String> callback) {
-        if (this.offlinePlayer == null || this.offlinePlayer.getPlayer() != null) {
-            callback.accept(this.getName());
+        if (this.isConsole() || this.isPlayer()) {
+            callback.accept(this.getNickname());
             return;
         }
 
         // If the player is offline, get the nickname from the database.
         this.api.getPlayerData(this.offlinePlayer.getUniqueId(), (data) -> {
             if (data == null) {
-                callback.accept(this.displayName);
+                callback.accept(this.name);
                 return;
             }
 
             String nickname = data.getNickname();
-
-            callback.accept(nickname == null ? this.displayName : data.getNickname());
+            callback.accept(nickname == null ? this.name : data.getNickname());
         });
     }
 
@@ -198,11 +197,12 @@ public class RosePlayer {
      * @return Components containing the parsed nickname.
      */
     public BaseComponent[] getParsedNickname() {
-        if (this.offlinePlayer == null || this.offlinePlayer.getPlayer() == null)
-            return TextComponent.fromLegacyText(this.displayName);
+        String nickname = this.getNickname();
+        if (nickname == null)
+            return TextComponent.fromLegacyText(this.getName());
 
-        RoseMessage nicknameMessage = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
-        MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(this, this.getName());
+        RoseMessage message = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
+        MessageTokenizerResults<BaseComponent[]> components = message.parse(this, nickname);
 
         return components.content();
     }
@@ -211,7 +211,7 @@ public class RosePlayer {
      * @param callback A callback containing the player's saved nickname, after being parsed.
      */
     public void getParsedNickname(Consumer<BaseComponent[]> callback) {
-        if (this.offlinePlayer == null || this.offlinePlayer.getPlayer() != null) {
+        if (this.isConsole() || this.isPlayer()) {
             callback.accept(this.getParsedNickname());
             return;
         }
@@ -219,18 +219,18 @@ public class RosePlayer {
         // If the player is offline, get the nickname from the database.
         this.api.getPlayerData(this.offlinePlayer.getUniqueId(), (data) -> {
             if (data == null) {
-                callback.accept(TextComponent.fromLegacyText(this.displayName));
+                callback.accept(TextComponent.fromLegacyText(this.name));
                 return;
             }
 
             String nickname = data.getNickname();
             if (nickname == null) {
-                callback.accept(TextComponent.fromLegacyText(this.displayName));
+                callback.accept(TextComponent.fromLegacyText(this.name));
                 return;
             }
 
             RoseMessage nicknameMessage = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
-            MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(this, this.getName());
+            MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(this, nickname);
             callback.accept(components.content());
         });
     }
@@ -241,7 +241,7 @@ public class RosePlayer {
      */
     public boolean setNickname(String nickname) {
         if (!this.isPlayer()) {
-            this.displayName = nickname;
+            this.name = nickname;
             return true;
         }
 
@@ -250,19 +250,11 @@ public class RosePlayer {
         if (event.isCancelled())
             return false;
 
+        nickname = event.getNickname();
         this.getPlayerData().setNickname(nickname);
         this.getPlayerData().save();
 
-        // Parse the nickname before setting the display name.
-        if (nickname != null)
-            nickname = TextComponent.toLegacyText(this.getParsedNickname());
-
-        // Update the nickname with the provider to avoid any conflicts.
-        NicknameProvider nicknameProvider = RoseChat.getInstance().getNicknameProvider();
-        if (nicknameProvider != null)
-            nicknameProvider.setNickname(this.asPlayer(), nickname);
-
-        this.offlinePlayer.getPlayer().setDisplayName(nickname);
+        this.updateDisplayName();
 
         return true;
     }
@@ -279,9 +271,6 @@ public class RosePlayer {
      * @param color The color to use.
      */
     public boolean setNicknameColor(String color) {
-        // Remove the current colour before setting the new one.
-        this.removeNicknameColor();
-
         String nickname = ChatColor.stripColor(HexUtils.colorify(this.getName()));
         nickname = color + nickname;
 
@@ -308,6 +297,20 @@ public class RosePlayer {
         }
 
         return this.setNickname(strippedNickname);
+    }
+
+    public void updateDisplayName() {
+        if (this.getPlayerData().getNickname() == null)
+            return;
+
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+            String name = TextComponent.toLegacyText(this.getParsedNickname());
+            this.setDisplayName(name);
+
+            if (RoseChat.getInstance().getNicknameProvider() != null)
+                RoseChat.getInstance().getNicknameProvider()
+                        .setNickname(this.asPlayer(), this.getDisplayName());
+        });
     }
 
     // Message Functions
@@ -343,6 +346,22 @@ public class RosePlayer {
         Bukkit.getPluginManager().callEvent(asyncPlayerChatEvent);
 
         this.getPlayerData().setActiveChannel(null);
+    }
+
+    /**
+     * Removes the player's mute if it has expired.
+     */
+    public void validateMuteExpiry() {
+        if (this.getPlayerData().isMuteExpired())
+            this.unmute();
+    }
+
+    /**
+     * Removes the player's chat color if they no longer have permission.
+     */
+    public void validateChatColor() {
+        if (!MessageUtils.canColor(this, this.getPlayerData().getColor(), PermissionArea.CHATCOLOR))
+            this.getPlayerData().setColor("");
     }
 
     /**
@@ -440,9 +459,9 @@ public class RosePlayer {
             return false;
 
         if (oldChannel != null)
-            oldChannel.onLeave(this.asPlayer());
+            oldChannel.onLeave(this);
 
-        channel.onJoin(this.asPlayer());
+        channel.onJoin(this);
 
         this.getPlayerData().setActiveChannel(channel);
         this.getPlayerData().setCurrentChannel(channel);
@@ -459,6 +478,28 @@ public class RosePlayer {
      */
     public boolean switchChannel(Channel channel) {
         return this.switchChannel(channel, false);
+    }
+
+    /**
+     * Finds the appropriate channel to put the player in.
+     * This is mainly used in instances where a player is forcefully removed from a channel and
+     * needs to join a new channel.
+     * @return The {@link Channel} that the player should move to.
+     */
+    public Channel findChannel() {
+        if (!this.isPlayer())
+            return this.api.getDefaultChannel();
+
+        Channel foundChannel = null;
+        for (Channel channel : this.api.getChannels()) {
+            if (channel.onWorldJoin(this, null, this.asPlayer().getWorld()))
+                foundChannel = channel;
+        }
+
+        if (foundChannel == null)
+            foundChannel = this.api.getDefaultChannel();
+
+        return foundChannel;
     }
 
     /**
@@ -560,6 +601,13 @@ public class RosePlayer {
     }
 
     /**
+     * @return True if the RosePlayer is an offline player.
+     */
+    public boolean isOffline() {
+        return this.offlinePlayer != null && this.offlinePlayer.getPlayer() == null;
+    }
+
+    /**
      * @return A player from the RosePlayer.
      */
     public Player asPlayer() {
@@ -609,15 +657,11 @@ public class RosePlayer {
      * @param callback A callback containing the player's saved data.
      */
     public void getPlayerData(Consumer<PlayerData> callback) {
-        if (!this.isPlayer())
-            return;
-
-        if (this.isPlayer()) {
+        if (!this.isOffline()) {
             callback.accept(this.getPlayerData());
-            return;
+        } else {
+            this.api.getPlayerData(this.offlinePlayer.getUniqueId(), callback);
         }
-
-        this.api.getPlayerData(this.offlinePlayer.getUniqueId(), callback);
     }
 
 }

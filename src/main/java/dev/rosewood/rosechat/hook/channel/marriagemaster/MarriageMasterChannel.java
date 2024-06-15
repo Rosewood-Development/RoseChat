@@ -85,12 +85,12 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        return this.marriageMaster.getPlayerData(player).isMarried();
+    private boolean hasTeam(RosePlayer player) {
+        return this.marriageMaster.getPlayerData(player.getUUID()).isMarried();
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -102,7 +102,8 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
 
         MarriagePlayer mp = this.marriageMaster.getPlayerData(sender.getUUID());
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (mp.isPartner(player) && this.getReceiveCondition(sender, player))
+            RosePlayer rosePlayer = new RosePlayer(player);
+            if (mp.isPartner(player) && this.getReceiveCondition(sender, rosePlayer))
                 recipients.add(player);
         }
 
@@ -110,7 +111,7 @@ public class MarriageMasterChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 

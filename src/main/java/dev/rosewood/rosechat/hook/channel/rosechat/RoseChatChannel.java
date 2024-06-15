@@ -11,6 +11,7 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DebugManager;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -79,17 +80,17 @@ public class RoseChatChannel extends ConditionalChannel {
         if (currentChannel != this)
             return;
 
-        Channel newChannel = Channel.findNextChannel(player);
+        Channel newChannel = rosePlayer.findChannel();
         rosePlayer.switchChannel(newChannel);
     }
 
     @Override
-    public boolean onLogin(Player player) {
-        return this.getJoinCondition(player) && (this.autoJoin && (this.worlds.isEmpty() || this.worlds.contains(player.getWorld().getName())));
+    public boolean onLogin(RosePlayer player) {
+        return this.getJoinCondition(player) && (this.autoJoin && (this.worlds.isEmpty() || this.worlds.contains(player.asPlayer().getWorld().getName())));
     }
 
     @Override
-    public boolean onWorldJoin(Player player, World from, World to) {
+    public boolean onWorldJoin(RosePlayer player, World from, World to) {
         if (this.worlds.isEmpty() || !this.autoJoin)
             return false;
 
@@ -102,7 +103,7 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     @Override
-    public boolean onWorldLeave(Player player, World from, World to) {
+    public boolean onWorldLeave(RosePlayer player, World from, World to) {
         if (this.worlds.isEmpty() || !this.autoJoin)
             return false;
 
@@ -146,14 +147,14 @@ public class RoseChatChannel extends ConditionalChannel {
 
         if (world == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (this.getReceiveCondition(sender, player))
+                if (this.getReceiveCondition(sender, new RosePlayer(player)))
                     recipients.add(player);
             }
 
             return recipients;
         } else {
             for (Player player : world.getPlayers()) {
-                if (this.getReceiveCondition(sender, player))
+                if (this.getReceiveCondition(sender, new RosePlayer(player)))
                     recipients.add(player);
             }
 
@@ -253,21 +254,6 @@ public class RoseChatChannel extends ConditionalChannel {
                 if (outputs.getTagSound() != null && (receiverData != null && receiverData.hasTagSounds()))
                     player.playSound(player.getLocation(), outputs.getTagSound(), 1.0f, 1.0f);
             }
-
-            if (debugManager.isEnabled() && debugManager.isTimerEnabled() && messageTimer != null && messageTimer.isRunning()) {
-                messageTimer.stop();
-                long time = messageTimer.elapsed(TimeUnit.MILLISECONDS);
-                debugManager.addMessage(() -> "Parsed Message in: " + time + "ms");
-                Bukkit.getConsoleSender().sendMessage(HexUtils.colorify("&eParsed Message in: &c" + time + "&ems"));
-
-                if (debugManager.doOnce()) {
-                    debugManager.save();
-                    debugManager.setEnabled(false);
-                    RoseChatAPI.getInstance().getLocaleManager().sendMessage(Bukkit.getConsoleSender(), "command-debug-off");
-                } else {
-                    debugManager.addMessage(() -> "\n\n\n");
-                }
-            }
         });
     }
 
@@ -282,7 +268,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Json messages are unsupported
         if (direction != MessageDirection.DISCORD_TO_MINECRAFT && direction != MessageDirection.SERVER_TO_SERVER_RAW) {
             if (api.getDiscord() != null && this.getDiscordChannel() != null && Setting.USE_DISCORD.getBoolean()) {
-                RoseChat.MESSAGE_THREAD_POOL.execute(() -> MessageUtils.sendDiscordMessage(message, this, this.getDiscordChannel()));
+                RoseChat.MESSAGE_THREAD_POOL.execute(() -> RoseChatAPI.getInstance().getDiscord().sendMessage(message, this, this.getDiscordChannel()));
             }
         }
     }
@@ -579,14 +565,19 @@ public class RoseChatChannel extends ConditionalChannel {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return player.hasPermission("rosechat.channelbypass")
                 || (player.hasPermission("rosechat.channel." + this.getId()) && this.joinable && this.getJoinCondition(player));
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
+        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
+        String nullValue = localeManager.getLocaleMessage("command-chat-info-none");
+
+        return super.getInfoPlaceholders()
                 .add("radius", this.radius == -1 ? nullValue : this.radius)
                 .add("discord", this.getDiscordChannel() == null ? nullValue : this.getDiscordChannel())
                 .add("auto-join", this.autoJoin ? trueValue : falseValue)

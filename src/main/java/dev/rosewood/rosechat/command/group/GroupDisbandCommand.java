@@ -67,9 +67,10 @@ public class GroupDisbandCommand extends RoseChatCommand {
             if (member == null)
                 continue;
 
+            RosePlayer roseMember = new RosePlayer(member);
             PlayerData data = this.getAPI().getPlayerData(member.getUniqueId());
             if (data.getCurrentChannel() == group)
-                data.setCurrentChannel(Channel.findNextChannel(member));
+                data.setCurrentChannel(roseMember.findChannel());
 
             this.getLocaleManager().sendComponentMessage(member, "command-gc-disband-success",
                     StringPlaceholders.of("name", group.getName()));

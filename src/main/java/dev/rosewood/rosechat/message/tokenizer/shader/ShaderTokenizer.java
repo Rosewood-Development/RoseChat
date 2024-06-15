@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 
 public class ShaderTokenizer extends Tokenizer {
 
-    private List<String> shaderColors;
+    private final List<String> shaderColors;
 
     public ShaderTokenizer() {
         super("shader");

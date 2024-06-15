@@ -80,13 +80,13 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(player.getUniqueId());
+    private boolean hasTeam(RosePlayer player) {
+        Clan clan = SimpleClans.getInstance().getClanManager().getClanByPlayerUniqueId(player.getUUID());
         return clan != null;
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -107,7 +107,11 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
                     continue;
 
                 Player player = clanPlayer.toPlayer();
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         } else {
@@ -116,7 +120,11 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
                     continue;
 
                 Player player = clanPlayer.toPlayer();
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         }
@@ -125,13 +133,13 @@ public class SimpleClansChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        return super.getInfoPlaceholders()
                 .add("type", this.channelType.toString().toLowerCase());
     }
 

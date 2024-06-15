@@ -47,7 +47,7 @@ public class GroupLeaveCommand extends RoseChatCommand {
             return;
 
         if (player.getChannel() == group)
-            player.switchChannel(Channel.findNextChannel(player.asPlayer()));
+            player.switchChannel(player.findChannel());
 
         String name = player.getName();
         player.sendLocaleMessage("command-gc-leave-success",

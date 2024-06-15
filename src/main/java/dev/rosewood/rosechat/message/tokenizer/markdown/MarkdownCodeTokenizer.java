@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -19,7 +18,7 @@ public class MarkdownCodeTokenizer extends Tokenizer {
         if (!input.startsWith("`"))
             return null;
 
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.code"))
+        if (!this.hasTokenPermission(params, "rosechat.code"))
             return null;
 
         int lastIndex = 0;

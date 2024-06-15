@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -23,7 +22,7 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
         if (!input.startsWith("> "))
             return null;
 
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.quote"))
+        if (!this.hasTokenPermission(params, "rosechat.quote"))
             return null;
 
         String content = input.substring(2);

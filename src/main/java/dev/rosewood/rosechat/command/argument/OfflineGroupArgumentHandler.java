@@ -16,7 +16,7 @@ public class OfflineGroupArgumentHandler extends ArgumentHandler<String> {
     @Override
     public String handle(CommandContext context, Argument argument, InputIterator inputIterator) throws HandledArgumentException {
         String input = inputIterator.next();
-        if (!RoseChatAPI.getInstance().getGroupChatNames().contains(input))
+        if (!RoseChatAPI.getInstance().getGroupChatIDs().contains(input))
             throw new HandledArgumentException("argument-handler-group");
 
         return input;
@@ -24,7 +24,7 @@ public class OfflineGroupArgumentHandler extends ArgumentHandler<String> {
 
     @Override
     public List<String> suggest(CommandContext context, Argument argument, String[] args) {
-        return RoseChatAPI.getInstance().getGroupChatNames();
+        return RoseChatAPI.getInstance().getGroupChatIDs();
     }
 
 }

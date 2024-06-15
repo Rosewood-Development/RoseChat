@@ -10,6 +10,8 @@ import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTo
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayDeque;
@@ -71,6 +73,9 @@ public class MessageTokenizer {
                 if (token.getIgnoredTokenizers().contains(tokenizer))
                     continue;
 
+                long startTime = System.nanoTime();
+                String originalContent = content;
+
                 this.parses++;
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
                 TokenizerResult result = tokenizer.tokenize(params);
@@ -82,6 +87,15 @@ public class MessageTokenizer {
                 token.getChildren().add(child);
                 content = content.substring(result.consumed());
                 this.outputs.merge(params.getOutputs());
+
+                if (DEBUG_MANAGER.isEnabled() && tokenizer != Tokenizers.CHARACTER) {
+                    String finalContent = content;
+                    DEBUG_MANAGER.addMessage(() ->
+                            "[" + tokenizer.getClass().getSimpleName() + "] Tokenized: " + originalContent + " -> " +
+                                    (child.getType() == TokenType.DECORATOR ? finalContent : child.getContent() + finalContent) + " in " +
+                                    NUMBER_FORMAT.format((System.nanoTime() - startTime) / 1000000.0) + "ms");
+                }
+
                 continue outer;
             }
 
@@ -129,9 +143,13 @@ public class MessageTokenizer {
 
         MessageOutputs outputs = tokenizer.tokenizeContent();
         T components = tokenizer.toComponents(composer);
-        DEBUG_MANAGER.addMessage(() ->
-                "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
-                        "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times");
+
+        if (DEBUG_MANAGER.isEnabled()) {
+            DEBUG_MANAGER.addMessage(() ->
+                    "Completed Tokenizing: " + (components instanceof String ? components : TextComponent.toPlainText((BaseComponent[]) components)) + "\n"
+                    + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
+                            "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times \n");
+        }
 
         return new MessageTokenizerResults<T>(components, outputs);
     }

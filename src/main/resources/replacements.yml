@@ -8,8 +8,6 @@ star:
   # The text that the player will type.
   input:
     text: ':star:'
-    # Setting this allows the emoji to be parsed to discord, and allows /toggleemoji to work with it.
-    is-emoji: true
   # The replacement, ":star:" will turn into "✸" when sent.
   output:
     text: '✸'
@@ -18,7 +16,6 @@ star:
 rosewood:
   input:
     text: ':rosewood:'
-    is-emoji: true
   output:
     text: "\uE000"
     # When the replacement is hovered over, this text will be shown.
@@ -27,7 +24,6 @@ rosewood:
 heart:
   input:
     text: '<3'
-    is-emoji: true
   output:
     text: "\u2764"
 

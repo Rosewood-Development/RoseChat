@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.api.event.group;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import org.bukkit.OfflinePlayer;
 
+@SuppressWarnings("unused")
 public class GroupLeaveEvent extends GroupEvent {
 
     private final OfflinePlayer player;

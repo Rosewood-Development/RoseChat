@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.ChannelManager;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -80,10 +81,10 @@ public abstract class Channel {
     /**
      * Called when the player joins the server.
      * This is used to check if the player should join the channel when logging in
-     * @param player The {@link Player} who is joining the channel.
+     * @param player The {@link RosePlayer} who is joining the channel.
      * @return True, if the player can join.
      */
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         // No default implementation.
         return false;
     }
@@ -91,12 +92,12 @@ public abstract class Channel {
     /**
      * Called when the player enters a world.
      * This is used to check if the player should join the channel when changing world.
-     * @param player The {@link Player} who is changing world.
+     * @param player The {@link RosePlayer} who is changing world.
      * @param from The {@link World} that the player was in.
      * @param to The {@link World} that the player is going to.
      * @return True, if the player should join the channel when entering the world.
      */
-    public boolean onWorldJoin(Player player, World from, World to) {
+    public boolean onWorldJoin(RosePlayer player, World from, World to) {
         // No default implementation.
         return false;
     }
@@ -104,30 +105,30 @@ public abstract class Channel {
     /**
      * Called when the player leaves a world.
      * This is used to check if the player should leave the channel when changing world.
-     * @param player The {@link Player} who is changing world.
+     * @param player The {@link RosePlayer} who is changing world.
      * @param from The {@link World} that the player was in.
      * @param to The {@link World} that the player is going to.
      * @return True, if the player should leave the channel when leaving the world.
      */
-    public boolean onWorldLeave(Player player, World from, World to) {
+    public boolean onWorldLeave(RosePlayer player, World from, World to) {
         // No default implementation.
         return false;
     }
 
     /**
      * Called when a player joins the channel.
-     * @param player The {@link Player} who is joining the channel.
+     * @param player The {@link RosePlayer} who is joining the channel.
      */
-    public void onJoin(Player player) {
-        this.members.add(player.getUniqueId());
+    public void onJoin(RosePlayer player) {
+        this.members.add(player.getUUID());
     }
 
     /**
      * Called when a player leaves a channel.
-     * @param player The {@link Player} who is leaving the channel.
+     * @param player The {@link RosePlayer} who is leaving the channel.
      */
-    public void onLeave(Player player) {
-        this.members.remove(player.getUniqueId());
+    public void onLeave(RosePlayer player) {
+        this.members.remove(player.getUUID());
     }
 
     /**
@@ -187,31 +188,32 @@ public abstract class Channel {
 
     /**
      * Called when a player uses a command to join the channel.
-     * @param player The {@link Player} using the command.
+     * @param player The {@link RosePlayer} using the command.
      * @return True, if the player can join by using the command.
      */
-    public abstract boolean canJoinByCommand(Player player);
+    public abstract boolean canJoinByCommand(RosePlayer player);
 
     /**
      * @return The amount of members in the channel.
      */
-    public int getMemberCount(RosePlayer sender) {
+    public int getMemberCount() {
         return this.members.size();
     }
 
     /**
-     * @param sender The {@link RosePlayer} getting the info.
-     * @param trueValue A value representing 'true', e.g. &aTrue
-     * @param falseValue A value representing 'false', e.g. &cFalse
-     * @param nullValue A value representing 'null', e.g. &eNone
      * @return A {@link StringPlaceholders.Builder} containing values to be shown in the /chat info command.
      */
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
+        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
+        String nullValue = localeManager.getLocaleMessage("command-chat-info-none");
+
         return StringPlaceholders.builder()
                 .add("default", this.isDefaultChannel() ? trueValue : falseValue)
                 .add("muted", this.isMuted() ? trueValue : falseValue)
-                .add("members", this.getMemberCount(sender))
-                .add("players", this.getMemberCount(sender))
+                .add("members", this.getMemberCount())
+                .add("players", this.getMemberCount())
                 .add("id", this.getId())
                 .add("format", this.getFormat() == null ? nullValue : this.getFormat())
                 .add("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
@@ -221,10 +223,6 @@ public abstract class Channel {
         return this.provider;
     }
 
-    /**
-     * Floods the channel with the specified message.
-     * @param message The message to use
-     */
     public void send(String message) {
         // No default implementation.
     }
@@ -314,30 +312,6 @@ public abstract class Channel {
 
     public void setShouldSendBungeeMessagesToDiscord(boolean sendBungeeMessagesToDiscord) {
         this.sendBungeeMessagesToDiscord = sendBungeeMessagesToDiscord;
-    }
-
-    /**
-     * Finds the next channel that the player should be moved to.
-     * This is mainly used in instances where a player is removed from a channel and needs to join the
-     * appropriate channel based on their location.
-     * @param player The {@link Player} to move channels.
-     * @return The {@link Channel} that the player should move to.
-     */
-    public static Channel findNextChannel(Player player) {
-        RoseChatAPI api = RoseChatAPI.getInstance();
-
-        // Find the correct channel for the player to go in.
-        Channel foundChannel = null;
-        for (Channel channel : api.getChannels()) {
-            if (channel.onWorldJoin(player, null, player.getWorld())) {
-                foundChannel = channel;
-            }
-        }
-
-        if (foundChannel == null)
-            foundChannel = api.getDefaultChannel();
-
-        return foundChannel;
     }
 
 }

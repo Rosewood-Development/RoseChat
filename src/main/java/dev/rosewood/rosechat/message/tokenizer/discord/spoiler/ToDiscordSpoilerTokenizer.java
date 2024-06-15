@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.spoiler;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -17,7 +16,7 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.spoiler"))
+        if (!this.hasTokenPermission(params, "rosechat.spoiler"))
             return null;
 
         String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();

@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.argument;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -51,13 +52,13 @@ public class ChannelArgumentHandler extends ArgumentHandler<Channel> {
             suggestions.addAll(RoseChatAPI.getInstance().getChannelIDs());
 
             if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean())
-                suggestions.addAll(RoseChatAPI.getInstance().getGroupChatNames());
+                suggestions.addAll(RoseChatAPI.getInstance().getGroupChatIDs());
 
             return suggestions;
         }
 
         // Show channels that a player can join, and group channels that they are in if enabled.
-        suggestions.addAll(RoseChatAPI.getInstance().getChannels().stream().filter(channel -> channel.canJoinByCommand(player))
+        suggestions.addAll(RoseChatAPI.getInstance().getChannels().stream().filter(channel -> channel.canJoinByCommand(new RosePlayer(player)))
                 .map(Channel::getId).toList());
 
         if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean())

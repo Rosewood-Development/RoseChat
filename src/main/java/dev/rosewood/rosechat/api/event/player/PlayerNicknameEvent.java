@@ -5,6 +5,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
+@SuppressWarnings("unused")
 public class PlayerNicknameEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -14,8 +15,8 @@ public class PlayerNicknameEvent extends PlayerEvent implements Cancellable {
 
     /**
      * Called when a player's nickname is updated.
-     * @param player The
-     * @param nickname
+     * @param player The player whose nickname is being updated.
+     * @param nickname The nickname that will be used.
      */
     public PlayerNicknameEvent(Player player, String nickname) {
         super(player);

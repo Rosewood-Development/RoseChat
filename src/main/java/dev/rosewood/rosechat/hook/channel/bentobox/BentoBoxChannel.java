@@ -92,13 +92,13 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        Island island = BentoBox.getInstance().getIslandsManager().getIsland(player.getWorld(), player.getUniqueId());
+    private boolean hasTeam(RosePlayer player) {
+        Island island = BentoBox.getInstance().getIslandsManager().getIsland(player.asPlayer().getWorld(), player.getUUID());
         return island != null;
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -116,18 +116,30 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
         if (this.channelType == BentoBoxChannelType.TEAM) {
             for (UUID uuid : island.getMemberSet()) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         } else if (this.channelType == BentoBoxChannelType.LOCAL) {
             for (Player player : island.getPlayersOnIsland()) {
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         } else if (this.channelType == BentoBoxChannelType.COOP) {
             for (UUID uuid : island.getMemberSet(RanksManager.COOP_RANK)) {
                 Player player = Bukkit.getPlayer(uuid);
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
         }
@@ -136,13 +148,13 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        return super.getInfoPlaceholders()
                 .add("type", this.channelType.toString().toLowerCase());
     }
 

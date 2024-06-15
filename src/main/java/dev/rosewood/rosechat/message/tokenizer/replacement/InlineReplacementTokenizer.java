@@ -37,7 +37,7 @@ public class InlineReplacementTokenizer extends Tokenizer {
             if (!input.startsWith(prefix))
                 continue;
 
-            if (!MessageUtils.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
                 return null;
 
             String outerRegex = "(?:" + Pattern.quote(prefix) + "(.*?)" + Pattern.quote(suffix) + ")"

@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
@@ -95,14 +96,14 @@ public class TownyChannel extends RoseChatChannel implements Listener {
         }
     }
 
-    private boolean hasTeam(Player player) {
-        Town town = TownyAPI.getInstance().getTown(player);
-        Nation nation = TownyAPI.getInstance().getNation(player);
+    private boolean hasTeam(RosePlayer player) {
+        Town town = TownyAPI.getInstance().getTown(player.getUUID());
+        Nation nation = TownyAPI.getInstance().getNation(player.getUUID());
         return (this.channelType != TownyChannelType.TOWN || town != null) && (this.channelType != TownyChannelType.NATION || nation != null);
     }
 
     @Override
-    public boolean onLogin(Player player) {
+    public boolean onLogin(RosePlayer player) {
         return super.onLogin(player) && this.hasTeam(player);
     }
 
@@ -119,7 +120,11 @@ public class TownyChannel extends RoseChatChannel implements Listener {
 
             for (Resident resident : town.getResidents()) {
                 Player player = Bukkit.getPlayer(resident.getUUID());
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
 
@@ -127,7 +132,11 @@ public class TownyChannel extends RoseChatChannel implements Listener {
                 for (Town ally : town.getAllies()) {
                     for (Resident resident : ally.getResidents()) {
                         Player player = Bukkit.getPlayer(resident.getUUID());
-                        if (player != null && this.getReceiveCondition(sender, player))
+                        if (player == null)
+                            continue;
+
+                        RosePlayer rosePlayer = new RosePlayer(player);
+                        if (this.getReceiveCondition(sender, rosePlayer))
                             recipients.add(player);
                     }
                 }
@@ -139,7 +148,11 @@ public class TownyChannel extends RoseChatChannel implements Listener {
 
             for (Resident resident : nation.getResidents()) {
                 Player player = Bukkit.getPlayer(resident.getUUID());
-                if (player != null && this.getReceiveCondition(sender, player))
+                if (player == null)
+                    continue;
+
+                RosePlayer rosePlayer = new RosePlayer(player);
+                if (this.getReceiveCondition(sender, rosePlayer))
                     recipients.add(player);
             }
 
@@ -147,7 +160,11 @@ public class TownyChannel extends RoseChatChannel implements Listener {
                 for (Nation ally : nation.getAllies()) {
                     for (Resident resident : ally.getResidents()) {
                         Player player = Bukkit.getPlayer(resident.getUUID());
-                        if (player != null && this.getReceiveCondition(sender, player))
+                        if (player == null)
+                            continue;
+
+                        RosePlayer rosePlayer = new RosePlayer(player);
+                        if (this.getReceiveCondition(sender, rosePlayer))
                             recipients.add(player);
                     }
                 }
@@ -158,13 +175,17 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     }
 
     @Override
-    public boolean canJoinByCommand(Player player) {
+    public boolean canJoinByCommand(RosePlayer player) {
         return super.canJoinByCommand(player) && this.hasTeam(player);
     }
 
     @Override
-    public StringPlaceholders.Builder getInfoPlaceholders(RosePlayer sender, String trueValue, String falseValue, String nullValue) {
-        return super.getInfoPlaceholders(sender, trueValue, falseValue, nullValue)
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
+        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
+
+        return super.getInfoPlaceholders()
                 .add("type", this.channelType.toString().toLowerCase())
                 .add("use-allies", this.useAllies ? trueValue : falseValue);
     }

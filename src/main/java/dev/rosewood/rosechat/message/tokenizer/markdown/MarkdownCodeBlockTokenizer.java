@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -19,7 +18,7 @@ public class MarkdownCodeBlockTokenizer extends Tokenizer {
         String input = params.getInput();
         if (!input.startsWith("```"))
             return null;
-        if (!MessageUtils.hasTokenPermission(params, "rosechat.multicode"))
+        if (!this.hasTokenPermission(params, "rosechat.multicode"))
             return null;
 
         int lastIndex = 0;

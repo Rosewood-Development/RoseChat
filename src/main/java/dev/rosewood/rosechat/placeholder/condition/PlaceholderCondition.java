@@ -94,13 +94,14 @@ public class PlaceholderCondition {
             placeholder = placeholders.apply(placeholder);
             placeholder = PlaceholderAPIHook.applyRelationalPlaceholders(player, player2, placeholder);
             return PlaceholderAPIHook.applyPlaceholders(player, placeholder);
-        }
-        else return placeholders.apply(placeholder);
+        } else
+            return placeholders.apply(placeholder);
     }
 
     public PlaceholderCondition parseValues() {
         for (String valueId : this.section.getKeys(false)) {
-            if (valueId.equalsIgnoreCase("condition")) continue;
+            if (valueId.equalsIgnoreCase("condition"))
+                continue;
 
             try {
                 if (valueId.equalsIgnoreCase("action")) {

@@ -19,12 +19,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.lang.reflect.Method;
 
+@SuppressWarnings("deprecation")
 public class HeldItemTokenizer extends Tokenizer {
 
     public static Tokenizer HELD_ITEM_TOKENIZER;
 
     private Class<?> nbtTagCompoundClass;
-    private Class<?> holderLookupClass;
     private Method obcItemStackAsNMSCopy;
     private Method obcPlayerGetHandle;
     private Method saveNmsItemStack;
@@ -59,7 +59,7 @@ public class HeldItemTokenizer extends Tokenizer {
             return null;
 
         if (!params.getSender().isPlayer()
-                || !MessageUtils.hasTokenPermission(params, "rosechat.helditem")
+                || !this.hasTokenPermission(params, "rosechat.helditem")
                 || params.getSender().asPlayer().getEquipment() == null)
             return new TokenizerResult(Token.text(input), input.length());
 
@@ -117,6 +117,7 @@ public class HeldItemTokenizer extends Tokenizer {
             Class<?> obcItemStackClass;
             Class<?> nmsItemStackClass;
             Class<?> obcPlayerClass;
+            Class<?> holderLookupClass;
             if (major == 16) {
                 obcItemStackClass = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftItemStack");
                 this.obcItemStackAsNMSCopy = obcItemStackClass.getMethod("asNMSCopy", ItemStack.class);
@@ -131,10 +132,10 @@ public class HeldItemTokenizer extends Tokenizer {
                 this.nbtTagCompoundClass = Class.forName("net.minecraft.nbt.NBTTagCompound");
 
                 if (major == 20 && minor >= 5) {
-                    this.holderLookupClass = Class.forName("net.minecraft.core.HolderLookup$a");
+                    holderLookupClass = Class.forName("net.minecraft.core.HolderLookup$a");
                     obcPlayerClass = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer");
                     this.obcPlayerGetHandle = obcPlayerClass.getMethod("getHandle");
-                    this.saveNmsItemStack = nmsItemStackClass.getMethod("a", this.holderLookupClass);
+                    this.saveNmsItemStack = nmsItemStackClass.getMethod("a", holderLookupClass);
                     return;
                 }
 
@@ -145,11 +146,11 @@ public class HeldItemTokenizer extends Tokenizer {
                 nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
                 this.nbtTagCompoundClass = Class.forName("net.minecraft.nbt.CompoundTag");
 
-                this.holderLookupClass = Class.forName("net.minecraft.core.HolderLookup$Provider");
+                holderLookupClass = Class.forName("net.minecraft.core.HolderLookup$Provider");
                 obcPlayerClass = Class.forName("org.bukkit.craftbukkit.entity.CraftPlayer");
                 this.obcPlayerGetHandle = obcPlayerClass.getMethod("getHandle");
 
-                this.saveNmsItemStack = nmsItemStackClass.getMethod("save", this.holderLookupClass);
+                this.saveNmsItemStack = nmsItemStackClass.getMethod("save", holderLookupClass);
             }
         } catch (Exception e) {
             e.printStackTrace();

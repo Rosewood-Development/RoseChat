@@ -28,7 +28,7 @@ public class FormatTokenizer extends Tokenizer {
         String content = matcher.group();
         char formatCharacter = content.charAt(1);
         char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
-        boolean hasPermission = MessageUtils.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
+        boolean hasPermission = this.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
         if (!hasPermission)
             return new TokenizerResult(Token.text(content), content.length());
 

@@ -34,11 +34,11 @@ public class RainbowTokenizer extends Tokenizer {
         };
 
         // Retrieve parameters from the rainbow pattern.
-        String saturationGroup = MessageUtils.getCaptureGroup(matcher, "saturation");
+        String saturationGroup = this.getCaptureGroup(matcher, "saturation");
         if (saturationGroup != null)
             rainbowValues.saturation = Float.parseFloat(saturationGroup);
 
-        String brightnessGroup = MessageUtils.getCaptureGroup(matcher, "brightness");
+        String brightnessGroup = this.getCaptureGroup(matcher, "brightness");
         if (brightnessGroup != null)
             rainbowValues.brightness = Float.parseFloat(brightnessGroup);
 
@@ -58,7 +58,7 @@ public class RainbowTokenizer extends Tokenizer {
         };
 
         String content = matcher.group();
-        return MessageUtils.hasTokenPermission(params, "rosechat.rainbow")
+        return this.hasTokenPermission(params, "rosechat.rainbow")
                 ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)), content.length())
                 : new TokenizerResult(Token.text(content), content.length());
     }

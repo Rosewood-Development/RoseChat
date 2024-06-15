@@ -4,9 +4,9 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageDirection;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -65,7 +65,7 @@ public class MessageListener implements Listener {
 
     private BaseComponent[] getButton(PostParseMessageEvent event, String placeholder) {
         return RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), event.getViewer(), placeholder,
-                MessageUtils.getSenderViewerPlaceholders(event.getMessage().getSender(), event.getViewer())
+                DefaultPlaceholders.getFor(event.getMessage().getSender(), event.getViewer())
                         .add("id", event.getMessage().getUUID())
                         .add("type", "server")
                         .add("channel", event.getMessage().getLocationPermission().replace("channel.", ""))
