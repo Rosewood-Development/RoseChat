@@ -18,7 +18,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
 
     @Override
     public BaseComponent[] compose(Token token) {
-        return this.compose(token, new TokenDecorators());
+        return this.compose(token, this.createDecorators());
     }
 
     protected BaseComponent[] compose(Token token, TokenDecorators contextDecorators) {
@@ -36,7 +36,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
                 case TEXT -> contentBuilder.append(child.getContent());
                 case DECORATOR -> contextDecorators.add(child.getDecorators());
                 case GROUP -> {
-                    TokenDecorators childDecorators = child.shouldEncapsulate() ? new TokenDecorators(contextDecorators) : contextDecorators;
+                    TokenDecorators childDecorators = child.shouldEncapsulate() ? this.createDecorators(contextDecorators) : contextDecorators;
                     for (BaseComponent component : this.compose(child, childDecorators))
                         componentBuilder.append(component, ComponentBuilder.FormatRetention.NONE);
                 }
@@ -51,8 +51,18 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
             return components;
 
         TextComponent wrapperComponent = new TextComponent(components);
-        token.getDecorators().forEach(x -> x.apply(wrapperComponent, this.tokenizer, token));
+        TokenDecorators wrapperDecorators = this.createDecorators();
+        wrapperDecorators.add(token.getDecorators());
+        wrapperDecorators.apply(wrapperComponent, this.tokenizer, token);
         return new BaseComponent[]{wrapperComponent};
+    }
+
+    protected TokenDecorators createDecorators() {
+        return new TokenDecorators();
+    }
+
+    protected TokenDecorators createDecorators(TokenDecorators contextDecorators) {
+        return new TokenDecorators(contextDecorators);
     }
 
     private void applyAndDecorate(ComponentBuilder componentBuilder, StringBuilder contentBuilder, Token token, TokenDecorators contextDecorators) {
@@ -62,11 +72,11 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
         if (contextDecorators.blocksTextStitching()) {
             for (char c : content.toCharArray()) {
                 componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
-                contextDecorators.apply(componentBuilder, this.tokenizer, token);
+                contextDecorators.apply(componentBuilder.getCurrentComponent(), this.tokenizer, token);
             }
         } else {
             componentBuilder.append(content, ComponentBuilder.FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder, this.tokenizer, token);
+            contextDecorators.apply(componentBuilder.getCurrentComponent(), this.tokenizer, token);
         }
     }
 

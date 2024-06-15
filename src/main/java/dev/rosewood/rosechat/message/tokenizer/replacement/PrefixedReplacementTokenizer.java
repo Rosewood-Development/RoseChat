@@ -171,8 +171,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     .placeholder("extra", originalContent)
                     .placeholder("tagged", "%group_1%")
                     .placeholders(groupPlaceholders.build())
-                    .encapsulate()
-                    .ignoreTokenizer(this);
+                    .encapsulate();
 
             if (!formattedHover.isEmpty())
                 tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
@@ -218,8 +217,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 .placeholder("extra", originalContent)
                 .placeholder("tagged", "%group_1%")
                 .placeholders(groupPlaceholders.build())
-                .encapsulate()
-                .ignoreTokenizer(this);
+                .encapsulate();
 
         if (hover != null)
             token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, hover));

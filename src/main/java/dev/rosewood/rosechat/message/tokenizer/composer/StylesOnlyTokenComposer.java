@@ -1,12 +1,10 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
 import java.util.List;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 public class StylesOnlyTokenComposer extends FullyDecoratedTokenComposer {
 
@@ -15,11 +13,24 @@ public class StylesOnlyTokenComposer extends FullyDecoratedTokenComposer {
     }
 
     @Override
-    public BaseComponent[] compose(Token token) {
-        return this.compose(token, new StyledTokenDecorators());
+    protected TokenDecorators createDecorators() {
+        return new StyledTokenDecorators();
+    }
+
+    @Override
+    protected TokenDecorators createDecorators(TokenDecorators contextDecorators) {
+        return new StyledTokenDecorators(contextDecorators);
     }
 
     private static class StyledTokenDecorators extends TokenDecorators {
+
+        public StyledTokenDecorators() {
+            super();
+        }
+
+        public StyledTokenDecorators(TokenDecorators decorators) {
+            super(decorators);
+        }
 
         @Override
         public void add(List<TokenDecorator> toAdd) {
