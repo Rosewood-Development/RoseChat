@@ -18,7 +18,7 @@ public class TokenDecorators {
 
     public TokenDecorators(TokenDecorators decorators) {
         this();
-        
+
         this.add(decorators.decorators);
     }
 

@@ -8,6 +8,7 @@ star:
   # The text that the player will type.
   input:
     text: ':star:'
+    can-toggle: true
   # The replacement, ":star:" will turn into "✸" when sent.
   output:
     text: '✸'
@@ -16,6 +17,7 @@ star:
 rosewood:
   input:
     text: ':rosewood:'
+    can-toggle: true
   output:
     text: "\uE000"
     # When the replacement is hovered over, this text will be shown.
@@ -24,6 +26,7 @@ rosewood:
 heart:
   input:
     text: '<3'
+    can-toggle: true
   output:
     text: "\u2764"
 

@@ -11,7 +11,7 @@ public class ReplacementInput {
     private boolean isRegex;
     private boolean isContentRegex;
     private boolean isInlineRegex;
-    private boolean isEmoji;
+    private boolean canToggle;
 
     public String getText() {
         return this.text;
@@ -85,12 +85,12 @@ public class ReplacementInput {
         this.isInlineRegex = isInlineRegex;
     }
 
-    public boolean isEmoji() {
-        return this.isEmoji;
+    public boolean canToggle() {
+        return this.canToggle;
     }
 
-    public void setIsEmoji(boolean isEmoji) {
-        this.isEmoji = isEmoji;
+    public void setCanToggle(boolean canToggle) {
+        this.canToggle = canToggle;
     }
 
 }

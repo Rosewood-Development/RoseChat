@@ -14,6 +14,7 @@ import dev.rosewood.rosechat.command.command.NicknameCommand;
 import dev.rosewood.rosechat.command.command.RealnameCommand;
 import dev.rosewood.rosechat.command.command.ReplyCommand;
 import dev.rosewood.rosechat.command.command.SocialSpyCommand;
+import dev.rosewood.rosechat.command.command.ToggleEmojiCommand;
 import dev.rosewood.rosechat.command.command.ToggleMessageCommand;
 import dev.rosewood.rosechat.command.command.ToggleSoundCommand;
 import dev.rosewood.rosechat.command.command.UnmuteCommand;
@@ -50,6 +51,7 @@ public class CommandManager extends AbstractCommandManager {
                 RealnameCommand::new,
                 ReplyCommand::new,
                 SocialSpyCommand::new,
+                ToggleEmojiCommand::new,
                 ToggleMessageCommand::new,
                 ToggleSoundCommand::new,
                 UnmuteCommand::new

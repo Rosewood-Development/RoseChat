@@ -129,6 +129,11 @@ command-socialspy-channel: "channel"
 command-socialspy-group: "group"
 command-socialspy-all: "message, channel, and group"
 
+# ToggleEmoji Command
+command-toggleemoji-description: "Toggles formatting emojis"
+command-toggleemoji-enabled: "&eYou have &aenabled &eformatting emojis."
+command-toggleemoji-disabled: "&eYou have &cdisabled &eformatting messages."
+
 # ToggleMessage Command
 command-togglemessage-description: "Toggles receiving messages"
 command-togglemessage-enabled: "&eYou have &aenabled &ereceiving messages."

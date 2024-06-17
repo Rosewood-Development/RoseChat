@@ -33,7 +33,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
 
         String content = matcher.group(1);
         for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
-            if (!emoji.getInput().isEmoji())
+            if (emoji.getInput().getText() == null)
                 continue;
 
             if (!emoji.getInput().getText().equalsIgnoreCase(content))

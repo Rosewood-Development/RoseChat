@@ -41,13 +41,10 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             }
         }
 
-        if (placeholder.startsWith("emoji_")) {
-            for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
-                if (!emoji.getInput().isEmoji())
-                    continue;
-
-                if (placeholder.equalsIgnoreCase("emoji_" + emoji.getId())) {
-                    return emoji.getOutput().getText();
+        if (placeholder.startsWith("replacement_")) {
+            for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
+                if (placeholder.equalsIgnoreCase("replacement_" + replacement.getId())) {
+                    return replacement.getOutput().getText();
                 }
             }
         }

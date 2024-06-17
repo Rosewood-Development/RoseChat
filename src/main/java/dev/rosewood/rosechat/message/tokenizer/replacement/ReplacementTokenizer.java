@@ -73,7 +73,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     return null;
 
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.
-                if (replacement.getInput().isEmoji()) {
+                if (replacement.getInput().canToggle()) {
                     PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(params.getSender().getUUID());
                     if (playerData != null && !playerData.hasEmojis())
                         return null;
