@@ -42,7 +42,10 @@ public class ReplacementManager extends Manager {
             ReplacementInput input = this.parseReplacementInput(replacementsConfiguration.getConfigurationSection(id + ".input"));
             ReplacementOutput output = this.parseReplacementOutput(replacementsConfiguration.getConfigurationSection(id + ".output"), false);
 
-            this.createReplacement(id, input, output);
+            Replacement replacement = this.createReplacement(id, input, output);
+            if (replacementsConfiguration.contains(id + ".input.has-closing-tag")
+                    && replacementsConfiguration.getBoolean(id + ".input.has-closing-tag"))
+                this.generateClosingTag(replacement);
         }
 
         File colorsFile = new File(this.rosePlugin.getDataFolder(), "colors.yml");
@@ -59,11 +62,14 @@ public class ReplacementManager extends Manager {
             ReplacementOutput output = this.parseReplacementOutput(colorsConfiguration.getConfigurationSection(id + ".output"),
                     input.getPrefix() == null);
 
-            this.createReplacement(id, input, output);
+            Replacement replacement = this.createReplacement(id, input, output);
+            if (colorsConfiguration.contains(id + ".input.has-closing-tag")
+                    && colorsConfiguration.getBoolean(id + ".input.has-closing-tag"))
+                this.generateClosingTag(replacement);
         }
     }
 
-    private void createReplacement(String id, ReplacementInput input, ReplacementOutput output) {
+    private Replacement createReplacement(String id, ReplacementInput input, ReplacementOutput output) {
         // Precompile regex strings.
         if (input.isRegex() || input.isContentRegex() || input.isInlineRegex()) {
             if (input.getText() != null) {
@@ -98,6 +104,8 @@ public class ReplacementManager extends Manager {
         replacement.setInput(input);
         replacement.setOutput(output);
         this.replacements.put(id, replacement);
+
+        return replacement;
     }
 
     private ReplacementInput parseReplacementInput(ConfigurationSection inputSection) {
@@ -146,6 +154,35 @@ public class ReplacementManager extends Manager {
         }
 
         return output;
+    }
+
+    /**
+     * Auto generates a closing tag based on the prefix.
+     * This allows user to create a simple replacement like "<red>" and
+     * automatically add a second tag for "<red>text here</red>".
+     * @param replacement The replacement to grab info from.
+     */
+    private void generateClosingTag(Replacement replacement) {
+        if (replacement.getInput().getText() == null)
+            return;
+
+        // Grab the text and convert it into a suffix by using the first and last chars
+        // A prefix like "<red>" will make a suffix of "</red>".
+        ReplacementInput input = new ReplacementInput(replacement.getInput());
+        String prefix = input.getText();
+        String suffix = prefix.charAt(0) + "/" + prefix.substring(1, prefix.length() - 1) + prefix.charAt(prefix.length() - 1);
+        input.setText(null);
+        input.setPrefix(prefix);
+        input.setSuffix(suffix);
+
+        // Grab the output text and convert it into something that can be used by prefixes and suffixes.
+        // Adds the group_1 placeholder for the text inside the prefix and suffix,
+        ReplacementOutput output = new ReplacementOutput(replacement.getOutput());
+        String text = output.getText();
+        output.setText(text + "%group_1%");
+        output.setHasColorRetention(false);
+
+        this.createReplacement(replacement.getId() + "-tag", input, output);
     }
 
     @Override

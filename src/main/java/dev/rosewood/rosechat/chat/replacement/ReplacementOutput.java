@@ -12,6 +12,20 @@ public class ReplacementOutput {
     private boolean matchLength;
     private boolean colorRetention;
 
+    public ReplacementOutput() {
+
+    }
+
+    public ReplacementOutput(ReplacementOutput output) {
+        this.text = output.text;
+        this.hover = output.hover;
+        this.font = output.font;
+        this.sound = output.sound;
+        this.tagOnlinePlayers = output.tagOnlinePlayers;
+        this.matchLength = output.matchLength;
+        this.colorRetention = output.colorRetention;
+    }
+
     public String getText() {
         return this.text;
     }

@@ -13,6 +13,23 @@ public class ReplacementInput {
     private boolean isInlineRegex;
     private boolean canToggle;
 
+    public ReplacementInput() {
+
+    }
+
+    public ReplacementInput(ReplacementInput input) {
+        this.text = input.text;
+        this.prefix = input.prefix;
+        this.suffix = input.suffix;
+        this.stop = input.stop;
+        this.inlinePrefix = input.inlinePrefix;
+        this.inlineSuffix = input.inlineSuffix;
+        this.isRegex = input.isRegex;
+        this.isContentRegex = input.isContentRegex;
+        this.isInlineRegex = input.isInlineRegex;
+        this.canToggle = input.canToggle;
+    }
+
     public String getText() {
         return this.text;
     }

@@ -5,392 +5,212 @@
 # The following permission is also required to send a message with a replacement in chat.
 #  "rosechat.replacements.channel.<channel>"
 
-black-tag:
-  input:
-    prefix: "<black>"
-    suffix: "</black>"
-  output:
-    text: "&0%group_1%"
-
 black:
   input:
     text: "<black>"
+    has-closing-tag: true
   output:
     text: "&0"
-
-dark_blue-tag:
-  input:
-    prefix: "<dark_blue>"
-    suffix: "</dark_blue>"
-  output:
-    text: "&1%group_1%"
 
 dark_blue:
   input:
     text: "<dark_blue>"
+    has-closing-tag: true
   output:
     text: "&1"
-
-dark_green-tag:
-  input:
-    prefix: "<dark_green>"
-    suffix: "</dark_green>"
-  output:
-    text: "&2%group_1%"
 
 dark_green:
   input:
     text: "<dark_green>"
+    has-closing-tag: true
   output:
     text: "&2"
-
-dark_aqua-tag:
-  input:
-    prefix: "<dark_aqua>"
-    suffix: "</dark_aqua>"
-  output:
-    text: "&3%group_1%"
 
 dark_aqua:
   input:
     text: "<dark_aqua>"
+    has-closing-tag: true
   output:
     text: "&3"
-
-dark_red-tag:
-  input:
-    prefix: "<dark_red>"
-    suffix: "</dark_red>"
-  output:
-    text: "&4%group_1%"
 
 dark_red:
   input:
     text: "<dark_red>"
+    has-closing-tag: true
   output:
     text: "&4"
-
-dark_purple-tag:
-  input:
-    prefix: "<dark_purple>"
-    suffix: "</dark_purple>"
-  output:
-    text: "&5%group_1%"
 
 dark_purple:
   input:
     text: "<dark_purple>"
+    has-closing-tag: true
   output:
     text: "&5"
-
-gold-tag:
-  input:
-    prefix: "<gold>"
-    suffix: "</gold>"
-  output:
-    text: "&6%group_1%"
 
 gold:
   input:
     text: "<gold>"
+    has-closing-tag: true
   output:
     text: "&6"
-
-gray-tag:
-  input:
-    prefix: "<gray>"
-    suffix: "</gray>"
-  output:
-    text: "&7%group_1%"
 
 gray:
   input:
     text: "<gray>"
+    has-closing-tag: true
   output:
     text: "&7"
-
-dark_gray-tag:
-  input:
-    prefix: "<dark_gray>"
-    suffix: "</dark_gray>"
-  output:
-    text: "&8%group_1%"
 
 dark_gray:
   input:
     text: "<dark_gray>"
+    has-closing-tag: true
   output:
     text: "&8"
-
-blue-tag:
-  input:
-    prefix: "<blue>"
-    suffix: "</blue>"
-  output:
-    text: "&9%group_1%"
 
 blue:
   input:
     text: "<blue>"
+    has-closing-tag: true
   output:
     text: "&9"
-
-green-tag:
-  input:
-    prefix: "<green>"
-    suffix: "</green>"
-  output:
-    text: "&a%group_1%"
 
 green:
   input:
     text: "<green>"
+    has-closing-tag: true
   output:
     text: "&a"
-
-aqua-tag:
-  input:
-    prefix: "<aqua>"
-    suffix: "</aqua>"
-  output:
-    text: "&b%group_1%"
 
 aqua:
   input:
     text: "<aqua>"
+    has-closing-tag: true
   output:
     text: "&b"
-
-red-tag:
-  input:
-    prefix: "<red>"
-    suffix: "</red>"
-  output:
-    text: "&c%group_1%"
 
 red:
   input:
     text: "<red>"
+    has-closing-tag: true
   output:
     text: "&c"
-
-light_purple-tag:
-  input:
-    prefix: "<light_purple>"
-    suffix: "</light_purple>"
-  output:
-    text: "&d%group_1%"
 
 light_purple:
   input:
     text: "<light_purple>"
+    has-closing-tag: true
   output:
     text: "&d"
-
-yellow-tag:
-  input:
-    prefix: "<yellow>"
-    suffix: "</yellow>"
-  output:
-    text: "&e%group_1%"
 
 yellow:
   input:
     text: "<yellow>"
+    has-closing-tag: true
   output:
     text: "&e"
-
-white-tag:
-  input:
-    prefix: "<white>"
-    suffix: "</white>"
-  output:
-    text: "&f%group_1%"
 
 white:
   input:
     text: "<white>"
+    has-closing-tag: true
   output:
     text: "&f"
-
-olive-tag:
-  input:
-    prefix: "<olive>"
-    suffix: "</olive>"
-  output:
-    text: "#808000%group_1%"
 
 olive:
   input:
     text: "<olive>"
+    has-closing-tag: true
   output:
     text: "#808000"
-
-obfuscated-tag:
-  input:
-    prefix: "<obfuscated>"
-    suffix: "</obfuscated>"
-  output:
-    text: "&k%group_1%"
 
 obfuscated:
   input:
     text: "<obfuscated>"
+    has-closing-tag: true
   output:
     text: "&k"
-
-bold-tag:
-  input:
-    prefix: "<bold>"
-    suffix: "</bold>"
-  output:
-    text: "&l%group_1%"
 
 bold:
   input:
     text: "<bold>"
+    has-closing-tag: true
   output:
     text: "&l"
-
-strikethrough-tag:
-  input:
-    prefix: "<strikethrough>"
-    suffix: "</strikethrough>"
-  output:
-    text: "&m%group_1%"
 
 strikethrough:
   input:
     text: "<strikethrough>"
+    has-closing-tag: true
   output:
     text: "&m"
-
-underlined-tag:
-  input:
-    prefix: "<underlined>"
-    suffix: "</underlined>"
-  output:
-    text: "&n%group_1%"
 
 underlined:
   input:
     text: "<underlined>"
+    has-closing-tag: true
   output:
     text: "&n"
-
-italic-tag:
-  input:
-    prefix: "<italic>"
-    suffix: "</italic>"
-  output:
-    text: "&o%group_1%"
 
 italic:
   input:
     text: "<italic>"
+    has-closing-tag: true
   output:
     text: "&o"
-
-pride-tag:
-  input:
-    prefix: "<pride>"
-    suffix: "</pride>"
-  output:
-    text: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>%group_1%"
 
 pride:
   input:
     text: "<pride>"
+    has-closing-tag: true
   output:
     text: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
-
-progress-tag:
-  input:
-    prefix: "<progress>"
-    suffix: "</progress>"
-  output:
-    text: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>%group_1%"
 
 progress:
   input:
     text: "<progress>"
+    has-closing-tag: true
   output:
     text: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
-
-trans-tag:
-  input:
-    prefix: "<trans>"
-    suffix: "</trans>"
-  output:
-    text: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>%group_1%"
 
 trans:
   input:
     text: "<trans>"
+    has-closing-tag: true
   output:
     text: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>"
-
-bi-tag:
-  input:
-    prefix: "<bi>"
-    suffix: "</bi>"
-  output:
-    text: "<g:#D60270:#9B4F96:#0037A7>%group_1%"
 
 bi:
   input:
     text: "<bi>"
+    has-closing-tag: true
   output:
     text: "<g:#D60270:#9B4F96:#0037A7>"
-
-pan-tag:
-  input:
-    prefix: "<pan>"
-    suffix: "</pan>"
-  output:
-    text: "<g:#FF1C8D:#FFD700:#1AB3FF>%group_1%"
 
 pan:
   input:
     text: "<pan>"
+    has-closing-tag: true
   output:
     text: "<g:#FF1C8D:#FFD700:#1AB3FF>"
-
-nb-tag:
-  input:
-    prefix: "<nb>"
-    suffix: "</nb>"
-  output:
-    text: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>%group_1%"
 
 nb:
   input:
     text: "<nb>"
+    has-closing-tag: true
   output:
     text: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>"
-
-lesbian-tag:
-  input:
-    prefix: "<lesbian>"
-    suffix: "</lesbian>"
-  output:
-    text: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>%group_1%"
 
 lesbian:
   input:
     text: "<lesbian>"
+    has-closing-tag: true
   output:
     text: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>"
-
-ace-tag:
-  input:
-    prefix: "<ace>"
-    suffix: "</ace>"
-  output:
-    text: "<g:#000000:#A4A4A4:#FFFFFF:#810081>%group_1%"
 
 ace:
   input:
     text: "<ace>"
+    has-closing-tag: true
   output:
     text: "<g:#000000:#A4A4A4:#FFFFFF:#810081>"
