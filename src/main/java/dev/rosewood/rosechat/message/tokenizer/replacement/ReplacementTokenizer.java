@@ -55,8 +55,7 @@ public class ReplacementTokenizer extends Tokenizer {
                         .placeholder("message", originalContent)
                         .placeholder("extra", originalContent)
                         .placeholder("tagged", "%group_1%")
-                        .placeholders(groupPlaceholders.build())
-                        .ignoreTokenizer(this);
+                        .placeholders(groupPlaceholders.build());
 
                 if (replacement.getOutput().getHover() != null)
                     token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
@@ -84,8 +83,7 @@ public class ReplacementTokenizer extends Tokenizer {
                 String content = replacement.getOutput().getText();
 
                 Token.Builder token = Token.group(content)
-                        .decorate(FontDecorator.of(replacement.getOutput().getFont()))
-                        .ignoreTokenizer(this);
+                        .decorate(FontDecorator.of(replacement.getOutput().getFont()));
 
                 if (replacement.getOutput().getHover() != null)
                     token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));

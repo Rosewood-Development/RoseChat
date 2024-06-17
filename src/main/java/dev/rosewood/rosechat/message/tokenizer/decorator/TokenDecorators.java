@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,14 +10,16 @@ import java.util.List;
 
 public class TokenDecorators {
 
-    private final List<TokenDecorator> decorators;
+    protected final List<TokenDecorator> decorators;
 
     public TokenDecorators() {
         this.decorators = new ArrayList<>();
     }
 
     public TokenDecorators(TokenDecorators decorators) {
-        this.decorators = new ArrayList<>(decorators.decorators);
+        this();
+        
+        this.add(decorators.decorators);
     }
 
     public void add(List<TokenDecorator> toAdd) {
@@ -36,9 +39,9 @@ public class TokenDecorators {
                 this.decorators.add(decorator);
     }
 
-    public void apply(ComponentBuilder builder, MessageTokenizer tokenizer, Token parent) {
+    public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
         for (TokenDecorator decorator : this.decorators)
-            decorator.apply(builder.getCurrentComponent(), tokenizer, parent);
+            decorator.apply(component, tokenizer, parent);
     }
 
     public boolean blocksTextStitching() {
