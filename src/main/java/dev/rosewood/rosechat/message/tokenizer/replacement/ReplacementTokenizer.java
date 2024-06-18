@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -55,7 +56,8 @@ public class ReplacementTokenizer extends Tokenizer {
                         .placeholder("message", originalContent)
                         .placeholder("extra", originalContent)
                         .placeholder("tagged", "%group_1%")
-                        .placeholders(groupPlaceholders.build());
+                        .placeholders(groupPlaceholders.build())
+                        .ignoreTokenizer(Tokenizers.SHADER_COLORS);
 
                 if (replacement.getOutput().getHover() != null)
                     token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
@@ -83,7 +85,8 @@ public class ReplacementTokenizer extends Tokenizer {
                 String content = replacement.getOutput().getText();
 
                 Token.Builder token = Token.group(content)
-                        .decorate(FontDecorator.of(replacement.getOutput().getFont()));
+                        .decorate(FontDecorator.of(replacement.getOutput().getFont()))
+                        .ignoreTokenizer(Tokenizers.SHADER_COLORS);
 
                 if (replacement.getOutput().getHover() != null)
                     token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, replacement.getOutput().getHover()));
