@@ -67,14 +67,8 @@ public class PlayerListener implements Listener {
             }
 
             // Set the display name when the player logs in
-            if (playerData.getNickname() != null) {
-                RoseMessage message = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
-                MessageTokenizerResults<BaseComponent[]> components = message.parse(player, playerData.getNickname());
-                player.setDisplayName(TextComponent.toLegacyText(components.content()));
-
-                if (RoseChat.getInstance().getNicknameProvider() != null)
-                    RoseChat.getInstance().getNicknameProvider().setNickname(player.asPlayer(), player.getDisplayName());
-            }
+            if (playerData.getNickname() != null)
+                player.updateDisplayName();
         });
     }
 

@@ -20,5 +20,6 @@ public class RoseChatArgumentHandlers {
     public static final ArgumentHandler<RosePlayer> GROUP_MEMBER = new GroupMemberArgumentHandler();
     public static final ArgumentHandler<String> OFFLINE_GROUP = new OfflineGroupArgumentHandler();
     public static final ArgumentHandler<GroupChannel> GROUP_INVITE = new GroupInviteArgumentHandler();
+    public static final ArgumentHandler<String> NICKNAME = new NicknameArgumentHandler();
 
 }

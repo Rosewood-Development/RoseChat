@@ -14,7 +14,6 @@ import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentCondition;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -40,7 +39,7 @@ public class NicknameCommand extends RoseChatCommand {
                 .arguments(ArgumentsDefinition.builder()
                         .optional("player", RoseChatArgumentHandlers.ROSE_PLAYER,
                                 ArgumentCondition.hasPermission("rosechat.nickname.others"))
-                        .required("nickname", ArgumentHandlers.GREEDY_STRING)
+                        .required("nickname", RoseChatArgumentHandlers.NICKNAME)
                         .build())
                 .build();
     }

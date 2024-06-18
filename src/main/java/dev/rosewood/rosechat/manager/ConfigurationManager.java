@@ -73,6 +73,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "When disabled, display names will only be updated when the player uses /nick.",
                 "This allows other plugins to get the display name at the time that the player last sent a message,",
                 "rather than when they set their nickname."),
+        UPDATE_PLAYER_LIST("nickname-settings.update-player-list", true,
+                "Should the player list (tab) be updated when a player changes their nickname?"),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         CHAT_EVENT_PRIORITY("chat-settings.chat-event-priority", "LOW", "The event priority for the chat listener.",

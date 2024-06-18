@@ -300,8 +300,16 @@ public class RosePlayer {
     }
 
     public void updateDisplayName() {
-        if (this.getPlayerData().getNickname() == null)
+        if (this.getPlayerData().getNickname() == null) {
+            if (RoseChat.getInstance().getNicknameProvider() != null)
+                RoseChat.getInstance().getNicknameProvider()
+                        .setNickname(this.asPlayer(), null);
+
+            if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
+                this.asPlayer().setPlayerListName(null);
+
             return;
+        }
 
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             String name = TextComponent.toLegacyText(this.getParsedNickname());
@@ -310,6 +318,9 @@ public class RosePlayer {
             if (RoseChat.getInstance().getNicknameProvider() != null)
                 RoseChat.getInstance().getNicknameProvider()
                         .setNickname(this.asPlayer(), this.getDisplayName());
+
+            if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
+                this.asPlayer().setPlayerListName(name);
         });
     }
 
