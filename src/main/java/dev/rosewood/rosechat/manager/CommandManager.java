@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.command.chat.BaseChatCommand;
 import dev.rosewood.rosechat.command.command.BaseCommand;
+import dev.rosewood.rosechat.command.command.BroadcastCommand;
 import dev.rosewood.rosechat.command.command.ChannelCommand;
 import dev.rosewood.rosechat.command.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.command.DeleteMessageCommand;
@@ -38,6 +39,7 @@ public class CommandManager extends AbstractCommandManager {
                 BaseCommand::new,
                 BaseChatCommand::new,
                 BaseGroupCommand::new,
+                BroadcastCommand::new,
                 GroupMessageCommand::new,
                 ChannelCommand::new,
                 ChatColorCommand::new,

@@ -188,15 +188,6 @@ public class RoseChatChannel extends ConditionalChannel {
 
         // Send the message to the player asynchronously.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
-
-            Stopwatch messageTimer;
-            if (debugManager.isEnabled()) {
-                messageTimer = Stopwatch.createStarted();
-            } else {
-                messageTimer = null;
-            }
-
             // If the message is not a json message, parse normally, or parse from discord if an id is available.
             MessageOutputs outputs;
             if (direction != MessageDirection.SERVER_TO_SERVER_RAW) {

@@ -38,6 +38,9 @@ command-help-list-description-no-sub: "&8 - &d/%cmd% &7- %desc%"
 command-reload-description: "Reloads the plugin"
 command-reload-reloaded: "&ePlugin data, configuration, and locale files were reloaded."
 
+# Broadcast Command
+command-broadcast-description: "Broadcast a message to the server, or to a channel"
+
 # Debug Command
 command-debug-description: "Toggles debug mode"
 command-debug-on: "&eDebug mode is now &aon&e. Use &b/rc debug &eagain to save debug information."
