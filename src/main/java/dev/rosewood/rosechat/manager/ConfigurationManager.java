@@ -175,6 +175,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "The format of a message that was sent from discord.", "Requires DiscordSRV"),
         HELD_ITEM_REPLACEMENT("chat-formats.held-item-replacement", "item",
                 "The ID of the replacement, found in replacements.yml, for held items in chat."),
+        EDITED_DISCORD_MESSAGE_FORMAT("chat-formats.edited-discord-message", "{edited}",
+                "The format of an edited discord message."),
 
         MARKDOWN_FORMATS("markdown-formats", null, "Discord Format Settings"),
         MARKDOWN_FORMAT_BOLD("markdown-formats.bold", "&l%message%&L"),

@@ -170,6 +170,14 @@ deleted-message:
     true:
       - "%original%"
 
+edited:
+  text:
+    default: " &8(edited)"
+  hover:
+    condition: "%player_has_permission_rosechat.editedmessages.see%"
+    true:
+      - "%original%"
+
 # These custom placeholders are used for tags.
 # The %tagged% placeholder is used for the thing that was tagged.
 # The 'other_player' is the player who was tagged.

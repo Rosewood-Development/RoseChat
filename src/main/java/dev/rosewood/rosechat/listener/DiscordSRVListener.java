@@ -12,6 +12,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.ListenerPriority;
@@ -25,6 +26,8 @@ import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildM
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -225,17 +228,21 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         Player player = Bukkit.getPlayer(playerData.getUUID());
                         if (player == null)
                             continue;
+                        
                         rules.ignoreMessageLogging();
 
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId()))
                                 continue;
 
-                            deletableMessage.setOriginal(null);
                             messageWrapper.setUUID(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
                                     Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
+                            components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
                             deletableMessage.setJson(ComponentSerializer.toString(components));
+
+                            // Set original to null for the new delete button.
+                            deletableMessage.setOriginal(null);
 
                             if (consoleComponents == null)
                                 consoleComponents = components;
@@ -247,7 +254,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
                             player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
-
                     }
 
                     if (consoleComponents != null)
@@ -257,6 +263,22 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 }
             }
         }
+    }
+
+    private BaseComponent[] appendEdited(BaseComponent[] components, DeletableMessage message, RosePlayer viewer) {
+        RosePlayer sender = new RosePlayer(message.getSender() == null ? Bukkit.getConsoleSender() : Bukkit.getPlayer(message.getSender()));
+        BaseComponent[] edited = RoseChatAPI.getInstance().parse(viewer, viewer, Setting.EDITED_DISCORD_MESSAGE_FORMAT.getString(),
+                DefaultPlaceholders.getFor(sender, viewer)
+                        .add("type", message.isClient() ? "client" : "server")
+                        .add("channel", message.getChannel())
+                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build());
+
+        Bukkit.getConsoleSender().sendMessage(TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal())));
+        ComponentBuilder builder = new ComponentBuilder();
+        builder.append(components, ComponentBuilder.FormatRetention.NONE);
+        builder.append(edited);
+
+        return builder.create();
     }
 
     public static String getColor(Member member) {

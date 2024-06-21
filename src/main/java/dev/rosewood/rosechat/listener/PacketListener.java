@@ -68,8 +68,6 @@ public class PacketListener {
         }
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, priority, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
-            final RoseChatAPI api = RoseChatAPI.getInstance();
-
             @Override
             public void onPacketSending(PacketEvent event) {
                 if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean())
