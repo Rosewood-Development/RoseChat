@@ -129,7 +129,7 @@ public final class RoseChatAPI {
                 DefaultPlaceholders.getFor(player, player)
                         .add("id", uuid.toString())
                         .add("type", messageToDelete.isClient() ? "client" : "server")
-                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(messageToDelete.getJson())))
+                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(messageToDelete.getOriginal())))
                         .build());
 
         boolean updated = false;

@@ -5,8 +5,11 @@ import java.util.UUID;
 public class DeletableMessage {
 
     private final UUID uuid;
+    private UUID sender;
+    private String original;
     private String json;
     private String discordId;
+    private String channel;
     private boolean isClient;
 
     public DeletableMessage(UUID uuid) {
@@ -24,6 +27,13 @@ public class DeletableMessage {
         this(uuid, json, isClient);
 
         this.discordId = discordId;
+    }
+
+    public DeletableMessage(UUID uuid, String json, boolean isClient, String discordId, String channel) {
+        this(uuid, json, isClient);
+
+        this.discordId = discordId;
+        this.channel = channel;
     }
 
     public UUID getUUID() {
@@ -52,6 +62,30 @@ public class DeletableMessage {
 
     public void setDiscordId(String discordId) {
         this.discordId = discordId;
+    }
+
+    public String getChannel() {
+        return this.channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public UUID getSender() {
+        return this.sender;
+    }
+
+    public void setSender(UUID sender) {
+        this.sender = sender;
+    }
+
+    public void setOriginal(String original) {
+        this.original = original;
+    }
+
+    public String getOriginal() {
+        return this.original;
     }
 
 }

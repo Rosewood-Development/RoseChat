@@ -17,15 +17,16 @@ import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -46,9 +47,9 @@ public class PacketListener {
         this.plugin = plugin;
 
         this.permissionsCache = CacheBuilder.newBuilder()
-                        .expireAfterWrite(5, TimeUnit.SECONDS).build();
+                .expireAfterWrite(5, TimeUnit.SECONDS).build();
         this.groupCache = CacheBuilder.newBuilder()
-                        .expireAfterWrite(5, TimeUnit.SECONDS).build();
+                .expireAfterWrite(5, TimeUnit.SECONDS).build();
     }
 
     public void removeListeners() {
@@ -74,66 +75,51 @@ public class PacketListener {
                 if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean())
                     return;
 
-                if (event.getPacketType() == PacketType.Play.Server.CHAT) {
-                    Player player = event.getPlayer();
-                    PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
-                    if (playerData == null)
-                        return;
+                RosePlayer player = new RosePlayer(event.getPlayer());
+                PlayerData data = player.getPlayerData();
+                if (data == null)
+                    return;
 
+                if (event.getPacketType() == PacketType.Play.Server.CHAT) {
                     PacketContainer packet = event.getPacket();
-                    String messageJson;
 
                     WrappedChatComponent chatComponent = packet.getChatComponents().readSafely(0);
-                    if (chatComponent == null) {
-                        messageJson = getMessageReflectively(packet);
-                    } else {
-                        messageJson = chatComponent.getJson();
-                    }
+                    String messageJson = chatComponent == null ? getMessageReflectively(packet) : chatComponent.getJson();
 
-                    if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}")) return;
+                    if (messageJson == null || messageJson.equalsIgnoreCase("{\"text\":\"\"}"))
+                        return;
 
                     // Ensures chat messages are added separately, to differentiate between client and server messages.
-                    if (playerData.getMessageLog().containsDeletableMessage(messageJson)) return;
-                    UUID messageId = UUID.randomUUID();
+                    DeletableMessage loggedMessage = data.getMessageLog().getDeletableMessage(messageJson);
+                    if (loggedMessage != null) {
+                        if (loggedMessage.isClient() || loggedMessage.getOriginal() != null)
+                            return;
 
-                    if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
-                        permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
-
-                    if (!permissionsCache.getIfPresent(player.getUniqueId())) {
-                        playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                        // Updated the logged message to keep the unedited message and the new edited message.
+                        loggedMessage.setOriginal(loggedMessage.getJson());
+                        String json = getServerMessageJson(loggedMessage, player);
+                        loggedMessage.setJson(json);
+                        event.setPacket(createSystemPacket(json));
                         return;
                     }
 
-                    RosePlayer sender = new RosePlayer(player);
-                    if (!groupCache.asMap().containsKey(player.getUniqueId())) {
-                        Permission vault = this.api.getVault();
-                        if (vault != null) {
-                            String group = this.api.getVault().getPrimaryGroup(player);
-                            groupCache.put(player.getUniqueId(), group);
-                        }
-                    }
+                    UUID messageId = UUID.randomUUID();
+                    if (updateAndCheckPermissions(player, messageId, messageJson))
+                        return;
 
-                    String group = groupCache.getIfPresent(player.getUniqueId());
-                    sender.setPermissionGroup(Objects.requireNonNullElse(group, "default"));
-
-                    BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
+                    BaseComponent[] deleteClientButton = MessageUtils.appendDeleteButton(player, data, messageId.toString(), messageJson);
 
                     if (deleteClientButton == null)
                         return;
 
                     messageJson = ComponentSerializer.toString(deleteClientButton);
-                    playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                    data.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true, null));
 
                     // Overwrite the packet since packet fields are final in 1.19
                     PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.CHAT);
                     newPacket.getChatComponents().write(0, WrappedChatComponent.fromJson(messageJson));
                     event.setPacket(newPacket);
                 } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT) {
-                    Player player = event.getPlayer();
-                    PlayerData playerData = this.api.getPlayerData(player.getUniqueId());
-                    if (playerData == null)
-                        return;
-
                     PacketContainer packet = event.getPacket();
                     if (packet.getBooleans().size() == 0 || packet.getBooleans().readSafely(0)) // Ignore hotbar messages
                         return;
@@ -157,7 +143,7 @@ public class PacketListener {
                         }
                     }
 
-                    // Work around for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
+                    // Workaround for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] components = null;
                     try {
                         components = messageJson == null ? null : ComponentSerializer.parse(messageJson);
@@ -167,56 +153,124 @@ public class PacketListener {
                         return;
 
                     // Ensures chat messages are added separately, to differentiate between client and server messages.
-                    if (playerData.getMessageLog().containsDeletableMessage(messageJson))
+                    DeletableMessage loggedMessage = data.getMessageLog().getDeletableMessage(messageJson);
+                    if (loggedMessage != null) {
+                        if (loggedMessage.isClient() || loggedMessage.getOriginal() != null)
+                            return;
+
+                        // Updated the logged message to keep the unedited message and the new edited message.
+                        loggedMessage.setOriginal(loggedMessage.getJson());
+                        String json = getServerMessageJson(loggedMessage, player);
+                        loggedMessage.setJson(json);
+                        event.setPacket(createSystemPacket(json));
                         return;
+                    }
+
                     UUID messageId = UUID.randomUUID();
-
-                    if (!permissionsCache.asMap().containsKey(player.getUniqueId()))
-                        permissionsCache.put(player.getUniqueId(), player.hasPermission("rosechat.deletemessages.client"));
-
-                    if (!permissionsCache.getIfPresent(player.getUniqueId())) {
-                        playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                    if (updateAndCheckPermissions(player, messageId, messageJson))
                         return;
-                    }
-
-                    RosePlayer sender = new RosePlayer(player);
-                    if (!groupCache.asMap().containsKey(player.getUniqueId())) {
-                        Permission vault = this.api.getVault();
-                        if (vault != null) {
-                            String group = this.api.getVault().getPrimaryGroup(player);
-                            groupCache.put(player.getUniqueId(), group);
-                        }
-                    }
-
-                    String group = groupCache.getIfPresent(player.getUniqueId());
-                    sender.setPermissionGroup(Objects.requireNonNullElse(group, "default"));
 
                     // Work around for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] deleteClientButton = null;
                     try {
-                        deleteClientButton = MessageUtils.appendDeleteButton(sender, playerData, messageId.toString(), messageJson);
+                        deleteClientButton = MessageUtils.appendDeleteButton(player, data, messageId.toString(), messageJson);
                     } catch (JsonSyntaxException ignored) {}
 
                     if (deleteClientButton == null)
                         return;
 
+                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true, null);
+                    deletableMessage.setOriginal(messageJson);
+
                     messageJson = ComponentSerializer.toString(deleteClientButton);
-                    playerData.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
+                    deletableMessage.setJson(messageJson);
+                    data.getMessageLog().addDeletableMessage(deletableMessage);
 
-                    // Overwrite the packet since packet fields are final in 1.19
-                    PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-
-                    if (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4) {
-                        newPacket.getChatComponents().write(0, WrappedChatComponent.fromJson(messageJson));
-                    } else {
-                        newPacket.getStrings().write(0, messageJson);
-                    }
-
-
-                    event.setPacket(newPacket);
+                    event.setPacket(createSystemPacket(messageJson));
                 }
             }
         });
+    }
+
+    private boolean updateAndCheckPermissions(RosePlayer player, UUID messageId, String messageJson) {
+        if (!permissionsCache.asMap().containsKey(player.getUUID()))
+            permissionsCache.put(player.getUUID(), player.hasPermission("rosechat.deletemessages.client"));
+
+        if (!permissionsCache.getIfPresent(player.getUUID())) {
+            player.getPlayerData().getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true, null));
+            return true;
+        }
+
+        if (!groupCache.asMap().containsKey(player.getUUID())) {
+            Permission vault = RoseChatAPI.getInstance().getVault();
+            if (vault != null) {
+                String group = player.getPermissionGroup();
+                groupCache.put(player.getUUID(), group);
+            }
+        }
+
+        String group = groupCache.getIfPresent(player.getUUID());
+        player.setPermissionGroup(group == null ? "default" : group);
+        return false;
+    }
+
+    private PacketContainer createSystemPacket(String json) {
+        // Overwrite the packet since packet fields are final in 1.19
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
+
+        if (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4) {
+            packet.getChatComponents().write(0, WrappedChatComponent.fromJson(json));
+        } else {
+            packet.getStrings().write(0, json);
+        }
+
+        return packet;
+    }
+
+    private String getServerMessageJson(DeletableMessage message, RosePlayer viewer) {
+        BaseComponent[] components = ComponentSerializer.parse(message.getJson());
+        if (components == null || components.length == 0 || viewer.isConsole())
+            return null;
+
+        boolean isSamePlayer = message.getSender() != null && message.getSender().equals(viewer.getUUID());
+        String permission = isSamePlayer ? "rosechat.deletemessages.self" : "rosechat.deletemessages.others";
+        String format = isSamePlayer ? Setting.DELETE_OWN_MESSAGE_FORMAT.getString() :  Setting.DELETE_OTHER_MESSAGE_FORMAT.getString();
+
+        if (!viewer.hasPermission(permission))
+            return null;
+
+        BaseComponent[] appended = this.appendDeleteButton(components, message, viewer, format);
+        return ComponentSerializer.toString(appended);
+    }
+
+    private BaseComponent[] appendDeleteButton(BaseComponent[] components, DeletableMessage message, RosePlayer viewer, String placeholder) {
+        BaseComponent[] button = this.getDeleteButton(message, viewer, placeholder);
+
+        ComponentBuilder builder = new ComponentBuilder();
+        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
+            builder.append(components, ComponentBuilder.FormatRetention.NONE);
+
+            if (button != null)
+                builder.append(button);
+        } else {
+            if (button != null)
+                builder.append(button);
+
+            builder.append(components, ComponentBuilder.FormatRetention.NONE);
+        }
+
+        return builder.create();
+    }
+
+    private BaseComponent[] getDeleteButton(DeletableMessage message, RosePlayer viewer, String placeholder) {
+        RosePlayer sender = new RosePlayer(message.getSender() == null ? Bukkit.getConsoleSender() : Bukkit.getPlayer(message.getSender()));
+
+        return RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), viewer, placeholder,
+                DefaultPlaceholders.getFor(sender, viewer)
+                        .add("id", message.getUUID().toString())
+                        .add("type", "server")
+                        .add("channel", message.getChannel())
+                        .build());
     }
 
     // Thanks, Nicole!

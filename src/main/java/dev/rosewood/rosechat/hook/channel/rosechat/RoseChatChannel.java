@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.hook.channel.rosechat;
 
-import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
@@ -10,18 +9,15 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.condition.ConditionalChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
-import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -34,7 +30,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 
@@ -144,22 +139,19 @@ public class RoseChatChannel extends ConditionalChannel {
      */
     public List<Player> getVisibleAnywhereRecipients(RosePlayer sender, World world) {
         List<Player> recipients = new ArrayList<>();
-
         if (world == null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (this.getReceiveCondition(sender, new RosePlayer(player)))
                     recipients.add(player);
             }
-
-            return recipients;
         } else {
             for (Player player : world.getPlayers()) {
                 if (this.getReceiveCondition(sender, new RosePlayer(player)))
                     recipients.add(player);
             }
-
-            return recipients;
         }
+
+        return recipients;
     }
 
     /**
@@ -236,7 +228,7 @@ public class RoseChatChannel extends ConditionalChannel {
                 parsedMessage = postParseMessageEvent.getComponents().content();
                 outputs = postParseMessageEvent.getComponents().outputs();
                 receiver.send(parsedMessage);
-                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage), false, discordId));
+                receiverData.getMessageLog().addDeletableMessage(new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage), false, discordId, this.getId()));
             }
 
             // Play the tag sound to the player.
@@ -294,7 +286,7 @@ public class RoseChatChannel extends ConditionalChannel {
         // Send message to Bungee
         this.sendToBungee(message, direction);
 
-        if (direction == MessageDirection.PLAYER_TO_SERVER) {
+        if (direction == MessageDirection.PLAYER_TO_SERVER || direction == MessageDirection.DISCORD_TO_MINECRAFT) {
             RosePlayer consoleReceiver = new RosePlayer(Bukkit.getConsoleSender());
 
             // Call the PreParseMessageEvent and check if the message can be parsed.
@@ -304,8 +296,19 @@ public class RoseChatChannel extends ConditionalChannel {
             if (preParseMessageEvent.isCancelled())
                 return;
 
-            BaseComponent[] parsedConsoleMessage = message.parse(consoleReceiver, this.getFormat()).content();
-            Bukkit.getConsoleSender().spigot().sendMessage(parsedConsoleMessage);
+            MessageTokenizerResults<BaseComponent[]> parsedComponents =
+                    direction == MessageDirection.PLAYER_TO_SERVER ?
+                            message.parse(consoleReceiver, this.getFormat()) :
+                            message.parseMessageFromDiscord(consoleReceiver, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), discordId);
+
+            PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, consoleReceiver, direction, parsedComponents);
+            Bukkit.getPluginManager().callEvent(postParseMessageEvent);
+            if (postParseMessageEvent.isCancelled())
+                return;
+
+            parsedComponents = postParseMessageEvent.getComponents();
+
+            Bukkit.getConsoleSender().spigot().sendMessage(parsedComponents.content());
         }
 
         List<Player> currentSpies = new ArrayList<>();

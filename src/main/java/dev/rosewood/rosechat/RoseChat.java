@@ -20,7 +20,6 @@ import dev.rosewood.rosechat.hook.nickname.NicknameProvider;
 import dev.rosewood.rosechat.listener.BungeeListener;
 import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
-import dev.rosewood.rosechat.listener.MessageListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
@@ -164,9 +163,6 @@ public class RoseChat extends RosePlugin {
                 DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
             }
         }, 60L);
-
-        if (pluginManager.isPluginEnabled("ProtocolLib") && NMSUtil.getVersionNumber() >= 17)
-            pluginManager.registerEvents(new MessageListener(), this);
 
         if (pluginManager.isPluginEnabled("Essentials"))
             this.nicknameProvider = new EssentialsHook();

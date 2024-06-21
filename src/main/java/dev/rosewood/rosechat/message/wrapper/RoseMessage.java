@@ -138,6 +138,13 @@ public class RoseMessage {
         deletableMessage.setJson(json);
         deletableMessage.setClient(false);
         deletableMessage.setDiscordId(discordId);
+
+        if (!this.sender.isConsole())
+            deletableMessage.setSender(this.sender.getUUID());
+
+        if (this.channel != null)
+            deletableMessage.setChannel(this.channel.getId());
+
         return deletableMessage;
     }
 

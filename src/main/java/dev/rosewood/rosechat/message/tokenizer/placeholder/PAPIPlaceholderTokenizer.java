@@ -40,7 +40,8 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
-            if (!params.getReceiver().isPlayer()) content = originalContent;
+            if (!params.getReceiver().isPlayer())
+                content = originalContent;
             else {
                 content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
                 content = PlaceholderAPIHook.applyPlaceholders(params.getReceiver().asPlayer(), content.replaceFirst("other_", ""));

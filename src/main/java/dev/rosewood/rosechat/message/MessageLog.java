@@ -76,13 +76,13 @@ public class MessageLog {
         return this.deletableMessages;
     }
 
-    public boolean containsDeletableMessage(String json) {
+    public DeletableMessage getDeletableMessage(String json) {
         if (this.deletableMessages.isEmpty())
-            return false;
+            return null;
 
         BaseComponent[] one = ComponentSerializer.parse(json);
         if (one.length == 0)
-            return false;
+            return null;
         BaseComponent componentOne = one[0];
 
         for (int i = this.deletableMessages.size() - 1; i >= 0; i--) {
@@ -95,10 +95,10 @@ public class MessageLog {
             BaseComponent componentTwo = two[0];
 
             if (componentOne.toLegacyText().equalsIgnoreCase(componentTwo.toLegacyText()))
-                return true;
+                return message;
         }
 
-        return false;
+        return null;
     }
 
     public void addDeletableMessage(DeletableMessage deletableMessage) {

@@ -380,7 +380,7 @@ public class MessageUtils {
                         .add("type", "client").build());
 
         if (deleteClientButton == null || deleteClientButton.length == 0) {
-            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
+            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true, null));
             return null;
         }
 

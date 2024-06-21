@@ -219,19 +219,26 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 messageWrapper.setPlayerInput(outputs.getFilteredMessage());
 
                 if (update) {
+                    BaseComponent[] consoleComponents = null;
+
                     for (PlayerData playerData : updateFor) {
                         Player player = Bukkit.getPlayer(playerData.getUUID());
                         if (player == null)
                             continue;
-
                         rules.ignoreMessageLogging();
+
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages()) {
                             if (deletableMessage.getDiscordId() == null || !deletableMessage.getDiscordId().equals(message.getId()))
                                 continue;
 
+                            deletableMessage.setOriginal(null);
                             messageWrapper.setUUID(deletableMessage.getUUID());
-                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player), Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
+                            BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
+                                    Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
                             deletableMessage.setJson(ComponentSerializer.toString(components));
+
+                            if (consoleComponents == null)
+                                consoleComponents = components;
                             break;
                         }
 
@@ -240,7 +247,11 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
                             player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+
                     }
+
+                    if (consoleComponents != null)
+                        Bukkit.getConsoleSender().spigot().sendMessage(consoleComponents);
                 } else {
                     channel.send(messageWrapper, message.getId());
                 }
