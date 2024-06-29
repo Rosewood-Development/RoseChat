@@ -44,6 +44,12 @@ public class PlayerListener implements Listener {
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUUID(), (gcs) -> {
             PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUUID());
 
+            // Set the display name when the player logs in
+            if (playerData.getNickname() != null)
+                player.updateDisplayName();
+            else
+                playerData.setDisplayName(event.getPlayer().getDisplayName());
+
             // If the current channel is not a group channel, put the player in the right channel.
             if (!playerData.isCurrentChannelGroupChannel() || playerData.getCurrentChannel() == null) {
                 playerData.setIsInGroupChannel(false);
@@ -65,12 +71,6 @@ public class PlayerListener implements Listener {
                     player.switchChannel(channel);
                 }
             }
-
-            // Set the display name when the player logs in
-            if (playerData.getNickname() != null)
-                player.updateDisplayName();
-            else
-                player.getPlayerData().setDisplayName(event.getPlayer().getDisplayName());
         });
     }
 

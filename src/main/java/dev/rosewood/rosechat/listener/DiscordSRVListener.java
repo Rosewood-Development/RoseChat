@@ -187,6 +187,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     private void createMessage(Message message, OfflinePlayer offlinePlayer, String name, Channel channel, StringPlaceholders.Builder placeholders, boolean update, List<PlayerData> updateFor) {
         StringBuilder messageBuilder = new StringBuilder(this.api.getDiscordEmojiManager().unformatUnicode(message.getContentRaw()));
         RosePlayer sender = (offlinePlayer == null ? new RosePlayer(name, true) : new RosePlayer(offlinePlayer));
+        sender.setDiscordProxy(true);
 
         // Add all attachments.
         for (Message.Attachment attachment : message.getAttachments())

@@ -544,7 +544,7 @@ public class RosePlayer {
      * @return True if the RosePlayer has the permission.
      */
     public boolean hasPermission(String permission) {
-        if (this.isConsole())
+        if (this.isConsole() || (this.isDiscordProxy && !Setting.REQUIRE_PERMISSIONS.getBoolean()))
             return true; // Console has all permissions
 
         // If the permission is ignored, return true
@@ -679,6 +679,10 @@ public class RosePlayer {
         } else {
             this.api.getPlayerData(this.offlinePlayer.getUniqueId(), callback);
         }
+    }
+
+    public void setDiscordProxy(boolean discordProxy) {
+        this.isDiscordProxy = discordProxy;
     }
 
 }
