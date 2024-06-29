@@ -6,6 +6,8 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.MessageLog;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class PlayerData {
     private Channel activeChannel;
     private String color;
     private String nickname;
+    private String strippedDisplayName;
     private final List<GroupChannel> groupInvites;
     private final List<UUID> ignoringPlayers;
     private final List<String> hiddenChannels;
@@ -238,6 +241,21 @@ public class PlayerData {
      */
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    /**
+     * @return The current display name of the player without any colour.
+     */
+    public String getStrippedDisplayName() {
+        return this.strippedDisplayName;
+    }
+
+    /**
+     * Sets the current display name and strips it.
+     * @param displayName The display name.
+     */
+    public void setDisplayName(String displayName) {
+        this.strippedDisplayName = ChatColor.stripColor(HexUtils.colorify(displayName));
     }
 
     /**

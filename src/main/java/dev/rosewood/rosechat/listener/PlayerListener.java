@@ -69,6 +69,8 @@ public class PlayerListener implements Listener {
             // Set the display name when the player logs in
             if (playerData.getNickname() != null)
                 player.updateDisplayName();
+            else
+                player.getPlayerData().setDisplayName(event.getPlayer().getDisplayName());
         });
     }
 

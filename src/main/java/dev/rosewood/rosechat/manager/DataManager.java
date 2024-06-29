@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.database.migrations._2_Create_Table_Hidden_Channels;
 import dev.rosewood.rosechat.database.migrations._3_Add_Data_Is_Group_Chat_Column;
+import dev.rosewood.rosechat.database.migrations._4_Add_Data_Stripped_Name;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DataManager extends AbstractDataManager {
@@ -33,7 +35,8 @@ public class DataManager extends AbstractDataManager {
         return Arrays.asList(
                 _1_Create_Tables_Data.class,
                 _2_Create_Table_Hidden_Channels.class,
-                _3_Add_Data_Is_Group_Chat_Column.class
+                _3_Add_Data_Is_Group_Chat_Column.class,
+                _4_Add_Data_Stripped_Name.class
         );
     }
 
@@ -112,8 +115,9 @@ public class DataManager extends AbstractDataManager {
         this.databaseConnector.connect(connection -> {
 
             String query = "REPLACE INTO " + this.getTablePrefix() + "player_data (uuid, has_message_spy, has_channel_spy, has_group_spy, " +
-                    "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, current_channel, chat_color, mute_time, nickname, is_currently_in_gc) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "can_be_messaged, has_tag_sounds, has_message_sounds, has_emojis, " +
+                    "current_channel, chat_color, mute_time, nickname, is_currently_in_gc, stripped_name) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, playerData.getUUID().toString());
                 statement.setBoolean(2, playerData.hasMessageSpy());
@@ -128,9 +132,26 @@ public class DataManager extends AbstractDataManager {
                 statement.setLong(11, playerData.getMuteExpirationTime());
                 statement.setString(12, playerData.getNickname());
                 statement.setBoolean(13, playerData.isCurrentChannelGroupChannel());
+                statement.setString(14, playerData.getStrippedDisplayName().toLowerCase());
                 statement.executeUpdate();
             }
         });
+    }
+
+    public boolean containsNickname(UUID nicknamer, String nickname) {
+        AtomicBoolean contains = new AtomicBoolean();
+
+        this.databaseConnector.connect(connection -> {
+            String query = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE stripped_name = ? AND uuid IS NOT ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, nickname.toLowerCase());
+                statement.setString(2, nicknamer.toString());
+                ResultSet result = statement.executeQuery();
+                contains.set(result.next());
+            }
+        });
+
+        return contains.get();
     }
 
     public void addIgnore(UUID ignoring, UUID ignored) {

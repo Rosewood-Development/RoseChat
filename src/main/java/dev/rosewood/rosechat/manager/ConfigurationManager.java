@@ -75,6 +75,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "rather than when they set their nickname."),
         UPDATE_PLAYER_LIST("nickname-settings.update-player-list", true,
                 "Should the player list (tab) be updated when a player changes their nickname?"),
+        ALLOW_DUPLICATE_NAMES("nickname-settings.allow-duplicate-names", true,
+                "Should multiple players be allowed to use the same nickname?"),
 
         CHAT_SETTINGS("chat-settings", null, "General Miscellaneous Settings"),
         CHAT_EVENT_PRIORITY("chat-settings.chat-event-priority", "LOW", "The event priority for the chat listener.",

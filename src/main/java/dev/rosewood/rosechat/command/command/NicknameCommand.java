@@ -1,8 +1,10 @@
 package dev.rosewood.rosechat.command.command;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
-import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -23,6 +25,8 @@ import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 
 public class NicknameCommand extends RoseChatCommand {
 
@@ -62,10 +66,10 @@ public class NicknameCommand extends RoseChatCommand {
             return;
         }
 
-        nickname = MessageUtils.stripShaderColors(nickname);
+        String strippedNickname = MessageUtils.stripShaderColors(nickname);
 
         RoseMessage nicknameMessage = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
-        nicknameMessage.setPlayerInput(nickname);
+        nicknameMessage.setPlayerInput(strippedNickname);
 
         MessageRules rules = new MessageRules().applyAllFilters().ignoreMessageLogging();
         RuleOutputs outputs = rules.apply(nicknameMessage, nickname);
@@ -79,7 +83,7 @@ public class NicknameCommand extends RoseChatCommand {
         if (!this.isNicknameAllowed(player, player, nicknameMessage))
             return;
 
-        this.setNickname(player, player, nickname);
+        this.setNickname(player, player, strippedNickname);
     }
 
     @RoseExecutable
@@ -91,8 +95,8 @@ public class NicknameCommand extends RoseChatCommand {
             return;
         }
 
-        nickname = MessageUtils.stripShaderColors(nickname);
-        this.setNickname(player, target, nickname);
+        String strippedNickname = MessageUtils.stripShaderColors(nickname);
+        this.setNickname(player, target, strippedNickname);
     }
 
     private void removeNickname(RosePlayer player, RosePlayer target) {
@@ -111,40 +115,56 @@ public class NicknameCommand extends RoseChatCommand {
     }
 
     private void setNickname(RosePlayer player, RosePlayer target, String nickname) {
-        boolean success = target.setNickname(nickname);
-        if (!success)
-            return;
+        // Parse the nickname to find what it would be like as a display name.
+        RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+            if (!Setting.ALLOW_DUPLICATE_NAMES.getBoolean()) {
+                RoseMessage message = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
+                MessageTokenizerResults<BaseComponent[]> components = message.parse(target, nickname);
 
-        if (player.isConsole() || !player.getUUID().equals(target.getUUID()))
-            player.sendLocaleMessage("command-nickname-player",
-                    StringPlaceholders.of(
-                            "player", target.getRealName(),
-                            "name", target.getName()
-                    ));
-        target.sendLocaleMessage("command-nickname-success",
-                StringPlaceholders.of("name", target.getName()));
+                String displayName = TextComponent.toLegacyText(components.content());
+                if (RoseChat.getInstance().getManager(DataManager.class).containsNickname(target.getUUID(), ChatColor.stripColor(HexUtils.colorify(displayName).toLowerCase()))) {
+                    player.sendLocaleMessage("command-nickname-taken");
+                    return;
+                }
+            }
+
+            Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
+                boolean success = target.setNickname(nickname);
+                if (!success)
+                    return;
+
+                if (player.isConsole() || !player.getUUID().equals(target.getUUID()))
+                    player.sendLocaleMessage("command-nickname-player",
+                            StringPlaceholders.of(
+                                    "player", target.getRealName(),
+                                    "name", target.getName()
+                            ));
+                target.sendLocaleMessage("command-nickname-success",
+                        StringPlaceholders.of("name", target.getName()));
+            });
+        });
     }
 
     private boolean isNicknameAllowed(RosePlayer player, RosePlayer target, RoseMessage message) {
         String nickname = message.getPlayerInput();
         String strippedNickname = ChatColor.stripColor(HexUtils.colorify(nickname));
 
-        if (strippedNickname.length() < Math.max(1, ConfigurationManager.Setting.MINIMUM_NICKNAME_LENGTH.getInt())) {
+        if (strippedNickname.length() < Math.max(1, Setting.MINIMUM_NICKNAME_LENGTH.getInt())) {
             player.sendLocaleMessage("command-nickname-too-short");
             return false;
         }
 
-        if (strippedNickname.length() > ConfigurationManager.Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
+        if (strippedNickname.length() > Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
             player.sendLocaleMessage("command-nickname-too-long");
             return false;
         }
 
-        if (!ConfigurationManager.Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean() && strippedNickname.contains(" ")) {
+        if (!Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean() && strippedNickname.contains(" ")) {
             player.sendLocaleMessage("command-nickname-not-allowed");
             return false;
         }
 
-        if (!ConfigurationManager.Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
+        if (!Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
             player.sendLocaleMessage("command-nickname-not-allowed");
             return false;
         }

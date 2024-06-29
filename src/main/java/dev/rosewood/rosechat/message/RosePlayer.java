@@ -252,9 +252,10 @@ public class RosePlayer {
 
         nickname = event.getNickname();
         this.getPlayerData().setNickname(nickname);
-        this.getPlayerData().save();
 
         this.updateDisplayName();
+
+        this.getPlayerData().save();
 
         return true;
     }
@@ -308,6 +309,9 @@ public class RosePlayer {
             if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
                 this.asPlayer().setPlayerListName(null);
 
+            this.setDisplayName(null);
+
+            this.getPlayerData().setDisplayName(this.getRealName());
             return;
         }
 
@@ -321,6 +325,8 @@ public class RosePlayer {
 
             if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
                 this.asPlayer().setPlayerListName(name);
+
+            this.getPlayerData().setDisplayName(name);
         });
     }
 

@@ -96,6 +96,9 @@ public class PacketListener {
                         // Updated the logged message to keep the unedited message and the new edited message.
                         loggedMessage.setOriginal(loggedMessage.getJson());
                         String json = getServerMessageJson(loggedMessage, player);
+                        if (json == null)
+                            return;
+
                         loggedMessage.setJson(json);
                         event.setPacket(createSystemPacket(json));
                         return;
@@ -159,6 +162,9 @@ public class PacketListener {
                         // Updated the logged message to keep the unedited message and the new edited message.
                         loggedMessage.setOriginal(loggedMessage.getJson());
                         String json = getServerMessageJson(loggedMessage, player);
+                        if (json == null)
+                            return;
+
                         loggedMessage.setJson(json);
                         event.setPacket(createSystemPacket(json));
                         return;

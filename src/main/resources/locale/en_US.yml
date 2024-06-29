@@ -114,6 +114,7 @@ command-nickname-too-short: "&cThis nickname is too short!"
 command-nickname-too-long: "&cThis nickname is too long!"
 command-nickname-not-allowed: "&cThis nickname is not allowed!"
 command-nickname-colors-only: "&cYou can only use colors in your nickname!"
+command-nickname-taken: "&cThis name is already taken!"
 
 # Realname Command
 command-realname-description: "View a player's real name"
