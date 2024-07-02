@@ -140,6 +140,7 @@ public class ConfigurationManager extends AbstractConfigurationManager {
                 "Should third-party plugins be supported?",
                 "This should be enabled when using plugins that edit discord messages.",
                 "For example, InteractiveChatDiscordAddon.",
+                "This must be enabled if you want to use Webhooks with DiscordSRV.",
                 "Enabling this will disable the ability delete Discord message from in-game."),
 
         CHAT_FORMATS("chat-formats", null, "These are the the other chat formats in the plugin."),

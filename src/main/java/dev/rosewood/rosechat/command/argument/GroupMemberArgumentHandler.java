@@ -11,6 +11,7 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import java.util.Collections;
 import java.util.List;
 
 public class GroupMemberArgumentHandler extends ArgumentHandler<RosePlayer> {
@@ -38,6 +39,9 @@ public class GroupMemberArgumentHandler extends ArgumentHandler<RosePlayer> {
 
         RosePlayer sender = new RosePlayer(context.getSender());
         group = sender.getOwnedGroupChannel();
+        if (group == null)
+            throw new HandledArgumentException("no-gc");
+
         if (!group.getMembers().contains(player.getUniqueId()))
             throw new HandledArgumentException("argument-handler-group-member", StringPlaceholders.of("input", input));
         else
@@ -56,6 +60,9 @@ public class GroupMemberArgumentHandler extends ArgumentHandler<RosePlayer> {
 
         RosePlayer sender = new RosePlayer(context.getSender());
         group = sender.getOwnedGroupChannel();
+        if (group == null)
+            return Collections.emptyList();
+
         return group.getMembers().stream().map(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             return player == null ? Bukkit.getOfflinePlayer(uuid).getName() : ChatColor.stripColor(player.getDisplayName());

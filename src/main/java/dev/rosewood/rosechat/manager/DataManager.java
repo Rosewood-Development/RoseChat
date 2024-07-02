@@ -63,6 +63,7 @@ public class DataManager extends AbstractDataManager {
                     boolean isCurrentlyChannelGroupChannel = result.getBoolean("is_currently_in_gc");
                     Channel channel = isCurrentlyChannelGroupChannel ?
                             RoseChatAPI.getInstance().getGroupChatById(currentChannel) : this.channelManager.getChannel(currentChannel);
+                    String strippedDisplayName = result.getString("stripped_name");
 
                     PlayerData playerData = new PlayerData(uuid);
                     playerData.setMessageSpy(messageSpy);
@@ -76,6 +77,7 @@ public class DataManager extends AbstractDataManager {
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     playerData.setIsInGroupChannel(isCurrentlyChannelGroupChannel);
+                    playerData.setDisplayName(strippedDisplayName);
 
                     if (muteTime > 0)
                         playerData.mute(muteTime);
@@ -371,10 +373,11 @@ public class DataManager extends AbstractDataManager {
                 }
             } else {
                 String updateQuery = "UPDATE " + this.getTablePrefix() + "group_chat SET " +
-                        "name = ? WHERE owner = ?";
+                        "name = ?, owner = ? WHERE id = ?";
                 try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
                     statement.setString(1, groupChat.getName());
                     statement.setString(2, groupChat.getOwner().toString());
+                    statement.setString(3, groupChat.getId());
                     statement.executeUpdate();
                 }
             }

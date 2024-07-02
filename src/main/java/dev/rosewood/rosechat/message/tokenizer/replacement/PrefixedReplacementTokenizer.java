@@ -76,7 +76,6 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 return this.createTagToken(params, originalContent, content, replacement, prefix);
             }
 
-
             String originalContent = null;
             String tagContent;
             if (replacement.getOutput().shouldTagOnlinePlayers()) {
@@ -107,7 +106,8 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 Player taggedPlayer = detectedTaggedPlayer.player();
                 placeholderViewer = new RosePlayer(taggedPlayer);
                 params.getOutputs().getTaggedPlayers().add(taggedPlayer.getUniqueId());
-                if (replacement.getOutput().getSound() != null) params.getOutputs().setTagSound(replacement.getOutput().getSound());
+                if (replacement.getOutput().getSound() != null)
+                    params.getOutputs().setTagSound(replacement.getOutput().getSound());
             } else {
                 // No player was found, use the tag string up until the first space instead.
                 int endIndex = content.indexOf(" ");
@@ -172,6 +172,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     .placeholder("extra", originalContent)
                     .placeholder("tagged", "%group_1%")
                     .placeholders(groupPlaceholders.build())
+                    .ignoreTokenizer(this)
                     .encapsulate();
 
             if (!formattedHover.isEmpty())
@@ -218,6 +219,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 .placeholder("extra", originalContent)
                 .placeholder("tagged", "%group_1%")
                 .placeholders(groupPlaceholders.build())
+                .ignoreTokenizer(this)
                 .encapsulate();
 
         if (hover != null)

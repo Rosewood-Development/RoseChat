@@ -67,6 +67,7 @@ command-chatcolor-rainbow: "Rainbow"
 command-ignore-description: "Stop seeing a player's messages"
 command-ignore-ignored: "&eYou are now ignoring &b%player%&e."
 command-ignore-unignored: "&eYou are no longer ignoring &b%player%&e."
+command-ignore-cannot-ignore: "&cYou cannot ignore this player!"
 
 # Ignorelist Command
 command-ignorelist-description: "Show who you are ignoring"
@@ -271,3 +272,9 @@ command-gcm-description: "Sends a message in a group chat."
 # Group Chat Rename Command
 command-gc-rename-description: "Rename your group chat"
 command-gc-rename-success: "&eYou group chat is now called &b%name%&e."
+
+# Group Chat Promote Command
+command-gc-promote-description: "Promote a group member to owner"
+command-gc-promote-already-owner: "&cYou are already the owner of this group chat!"
+command-gc-promote-success: "&b%player% &eis now the owner of &b%name%&e!"
+command-gc-promote-promoted: "&eYou are now the owner of &b%name%&e!"

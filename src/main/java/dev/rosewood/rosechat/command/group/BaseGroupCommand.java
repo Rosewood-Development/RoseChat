@@ -30,7 +30,8 @@ public class BaseGroupCommand extends BaseRoseCommand {
                                 new GroupLeaveCommand(this.rosePlugin),
                                 new GroupListCommand(this.rosePlugin),
                                 new GroupMembersCommand(this.rosePlugin),
-                                new GroupRenameCommand(this.rosePlugin)
+                                new GroupRenameCommand(this.rosePlugin),
+                                new GroupPromoteCommand(this.rosePlugin)
                         ))
                 .build();
     }

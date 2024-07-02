@@ -52,6 +52,11 @@ public class IgnoreCommand extends RoseChatCommand {
                 return;
             }
 
+            if (target.hasPermission("rosechat.ignore.bypass")) {
+                player.sendLocaleMessage("command-ignore-cannot-ignore");
+                return;
+            }
+
             PlayerData playerData = player.getPlayerData();
 
             this.getAPI().getPlayerData(target.getUUID(), (targetData) -> {
