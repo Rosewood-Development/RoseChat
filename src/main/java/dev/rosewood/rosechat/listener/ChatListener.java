@@ -63,10 +63,10 @@ public class ChatListener implements Listener {
                     return;
                 }
 
-                String format = channel.getShoutFormat() == null ?
-                        channel.getFormat() : channel.getShoutFormat();
+                String format = channel.getFormats().getShout() == null ?
+                        channel.getFormats().getMinecraft() : channel.getFormats().getShout();
 
-                channel.send(player, message.substring(command.length()).trim(), format);
+                channel.send(player, message.substring(command.length()).trim(), format, true);
 
                 player.updateDisplayName();
                 return;

@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.FormatGroup;
 import dev.rosewood.rosechat.command.command.CustomChannelCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
@@ -127,8 +128,11 @@ public class ChannelManager extends Manager {
 
         // If a channel does not have a format, set the format to the same as the default channel.
         for (Channel channel : this.channels.values()) {
-            if (channel.getFormat() == null)
-                channel.setFormat(this.defaultChannel.getFormat());
+            if (channel.getFormats() == null)
+                channel.setFormats(new FormatGroup());
+
+            if (channel.getFormats().getMinecraft() == null)
+                channel.getFormats().add("minecraft", this.defaultChannel.getFormats().getMinecraft());
 
             if (!loadedChannels.containsKey(channel.getProvider().getSupportedPlugin()))
                 loadedChannels.put(channel.getProvider().getSupportedPlugin(), new ArrayList<>());

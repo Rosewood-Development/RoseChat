@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.placeholder.ConditionManager;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
@@ -20,7 +21,7 @@ public class PlaceholderManager extends Manager {
     private final Map<String, CustomPlaceholder> placeholders;
     private final Map<String, String> chatFormats;
     private final Map<String, List<String>> parsedFormats;
-    private DiscordEmbedPlaceholder discordEmbedPlaceholder;
+    private final Map<String, DiscordEmbedPlaceholder> discordEmbedPlaceholders;
 
     public PlaceholderManager(RosePlugin rosePlugin) {
         super(rosePlugin);
@@ -28,6 +29,7 @@ public class PlaceholderManager extends Manager {
         this.placeholders = new HashMap<>();
         this.chatFormats = new HashMap<>();
         this.parsedFormats = new HashMap<>();
+        this.discordEmbedPlaceholders = new HashMap<>();
     }
 
     @Override
@@ -35,7 +37,6 @@ public class PlaceholderManager extends Manager {
         this.placeholders.clear();
         this.chatFormats.clear();
         this.parsedFormats.clear();
-        this.discordEmbedPlaceholder = null;
 
         File placeholderFile = new File(this.rosePlugin.getDataFolder(), "custom-placeholders.yml");
         if (!placeholderFile.exists())
@@ -51,10 +52,10 @@ public class PlaceholderManager extends Manager {
             if (placeholderSection == null)
                 continue;
 
-            if (Setting.MINECRAFT_TO_DISCORD_FORMAT.getString().contains(id)
-                    && (placeholderSection.contains("title") || placeholderSection.contains("description"))) {
-                this.discordEmbedPlaceholder = new DiscordEmbedPlaceholder(id);
-                this.discordEmbedPlaceholder.parse(placeholderSection);
+            if (placeholderSection.contains("title") || placeholderSection.contains("description")) {
+                DiscordEmbedPlaceholder embedPlaceholder = new DiscordEmbedPlaceholder(id);
+                embedPlaceholder.parse(placeholderSection);
+                this.discordEmbedPlaceholders.put(id, embedPlaceholder);
                 continue;
             }
 
@@ -126,8 +127,8 @@ public class PlaceholderManager extends Manager {
         return this.parsedFormats;
     }
 
-    public DiscordEmbedPlaceholder getDiscordEmbedPlaceholder() {
-        return this.discordEmbedPlaceholder;
+    public Map<String, DiscordEmbedPlaceholder> getDiscordEmbedPlaceholders() {
+        return this.discordEmbedPlaceholders;
     }
 
 }

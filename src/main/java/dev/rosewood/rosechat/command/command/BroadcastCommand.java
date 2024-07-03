@@ -58,7 +58,7 @@ public class BroadcastCommand extends RoseChatCommand {
 
     @RoseExecutable
     public void execute(CommandContext context, Channel channel, String message) {
-        channel.send(new RosePlayer(context.getSender()), message, null);
+        channel.send(new RosePlayer(context.getSender()), message, channel.getFormats().getBroadcast(), false);
     }
 
 }

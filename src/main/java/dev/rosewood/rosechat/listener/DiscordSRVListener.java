@@ -238,7 +238,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                             messageWrapper.setUUID(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
-                                    Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), message.getId()).content();
+                                    channel.getFormats().getDiscordToMinecraft(), message.getId()).content();
                             components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
                             deletableMessage.setJson(ComponentSerializer.toString(components));
 

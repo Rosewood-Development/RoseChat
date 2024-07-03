@@ -191,7 +191,8 @@ public class RoseChatChannel extends ConditionalChannel {
                 if (preParseMessageEvent.isCancelled())
                     return;
 
-                MessageTokenizerResults<BaseComponent[]> components = discordId == null ? message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
+                MessageTokenizerResults<BaseComponent[]> components = discordId == null ? message.parse(receiver, format)
+                        : message.parseMessageFromDiscord(receiver, format, discordId);
 
                 PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, receiver, direction, components);
                 Bukkit.getPluginManager().callEvent(postParseMessageEvent);
@@ -266,7 +267,7 @@ public class RoseChatChannel extends ConditionalChannel {
                     RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                         api.getBungeeManager()
                                 .sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), true,
-                                        ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormat())));
+                                        ComponentSerializer.toString(message.parseBungeeMessage(message.getSender(), this.getFormats().getMinecraft())));
                     });
                 } else {
                     api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), false, message.getPlayerInput());
@@ -275,13 +276,14 @@ public class RoseChatChannel extends ConditionalChannel {
         }
     }
 
-    private void send(RoseMessage message, MessageDirection direction, String format, String discordId, MessageRules messageRules) {
+    private void send(RoseMessage message, MessageDirection direction, String format, String discordId, MessageRules messageRules, boolean sendToDiscord) {
         // Send message to the player
         this.sendToPlayer(message, message.getSender(), direction, format, discordId);
 
         // Send message to Discord
         messageRules.ignoreMessageLogging();
-        this.sendToDiscord(message, direction);
+        if (sendToDiscord)
+            this.sendToDiscord(message, direction);
 
         // Send message to Bungee
         this.sendToBungee(message, direction);
@@ -298,8 +300,8 @@ public class RoseChatChannel extends ConditionalChannel {
 
             MessageTokenizerResults<BaseComponent[]> parsedComponents =
                     direction == MessageDirection.PLAYER_TO_SERVER ?
-                            message.parse(consoleReceiver, this.getFormat()) :
-                            message.parseMessageFromDiscord(consoleReceiver, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), discordId);
+                            message.parse(consoleReceiver, format) :
+                            message.parseMessageFromDiscord(consoleReceiver, this.getFormats().getDiscordToMinecraft(), discordId);
 
             PostParseMessageEvent postParseMessageEvent = new PostParseMessageEvent(message, consoleReceiver, direction, parsedComponents);
             Bukkit.getPluginManager().callEvent(postParseMessageEvent);
@@ -450,11 +452,11 @@ public class RoseChatChannel extends ConditionalChannel {
 
     @Override
     public void send(RosePlayer sender, String message) {
-        this.send(sender, message, this.getFormat());
+        this.send(sender, message, this.getFormats().getMinecraft(), true);
     }
 
     @Override
-    public void send(RosePlayer sender, String message, String format) {
+    public void send(RosePlayer sender, String message, String format, boolean sendToDiscord) {
         RoseMessage roseMessage = RoseMessage.forChannel(sender, this);
 
         // Create the rules for this message.
@@ -471,13 +473,13 @@ public class RoseChatChannel extends ConditionalChannel {
         roseMessage.setPlayerInput(outputs.getFilteredMessage());
 
         // Send the message to the members.
-        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, format, null, rules);
+        this.send(roseMessage, MessageDirection.PLAYER_TO_SERVER, format, null, rules, sendToDiscord);
     }
 
     @Override
     public void send(RoseMessage message, String discordId) {
         // Send the message from discord, with the correct format.
-        this.send(message, MessageDirection.DISCORD_TO_MINECRAFT, Setting.DISCORD_TO_MINECRAFT_FORMAT.getString(), discordId, new MessageRules());
+        this.send(message, MessageDirection.DISCORD_TO_MINECRAFT, this.getFormats().getDiscordToMinecraft(), discordId, new MessageRules(), false);
     }
 
     @Override
@@ -487,10 +489,10 @@ public class RoseChatChannel extends ConditionalChannel {
         roseMessage.setUUID(messageId);
 
         if (isJson) {
-            this.send(roseMessage, MessageDirection.SERVER_TO_SERVER_RAW, this.getFormat(), null, new MessageRules());
+            this.send(roseMessage, MessageDirection.SERVER_TO_SERVER_RAW, this.getFormats().getMinecraft(), null, new MessageRules(), true);
         } else {
             MessageRules rules = new MessageRules().applyAllFilters();
-            this.send(roseMessage, MessageDirection.SERVER_TO_SERVER, this.getFormat(), null, rules);
+            this.send(roseMessage, MessageDirection.SERVER_TO_SERVER, this.getFormats().getMinecraft(), null, rules, true);
         }
     }
 

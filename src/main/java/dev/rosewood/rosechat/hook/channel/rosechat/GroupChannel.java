@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
 import dev.rosewood.rosechat.api.event.group.GroupNameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.FormatGroup;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.PermissionArea;
@@ -40,7 +41,10 @@ public class GroupChannel extends Channel {
 
     @Override
     public void onLoad(String id, ConfigurationSection config) {
-        // No implementation
+        FormatGroup formats = new FormatGroup();
+        formats.add("minecraft", Setting.GROUP_FORMAT.getString());
+
+        this.setFormats(new FormatGroup());
     }
 
     @Override
@@ -72,7 +76,7 @@ public class GroupChannel extends Channel {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                receiver.send(roseMessage.parse(receiver, this.getFormat()).content());
+                receiver.send(roseMessage.parse(receiver, this.getFormats().getMinecraft()).content());
             });
         }
 
@@ -98,7 +102,7 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message, String format) {
+    public void send(RosePlayer sender, String message, String format, boolean sendToDiscord) {
         this.send(sender, message);
     }
 
@@ -154,11 +158,6 @@ public class GroupChannel extends Channel {
     @Override
     public boolean canJoinByCommand(RosePlayer player) {
         return Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean();
-    }
-
-    @Override
-    public String getFormat() {
-        return Setting.GROUP_FORMAT.getString();
     }
 
     @Override

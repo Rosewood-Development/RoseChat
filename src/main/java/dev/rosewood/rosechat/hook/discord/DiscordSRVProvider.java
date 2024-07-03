@@ -56,16 +56,16 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         PreParseDiscordMessageEvent preParseDiscordMessageEvent = new PreParseDiscordMessageEvent(roseMessage, textChannel);
         Bukkit.getPluginManager().callEvent(preParseDiscordMessageEvent);
-
         if (preParseDiscordMessageEvent.isCancelled())
             return;
 
         StringPlaceholders placeholders = DefaultPlaceholders.getFor(roseMessage.getSender(), roseMessage.getSender(), group).build();
-        DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholder();
+        String format = group.getFormats().getMinecraftToDiscord();
+        DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholders().get(format.substring(1, format.length() - 1));
         if (embedPlaceholder != null) {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
         } else {
-            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), Setting.MINECRAFT_TO_DISCORD_FORMAT.getString()).content();
+            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), group.getFormats().getMinecraftToDiscord()).content();
             if (text == null)
                 return;
 
@@ -226,9 +226,9 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 color,
                 thumbnailUrl == null ? null : new MessageEmbed.Thumbnail(thumbnailUrl, thumbnailUrl, thumbnailWidth, thumbnailHeight),
                 null,
-                new MessageEmbed.AuthorInfo(authorName, authorUrl, authorIconUrl, authorIconUrl),
+                authorName == null ? null : new MessageEmbed.AuthorInfo(authorName, authorUrl, authorIconUrl, authorIconUrl),
                 null,
-                new MessageEmbed.Footer(footerText, footerIconUrl, footerIconUrl),
+                footerText == null ? null : new MessageEmbed.Footer(footerText, footerIconUrl, footerIconUrl),
                 imageUrl == null ? null : new MessageEmbed.ImageInfo(imageUrl, imageUrl, imageWidth, imageHeight),
                 fields);
         channel.sendMessageEmbeds(messageEmbed).queue((message) -> {

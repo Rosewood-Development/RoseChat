@@ -25,12 +25,11 @@ public abstract class Channel {
     private boolean muted;
 
     // Settings
-    private String format;
+    private FormatGroup formats;
     private String discordChannel;
     private List<String> commands;
     private List<String> overrideCommands;
     private List<String> shoutCommands;
-    private String shoutFormat;
     private boolean sendBungeeMessagesToDiscord;
 
     public Channel(ChannelProvider provider) {
@@ -46,11 +45,12 @@ public abstract class Channel {
      */
     public void onLoad(String id, ConfigurationSection config) {
         this.id = id;
+
+        if (config.contains("formats"))
+            this.formats = FormatGroup.fromConfig(config.getConfigurationSection("formats"));
+
         if (config.contains("default") && config.getBoolean("default"))
             this.setDefault();
-
-        if (config.contains("format"))
-            this.setFormat(config.getString("format"));
 
         if (config.contains("discord"))
             this.setDiscordChannel(config.getString("discord"));
@@ -66,9 +66,6 @@ public abstract class Channel {
 
         if (config.contains("send-bungee-messages-to-discord"))
             this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
-
-        if (config.contains("shout-format"))
-            this.setShoutFormat(config.getString("shout-format"));
     }
 
     /**
@@ -144,7 +141,7 @@ public abstract class Channel {
      * @param message The message to be sent.
      * @param format The format of the message.
      */
-    public abstract void send(RosePlayer sender, String message, String format);
+    public abstract void send(RosePlayer sender, String message, String format, boolean sendToDiscord);
 
     /**
      * Called when a message is sent to the channel from Discord.
@@ -215,7 +212,6 @@ public abstract class Channel {
                 .add("members", this.getMemberCount())
                 .add("players", this.getMemberCount())
                 .add("id", this.getId())
-                .add("format", this.getFormat() == null ? nullValue : this.getFormat())
                 .add("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
     }
 
@@ -258,12 +254,12 @@ public abstract class Channel {
         this.muted = muted;
     }
 
-    public String getFormat() {
-        return this.format;
+    public FormatGroup getFormats() {
+        return this.formats;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
+    public void setFormats(FormatGroup formats) {
+        this.formats = formats;
     }
 
     public String getDiscordChannel() {
@@ -296,14 +292,6 @@ public abstract class Channel {
 
     public void setShoutCommands(List<String> shoutCommands) {
         this.shoutCommands = shoutCommands;
-    }
-
-    public String getShoutFormat() {
-        return this.shoutFormat;
-    }
-
-    public void setShoutFormat(String shoutFormat) {
-        this.shoutFormat = shoutFormat;
     }
 
     public boolean shouldSendBungeeMessagesToDiscord() {
