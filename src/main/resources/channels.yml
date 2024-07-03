@@ -15,6 +15,7 @@ global:
     discord-to-minecraft: '{from-discord}{discord-player}{separator}{message}'
     shout: '&8[&3SHOUT&8]&f {prefix}{player}{separator}{message}'
     broadcast: '&8[&cBroadcast&8]&f {message}'
+    join-message: "&eWelcome to the &bGlobal Channel&e!"
 
   # This sets the channel as the default channel, players will be placed into it when they first join the server.
   default: true

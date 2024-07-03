@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.command.command;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
@@ -60,7 +61,11 @@ public class ChannelCommand extends RoseChatCommand {
         if (!success)
             return;
 
-        player.sendLocaleMessage("command-channel-joined",
+        String joinMessage = channel.getFormats().get("join-message");
+        if (joinMessage != null)
+            player.send(RoseChatAPI.getInstance().parse(player, player, joinMessage));
+        else
+            player.sendLocaleMessage("command-channel-joined",
                 StringPlaceholders.of("id", channel.getId()));
     }
 

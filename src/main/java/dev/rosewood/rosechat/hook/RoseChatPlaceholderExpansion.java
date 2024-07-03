@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.hook;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -11,6 +12,7 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,6 +47,20 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
                 if (placeholder.equalsIgnoreCase("replacement_" + replacement.getId())) {
                     return replacement.getOutput().getText();
+                }
+            }
+        }
+
+        if (placeholder.startsWith("channel_")) {
+            for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
+                if (!placeholder.contains("_" + channel.getId() + "_"))
+                    continue;
+
+                StringPlaceholders info = channel.getInfoPlaceholders().build();
+                for (String infoKey : info.getPlaceholders().keySet()) {
+                    if (placeholder.endsWith("_" + infoKey)) {
+                        return info.getPlaceholders().get(infoKey);
+                    }
                 }
             }
         }

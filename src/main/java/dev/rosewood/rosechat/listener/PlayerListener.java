@@ -165,8 +165,13 @@ public class PlayerListener implements Listener {
                             return;
 
                         player.switchChannel(channel);
-                        player.sendLocaleMessage("command-channel-joined",
-                                StringPlaceholders.of("id", channel.getId()));
+
+                        String joinMessage = channel.getFormats().get("join-message");
+                        if (joinMessage != null)
+                            player.send(RoseChatAPI.getInstance().parse(player, player, joinMessage));
+                        else
+                            player.sendLocaleMessage("command-channel-joined",
+                                    StringPlaceholders.of("id", channel.getId()));
                     } else {
                         String message = input.substring(("/" + command + " ").length());
                         player.quickChat(channel, message);
