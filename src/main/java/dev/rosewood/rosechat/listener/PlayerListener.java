@@ -71,6 +71,8 @@ public class PlayerListener implements Listener {
                     player.switchChannel(channel);
                 }
             }
+
+            player.validateChatColor();
         });
     }
 
