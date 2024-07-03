@@ -34,7 +34,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = spigotHexToken.content().length();
             return (this.hasTokenPermission(params, "rosechat.color"))
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(spigotHexToken.color())), length)
-                    : new TokenizerResult(Token.text(spigotHexToken.content()), length);
+                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : spigotHexToken.content()), length);
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
@@ -46,7 +46,7 @@ public class ColorTokenizer extends Tokenizer {
 
             return canUseColors && hasColorPerm
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(legacyToken.color())), length)
-                    : new TokenizerResult(Token.text(legacyToken.content()), length);
+                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : legacyToken.content()), length);
         }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
@@ -54,7 +54,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = hexToken.content().length();
             return this.hasTokenPermission(params, "rosechat.hex")
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(hexToken.color())), length)
-                    : new TokenizerResult(Token.text(hexToken.content()), length);
+                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : hexToken.content()), length);
         }
 
         // Handle color codes that are already parsed

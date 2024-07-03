@@ -113,6 +113,8 @@ public class ConfigurationManager extends AbstractConfigurationManager {
         ADD_GROUP_CHANNELS_TO_CHANNEL_LIST("chat-settings.add-group-channels-to-channel-list", false,
                 "Should group channels be accessible using /channel instead of /gcm?",
                 "The can-join-group-channels setting will not take affect."),
+        REMOVE_COLOR_CODES("chat-settings.remove-color-codes", false,
+                "Should color codes be removed if a player attempts to send colours with no permission?"),
 
         DISCORD_SETTINGS("discord-settings", null, "Discord Settings", "Requires DiscordSRV"),
         USE_DISCORD("discord-settings.use-discord", true, "Should DiscordSRV support be enabled?"),
