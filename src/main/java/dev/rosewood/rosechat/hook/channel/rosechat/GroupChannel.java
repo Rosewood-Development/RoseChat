@@ -17,7 +17,6 @@ import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import java.util.Collections;
 import java.util.List;
@@ -32,19 +31,16 @@ public class GroupChannel extends Channel {
 
     public GroupChannel(String id) {
         super(null);
+
         this.id = id;
+
+        FormatGroup formats = new FormatGroup();
+        formats.add("minecraft", Setting.GROUP_FORMAT.getString());
+        this.setFormats(formats);
     }
 
     public void save() {
         RoseChat.getInstance().getManager(GroupManager.class).createOrUpdateGroupChat(this);
-    }
-
-    @Override
-    public void onLoad(String id, ConfigurationSection config) {
-        FormatGroup formats = new FormatGroup();
-        formats.add("minecraft", Setting.GROUP_FORMAT.getString());
-
-        this.setFormats(new FormatGroup());
     }
 
     @Override

@@ -35,6 +35,7 @@ import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
+import dev.rosewood.rosechat.nms.NMSAdapter;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -72,6 +73,12 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public void enable() {
+        if (!NMSAdapter.isValidVersion()) {
+            LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                    "&eThe [item] placeholder is not supported on this Minecraft version.");
+        }
+
         PluginManager pluginManager = Bukkit.getPluginManager();
         this.initHooks(pluginManager);
 
