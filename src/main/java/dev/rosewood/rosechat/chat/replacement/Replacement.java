@@ -24,6 +24,8 @@ public class Replacement {
 
     public void setInput(ReplacementInput input) {
         this.input = input;
+        if (input.getPermission() == null)
+            input.setPermission("rosechat.replacement." + this.id);
     }
 
     public ReplacementOutput getOutput() {

@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -37,7 +36,7 @@ public class InlineReplacementTokenizer extends Tokenizer {
             if (!input.startsWith(prefix))
                 continue;
 
-            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
                 return null;
 
             String outerRegex = "(?:" + Pattern.quote(prefix) + "(.*?)" + Pattern.quote(suffix) + ")"

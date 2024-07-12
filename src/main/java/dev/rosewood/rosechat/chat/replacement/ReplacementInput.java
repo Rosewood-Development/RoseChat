@@ -8,6 +8,7 @@ public class ReplacementInput {
     private String stop;
     private String inlinePrefix;
     private String inlineSuffix;
+    private String permission;
     private boolean isRegex;
     private boolean isContentRegex;
     private boolean isInlineRegex;
@@ -24,6 +25,7 @@ public class ReplacementInput {
         this.stop = input.stop;
         this.inlinePrefix = input.inlinePrefix;
         this.inlineSuffix = input.inlineSuffix;
+        this.permission = input.permission;
         this.isRegex = input.isRegex;
         this.isContentRegex = input.isContentRegex;
         this.isInlineRegex = input.isInlineRegex;
@@ -76,6 +78,14 @@ public class ReplacementInput {
 
     public void setInlineSuffix(String inlineSuffix) {
         this.inlineSuffix = inlineSuffix;
+    }
+
+    public String getPermission() {
+        return this.permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     public boolean isRegex() {

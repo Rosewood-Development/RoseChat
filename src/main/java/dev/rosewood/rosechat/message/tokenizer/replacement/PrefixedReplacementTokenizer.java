@@ -63,7 +63,7 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 }
             }
 
-            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
                 return null;
 
             if (suffix != null) {

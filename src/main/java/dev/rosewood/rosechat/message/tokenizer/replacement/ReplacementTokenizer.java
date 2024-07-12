@@ -34,7 +34,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     continue;
 
                 // Check permissions
-                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
                     return null;
 
                 String originalContent = matcher.group();
@@ -71,7 +71,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     continue;
 
                 // Check permissions
-                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + replacement.getId()))
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
                     return null;
 
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.
