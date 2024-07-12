@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.hook.channel.condition;
+package dev.rosewood.rosechat.hook.channel.rosechat.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;

@@ -60,12 +60,12 @@ public class DiscordSRVProvider implements DiscordChatProvider {
             return;
 
         StringPlaceholders placeholders = DefaultPlaceholders.getFor(roseMessage.getSender(), roseMessage.getSender(), group).build();
-        String format = group.getFormats().getMinecraftToDiscord();
+        String format = group.getSettings().getFormats().get("minecraft-to-discord");
         DiscordEmbedPlaceholder embedPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getDiscordEmbedPlaceholders().get(format.substring(1, format.length() - 1));
         if (embedPlaceholder != null) {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
         } else {
-            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), group.getFormats().getMinecraftToDiscord()).content();
+            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), group.getSettings().getFormats().get("minecraft-to-discord")).content();
             if (text == null)
                 return;
 

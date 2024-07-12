@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.command;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.ChannelArgumentHandler;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -58,7 +59,12 @@ public class BroadcastCommand extends RoseChatCommand {
 
     @RoseExecutable
     public void execute(CommandContext context, Channel channel, String message) {
-        channel.send(new RosePlayer(context.getSender()), message, channel.getFormats().getBroadcast(), false);
+        ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                .sender(new RosePlayer(context.getSender()))
+                .message(message)
+                .format(channel.getSettings().getFormats().get("broadcast"))
+                .build();
+        channel.send(options);
     }
 
 }

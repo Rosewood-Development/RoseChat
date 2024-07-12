@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
@@ -51,10 +52,10 @@ public class ChatListener implements Listener {
 
         // Check if the message is using a shout command and send the message if they are.
         for (Channel channel : this.api.getChannels()) {
-            if (channel.getShoutCommands().isEmpty())
+            if (channel.getSettings().getShoutCommands().isEmpty())
                 continue;
 
-            for (String command : channel.getShoutCommands()) {
+            for (String command : channel.getSettings().getShoutCommands()) {
                 if (!message.startsWith(command))
                     continue;
 
@@ -63,10 +64,16 @@ public class ChatListener implements Listener {
                     return;
                 }
 
-                String format = channel.getFormats().getShout() == null ?
-                        channel.getFormats().getMinecraft() : channel.getFormats().getShout();
+                String format = channel.getSettings().getFormats().get("shout") == null ?
+                        channel.getSettings().getFormats().get("chat") : channel.getSettings().getFormats().get("shout");
 
-                channel.send(player, message.substring(command.length()).trim(), format, true);
+                ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                        .sender(player)
+                        .message(message.substring(command.length()).trim())
+                        .format(format)
+                        .sendToDiscord(true)
+                        .build();
+                channel.send(options);
 
                 player.updateDisplayName();
                 return;
@@ -89,7 +96,11 @@ public class ChatListener implements Listener {
             return;
         }
 
-        channel.send(player, message);
+        ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                .sender(player)
+                .message(message)
+                .build();
+        channel.send(options);
         player.updateDisplayName();
     }
 

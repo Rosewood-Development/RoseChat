@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.database.migrations._1_Create_Tables_Data;
 import dev.rosewood.rosechat.database.migrations._2_Create_Table_Hidden_Channels;
 import dev.rosewood.rosechat.database.migrations._3_Add_Data_Is_Group_Chat_Column;
 import dev.rosewood.rosechat.database.migrations._4_Add_Data_Stripped_Name;
+import dev.rosewood.rosechat.database.migrations._5_Rename_Table_Muted_Channels;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.database.DataMigration;
@@ -36,7 +37,8 @@ public class DataManager extends AbstractDataManager {
                 _1_Create_Tables_Data.class,
                 _2_Create_Table_Hidden_Channels.class,
                 _3_Add_Data_Is_Group_Chat_Column.class,
-                _4_Add_Data_Stripped_Name.class
+                _4_Add_Data_Stripped_Name.class,
+                _5_Rename_Table_Muted_Channels.class
         );
     }
 
@@ -202,39 +204,34 @@ public class DataManager extends AbstractDataManager {
         });
     }
 
-    public List<Channel> getMutedChannels() {
-        List<Channel> mutedChannels = new ArrayList<>();
+    public void loadChannelSettings() {
         this.databaseConnector.connect(connection -> {
-            String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "muted_channels";
+            String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "channel_settings";
             try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                 ResultSet result = statement.executeQuery();
                 while (result.next()) {
                     Channel channel = this.channelManager.getChannel(result.getString("id"));
-                    channel.setMuted(true);
-                    mutedChannels.add(channel);
+                    boolean muted = result.getBoolean("muted");
+                    int slowmode = result.getInt("slowmode");
+
+                    channel.setMuted(muted);
+                    channel.setSlowmodeSpeed(slowmode);
+
+                    if (channel.getSlowmodeSpeed() != 0)
+                        channel.startSlowmode();
                 }
             }
         });
-
-        return mutedChannels;
     }
 
-    public void addMutedChannel(Channel channel) {
+    public void saveChannelSettings(Channel channel) {
         this.databaseConnector.connect(connection -> {
-            String insertQuery = "INSERT INTO " + this.getTablePrefix() + "muted_channels (id) " +
-                    "VALUES(?)";
+            String insertQuery = "REPLACE INTO " + this.getTablePrefix() + "channel_settings (id, muted, slowmode) " +
+                    "VALUES(?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                 statement.setString(1, channel.getId());
-                statement.executeUpdate();
-            }
-        });
-    }
-
-    public void removeMutedChannel(Channel channel) {
-        this.databaseConnector.connect(connection -> {
-            String deleteQuery = "DELETE FROM " + this.getTablePrefix() + "muted_channels WHERE id = ?";
-            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
-                statement.setString(1, channel.getId());
+                statement.setBoolean(2, channel.isMuted());
+                statement.setInt(3, channel.getSlowmodeSpeed());
                 statement.executeUpdate();
             }
         });

@@ -10,7 +10,7 @@ global:
   # The minecraft format is used when a chat message is sent.
   # Discord formats require DiscordSRV.
   formats:
-    minecraft: '{prefix}{player}{separator}{message}'
+    chat: '{prefix}{player}{separator}{message}'
     minecraft-to-discord: '{discord}'
     discord-to-minecraft: '{from-discord}{discord-player}{separator}{message}'
     shout: '&8[&3SHOUT&8]&f {prefix}{player}{separator}{message}'
@@ -40,7 +40,7 @@ global:
 # Staff Channel - /c staff or /staff
 staff:
   formats:
-    minecraft: '{channel-prefix}{player}{separator}{message}'
+    chat: '{channel-prefix}{player}{separator}{message}'
 
   visible-anywhere: true
 
@@ -53,7 +53,7 @@ staff:
 # Local Channel - /c local
 local:
   formats:
-    minecraft: '{channel-prefix}{player}{separator}{message}'
+    chat: '{channel-prefix}{player}{separator}{message}'
 
   # The radius is the distance, in blocks, between players that can read the messages that are sent.
   radius: 200

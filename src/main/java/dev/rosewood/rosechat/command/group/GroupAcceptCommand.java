@@ -69,12 +69,11 @@ public class GroupAcceptCommand extends RoseChatCommand {
             return;
         }
 
-        data.getGroupInvites().remove(group);
-
-        GroupJoinEvent groupJoinEvent = new GroupJoinEvent(group, player.asPlayer());
-        Bukkit.getPluginManager().callEvent(groupJoinEvent);
-        if (groupJoinEvent.isCancelled())
+        boolean success = group.join(player.getUUID());
+        if (!success)
             return;
+
+        data.getGroupInvites().remove(group);
 
         String name = player.getName();
 
@@ -94,7 +93,7 @@ public class GroupAcceptCommand extends RoseChatCommand {
                         "player", name
                 ));
 
-        group.join(player.getUUID());
+
     }
 
 }

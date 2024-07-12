@@ -24,7 +24,8 @@ public class BaseChatCommand extends BaseRoseCommand {
                                 new ChatMoveCommand(this.rosePlugin),
                                 new ChatMuteCommand(this.rosePlugin),
                                 new ChatSudoCommand(this.rosePlugin),
-                                new ChatToggleCommand(this.rosePlugin)
+                                new ChatToggleCommand(this.rosePlugin),
+                                new ChatSlowmodeCommand(this.rosePlugin)
                         ))
                 .build();
     }

@@ -93,8 +93,10 @@ public class PlayerListener implements Listener {
         event.getCommands().remove("rosechat:delmsg");
 
         for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
-            if (channel.getCommands().isEmpty()) continue;
-            for (String command : channel.getCommands()) {
+            if (channel.getSettings().getCommands().isEmpty())
+                continue;
+
+            for (String command : channel.getSettings().getCommands()) {
                 event.getCommands().remove(command + ":" + command);
                 if (!event.getPlayer().hasPermission("rosechat.channel." + channel.getId()))
                     event.getCommands().remove(command);
@@ -145,10 +147,10 @@ public class PlayerListener implements Listener {
         RosePlayer player = new RosePlayer(event.getPlayer());
 
         for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
-            if (channel.getOverrideCommands().isEmpty())
+            if (channel.getSettings().getOverrideCommands().isEmpty())
                 continue;
 
-            for (String command : channel.getOverrideCommands()) {
+            for (String command : channel.getSettings().getOverrideCommands()) {
                 if (input.equalsIgnoreCase("/" + command) || input.toLowerCase().startsWith("/" + command.toLowerCase() + " ")) {
                     if (!channel.canJoinByCommand(player)) {
                         player.sendLocaleMessage("command-channel-not-joinable");
@@ -166,7 +168,7 @@ public class PlayerListener implements Listener {
 
                         player.switchChannel(channel);
 
-                        String joinMessage = channel.getFormats().get("join-message");
+                        String joinMessage = channel.getSettings().getFormats().get("join-message");
                         if (joinMessage != null)
                             player.send(RoseChatAPI.getInstance().parse(player, player, joinMessage));
                         else

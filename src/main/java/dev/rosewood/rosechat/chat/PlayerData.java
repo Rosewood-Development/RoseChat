@@ -3,9 +3,10 @@ package dev.rosewood.rosechat.chat;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.log.PlayerMessageLog;
+import dev.rosewood.rosechat.chat.task.MuteTask;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
-import dev.rosewood.rosechat.message.MessageLog;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -18,7 +19,7 @@ public class PlayerData {
     private final RoseChatAPI api;
 
     private final UUID uuid;
-    private final MessageLog messageLog;
+    private final PlayerMessageLog messageLog;
     private String replyTo;
     private boolean messageSpy;
     private boolean channelSpy;
@@ -48,7 +49,7 @@ public class PlayerData {
         this.api = RoseChatAPI.getInstance();
 
         this.uuid = uuid;
-        this.messageLog = new MessageLog(uuid);
+        this.messageLog = new PlayerMessageLog(uuid);
         this.canBeMessaged = true;
         this.tagSounds = true;
         this.messageSounds = true;
@@ -77,7 +78,7 @@ public class PlayerData {
     /**
      * @return The message log.
      */
-    public MessageLog getMessageLog() {
+    public PlayerMessageLog getMessageLog() {
         return this.messageLog;
     }
 

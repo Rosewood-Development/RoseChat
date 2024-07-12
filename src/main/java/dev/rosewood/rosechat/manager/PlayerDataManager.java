@@ -19,14 +19,12 @@ public class PlayerDataManager extends Manager {
 
     private final DataManager dataManager;
     private final Map<UUID, PlayerData> playerData;
-    private final List<Channel> mutedChannels;
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         
         this.playerData = new HashMap<>();
         this.dataManager = rosePlugin.getManager(DataManager.class);
-        this.mutedChannels = new ArrayList<>();
 
         // Need to make sure this always gets loaded before the PlayerDataManager
         rosePlugin.getManager(ChannelManager.class);
@@ -49,14 +47,14 @@ public class PlayerDataManager extends Manager {
                     data.save();
                 }
             }));
-            this.getMutedChannels((channels) -> {});
+
+            this.loadChannelSettings();
         }, 5L);
     }
 
     @Override
     public void disable() {
         this.playerData.clear();
-        this.mutedChannels.clear();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
@@ -125,27 +123,12 @@ public class PlayerDataManager extends Manager {
         });
     }
 
-    public void getMutedChannels(Consumer<List<Channel>> callback) {
-        if (!this.mutedChannels.isEmpty()) {
-            callback.accept(this.mutedChannels);
-            return;
-        }
-
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
-            List<Channel> mutedChannels = this.dataManager.getMutedChannels();
-            this.mutedChannels.addAll(mutedChannels);
-            callback.accept(mutedChannels);
-        });
+    public void loadChannelSettings() {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, this.dataManager::loadChannelSettings);
     }
 
-    public void addMutedChannel(Channel channel) {
-        this.mutedChannels.add(channel);
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.addMutedChannel(channel));
-    }
-
-    public void removeMutedChannel(Channel channel) {
-        this.mutedChannels.remove(channel);
-        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.removeMutedChannel(channel));
+    public void saveChannelSettings(Channel channel) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> this.dataManager.saveChannelSettings(channel));
     }
 
     public Map<UUID, PlayerData> getPlayerData() {

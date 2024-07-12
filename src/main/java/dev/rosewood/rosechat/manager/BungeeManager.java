@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -170,7 +171,13 @@ public class BungeeManager extends Manager {
 
         // Must be done asynchronously for LuckPerms & Vault.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            channel.send(sender, message, messageId, isJson);
+            ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                    .sender(sender)
+                    .message(message)
+                    .messageId(messageId)
+                    .isJson(isJson)
+                    .build();
+            channel.send(options);
         });
     }
 

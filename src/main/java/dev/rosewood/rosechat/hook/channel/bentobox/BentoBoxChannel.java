@@ -51,16 +51,14 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
 
     @EventHandler
     public void onIslandReset(IslandPreclearEvent event) {
-        for (UUID uuid : event.getIsland().getMemberSet()) {
+        for (UUID uuid : event.getIsland().getMemberSet())
             this.onTeamLeaveGeneric(uuid);
-        }
     }
 
     @EventHandler
     public void onTeamDisband(TeamDeleteEvent event) {
-        for (UUID uuid : event.getIsland().getMemberSet()) {
+        for (UUID uuid : event.getIsland().getMemberSet())
             this.onTeamLeaveGeneric(uuid);
-        }
     }
 
     @EventHandler
@@ -85,10 +83,9 @@ public class BentoBoxChannel extends RoseChatChannel implements Listener {
             if (currentChannel == this)
                 return;
 
-            if (rosePlayer.switchChannel(this)) {
+            if (rosePlayer.switchChannel(this))
                 RoseChatAPI.getInstance().getLocaleManager().sendMessage(player,
                         "command-channel-joined", StringPlaceholders.of("id", this.getId()));
-            }
         }
     }
 

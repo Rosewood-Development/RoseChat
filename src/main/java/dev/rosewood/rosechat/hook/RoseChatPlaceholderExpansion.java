@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -65,8 +66,22 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             }
         }
 
-        if (player == null)
-            return null;
+        if (player == null) {
+            // Grab the last message without a player if no player was provided.
+            if (placeholder.startsWith("last_message_")) {
+                String channelId = placeholder.substring("last_message_".length());
+                Channel channel = RoseChatAPI.getInstance().getChannelById(channelId);
+                if (channel == null)
+                    return null;
+
+                ChannelMessageOptions options = channel.getMessageLog().getAndRemoveNextMessage();
+                if (options == null)
+                    return null;
+
+                return options.message();
+            } else
+                return null;
+        }
 
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
         if (playerData == null)
@@ -80,6 +95,17 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
                 return null;
 
             return HexUtils.colorify(rcPlaceholder.get("text").parseToString(sender, sender, DefaultPlaceholders.getFor(sender, sender).build()));
+        } else if (placeholder.startsWith("last_message_")) {
+            String channelId = placeholder.substring("last_message_".length());
+            Channel channel = RoseChatAPI.getInstance().getChannelById(channelId);
+            if (channel == null)
+                return null;
+
+            ChannelMessageOptions options = channel.getMessageLog().getAndRemoveNextMessage(player);
+            if (options == null)
+                return null;
+
+            return options.message();
         }
 
         return switch (placeholder) {

@@ -52,11 +52,11 @@ public class ChatMuteCommand extends RoseChatCommand {
         if (channel.isMuted()) {
             player.sendLocaleMessage("command-chat-mute-muted",
                     StringPlaceholders.of("channel", channel.getId()));
-            this.getAPI().getPlayerDataManager().addMutedChannel(channel);
+            this.getAPI().getPlayerDataManager().saveChannelSettings(channel);
         } else {
             player.sendLocaleMessage("command-chat-mute-unmuted",
                     StringPlaceholders.of("channel", channel.getId()));
-            this.getAPI().getPlayerDataManager().removeMutedChannel(channel);
+            this.getAPI().getPlayerDataManager().saveChannelSettings(channel);
         }
     }
 

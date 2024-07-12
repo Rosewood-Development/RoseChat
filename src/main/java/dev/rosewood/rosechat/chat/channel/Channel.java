@@ -1,17 +1,17 @@
 package dev.rosewood.rosechat.chat.channel;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.log.ChannelMessageLog;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.task.SlowmodeTask;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
-import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,25 +19,19 @@ import java.util.UUID;
 public abstract class Channel {
 
     private final ChannelProvider provider;
-    protected String id;
     protected final List<UUID> members;
-    private boolean defaultChannel;
-    private boolean muted;
-
-    // Settings
-    private FormatGroup formats;
-    private String discordChannel;
-    private List<String> commands;
-    private List<String> overrideCommands;
-    private List<String> shoutCommands;
-    private boolean sendBungeeMessagesToDiscord;
+    protected final ChannelMessageLog messageLog;
+    protected String id;
+    protected ChannelSettings settings;
+    protected SlowmodeTask slowmodeTask;
+    private boolean isDefault;
+    private boolean isMuted;
+    private int slowmodeSpeed;
 
     public Channel(ChannelProvider provider) {
         this.members = new ArrayList<>();
         this.provider = provider;
-        this.commands = new ArrayList<>();
-        this.overrideCommands = new ArrayList<>();
-        this.shoutCommands = new ArrayList<>();
+        this.messageLog = new ChannelMessageLog();
     }
 
     /**
@@ -46,26 +40,7 @@ public abstract class Channel {
     public void onLoad(String id, ConfigurationSection config) {
         this.id = id;
 
-        if (config.contains("formats"))
-            this.formats = FormatGroup.fromConfig(config.getConfigurationSection("formats"));
-
-        if (config.contains("default") && config.getBoolean("default"))
-            this.setDefault();
-
-        if (config.contains("discord"))
-            this.setDiscordChannel(config.getString("discord"));
-
-        if (config.contains("commands"))
-            this.setCommands(config.getStringList("commands"));
-
-        if (config.contains("override-commands"))
-            this.setOverrideCommands(config.getStringList("override-commands"));
-
-        if (config.contains("shout-commands"))
-            this.setShoutCommands(config.getStringList("shout-commands"));
-
-        if (config.contains("send-bungee-messages-to-discord"))
-            this.setShouldSendBungeeMessagesToDiscord(config.getBoolean("send-bungee-messages-to-discord"));
+        this.settings = ChannelSettings.fromConfig(config);
     }
 
     /**
@@ -129,39 +104,112 @@ public abstract class Channel {
     }
 
     /**
-     * Called when a message is sent to the channel.
-     * @param sender The {@link RosePlayer} who is sending the message.
-     * @param message The message to be sent.
+     * Sends a message to the channel.
+     * This automatically finds out who should receive the message and sends it to them.
+     * @param options The {@link ChannelMessageOptions} to use when sending the message.
      */
-    public abstract void send(RosePlayer sender, String message);
+    public abstract void send(ChannelMessageOptions options);
 
     /**
-     * Called when a message is sent to the channel.
-     * @param sender The {@link RosePlayer} who is sending the message.
-     * @param message The message to be sent.
-     * @param format The format of the message.
+     * Applies the standard rules to the {@link RoseMessage} and blocks the message if rules were broken.
+     * @param message The {@link RoseMessage} to apply rules to.
+     * @param input The input string to check.
+     * @return {@link MessageRules} applied for the message, or null if blocked.
      */
-    public abstract void send(RosePlayer sender, String message, String format, boolean sendToDiscord);
+    protected MessageRules applyRules(RoseMessage message, String input) {
+        MessageRules rules = new MessageRules().applyAllFilters();
+        MessageRules.RuleOutputs outputs = rules.apply(message, input);
 
-    /**
-     * Called when a message is sent to the channel from Discord.
-     * @param message The {@link RoseMessage} to be sent.
-     * @param discordId The ID of the message sent in Discord.
-     */
-    public void send(RoseMessage message, String discordId) {
-        // No default implementation
+        if (outputs.isBlocked()) {
+            if (outputs.getWarning() != null)
+                outputs.getWarning().send(message.getSender());
+            return null;
+        }
+
+        message.setPlayerInput(outputs.getFilteredMessage());
+        return rules;
     }
 
     /**
-     * Called when a message is sent from Bungee.
-     * @param sender The {@link RosePlayer} who is sending the message.
-     * @param message The message to be sent.
-     * @param messageId The {@link UUID} of the message sent from the other server.
-     * @param isJson True if the message contains a json string.
-     *               This is typically only used when keep-format-over-bungee is enabled.
+     * Called when a player uses a command to join the channel.
+     * @param player The {@link RosePlayer} using the command.
+     * @return True, if the player can join by using the command.
      */
-    public void send(RosePlayer sender, String message, UUID messageId, boolean isJson) {
-        // No default implementation
+    public abstract boolean canJoinByCommand(RosePlayer player);
+
+    /**
+     * @return A {@link StringPlaceholders.Builder} containing values to be shown in the /chat info command.
+     */
+    public StringPlaceholders.Builder getInfoPlaceholders() {
+        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
+        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
+        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
+        String nullValue = localeManager.getLocaleMessage("command-chat-info-none");
+
+        return this.settings.toPlaceholders(nullValue)
+                .add("default", this.isDefault ? trueValue : falseValue)
+                .add("members", this.getMemberCount())
+                .add("players", this.getMemberCount())
+                .add("servers", this.getServers().isEmpty() ? nullValue : this.getServers().toString())
+                .add("id", this.getId())
+                .add("muted", this.isMuted)
+                .add("slowmode", this.slowmodeTask == null ? falseValue : this.slowmodeSpeed);
+    }
+
+    /**
+     * Checks if a message can be received by a player.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param receiver The {@link RosePlayer} to receive the message.
+     * @return True if the receiver can receive the message.
+     */
+    public boolean canPlayerReceiveMessage(RosePlayer sender, RosePlayer receiver) {
+        if (sender.getUUID() != null && receiver.getUUID() != null)
+            if (sender.getUUID().equals(receiver.getUUID()))
+                return true;
+
+        PlayerData data = receiver.getPlayerData();
+        if (data == null)
+            return true;
+
+        if (!receiver.hasPermission("rosechat.channel." + this.getId()))
+            return false;
+
+        if (data.isChannelHidden(this.getId()))
+            return false;
+
+        if (sender.getUUID() != null)
+            return !data.getIgnoringPlayers().contains(sender.getUUID());
+
+        return true;
+    }
+
+    public void startSlowmode() {
+        this.slowmodeTask = new SlowmodeTask(this, this.slowmodeSpeed);
+    }
+
+    public void stopSlowmode(boolean clear) {
+        if (this.slowmodeTask != null) {
+            this.slowmodeTask.stop();
+            this.slowmodeTask = null;
+
+            if (clear)
+                this.messageLog.getMessages().clear();
+        }
+    }
+
+    /**
+     * Handles slow mode for a message.
+     * @param options The {@link ChannelMessageOptions} containing message information.
+     * @return True if the message has been handled and slow mode is enabled.
+     */
+    protected boolean handleSlowmode(ChannelMessageOptions options) {
+        if (this.slowmodeTask != null && !options.bypassSlowmode()
+                && !options.sender().hasPermission("rosechat.slowmode.bypass." + this.getId())) {
+            this.messageLog.addMessage(options);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -174,6 +222,13 @@ public abstract class Channel {
     public abstract List<UUID> getMembers();
 
     /**
+     * @return The amount of members in the channel, this is not always the amount of {@link Channel#getMembers()}.
+     */
+    public int getMemberCount() {
+        return this.members.size();
+    }
+
+    /**
      * @return The id of the channel.
      */
     public abstract String getId();
@@ -183,123 +238,40 @@ public abstract class Channel {
      */
     public abstract List<String> getServers();
 
-    /**
-     * Called when a player uses a command to join the channel.
-     * @param player The {@link RosePlayer} using the command.
-     * @return True, if the player can join by using the command.
-     */
-    public abstract boolean canJoinByCommand(RosePlayer player);
-
-    /**
-     * @return The amount of members in the channel.
-     */
-    public int getMemberCount() {
-        return this.members.size();
+    public boolean isMuted() {
+        return this.isMuted;
     }
 
-    /**
-     * @return A {@link StringPlaceholders.Builder} containing values to be shown in the /chat info command.
-     */
-    public StringPlaceholders.Builder getInfoPlaceholders() {
-        LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-        String trueValue = localeManager.getLocaleMessage("command-chat-info-true");
-        String falseValue = localeManager.getLocaleMessage("command-chat-info-false");
-        String nullValue = localeManager.getLocaleMessage("command-chat-info-none");
+    public void setMuted(boolean muted) {
+        this.isMuted = muted;
+    }
 
-        return StringPlaceholders.builder()
-                .add("default", this.isDefaultChannel() ? trueValue : falseValue)
-                .add("muted", this.isMuted() ? trueValue : falseValue)
-                .add("members", this.getMemberCount())
-                .add("players", this.getMemberCount())
-                .add("id", this.getId())
-                .add("commands", this.commands.isEmpty() ? nullValue : this.getCommands().toString());
+    public int getSlowmodeSpeed() {
+        return this.slowmodeSpeed;
+    }
+
+    public void setSlowmodeSpeed(int slowmodeSpeed) {
+        this.slowmodeSpeed = slowmodeSpeed;
     }
 
     public ChannelProvider getProvider() {
         return this.provider;
     }
 
-    public void send(String message) {
-        // No default implementation.
+    public ChannelMessageLog getMessageLog() {
+        return this.messageLog;
     }
 
-    /**
-     * Checks if a message can be received by a player.
-     * @param receiver The {@link Player} to receive the message.
-     * @param data The {@link PlayerData} of the receiver.
-     * @param senderUUID The {@link UUID} of the player sending the message.
-     * @return True if the receiver can receive the message.
-     */
-    public boolean canPlayerReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
-        return (data != null
-                && !data.getIgnoringPlayers().contains(senderUUID)
-                && receiver.hasPermission("rosechat.channel." + this.getId())
-                && (!data.isChannelHidden(this.getId()) || senderUUID == null || data.getUUID().equals(senderUUID)));
+    public ChannelSettings getSettings() {
+        return this.settings;
     }
 
-    public boolean isDefaultChannel() {
-        return this.defaultChannel;
+    public boolean isDefault() {
+        return isDefault;
     }
 
-    public void setDefault() {
-        RoseChat.getInstance().getManager(ChannelManager.class).setDefaultChannel(this);
-        this.defaultChannel = true;
-    }
-
-    public boolean isMuted() {
-        return this.muted;
-    }
-
-    public void setMuted(boolean muted) {
-        this.muted = muted;
-    }
-
-    public FormatGroup getFormats() {
-        return this.formats;
-    }
-
-    public void setFormats(FormatGroup formats) {
-        this.formats = formats;
-    }
-
-    public String getDiscordChannel() {
-        return this.discordChannel;
-    }
-
-    public void setDiscordChannel(String discordChannel) {
-        this.discordChannel = discordChannel;
-    }
-
-    public List<String> getCommands() {
-        return this.commands;
-    }
-
-    public void setCommands(List<String> commands) {
-        this.commands = commands;
-    }
-
-    public List<String> getOverrideCommands() {
-        return this.overrideCommands;
-    }
-
-    public void setOverrideCommands(List<String> overrideCommands) {
-        this.overrideCommands = overrideCommands;
-    }
-
-    public List<String> getShoutCommands() {
-        return this.shoutCommands;
-    }
-
-    public void setShoutCommands(List<String> shoutCommands) {
-        this.shoutCommands = shoutCommands;
-    }
-
-    public boolean shouldSendBungeeMessagesToDiscord() {
-        return this.sendBungeeMessagesToDiscord;
-    }
-
-    public void setShouldSendBungeeMessagesToDiscord(boolean sendBungeeMessagesToDiscord) {
-        this.sendBungeeMessagesToDiscord = sendBungeeMessagesToDiscord;
+    public void setDefault(boolean aDefault) {
+        this.isDefault = aDefault;
     }
 
 }

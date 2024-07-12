@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -120,10 +121,10 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
             return;
 
         for (Channel channel : this.api.getChannels()) {
-            if (channel.getDiscordChannel() == null)
+            if (channel.getSettings().getDiscord() == null)
                 continue;
 
-            if (!channel.getDiscordChannel().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel)))
+            if (!channel.getSettings().getDiscord().equals(this.discord.getDestinationGameChannelNameForTextChannel(discordChannel)))
                 continue;
 
             if (channel.isMuted())
@@ -238,7 +239,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                             messageWrapper.setUUID(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
-                                    channel.getFormats().getDiscordToMinecraft(), message.getId()).content();
+                                    channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).content();
                             components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
                             deletableMessage.setJson(ComponentSerializer.toString(components));
 
@@ -260,7 +261,15 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                     if (consoleComponents != null)
                         Bukkit.getConsoleSender().spigot().sendMessage(consoleComponents);
                 } else {
-                    channel.send(messageWrapper, message.getId());
+                    String discordFormat = channel.getSettings().getFormats().get("discord-to-minecraft");
+                    String format = discordFormat != null ? discordFormat : channel.getSettings().getFormats().get("chat");
+
+                    ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                            .wrapper(messageWrapper)
+                            .discordId(message.getId())
+                            .format(format)
+                            .build();
+                    channel.send(options);
                 }
             }
         }

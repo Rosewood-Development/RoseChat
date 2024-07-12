@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.manager;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.chat.channel.FormatGroup;
 import dev.rosewood.rosechat.command.command.CustomChannelCommand;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
@@ -56,7 +55,8 @@ public class ChannelManager extends Manager {
             this.generateChannels();
             if (this.channelProviders.containsKey("worldguard")) {
                 long interval = Setting.WORLDGUARD_CHECK_INTERVAL.getLong();
-                if (interval != 0) this.worldGuardTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.rosePlugin,
+                if (interval != 0)
+                    this.worldGuardTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.rosePlugin,
                         this::updatePlayerRegions, 0, interval);
             }
         }, 0L);
@@ -83,7 +83,7 @@ public class ChannelManager extends Manager {
                 for (Class<? extends Channel> channelClass : channelProvider.getChannels()) {
                     Channel channel = channelClass.getDeclaredConstructor(ChannelProvider.class).newInstance(channelProvider);
                     channel.onLoad();
-                    if (channel.isDefaultChannel())
+                    if (channel.getSettings().isDefault())
                         this.defaultChannel = channel;
 
                     this.channels.put(channel.getId(), channel);
@@ -128,11 +128,8 @@ public class ChannelManager extends Manager {
 
         // If a channel does not have a format, set the format to the same as the default channel.
         for (Channel channel : this.channels.values()) {
-            if (channel.getFormats() == null)
-                channel.setFormats(new FormatGroup());
-
-            if (channel.getFormats().getMinecraft() == null)
-                channel.getFormats().add("minecraft", this.defaultChannel.getFormats().getMinecraft());
+            if (!channel.getSettings().getFormats().containsKey("chat"))
+                channel.getSettings().getFormats().put("chat", this.defaultChannel.getSettings().getFormats().get("chat"));
 
             if (!loadedChannels.containsKey(channel.getProvider().getSupportedPlugin()))
                 loadedChannels.put(channel.getProvider().getSupportedPlugin(), new ArrayList<>());
@@ -161,7 +158,7 @@ public class ChannelManager extends Manager {
             try {
                 Channel channel = base.getDeclaredConstructor(ChannelProvider.class).newInstance(provider);
                 channel.onLoad(id, this.channelsConfig.getConfigurationSection(id));
-                if (channel.isDefaultChannel())
+                if (channel.getSettings().isDefault())
                     this.defaultChannel = channel;
 
                 this.channels.put(id, channel);

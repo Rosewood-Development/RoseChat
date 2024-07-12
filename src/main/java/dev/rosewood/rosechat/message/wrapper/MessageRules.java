@@ -112,7 +112,7 @@ public class MessageRules {
     }
 
     private void filterSpam(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.SPAM_CHECKING_ENABLED.getBoolean())
+        if (!Setting.SPAM_CHECKING_ENABLED.getBoolean() || this.ignoreMessageLogging)
             return;
 
         if (message.getSender().hasPermission("rosechat.spam." + message.getLocationPermission())

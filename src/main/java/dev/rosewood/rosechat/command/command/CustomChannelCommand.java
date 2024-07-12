@@ -22,7 +22,7 @@ public class CustomChannelCommand extends Command {
         RoseChatAPI api = RoseChatAPI.getInstance();
 
         for (Channel channel : api.getChannels()) {
-            if (!channel.getCommands().contains(label.toLowerCase()))
+            if (!channel.getSettings().getCommands().contains(label.toLowerCase()))
                 continue;
 
             if (!player.hasPermission("rosechat.channel." + channel.getId())) {

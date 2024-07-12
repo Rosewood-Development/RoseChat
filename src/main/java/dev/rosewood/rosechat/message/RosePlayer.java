@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
@@ -352,7 +353,11 @@ public class RosePlayer {
      */
     public void quickChat(Channel channel, String message) {
         if (!this.isPlayer()) {
-            channel.send(this, message);
+            ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                    .sender(this)
+                    .message(message)
+                    .build();
+            channel.send(options);
             return;
         }
 

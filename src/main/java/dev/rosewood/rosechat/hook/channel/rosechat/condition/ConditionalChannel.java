@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.hook.channel.condition;
+package dev.rosewood.rosechat.hook.channel.rosechat.condition;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;

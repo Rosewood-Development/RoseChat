@@ -192,6 +192,11 @@ command-chat-toggle-description: "Toggles seeing a channel"
 command-chat-toggle-on: "&eYou will now see the &b%channel% &echannel."
 command-chat-toggle-off: "&eYou will no longer see the &b%channel% &echannel."
 
+# Chat Slowmode Command
+command-chat-slowmode-description: "Enables slowmode for a channel"
+command-chat-slowmode-on: "&eA &b%speed%s &eslow mode has been enabled in &b%channel%&e."
+command-chat-slowmode-off: "&eSlow mode has been disabled in &b%channel%&e."
+
 # Generic Group Chat Messages
 gc-limit: "&cYou cannot join any more group chats!"
 gc-no-invites: "&cYou have no group invites :("

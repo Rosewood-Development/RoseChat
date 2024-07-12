@@ -1,24 +1,26 @@
-package dev.rosewood.rosechat.message;
+package dev.rosewood.rosechat.chat.log;
 
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.message.DeletableMessage;
+import dev.rosewood.rosechat.message.MessageUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class MessageLog {
+public class PlayerMessageLog extends ConsoleMessageLog {
 
     private UUID owner;
-    private List<String> messages;
     private final List<DeletableMessage> deletableMessages;
     private int cleanupAmount;
 
-    public MessageLog(UUID sender) {
+    public PlayerMessageLog(UUID sender) {
+        super();
+
         this.owner = sender;
-        this.messages = new ArrayList<>();
         this.deletableMessages = Collections.synchronizedList(new LinkedList<>());
     }
 
@@ -29,7 +31,7 @@ public class MessageLog {
     public boolean addMessageWithSpamCheck(String messageToAdd) {
         // Refresh the cleanup amount, as it can be changed during a reload.
         this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
-        this.messages.add(messageToAdd);
+        this.addMessage(messageToAdd);
 
         int similarMessages = 0;
 
@@ -52,24 +54,12 @@ public class MessageLog {
         return false;
     }
 
-    public void addMessage(String message) {
-        this.messages.add(message);
-    }
-
     public UUID getOwner() {
         return this.owner;
     }
 
     public void setOwner(UUID owner) {
         this.owner = owner;
-    }
-
-    public List<String> getMessages() {
-        return this.messages;
-    }
-
-    public void setMessages(List<String> messages) {
-        this.messages = messages;
     }
 
     public List<DeletableMessage> getDeletableMessages() {

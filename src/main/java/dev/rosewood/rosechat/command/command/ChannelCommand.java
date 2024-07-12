@@ -61,7 +61,7 @@ public class ChannelCommand extends RoseChatCommand {
         if (!success)
             return;
 
-        String joinMessage = channel.getFormats().get("join-message");
+        String joinMessage = channel.getSettings().getFormats().get("join-message");
         if (joinMessage != null)
             player.send(RoseChatAPI.getInstance().parse(player, player, joinMessage));
         else

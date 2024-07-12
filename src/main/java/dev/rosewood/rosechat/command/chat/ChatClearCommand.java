@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.command.chat;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.ChannelArgumentHandler;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
@@ -47,8 +48,12 @@ public class ChatClearCommand extends RoseChatCommand {
     }
 
     private void execute(RosePlayer player, Channel channel) {
+        ChannelMessageOptions options = new ChannelMessageOptions.Builder()
+                .message("\n")
+                .build();
+
         for (int i = 0; i < 100; i++)
-            channel.send("\n");
+            channel.send(options);
 
         player.sendLocaleMessage("command-chat-clear-cleared",
                 StringPlaceholders.of("channel", channel.getId()));

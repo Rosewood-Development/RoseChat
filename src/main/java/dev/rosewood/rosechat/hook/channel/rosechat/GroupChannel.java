@@ -8,7 +8,7 @@ import dev.rosewood.rosechat.api.event.group.GroupLeaveEvent;
 import dev.rosewood.rosechat.api.event.group.GroupNameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.chat.channel.FormatGroup;
+import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.PermissionArea;
@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class GroupChannel extends Channel {
 
@@ -34,9 +33,7 @@ public class GroupChannel extends Channel {
 
         this.id = id;
 
-        FormatGroup formats = new FormatGroup();
-        formats.add("minecraft", Setting.GROUP_FORMAT.getString());
-        this.setFormats(formats);
+        this.getSettings().getFormats().put("chat", Setting.GROUP_FORMAT.getString());
     }
 
     public void save() {
@@ -44,39 +41,44 @@ public class GroupChannel extends Channel {
     }
 
     @Override
-    public void send(RosePlayer sender, String message) {
-        // Parses the first message synchronously
-        // Allows for creating a token storage.
-        RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.GROUP);
-        roseMessage.setPlayerInput(message);
-        roseMessage.setPlaceholders(this.getInfoPlaceholders().build());
-
-        // Create the rules for this message.
-        MessageRules rules = new MessageRules().applyAllFilters();
-        MessageRules.RuleOutputs ruleOutputs = rules.apply(roseMessage, message);
-
-        if (ruleOutputs.getWarning() != null)
-            ruleOutputs.getWarning().send(sender);
-
-        // Check if the message is allowed to be sent.
-        if (ruleOutputs.isBlocked())
+    public void send(ChannelMessageOptions options) {
+        // An empty message can't be sent to the channel.
+        if (options.messageId() == null)
             return;
 
-        List<RosePlayer> receivers = this.getMembers().stream().map(Bukkit::getPlayer).filter(Objects::nonNull).map(RosePlayer::new).collect(Collectors.toList());
-        receivers.add(new RosePlayer(Bukkit.getConsoleSender()));
+        RoseChatAPI api = RoseChatAPI.getInstance();
 
-        for (RosePlayer receiver : receivers) {
-            // Clone the message for viewer-specific placeholders.
-            PlayerData playerData = receiver.getPlayerData();
-            if (playerData != null && !this.canPlayerReceiveMessage(receiver, playerData, sender.getUUID()))
+        // If there is no sender, the message can't be sent a group channel.
+        if (options.sender() == null)
+            return;
+
+        // Handle messages to be sent to this group.
+        RoseMessage message = RoseMessage.forLocation(options.sender(), PermissionArea.GROUP);
+
+        // Apply the rules for this message or return if the message was blocked.
+        MessageRules rules = this.applyRules(message, options.message());
+        if (rules == null)
+            return;
+
+        String format = options.format() != null ? options.format() : this.getSettings().getFormats().get("chat");
+
+        // Get all the members as RosePlayers and add the console.
+        List<RosePlayer> members = this.getMembers().stream()
+                .map(Bukkit::getPlayer).filter(Objects::nonNull).map(RosePlayer::new).toList();
+        members.add(new RosePlayer(Bukkit.getConsoleSender()));
+
+        for (RosePlayer member : members) {
+            // Check if the player can receive the message.
+            if (!this.canPlayerReceiveMessage(message.getSender(), member))
                 continue;
 
-            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                receiver.send(roseMessage.parse(receiver, this.getFormats().getMinecraft()).content());
-            });
+            RoseChat.MESSAGE_THREAD_POOL.execute(() ->
+                    member.send(message.parse(member, format).content()));
         }
 
-        for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getGroupSpies()) {
+        // Send the message to the spies.
+        for (UUID uuid : api.getPlayerDataManager().getGroupSpies()) {
+            // Continue if the spy is also a member.
             if (this.members.contains(uuid))
                 continue;
 
@@ -85,47 +87,25 @@ public class GroupChannel extends Channel {
                 continue;
 
             RosePlayer rosePlayer = new RosePlayer(player);
-            PlayerData playerData = RoseChatAPI.getInstance().getPlayerData(uuid);
-
-            // Don't send the message if the receiver can't receive it.
-            if (!this.canPlayerReceiveMessage(rosePlayer, playerData, sender.getUUID()))
-                continue;
-
-            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                rosePlayer.send(roseMessage.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content());
-            });
+            RoseChat.MESSAGE_THREAD_POOL.execute(() ->
+                    rosePlayer.send(message.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content()));
         }
     }
 
     @Override
-    public void send(RosePlayer sender, String message, String format, boolean sendToDiscord) {
-        this.send(sender, message);
-    }
+    public boolean canPlayerReceiveMessage(RosePlayer sender, RosePlayer receiver) {
+        if (sender.getUUID() != null && receiver.getUUID() != null)
+            if (sender.getUUID().equals(receiver.getUUID()))
+                return true;
 
-    @Override
-    public void send(RoseMessage message, String discordId) {
-        // No discord support for GroupChats
-    }
+        PlayerData data = receiver.getPlayerData();
+        if (data == null)
+            return true;
 
-    @Override
-    public void send(RosePlayer sender, String message, UUID messageId, boolean isJson) {
-        // No bungee support for GroupChats
-    }
+        if (sender.getUUID() != null)
+            return !data.getIgnoringPlayers().contains(sender.getUUID());
 
-    @Override
-    public boolean canPlayerReceiveMessage(RosePlayer receiver, PlayerData data, UUID senderUUID) {
-        return (data != null
-                && !data.getIgnoringPlayers().contains(senderUUID));
-    }
-
-    @Override
-    public void onJoin(RosePlayer player) {
-        // No implementation
-    }
-
-    @Override
-    public void onLeave(RosePlayer player) {
-        // No implementation
+        return true;
     }
 
     private void addMember(UUID uuid) {

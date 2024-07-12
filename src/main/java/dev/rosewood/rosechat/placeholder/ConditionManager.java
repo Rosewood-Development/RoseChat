@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.placeholder;
 
-import dev.rosewood.rosechat.hook.channel.condition.ChannelCondition;
-import dev.rosewood.rosechat.hook.channel.condition.CompoundChannelCondition;
-import dev.rosewood.rosechat.hook.channel.condition.MultipleChannelCondition;
+import dev.rosewood.rosechat.hook.channel.rosechat.condition.ChannelCondition;
+import dev.rosewood.rosechat.hook.channel.rosechat.condition.CompoundChannelCondition;
+import dev.rosewood.rosechat.hook.channel.rosechat.condition.MultipleChannelCondition;
 import dev.rosewood.rosechat.placeholder.condition.BooleanPlaceholderCondition;
 import dev.rosewood.rosechat.placeholder.condition.CompoundPlaceholderCondition;
 import dev.rosewood.rosechat.placeholder.condition.NullPlaceholderCondition;
