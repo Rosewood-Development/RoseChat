@@ -128,7 +128,7 @@ public class PacketListener {
                     String messageJson;
 
                     // Use a chat component on 1.20.4
-                    if (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4) {
+                    if (NMSUtil.getVersionNumber() > 20 || (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4)) {
                         WrappedChatComponent chatComponent = packet.getChatComponents().readSafely(0);
                         if (chatComponent == null) {
                             messageJson = getMessageReflectively(packet);
@@ -222,7 +222,7 @@ public class PacketListener {
         // Overwrite the packet since packet fields are final in 1.19
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
 
-        if (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4) {
+        if (NMSUtil.getVersionNumber() > 20 || (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4)) {
             packet.getChatComponents().write(0, WrappedChatComponent.fromJson(json));
         } else {
             packet.getStrings().write(0, json);
