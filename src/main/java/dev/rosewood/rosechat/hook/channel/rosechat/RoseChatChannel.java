@@ -6,9 +6,9 @@ import dev.rosewood.rosechat.api.event.message.PostParseMessageEvent;
 import dev.rosewood.rosechat.api.event.message.PreParseMessageEvent;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.condition.ConditionalChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageDirection;
@@ -154,6 +154,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             RoseMessage message = RoseMessage.forChannel(options.sender(), this);
             message.setPlayerInput(options.message());
             message.setUUID(options.messageId());
+            message.setPlaceholders(this.getInfoPlaceholders().build());
 
             if (options.isJson()) {
                 this.send(options, message, MessageDirection.SERVER_TO_SERVER_RAW, new MessageRules());
@@ -190,6 +191,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
 
         // Handle messages to be sent on this server.
         RoseMessage message = RoseMessage.forChannel(options.sender(), this);
+        message.setPlaceholders(this.getInfoPlaceholders().build());
 
         // Apply the rules for this message or return if the message was blocked.
         MessageRules rules = this.applyRules(message, options.message());
@@ -278,7 +280,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
-        if (api.getDiscord() == null || this.getSettings().getDiscord() == null || !Setting.USE_DISCORD.getBoolean())
+        if (api.getDiscord() == null || this.getSettings().getDiscord() == null || !Settings.USE_DISCORD.get())
             return;
 
         RoseChat.MESSAGE_THREAD_POOL.execute(() ->
@@ -443,7 +445,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             if (message.getSender().getUUID() != null && message.getSender().getUUID().equals(spy.getUniqueId()))
                 continue;
 
-            this.sendToPlayer(message, new RosePlayer(spy), direction, Setting.CHANNEL_SPY_FORMAT.getKey(), null);
+            this.sendToPlayer(message, new RosePlayer(spy), direction, Settings.CHANNEL_SPY_FORMAT.get(), null);
         }
     }
 

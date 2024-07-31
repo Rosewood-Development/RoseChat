@@ -39,7 +39,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
             if (!emoji.getInput().getText().equalsIgnoreCase(content))
                 continue;
 
-            if (!this.hasExtendedTokenPermission(params, "rosechat.emojis", "rosechat.emoji" + emoji.getId()))
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + emoji.getId()))
                 return null;
 
             content = emoji.getOutput().getText();

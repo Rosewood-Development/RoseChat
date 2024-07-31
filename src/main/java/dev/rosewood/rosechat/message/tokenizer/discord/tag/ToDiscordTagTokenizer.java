@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.tag;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -17,7 +17,7 @@ public class ToDiscordTagTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!Setting.CAN_TAG_MEMBERS.getBoolean())
+        if (!Settings.CAN_TAG_MEMBERS.get())
             return null;
 
         if (!input.startsWith("@"))

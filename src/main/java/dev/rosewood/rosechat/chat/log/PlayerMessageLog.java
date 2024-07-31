@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.chat.log;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -30,7 +30,7 @@ public class PlayerMessageLog extends ConsoleMessageLog {
      */
     public boolean addMessageWithSpamCheck(String messageToAdd) {
         // Refresh the cleanup amount, as it can be changed during a reload.
-        this.cleanupAmount = Setting.SPAM_MESSAGE_COUNT.getInt();
+        this.cleanupAmount = Settings.SPAM_MESSAGE_COUNT.get();
         this.addMessage(messageToAdd);
 
         int similarMessages = 0;
@@ -40,7 +40,7 @@ public class PlayerMessageLog extends ConsoleMessageLog {
                 String message = this.messages.get((this.messages.size() - 1) - i);
                 double difference = MessageUtils.getLevenshteinDistancePercent(message, messageToAdd);
 
-                if ((1 - difference) <= (Setting.SPAM_FILTER_SENSITIVITY.getDouble() / 100))
+                if ((1 - difference) <= (Settings.SPAM_FILTER_SENSITIVITY.get() / 100))
                     similarMessages++;
             }
 

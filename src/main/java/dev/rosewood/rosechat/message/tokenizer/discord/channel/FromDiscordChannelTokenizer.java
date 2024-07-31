@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.channel;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
-import dev.rosewood.rosechat.manager.ConfigurationManager;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -34,7 +34,7 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
 
         String channelName = discord.getChannelName(matcher.group(1));
         String serverId = discord.getServerId();
-        String content = ConfigurationManager.Setting.DISCORD_FORMAT_CHANNEL.getString();
+        String content = Settings.DISCORD_FORMAT_CHANNEL.get();
 
         return this.hasTokenPermission(params, "rosechat.discordchannel") ?
                 new TokenizerResult(Token.group(content)

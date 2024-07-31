@@ -4,7 +4,7 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.OfflinePlayerArgumentHandler;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -37,7 +37,7 @@ public class MessageCommand extends RoseChatCommand {
                 .permission("rosechat.message")
                 .descriptionKey("command-message-description")
                 .arguments(ArgumentsDefinition.builder()
-                        .required("player", new OfflinePlayerArgumentHandler(Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()))
+                        .required("player", new OfflinePlayerArgumentHandler(Settings.ALLOW_BUNGEECORD_MESSAGES.get()))
                         .required("message", ArgumentHandlers.GREEDY_STRING)
                         .build())
                 .build();

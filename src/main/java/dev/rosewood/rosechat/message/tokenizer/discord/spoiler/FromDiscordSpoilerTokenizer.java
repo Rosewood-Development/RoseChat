@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.spoiler;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -33,7 +33,7 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(2, lastIndex - 1);
 
-        String format = Setting.MARKDOWN_FORMAT_SPOILER.getString();
+        String format = Settings.MARKDOWN_FORMAT_SPOILER.get();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());

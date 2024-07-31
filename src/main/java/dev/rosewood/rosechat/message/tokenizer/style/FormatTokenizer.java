@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.style;
 
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -31,7 +31,7 @@ public class FormatTokenizer extends Tokenizer {
         char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
         boolean hasPermission = this.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
         if (!hasPermission)
-            return new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : content), content.length());
+            return new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length());
 
         ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
         boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format

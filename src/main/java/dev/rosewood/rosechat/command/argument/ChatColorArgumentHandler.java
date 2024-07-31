@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.command.argument;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
@@ -10,7 +10,6 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.InputIterator;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
         // Manually add each formatting type if the player has permission.
         suggestions.add("remove");
         if (this.permissionArea == null ||
-                context.getSender().hasPermission("rosechat.color." + this.permissionArea) && !Setting.USE_PER_COLOR_PERMISSIONS.getBoolean())
+                context.getSender().hasPermission("rosechat.color." + this.permissionArea) && !Settings.USE_PER_COLOR_PERMISSIONS.get())
             suggestions.add("&a");
 
         if (this.permissionArea == null ||

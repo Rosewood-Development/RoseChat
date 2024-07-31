@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.command.argument;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
@@ -29,7 +29,7 @@ public class ChannelArgumentHandler extends ArgumentHandler<Channel> {
 
         // If enabled, check if a group channel exists before grabbing the real channel.
         Channel channel;
-        if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean()) {
+        if (Settings.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.get()) {
             channel = RoseChatAPI.getInstance().getGroupChatById(input);
 
             if (channel != null)
@@ -51,7 +51,7 @@ public class ChannelArgumentHandler extends ArgumentHandler<Channel> {
         if (!this.checkPermissions || (!(context.getSender() instanceof Player player))) {
             suggestions.addAll(RoseChatAPI.getInstance().getChannelIDs());
 
-            if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean())
+            if (Settings.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.get())
                 suggestions.addAll(RoseChatAPI.getInstance().getGroupChatIDs());
 
             return suggestions;
@@ -61,7 +61,7 @@ public class ChannelArgumentHandler extends ArgumentHandler<Channel> {
         suggestions.addAll(RoseChatAPI.getInstance().getChannels().stream().filter(channel -> channel.canJoinByCommand(new RosePlayer(player)))
                 .map(Channel::getId).toList());
 
-        if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean())
+        if (Settings.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.get())
             suggestions.addAll(RoseChatAPI.getInstance().getGroupChats(player.getUniqueId()).stream().map(Channel::getId).toList());
 
         return suggestions;

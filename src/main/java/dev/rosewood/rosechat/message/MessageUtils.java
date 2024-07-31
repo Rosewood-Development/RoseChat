@@ -5,7 +5,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
@@ -116,7 +116,7 @@ public class MessageUtils {
         Matcher matcher = HEX_REGEX.matcher(str);
         while (matcher.find()) {
             String match = str.substring(matcher.start(), matcher.end());
-            if (Setting.CORE_SHADER_COLORS.getStringList().contains(match)) {
+            if (Settings.CORE_SHADER_COLORS.get().contains(match)) {
                 String freeHex = ShaderTokenizer.findFreeHex(match.substring(1));
                 str = str.replace(match, "#" + freeHex);
             }
@@ -181,7 +181,7 @@ public class MessageUtils {
         }
 
         // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(messageTarget, Setting.CONSOLE_MESSAGE_FORMAT.getString()).content();
+        BaseComponent[] parsedMessage = roseMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get()).content();
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
@@ -199,7 +199,7 @@ public class MessageUtils {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SPY_FORMAT.getString()).content();
+                BaseComponent[] parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get()).content();
                 spy.spigot().sendMessage(parsedSpyMessage);
             });
         }
@@ -211,9 +211,9 @@ public class MessageUtils {
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Setting.MESSAGE_SENT_FORMAT.getString()).content();
+            BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get()).content();
 
-            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget, Setting.MESSAGE_RECEIVED_FORMAT.getString());
+            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget, Settings.MESSAGE_RECEIVED_FORMAT.get());
             BaseComponent[] parsedReceivedMessage = receivedMessageOutput.content();
 
             if (target == null) {
@@ -252,8 +252,8 @@ public class MessageUtils {
                 if (messageTarget.isPlayer()) {
                     Player targetPlayer = messageTarget.asPlayer();
                     PlayerData targetData = messageTarget.getPlayerData();
-                    if (targetData != null && targetData.hasMessageSounds() && !Setting.MESSAGE_SOUND.getString().equalsIgnoreCase("none")) {
-                        targetPlayer.playSound(targetPlayer.getLocation(), Sound.valueOf(Setting.MESSAGE_SOUND.getString()), 1.0f, 1.0f);
+                    if (targetData != null && targetData.hasMessageSounds() && Settings.MESSAGE_SOUND.get() != null) {
+                        targetPlayer.playSound(targetPlayer.getLocation(), Settings.MESSAGE_SOUND.get(), 1.0f, 1.0f);
                     }
                 }
             }
@@ -264,7 +264,7 @@ public class MessageUtils {
             return;
 
         String nickname = sender.getPlayerData().getNickname();
-        if (Setting.UPDATE_DISPLAY_NAMES.getBoolean() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
+        if (Settings.UPDATE_DISPLAY_NAMES.get() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
                 sender.setDisplayName(TextComponent.toLegacyText(components.content()));
@@ -357,7 +357,7 @@ public class MessageUtils {
 
         String location = area.toString().toLowerCase();
         boolean hasColor = colorMatcher.find();
-        boolean usePerColorPerms = Setting.USE_PER_COLOR_PERMISSIONS.getBoolean();
+        boolean usePerColorPerms = Settings.USE_PER_COLOR_PERMISSIONS.get();
         boolean hasLocationPermission = sender.hasPermission("rosechat.color." + location);
         boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." + ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
         boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
@@ -372,7 +372,7 @@ public class MessageUtils {
 
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {
         ComponentBuilder builder = new ComponentBuilder();
-        String placeholder = Setting.DELETE_CLIENT_MESSAGE_FORMAT.getString();
+        String placeholder = Settings.DELETE_CLIENT_MESSAGE_FORMAT.get();
 
         BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 DefaultPlaceholders.getFor(sender, sender)
@@ -384,7 +384,7 @@ public class MessageUtils {
             return null;
         }
 
-        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
+        if (Settings.DELETE_MESSAGE_SUFFIX.get()) {
             builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
             builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
         } else {

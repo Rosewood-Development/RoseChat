@@ -7,6 +7,7 @@ public class ReplacementOutput {
     private String text;
     private String hover;
     private String font;
+    private String discordOutput;
     private Sound sound;
     private boolean tagOnlinePlayers;
     private boolean matchLength;
@@ -20,6 +21,7 @@ public class ReplacementOutput {
         this.text = output.text;
         this.hover = output.hover;
         this.font = output.font;
+        this.discordOutput = output.discordOutput;
         this.sound = output.sound;
         this.tagOnlinePlayers = output.tagOnlinePlayers;
         this.matchLength = output.matchLength;
@@ -48,6 +50,14 @@ public class ReplacementOutput {
 
     public void setFont(String font) {
         this.font = font;
+    }
+
+    public String getDiscordOutput() {
+        return this.discordOutput;
+    }
+
+    public void setDiscordOutput(String discordOutput) {
+        this.discordOutput = discordOutput;
     }
 
     public Sound getSound() {

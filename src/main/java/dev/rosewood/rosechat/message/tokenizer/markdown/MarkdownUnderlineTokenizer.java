@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -32,7 +32,7 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
         String originalContent = input.substring(0, matcher.end());
         String content = originalContent.substring(2, originalContent.length() - 2);
 
-        String format = ConfigurationManager.Setting.MARKDOWN_FORMAT_UNDERLINE.getString();
+        String format = Settings.MARKDOWN_FORMAT_UNDERLINE.get();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
         return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());
     }

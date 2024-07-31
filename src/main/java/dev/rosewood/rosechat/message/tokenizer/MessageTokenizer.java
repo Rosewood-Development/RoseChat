@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.DebugManager;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
@@ -35,14 +36,16 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final Token rootToken;
     private final MessageOutputs outputs;
+    private final MessageDirection direction;
     private int parses = 0;
 
-    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction, Tokenizers.TokenizerBundle... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
         this.rootToken = Token.group(format).build();
         this.outputs = new MessageOutputs();
+        this.direction = direction;
     }
 
     public MessageOutputs tokenizeContent() {
@@ -77,7 +80,7 @@ public class MessageTokenizer {
                 String originalContent = content;
 
                 this.parses++;
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput());
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction);
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;
@@ -117,13 +120,13 @@ public class MessageTokenizer {
     }
 
     public static MessageTokenizerResults<BaseComponent[]> tokenize(RoseMessage roseMessage, RosePlayer viewer,
-                                                                    String message,
+                                                                    String message, MessageDirection direction,
                                                                     Tokenizers.TokenizerBundle... tokenizerBundles) {
-        return tokenize(roseMessage, viewer, message, null, tokenizerBundles);
+        return tokenize(roseMessage, viewer, message, direction, null, tokenizerBundles);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message,
+    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, MessageDirection direction,
                                                           TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
         if (message == null) {
             if (roseMessage.getPlayerInput() != null) {
@@ -136,7 +139,7 @@ public class MessageTokenizer {
         }
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, tokenizerBundles);
+        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, direction, tokenizerBundles);
 
         if (composer == null) // a null composer means this will always be BaseComponent[], so this is safe
             composer = (TokenComposer<T>) TokenComposer.decorated(tokenizer);

@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
 import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
 import dev.rosewood.rosechat.hook.channel.fabledskyblock.FabledSkyblockChannelProvider;
@@ -25,8 +26,6 @@ import dev.rosewood.rosechat.listener.PlayerListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.CommandManager;
-import dev.rosewood.rosechat.manager.ConfigurationManager;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
@@ -37,6 +36,7 @@ import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
 import dev.rosewood.rosechat.nms.NMSAdapter;
 import dev.rosewood.rosegarden.RosePlugin;
+import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
@@ -64,7 +64,6 @@ public class RoseChat extends RosePlugin {
 
     public RoseChat() {
         super(-1, 5608,
-                ConfigurationManager.class,
                 DataManager.class,
                 LocaleManager.class,
                 CommandManager.class);
@@ -98,7 +97,7 @@ public class RoseChat extends RosePlugin {
 
         // Unregister and register the chat event for a configurable priority.
         try {
-            EventPriority priority = EventPriority.valueOf(Setting.CHAT_EVENT_PRIORITY.getString().toUpperCase());
+            EventPriority priority = Settings.CHAT_EVENT_PRIORITY.get();
             if (this.chatListener != null) {
                 HandlerList.unregisterAll(this.chatListener);
             } else {
@@ -124,6 +123,8 @@ public class RoseChat extends RosePlugin {
             packetListener.removeListeners();
             packetListener.addListener();
         }
+
+        this.registerChannelHooks(pluginManager);
     }
 
     @Override
@@ -173,8 +174,9 @@ public class RoseChat extends RosePlugin {
 
         if (pluginManager.isPluginEnabled("Essentials"))
             this.nicknameProvider = new EssentialsHook();
+    }
 
-        // Channel Hooks
+    public void registerChannelHooks(PluginManager pluginManager) {
         new RoseChatChannelProvider().register();
 
         if (pluginManager.getPlugin("Towny") != null)
@@ -218,6 +220,24 @@ public class RoseChat extends RosePlugin {
 
     public NicknameProvider getNicknameProvider() {
         return this.nicknameProvider;
+    }
+
+    @Override
+    protected List<RoseSetting<?>> getRoseConfigSettings() {
+        return Settings.getKeys();
+    }
+
+    @Override
+    protected String[] getRoseConfigHeader() {
+        return new String[] {
+                "     __________                    _________  __            __   ",
+                "     \\______   \\ ____  ______ ____ \\_   ___ \\|  |__ _____ _/  |_ ",
+                "      |       _//  _ \\/  ___// __ \\/    \\  \\/|  |  \\\\__  \\\\   __\\",
+                "      |    |   (  <_> )___ \\\\  ___/\\     \\___|   Y  \\/ __ \\|  |  ",
+                "      |____|_  /\\____/____  >\\___  >\\______  /___|  (____  /__|  ",
+                "             \\/           \\/     \\/        \\/     \\/     \\/      ",
+                ""
+        };
     }
 
     public static RoseChat getInstance() {

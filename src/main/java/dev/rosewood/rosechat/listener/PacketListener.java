@@ -13,7 +13,7 @@ import com.google.gson.JsonSyntaxException;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -62,7 +62,7 @@ public class PacketListener {
 
         ListenerPriority priority =  ListenerPriority.NORMAL;
         try {
-            priority = ListenerPriority.valueOf(Setting.PACKET_EVENT_PRIORITY.getString());
+            priority = ListenerPriority.valueOf(Settings.PACKET_EVENT_PRIORITY.get());
         } catch (IllegalArgumentException ignored) {
 
         }
@@ -70,7 +70,7 @@ public class PacketListener {
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, priority, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean())
+                if (!Settings.ENABLE_DELETING_MESSAGES.get())
                     return;
 
                 RosePlayer player = new RosePlayer(event.getPlayer());
@@ -238,7 +238,7 @@ public class PacketListener {
 
         boolean isSamePlayer = message.getSender() != null && message.getSender().equals(viewer.getUUID());
         String permission = isSamePlayer ? "rosechat.deletemessages.self" : "rosechat.deletemessages.others";
-        String format = isSamePlayer ? Setting.DELETE_OWN_MESSAGE_FORMAT.getString() :  Setting.DELETE_OTHER_MESSAGE_FORMAT.getString();
+        String format = isSamePlayer ? Settings.DELETE_OWN_MESSAGE_FORMAT.get() :  Settings.DELETE_OTHER_MESSAGE_FORMAT.get();
 
         if (!viewer.hasPermission(permission))
             return null;
@@ -251,7 +251,7 @@ public class PacketListener {
         BaseComponent[] button = this.getDeleteButton(message, viewer, placeholder);
 
         ComponentBuilder builder = new ComponentBuilder();
-        if (Setting.DELETE_MESSAGE_FORMAT_APPEND_SUFFIX.getBoolean()) {
+        if (Settings.DELETE_MESSAGE_SUFFIX.get()) {
             builder.append(components, ComponentBuilder.FormatRetention.NONE);
 
             if (button != null)

@@ -3,8 +3,8 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.api.event.group.GroupCreateEvent;
 import dev.rosewood.rosechat.api.event.group.GroupPreCreateEvent;
 import dev.rosewood.rosechat.command.RoseChatCommand;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -60,7 +60,7 @@ public class GroupCreateCommand extends RoseChatCommand {
             return;
         }
 
-        if (Setting.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.getBoolean() && this.getAPI().getChannelById(id) != null) {
+        if (Settings.ADD_GROUP_CHANNELS_TO_CHANNEL_LIST.get() && this.getAPI().getChannelById(id) != null) {
             this.getLocaleManager().sendComponentMessage(player, "command-gc-already-exists");
             return;
         }

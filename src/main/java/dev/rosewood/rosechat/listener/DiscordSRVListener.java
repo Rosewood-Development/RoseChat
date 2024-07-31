@@ -7,7 +7,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -54,7 +54,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-        if (!Setting.USE_DISCORD.getBoolean() || !Setting.EDIT_DISCORD_MESSAGES.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean())
+        if (!Settings.USE_DISCORD.get() || !Settings.EDIT_DISCORD_MESSAGES.get() || Settings.SUPPORT_THIRD_PARTY_PLUGINS.get())
             return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
@@ -74,7 +74,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        if (!Setting.ENABLE_DELETING_MESSAGES.getBoolean() || !Setting.USE_DISCORD.getBoolean() || Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean())
+        if (!Settings.ENABLE_DELETING_MESSAGES.get() || !Settings.USE_DISCORD.get() || Settings.SUPPORT_THIRD_PARTY_PLUGINS.get())
             return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
@@ -107,7 +107,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     @Subscribe(priority = ListenerPriority.LOW)
     public void onDiscordMessagePostProcess(DiscordGuildMessagePostProcessEvent event) {
-        if (!Setting.USE_DISCORD.getBoolean())
+        if (!Settings.USE_DISCORD.get())
             return;
 
         event.setCancelled(true);
@@ -150,7 +150,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 PlayerData data = this.api.getPlayerData(player.getUniqueId());
 
                 String name = data.getNickname() == null ? player.getDisplayName() : data.getNickname();
-                name = Setting.USE_IGN_WITH_DISCORD.getBoolean() ? name : member.getEffectiveName();
+                name = Settings.USE_IGN_WITH_DISCORD.get() ? name : member.getEffectiveName();
 
                 this.createMessage(message, player, name, channel, placeholders, update, updateFor);
                 return;
@@ -199,7 +199,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         for (String line : lines) {
             index++;
 
-            if (index > Setting.DISCORD_MESSAGE_LIMIT.getInt())
+            if (index > Settings.DISCORD_MESSAGE_LIMIT.get())
                 return;
 
             if (!MessageUtils.isMessageEmpty(line)) {
@@ -207,7 +207,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 messageWrapper.setPlaceholders(placeholders.add("user_nickname", name).build());
 
                 MessageRules rules = new MessageRules();
-                if (Setting.REQUIRE_PERMISSIONS.getBoolean()) {
+                if (Settings.REQUIRE_PERMISSIONS.get()) {
                     // Don't count the message as spam if the message is being edited.
                     if (update)
                         rules.applyCapsFilter().applyURLFilter().applyLanguageFilter();
@@ -216,7 +216,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                 }
 
                 MessageRules.RuleOutputs outputs = rules.apply(messageWrapper, line);
-                if (outputs.isBlocked() && Setting.DELETE_BLOCKED_MESSAGES.getBoolean()) {
+                if (outputs.isBlocked() && Settings.DELETE_BLOCKED_MESSAGES.get()) {
                     message.delete().queue();
                     return;
                 }
@@ -277,13 +277,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
     private BaseComponent[] appendEdited(BaseComponent[] components, DeletableMessage message, RosePlayer viewer) {
         RosePlayer sender = new RosePlayer(message.getSender() == null ? Bukkit.getConsoleSender() : Bukkit.getPlayer(message.getSender()));
-        BaseComponent[] edited = RoseChatAPI.getInstance().parse(viewer, viewer, Setting.EDITED_DISCORD_MESSAGE_FORMAT.getString(),
+        BaseComponent[] edited = RoseChatAPI.getInstance().parse(viewer, viewer, Settings.EDITED_DISCORD_MESSAGE_FORMAT.get(),
                 DefaultPlaceholders.getFor(sender, viewer)
                         .add("type", message.isClient() ? "client" : "server")
                         .add("channel", message.getChannel())
-                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build());
+                        .add("original", message.getOriginal() == null ?
+                                null : TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build());
 
-        Bukkit.getConsoleSender().sendMessage(TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal())));
         ComponentBuilder builder = new ComponentBuilder();
         builder.append(components, ComponentBuilder.FormatRetention.NONE);
         builder.append(edited);

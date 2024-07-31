@@ -7,8 +7,8 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -307,7 +307,7 @@ public class RosePlayer {
                 RoseChat.getInstance().getNicknameProvider()
                         .setNickname(this.asPlayer(), null);
 
-            if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
+            if (Settings.UPDATE_PLAYER_LIST.get() && this.isPlayer())
                 this.asPlayer().setPlayerListName(null);
 
             this.setDisplayName(null);
@@ -324,7 +324,7 @@ public class RosePlayer {
                 RoseChat.getInstance().getNicknameProvider()
                         .setNickname(this.asPlayer(), this.getDisplayName());
 
-            if (Setting.UPDATE_PLAYER_LIST.getBoolean() && this.isPlayer())
+            if (Settings.UPDATE_PLAYER_LIST.get() && this.isPlayer())
                 this.asPlayer().setPlayerListName(name);
 
             this.getPlayerData().setDisplayName(name);
@@ -549,7 +549,7 @@ public class RosePlayer {
      * @return True if the RosePlayer has the permission.
      */
     public boolean hasPermission(String permission) {
-        if (this.isConsole() || (this.isDiscordProxy && !Setting.REQUIRE_PERMISSIONS.getBoolean()))
+        if (this.isConsole() || (this.isDiscordProxy && !Settings.REQUIRE_PERMISSIONS.get()))
             return true; // Console has all permissions
 
         // If the permission is ignored, return true
@@ -564,14 +564,14 @@ public class RosePlayer {
 
            // Otherwise, check their offline permissions if Vault is available
            if (this.api.getVault() != null) {
-               return !Setting.REQUIRE_PERMISSIONS.getBoolean() || this.offlinePlayer.isOp()
+               return !Settings.REQUIRE_PERMISSIONS.get() || this.offlinePlayer.isOp()
                        || this.api.getVault().playerHas(null, this.offlinePlayer, permission);
            }
        }
 
         // If the player is not available, check the group permissions as long as we have Vault
         if (this.group != null && this.api.getVault() != null)
-            return !Setting.REQUIRE_PERMISSIONS.getBoolean() || this.api.getVault().groupHas((String) null, this.group, permission);
+            return !Settings.REQUIRE_PERMISSIONS.get() || this.api.getVault().groupHas((String) null, this.group, permission);
 
         // If none of the above worked, just allow it
         return true;

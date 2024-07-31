@@ -17,21 +17,19 @@ import java.util.function.Consumer;
 
 public class PlayerDataManager extends Manager {
 
-    private final DataManager dataManager;
     private final Map<UUID, PlayerData> playerData;
+    private DataManager dataManager;
 
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         
         this.playerData = new HashMap<>();
-        this.dataManager = rosePlugin.getManager(DataManager.class);
-
-        // Need to make sure this always gets loaded before the PlayerDataManager
-        rosePlugin.getManager(ChannelManager.class);
     }
 
     @Override
     public void reload() {
+        this.dataManager = this.rosePlugin.getManager(DataManager.class);
+
         // Delay to make sure channels are loaded first.
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
             Bukkit.getOnlinePlayers().forEach(player -> this.getPlayerData(player.getUniqueId(), data -> {

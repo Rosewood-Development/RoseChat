@@ -5,8 +5,8 @@ import dev.rosewood.rosechat.api.event.message.discord.PostParseDiscordMessageEv
 import dev.rosewood.rosechat.api.event.message.discord.PreParseDiscordMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -77,7 +77,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
             text = postParseDiscordMessageEvent.getOutput();
 
-            if (Setting.SUPPORT_THIRD_PARTY_PLUGINS.getBoolean()) {
+            if (Settings.SUPPORT_THIRD_PARTY_PLUGINS.get()) {
                 this.discord.processChatMessage(roseMessage.getSender().asPlayer(), this.emojiManager.formatUnicode(text), channel, false);
             } else {
                 textChannel.sendMessage(this.emojiManager.formatUnicode(text)).queue((message) -> {

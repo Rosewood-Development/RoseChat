@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.command.command;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
@@ -117,7 +117,7 @@ public class NicknameCommand extends RoseChatCommand {
     private void setNickname(RosePlayer player, RosePlayer target, String nickname) {
         // Parse the nickname to find what it would be like as a display name.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            if (!Setting.ALLOW_DUPLICATE_NAMES.getBoolean()) {
+            if (!Settings.ALLOW_DUPLICATE_NAMES.get()) {
                 RoseMessage message = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
                 MessageTokenizerResults<BaseComponent[]> components = message.parse(target, nickname);
 
@@ -149,22 +149,22 @@ public class NicknameCommand extends RoseChatCommand {
         String nickname = message.getPlayerInput();
         String strippedNickname = ChatColor.stripColor(HexUtils.colorify(nickname));
 
-        if (strippedNickname.length() < Math.max(1, Setting.MINIMUM_NICKNAME_LENGTH.getInt())) {
+        if (strippedNickname.length() < Math.max(1, Settings.MINIMUM_NICKNAME_LENGTH.get())) {
             player.sendLocaleMessage("command-nickname-too-short");
             return false;
         }
 
-        if (strippedNickname.length() > Setting.MAXIMUM_NICKNAME_LENGTH.getInt()) {
+        if (strippedNickname.length() > Settings.MAXIMUM_NICKNAME_LENGTH.get()) {
             player.sendLocaleMessage("command-nickname-too-long");
             return false;
         }
 
-        if (!Setting.ALLOW_SPACES_IN_NICKNAMES.getBoolean() && strippedNickname.contains(" ")) {
+        if (!Settings.ALLOW_SPACES_IN_NICKNAMES.get() && strippedNickname.contains(" ")) {
             player.sendLocaleMessage("command-nickname-not-allowed");
             return false;
         }
 
-        if (!Setting.ALLOW_NONALPHANUMERIC_CHARACTERS.getBoolean() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
+        if (!Settings.ALLOW_NONALPHANUMERIC_CHARACTERS.get() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
             player.sendLocaleMessage("command-nickname-not-allowed");
             return false;
         }

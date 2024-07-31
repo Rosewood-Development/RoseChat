@@ -6,12 +6,12 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
 import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
@@ -125,7 +125,7 @@ public final class RoseChatAPI {
             return;
 
         // Get the deleted message format.
-        BaseComponent[] format = this.parse(player, player, Setting.DELETED_MESSAGE_FORMAT.getString(),
+        BaseComponent[] format = this.parse(player, player, Settings.DELETED_MESSAGE_FORMAT.get(),
                 DefaultPlaceholders.getFor(player, player)
                         .add("id", uuid.toString())
                         .add("type", messageToDelete.isClient() ? "client" : "server")
@@ -170,7 +170,7 @@ public final class RoseChatAPI {
             if (updated)
                 messageToDelete.setClient(true);
 
-            if (!Setting.DELETE_DISCORD_MESSAGES.getBoolean())
+            if (!Settings.DELETE_DISCORD_MESSAGES.get())
                 return;
 
             if (this.getDiscord() != null && messageToDelete.getDiscordId() != null)

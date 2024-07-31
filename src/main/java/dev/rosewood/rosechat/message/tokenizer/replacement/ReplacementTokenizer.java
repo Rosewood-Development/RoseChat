@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -41,7 +42,10 @@ public class ReplacementTokenizer extends Tokenizer {
                 if (!input.startsWith(originalContent))
                     continue;
 
-                String content = replacement.getOutput().getText();
+                String content = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
+                        && replacement.getOutput().getDiscordOutput() != null ?
+                            replacement.getOutput().getDiscordOutput() :
+                            replacement.getOutput().getText();
 
                 StringPlaceholders.Builder groupPlaceholders = StringPlaceholders.builder();
                 int groups = Math.max(9, matcher.groupCount() + 1);
@@ -82,7 +86,10 @@ public class ReplacementTokenizer extends Tokenizer {
                 }
 
                 String originalContent = replacement.getInput().getText();
-                String content = replacement.getOutput().getText();
+                String content = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
+                        && replacement.getOutput().getDiscordOutput() != null ?
+                        replacement.getOutput().getDiscordOutput() :
+                        replacement.getOutput().getText();
 
                 Token.Builder token = Token.group(content)
                         .decorate(FontDecorator.of(replacement.getOutput().getFont()))

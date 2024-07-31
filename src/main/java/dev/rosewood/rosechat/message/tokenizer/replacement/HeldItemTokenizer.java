@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -50,7 +50,7 @@ public class HeldItemTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        Replacement replacement = this.api.getReplacementById(Setting.HELD_ITEM_REPLACEMENT.getString());
+        Replacement replacement = this.api.getReplacementById(Settings.HELD_ITEM_REPLACEMENT.get());
         if (replacement == null)
             return null;
 

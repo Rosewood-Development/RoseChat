@@ -20,6 +20,7 @@ public class DebugManager extends Manager {
 
     public DebugManager(RosePlugin rosePlugin) {
         super(rosePlugin);
+
         this.messages = new LinkedList<>();
     }
 

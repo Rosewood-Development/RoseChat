@@ -3,7 +3,7 @@ package dev.rosewood.rosechat.message.wrapper;
 import dev.rosewood.rosechat.api.event.message.MessageBlockedEvent;
 import dev.rosewood.rosechat.api.event.message.MessageFilteredEvent;
 import dev.rosewood.rosechat.chat.FilterWarning;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -78,7 +78,7 @@ public class MessageRules {
     }
 
     private boolean isCaps(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.CAPS_CHECKING_ENABLED.getBoolean())
+        if (!Settings.CAPS_CHECKING_ENABLED.get())
             return false;
 
         if (message.getSender().hasPermission("rosechat.caps." + message.getLocationPermission()))
@@ -90,20 +90,20 @@ public class MessageRules {
                 caps++;
         }
 
-        return caps > Setting.MAXIMUM_CAPS_ALLOWED.getInt();
+        return caps > Settings.MAXIMUM_CAPS_ALLOWED.get();
     }
 
     private void filterCaps(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.CAPS_CHECKING_ENABLED.getBoolean())
+        if (!Settings.CAPS_CHECKING_ENABLED.get())
             return;
 
         if (!this.isCaps(message, outputs))
             return;
 
-        if (Setting.WARN_ON_CAPS_SENT.getBoolean())
+        if (Settings.WARN_ON_CAPS_SENT.get())
             outputs.setWarning(FilterWarning.CAPS);
 
-        if (Setting.LOWERCASE_CAPS_ENABLED.getBoolean()) {
+        if (Settings.LOWERCASE_CAPS_ENABLED.get()) {
             outputs.transformMessage(String::toLowerCase);
             return;
         }
@@ -112,7 +112,7 @@ public class MessageRules {
     }
 
     private void filterSpam(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.SPAM_CHECKING_ENABLED.getBoolean() || this.ignoreMessageLogging)
+        if (!Settings.SPAM_CHECKING_ENABLED.get() || this.ignoreMessageLogging)
             return;
 
         if (message.getSender().hasPermission("rosechat.spam." + message.getLocationPermission())
@@ -122,14 +122,14 @@ public class MessageRules {
         if (!message.getSender().getPlayerData().getMessageLog().addMessageWithSpamCheck(outputs.getFilteredMessage()))
             return;
 
-        if (Setting.WARN_ON_SPAM_SENT.getBoolean())
+        if (Settings.WARN_ON_SPAM_SENT.get())
             outputs.setWarning(FilterWarning.SPAM);
 
         outputs.setBlocked(true);
     }
 
     private void filterURLs(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.URL_CHECKING_ENABLED.getBoolean())
+        if (!Settings.URL_CHECKING_ENABLED.get())
             return;
 
         if (message.getSender().hasPermission("rosechat.links." + message.getLocationPermission()))
@@ -146,15 +146,15 @@ public class MessageRules {
         if (!hasURL)
             return;
 
-        if (Setting.WARN_ON_URL_SENT.getBoolean())
+        if (Settings.WARN_ON_URL_SENT.get())
             outputs.setWarning(FilterWarning.URL);
 
-        if (!Setting.URL_CENSORING_ENABLED.getBoolean())
+        if (!Settings.URL_CENSORING_ENABLED.get())
             outputs.setBlocked(true);
     }
 
     private void filterLanguage(RoseMessage message, RuleOutputs outputs) {
-        if (!Setting.SWEAR_CHECKING_ENABLED.getBoolean())
+        if (!Settings.SWEAR_CHECKING_ENABLED.get())
             return;
 
         if (message.getSender().hasPermission("rosechat.language." + message.getLocationPermission()))
@@ -162,12 +162,12 @@ public class MessageRules {
 
         String strippedMessage = MessageUtils.stripAccents(outputs.getFilteredMessage().toLowerCase());
 
-        for (String swear : Setting.BLOCKED_SWEARS.getStringList()) {
+        for (String swear : Settings.BLOCKED_SWEARS.get()) {
             for (String word : strippedMessage.split(" ")) {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
 
-                if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
-                    if (Setting.WARN_ON_BLOCKED_SWEAR_SENT.getBoolean())
+                if ((1 - difference) <= (Settings.SWEAR_FILTER_SENSITIVITY.get() / 100.0)) {
+                    if (Settings.WARN_ON_BLOCKED_SWEAR_SENT.get())
                         outputs.setWarning(FilterWarning.SWEAR);
 
                     outputs.setBlocked(true);
@@ -176,14 +176,14 @@ public class MessageRules {
             }
         }
 
-        for (String replacements : Setting.SWEAR_REPLACEMENTS.getStringList()) {
+        for (String replacements : Settings.SWEAR_REPLACEMENTS.get()) {
             String[] swearReplacement = replacements.split(":");
             String swear = swearReplacement[0];
             String replacement = swearReplacement[1];
 
             for (String word : outputs.getFilteredMessage().split(" ")) {
                 double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if ((1 - difference) <= (Setting.SWEAR_FILTER_SENSITIVITY.getDouble() / 100.0)) {
+                if ((1 - difference) <= (Settings.SWEAR_FILTER_SENSITIVITY.get() / 100.0)) {
                     outputs.transformMessage(x -> x.replace(word, replacement));
                 }
             }

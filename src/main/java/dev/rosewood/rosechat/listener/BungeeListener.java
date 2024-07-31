@@ -13,10 +13,10 @@ import java.util.UUID;
 
 public class BungeeListener implements PluginMessageListener {
 
-    private final BungeeManager bungeeManager;
+    private final RoseChat plugin;
 
     public BungeeListener(RoseChat plugin) {
-        this.bungeeManager = plugin.getManager(BungeeManager.class);
+        this.plugin = plugin;
     }
 
     @Override
@@ -24,13 +24,15 @@ public class BungeeListener implements PluginMessageListener {
         if (!channel.equalsIgnoreCase("BungeeCord"))
             return;
 
+        BungeeManager bungeeManager = this.plugin.getManager(BungeeManager.class);
+
         ByteArrayInputStream bytes = new ByteArrayInputStream(message);
         DataInputStream in = new DataInputStream(bytes);
 
         try {
             String command = in.readUTF();
             if (command.equals("PlayerList")) {
-                this.bungeeManager.receivePlayers(in.readUTF(), in.readUTF().split(", "));
+                bungeeManager.receivePlayers(in.readUTF(), in.readUTF().split(", "));
                 return;
             }
 
@@ -63,7 +65,7 @@ public class BungeeListener implements PluginMessageListener {
                     UUID messageId = messageIdStr.equalsIgnoreCase("null") ? null : UUID.fromString(messageIdStr);
                     boolean isJson = data.readBoolean();
                     String rcMessage = data.readUTF();
-                    this.bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);
+                    bungeeManager.receiveChannelMessage(rcChannel, sender, senderUUID, group, permissions, messageId, isJson, rcMessage);
                 }
                 case "direct_message" -> {
                     String sender = data.readUTF();
@@ -71,25 +73,25 @@ public class BungeeListener implements PluginMessageListener {
                     String group = data.readUTF();
                     List<String> permissions = Arrays.asList(data.readUTF().split(","));
                     String rcMessage = data.readUTF();
-                    this.bungeeManager.receiveDirectMessage(player, sender, senderUUID, group, permissions, rcMessage);
+                    bungeeManager.receiveDirectMessage(player, sender, senderUUID, group, permissions, rcMessage);
                 }
                 case "update_reply" -> {
                     String sender = data.readUTF();
-                    this.bungeeManager.receiveUpdateReply(player, sender);
+                    bungeeManager.receiveUpdateReply(player, sender);
                 }
                 case "check_plugin" -> {
                     String sender = data.readUTF();
                     String plugin = data.readUTF();
-                    this.bungeeManager.receivePluginCheck(sender, plugin);
+                    bungeeManager.receivePluginCheck(sender, plugin);
                 }
                 case "confirm_plugin" -> {
                     boolean hasPlugin = data.readBoolean();
                     String sender = data.readUTF();
-                    this.bungeeManager.receivePluginCheckConfirmation(sender, hasPlugin);
+                    bungeeManager.receivePluginCheckConfirmation(sender, hasPlugin);
                 }
                 case "delete_message" -> {
                     UUID messageId = UUID.fromString(data.readUTF());
-                    this.bungeeManager.receiveMessageDeletion(messageId);
+                    bungeeManager.receiveMessageDeletion(messageId);
                 }
             }
         } catch (IOException e) {

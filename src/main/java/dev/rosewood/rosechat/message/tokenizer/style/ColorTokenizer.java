@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.style;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -34,19 +34,19 @@ public class ColorTokenizer extends Tokenizer {
             int length = spigotHexToken.content().length();
             return (this.hasTokenPermission(params, "rosechat.color"))
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(spigotHexToken.color())), length)
-                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : spigotHexToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : spigotHexToken.content()), length);
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
         if (legacyToken != null) {
             int length = legacyToken.content().length();
             boolean canUseColors = this.hasTokenPermission(params, "rosechat.color");
-            boolean hasColorPerm = !Setting.USE_PER_COLOR_PERMISSIONS.getBoolean()
+            boolean hasColorPerm = !Settings.USE_PER_COLOR_PERMISSIONS.get()
                     || this.hasTokenPermission(params, "rosechat." + legacyToken.color().getName().toLowerCase());
 
             return canUseColors && hasColorPerm
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(legacyToken.color())), length)
-                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : legacyToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : legacyToken.content()), length);
         }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
@@ -54,7 +54,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = hexToken.content().length();
             return this.hasTokenPermission(params, "rosechat.hex")
                     ? new TokenizerResult(Token.decorator(ColorDecorator.of(hexToken.color())), length)
-                    : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : hexToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : hexToken.content()), length);
         }
 
         // Handle color codes that are already parsed

@@ -28,21 +28,22 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
 
-    private final ChannelManager channelManager;
-    private final PlayerDataManager playerDataManager;
+    private final RoseChat plugin;
 
     public PlayerListener(RoseChat plugin) {
-        this.channelManager = plugin.getManager(ChannelManager.class);
-        this.playerDataManager = plugin.getManager(PlayerDataManager.class);
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
+        ChannelManager channelManager = this.plugin.getManager(ChannelManager.class);
+        PlayerDataManager playerDataManager = this.plugin.getManager(PlayerDataManager.class);
+
         RosePlayer player = new RosePlayer(event.getPlayer());
 
         // Ensure group chats are loaded first.
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUUID(), (gcs) -> {
-            PlayerData playerData = this.playerDataManager.getPlayerDataSynchronous(player.getUUID());
+            PlayerData playerData = playerDataManager.getPlayerDataSynchronous(player.getUUID());
 
             // Set the display name when the player logs in
             if (playerData.getNickname() != null)
@@ -55,7 +56,7 @@ public class PlayerListener implements Listener {
                 playerData.setIsInGroupChannel(false);
 
                 // Place the player in the correct channel.
-                for (Channel channel : this.channelManager.getChannels().values()) {
+                for (Channel channel : channelManager.getChannels().values()) {
                     if (channel.onLogin(player)) {
                         player.switchChannel(channel);
                         break;
@@ -64,7 +65,7 @@ public class PlayerListener implements Listener {
 
                 // If no channel was found, force put player in the default channel.
                 if (playerData.getCurrentChannel() == null) {
-                    Channel defaultChannel = this.channelManager.getDefaultChannel();
+                    Channel defaultChannel = channelManager.getDefaultChannel();
                     player.switchChannel(defaultChannel);
                 } else {
                     Channel channel = playerData.getCurrentChannel();
@@ -79,10 +80,11 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Bukkit.getScheduler().runTaskLaterAsynchronously(RoseChat.getInstance(), () -> {
+            PlayerDataManager playerDataManager = this.plugin.getManager(PlayerDataManager.class);
             RosePlayer player = new RosePlayer(event.getPlayer());
-            this.playerDataManager.getPlayerData(player.getUUID()).save();
-            this.playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
-            this.playerDataManager.unloadPlayerData(player.getUUID());
+            playerDataManager.getPlayerData(player.getUUID()).save();
+            playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
+            playerDataManager.unloadPlayerData(player.getUUID());
         }, 5L);
     }
 

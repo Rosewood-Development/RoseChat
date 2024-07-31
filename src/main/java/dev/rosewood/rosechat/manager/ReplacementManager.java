@@ -144,6 +144,7 @@ public class ReplacementManager extends Manager {
                 case "match-length" -> output.setShouldMatchLength(outputSection.getBoolean("match-length"));
                 case "color-retention" -> output.setHasColorRetention(outputSection.getBoolean("color-retention"));
                 case "font" -> output.setFont(outputSection.getString("font"));
+                case "discord-output" -> output.setDiscordOutput(outputSection.getString("discord-output"));
                 case "sound" -> {
                     try {
                         Sound sound = Sound.valueOf(outputSection.getString("sound").toUpperCase());

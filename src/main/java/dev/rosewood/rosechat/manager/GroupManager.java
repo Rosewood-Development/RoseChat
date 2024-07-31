@@ -15,21 +15,21 @@ import org.bukkit.Bukkit;
 public class GroupManager extends Manager {
 
     private final GroupChannelProvider channelProvider;
-    private final DataManager dataManager;
     private final Map<String, GroupChannel> groupChats;
     private final List<String> groupChatIDs;
+    private DataManager dataManager;
 
     public GroupManager(RosePlugin rosePlugin) {
         super(rosePlugin);
 
         this.channelProvider = new GroupChannelProvider();
-        this.dataManager = rosePlugin.getManager(DataManager.class);
         this.groupChats = new HashMap<>();
         this.groupChatIDs = new ArrayList<>();
     }
 
     @Override
     public void reload() {
+        this.dataManager = rosePlugin.getManager(DataManager.class);
         Bukkit.getOnlinePlayers().forEach(player -> this.loadMemberGroupChats(player.getUniqueId(), (gcs) -> {}));
         this.loadNames();
     }

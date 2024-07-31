@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -94,7 +95,10 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
     }
 
     private TokenizerResult createTagToken(TokenizerParams params, String originalContent, String content, Replacement replacement, String prefix) {
-        String output = replacement.getOutput().getText();
+        String output = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
+                && replacement.getOutput().getDiscordOutput() != null ?
+                replacement.getOutput().getDiscordOutput() :
+                replacement.getOutput().getText();
         CustomPlaceholder placeholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(output.substring(1, output.length() - 1));
 
         RosePlayer placeholderViewer = null;
@@ -183,7 +187,10 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
             return new TokenizerResult(tokenBuilder.build(), originalContent.length());
         }
 
-        content = replacement.getOutput().getText();
+        content = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
+                && replacement.getOutput().getDiscordOutput() != null ?
+                replacement.getOutput().getDiscordOutput() :
+                replacement.getOutput().getText();
         String hover = replacement.getOutput().getHover();
 
         StringBuilder contentBuilder = new StringBuilder();

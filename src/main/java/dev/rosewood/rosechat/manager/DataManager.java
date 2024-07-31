@@ -20,29 +20,28 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 public class DataManager extends AbstractDataManager {
 
-    private final ChannelManager channelManager;
-
     public DataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
-
-        this.channelManager = rosePlugin.getManager(ChannelManager.class);
     }
 
     @Override
-    public List<Class<? extends DataMigration>> getDataMigrations() {
+    public List<Supplier<? extends DataMigration>> getDataMigrations() {
         return Arrays.asList(
-                _1_Create_Tables_Data.class,
-                _2_Create_Table_Hidden_Channels.class,
-                _3_Add_Data_Is_Group_Chat_Column.class,
-                _4_Add_Data_Stripped_Name.class,
-                _5_Rename_Table_Muted_Channels.class
+                _1_Create_Tables_Data::new,
+                _2_Create_Table_Hidden_Channels::new,
+                _3_Add_Data_Is_Group_Chat_Column::new,
+                _4_Add_Data_Stripped_Name::new,
+                _5_Rename_Table_Muted_Channels::new
         );
     }
 
     public PlayerData getPlayerData(UUID uuid) {
+        ChannelManager channelManager = this.rosePlugin.getManager(ChannelManager.class);
+
         AtomicReference<PlayerData> value = new AtomicReference<>(null);
         this.databaseConnector.connect(connection -> {
             String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
@@ -64,7 +63,7 @@ public class DataManager extends AbstractDataManager {
                     String nickname = result.getString("nickname");
                     boolean isCurrentlyChannelGroupChannel = result.getBoolean("is_currently_in_gc");
                     Channel channel = isCurrentlyChannelGroupChannel ?
-                            RoseChatAPI.getInstance().getGroupChatById(currentChannel) : this.channelManager.getChannel(currentChannel);
+                            RoseChatAPI.getInstance().getGroupChatById(currentChannel) : channelManager.getChannel(currentChannel);
                     String strippedDisplayName = result.getString("stripped_name");
 
                     PlayerData playerData = new PlayerData(uuid);
@@ -205,12 +204,14 @@ public class DataManager extends AbstractDataManager {
     }
 
     public void loadChannelSettings() {
+        ChannelManager channelManager = this.rosePlugin.getManager(ChannelManager.class);
+
         this.databaseConnector.connect(connection -> {
             String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "channel_settings";
             try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                 ResultSet result = statement.executeQuery();
                 while (result.next()) {
-                    Channel channel = this.channelManager.getChannel(result.getString("id"));
+                    Channel channel = channelManager.getChannel(result.getString("id"));
                     boolean muted = result.getBoolean("muted");
                     int slowmode = result.getInt("slowmode");
 

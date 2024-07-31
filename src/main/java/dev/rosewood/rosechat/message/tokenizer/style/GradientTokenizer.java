@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.style;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -58,7 +58,7 @@ public class GradientTokenizer extends Tokenizer {
         String content = matcher.group();
         return this.hasTokenPermission(params, "rosechat.gradient")
                 ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)), content.length())
-                : new TokenizerResult(Token.text(Setting.REMOVE_COLOR_CODES.getBoolean() ? "" : content), content.length());
+                : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length());
     }
 
 }

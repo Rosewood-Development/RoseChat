@@ -1,12 +1,11 @@
 package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.command.PrimaryCommand;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
 import dev.rosewood.rosegarden.command.framework.BaseRoseCommand;
@@ -39,7 +38,7 @@ public class GroupMessageCommand extends BaseRoseCommand {
     public void execute(CommandContext context, GroupChannel group) {
         RosePlayer player = new RosePlayer(context.getSender());
 
-        if (!Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean()) {
+        if (!Settings.CAN_JOIN_GROUP_CHANNELS.get()) {
             player.sendLocaleMessage("message-blank");
             return;
         }

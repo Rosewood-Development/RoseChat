@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
@@ -18,8 +19,9 @@ public class TokenizerParams {
     private final String locationPermission;
     private final Channel channel;
     private final StringPlaceholders placeholders;
+    private final MessageDirection direction;
 
-    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput) {
+    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput, MessageDirection direction) {
         this.outputs = new MessageOutputs();
         this.sender = message.getSender();
         this.receiver = receiver;
@@ -30,6 +32,7 @@ public class TokenizerParams {
         this.locationPermission = message.getLocationPermission();
         this.channel = message.getChannel();
         this.placeholders = message.getPlaceholders();
+        this.direction = direction;
     }
 
     public MessageOutputs getOutputs() {
@@ -70,6 +73,10 @@ public class TokenizerParams {
 
     public StringPlaceholders getPlaceholders() {
         return this.placeholders;
+    }
+
+    public MessageDirection getDirection() {
+        return this.direction;
     }
 
 }

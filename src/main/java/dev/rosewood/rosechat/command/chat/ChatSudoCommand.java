@@ -21,6 +21,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class ChatSudoCommand extends RoseChatCommand {
+
     public ChatSudoCommand(RosePlugin rosePlugin) {
         super(rosePlugin);
     }

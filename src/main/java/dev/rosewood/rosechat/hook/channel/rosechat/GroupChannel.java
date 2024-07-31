@@ -9,7 +9,8 @@ import dev.rosewood.rosechat.api.event.group.GroupNameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.chat.channel.ChannelSettings;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class GroupChannel extends Channel {
 
@@ -33,7 +35,8 @@ public class GroupChannel extends Channel {
 
         this.id = id;
 
-        this.getSettings().getFormats().put("chat", Setting.GROUP_FORMAT.getString());
+        this.settings = new ChannelSettings();
+        this.getSettings().getFormats().put("chat", Settings.GROUP_FORMAT.get());
     }
 
     public void save() {
@@ -43,7 +46,7 @@ public class GroupChannel extends Channel {
     @Override
     public void send(ChannelMessageOptions options) {
         // An empty message can't be sent to the channel.
-        if (options.messageId() == null)
+        if (options.message() == null)
             return;
 
         RoseChatAPI api = RoseChatAPI.getInstance();
@@ -54,6 +57,7 @@ public class GroupChannel extends Channel {
 
         // Handle messages to be sent to this group.
         RoseMessage message = RoseMessage.forLocation(options.sender(), PermissionArea.GROUP);
+        message.setPlaceholders(this.getInfoPlaceholders().build());
 
         // Apply the rules for this message or return if the message was blocked.
         MessageRules rules = this.applyRules(message, options.message());
@@ -64,7 +68,7 @@ public class GroupChannel extends Channel {
 
         // Get all the members as RosePlayers and add the console.
         List<RosePlayer> members = this.getMembers().stream()
-                .map(Bukkit::getPlayer).filter(Objects::nonNull).map(RosePlayer::new).toList();
+                .map(Bukkit::getPlayer).filter(Objects::nonNull).map(RosePlayer::new).collect(Collectors.toList());
         members.add(new RosePlayer(Bukkit.getConsoleSender()));
 
         for (RosePlayer member : members) {
@@ -88,7 +92,7 @@ public class GroupChannel extends Channel {
 
             RosePlayer rosePlayer = new RosePlayer(player);
             RoseChat.MESSAGE_THREAD_POOL.execute(() ->
-                    rosePlayer.send(message.parse(rosePlayer, Setting.GROUP_SPY_FORMAT.getString()).content()));
+                    rosePlayer.send(message.parse(rosePlayer, Settings.GROUP_SPY_FORMAT.get()).content()));
         }
     }
 
@@ -133,7 +137,7 @@ public class GroupChannel extends Channel {
 
     @Override
     public boolean canJoinByCommand(RosePlayer player) {
-        return Setting.CAN_JOIN_GROUP_CHANNELS.getBoolean();
+        return Settings.CAN_JOIN_GROUP_CHANNELS.get();
     }
 
     @Override

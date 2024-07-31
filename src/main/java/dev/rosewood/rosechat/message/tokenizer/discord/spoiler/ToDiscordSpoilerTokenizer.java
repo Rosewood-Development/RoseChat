@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.spoiler;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -19,7 +19,7 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
         if (!this.hasTokenPermission(params, "rosechat.spoiler"))
             return null;
 
-        String spoiler = ConfigurationManager.Setting.MARKDOWN_FORMAT_SPOILER.getString();
+        String spoiler = Settings.MARKDOWN_FORMAT_SPOILER.get();
         String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
         String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
         if (!input.startsWith(prefix))

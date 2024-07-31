@@ -8,7 +8,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -37,7 +37,7 @@ public class BungeeManager extends Manager {
         this.bungeePlayers = ArrayListMultimap.create();
         this.checkPluginPlayers = new ArrayList<>();
 
-        if (RoseChatAPI.getInstance().isBungee() && Setting.ALLOW_BUNGEECORD_MESSAGES.getBoolean()) {
+        if (RoseChatAPI.getInstance().isBungee() && Settings.ALLOW_BUNGEECORD_MESSAGES.get()) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(rosePlugin, () -> {
                 this.bungeePlayers.get("ALL").clear();
                 this.getPlayers("ALL");
@@ -258,7 +258,7 @@ public class BungeeManager extends Manager {
         this.send("ForwardToPlayer", receiver, "rosechat:check_plugin", outputStream, out);
 
         Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
-            int timeout = ConfigurationManager.Setting.BUNGEECORD_MESSAGE_TIMEOUT.getInt();
+            int timeout = Settings.BUNGEECORD_MESSAGE_TIMEOUT.get();
             long startTime = System.currentTimeMillis();
             while (startTime + timeout > System.currentTimeMillis()) {
                 if (this.checkPluginPlayers.contains(sender)) {

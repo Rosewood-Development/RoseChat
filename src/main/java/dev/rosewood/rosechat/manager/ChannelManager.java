@@ -1,11 +1,10 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.command.CustomChannelCommand;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.worldguard.WorldGuardChannel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
@@ -24,10 +23,10 @@ import java.util.Map;
 
 public class ChannelManager extends Manager {
 
-    private final LocaleManager localeManager;
     private final Map<String, ChannelProvider> channelProviders;
     private final Map<String, Channel> channels;
     private final List<WorldGuardChannel> worldGuardChannels;
+    private LocaleManager localeManager;
     private Channel defaultChannel;
     private CommentedFileConfiguration channelsConfig;
     private BukkitTask worldGuardTask;
@@ -35,7 +34,6 @@ public class ChannelManager extends Manager {
     public ChannelManager(RosePlugin rosePlugin) {
         super(rosePlugin);
 
-        this.localeManager = RoseChat.getInstance().getManager(LocaleManager.class);
         this.channelProviders = new HashMap<>();
         this.channels = new HashMap<>();
         this.worldGuardChannels = new ArrayList<>();
@@ -43,6 +41,8 @@ public class ChannelManager extends Manager {
 
     @Override
     public void reload() {
+        this.localeManager = this.rosePlugin.getManager(LocaleManager.class);
+
         File channelsFile = new File(this.rosePlugin.getDataFolder(), "channels.yml");
         if (!channelsFile.exists())
             this.rosePlugin.saveResource("channels.yml", false);
@@ -54,7 +54,7 @@ public class ChannelManager extends Manager {
         Bukkit.getScheduler().runTaskLater(this.rosePlugin, () -> {
             this.generateChannels();
             if (this.channelProviders.containsKey("worldguard")) {
-                long interval = Setting.WORLDGUARD_CHECK_INTERVAL.getLong();
+                long interval = Settings.WORLDGUARD_CHECK_INTERVAL.get();
                 if (interval != 0)
                     this.worldGuardTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.rosePlugin,
                         this::updatePlayerRegions, 0, interval);

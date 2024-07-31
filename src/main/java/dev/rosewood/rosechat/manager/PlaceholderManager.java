@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
-import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.placeholder.ConditionManager;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholder.DiscordEmbedPlaceholder;
@@ -69,8 +68,8 @@ public class PlaceholderManager extends Manager {
         }
 
         // Formats
-        for (String format : Setting.CHAT_FORMATS.getSection().getKeys(false)) {
-            this.chatFormats.put(format, Setting.CHAT_FORMATS.getSection().getString(format));
+        for (String format : Settings.CHAT_FORMATS.get().getKeys(false)) {
+            this.chatFormats.put(format, Settings.CHAT_FORMATS.get().getString(format));
         }
 
         parseFormats();

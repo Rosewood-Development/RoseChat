@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -61,7 +62,12 @@ public class InlineReplacementTokenizer extends Tokenizer {
                     return null;
             }
 
-            Token.Builder token = Token.group(replacement.getOutput().getText())
+            String output = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
+                    && replacement.getOutput().getDiscordOutput() != null ?
+                    replacement.getOutput().getDiscordOutput() :
+                    replacement.getOutput().getText();
+
+            Token.Builder token = Token.group(output)
                     .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                     .placeholder("group_0", originalContent)
                     .placeholder("message", originalContent)

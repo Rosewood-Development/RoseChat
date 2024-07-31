@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
-import dev.rosewood.rosechat.manager.ConfigurationManager.Setting;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -27,7 +27,7 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
 
         String content = input.substring(2);
 
-        String format = Setting.MARKDOWN_FORMAT_BLOCK_QUOTES.getString();
+        String format = Settings.MARKDOWN_FORMAT_BLOCK_QUOTES.get();
         content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
         return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), input.length());
