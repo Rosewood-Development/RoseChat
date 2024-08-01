@@ -1,301 +1,285 @@
-# ru_RU translation by Sanek725
-# Префикс
-prefix: '&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] '
+# ru_RU
+# Префикс сообщения плагина
+prefix: "&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] "
 
-# команды
-no-permission: '&cТы не можешь использовать это!'
-player-not-found: '&cЭтот игрок не в сети!'
-player-only: '&cЭта команда &lтолько&r&c для игроков'
-invalid-arguments: '&cИспользуй: &e%syntax%&c.'
-not-a-number: '&cЭто не число!'
-message-blank: '&cПожалуйста, введите сообщение!'
+# Общие команды сообщения
+no-permission: "&cУ вас нет разрешения на это!"
+only-player: "&cЭту команду может использовать только игрок."
+invalid-argument: "&c%message%"
+message-blank: "&cПожалуйста, введите сообщение!"
 
-# Базовое командные сообщения
-base-command-help: '&eИспользуй &b/rc help &eдля получения информации.'
-
-# Команды поддержки
-command-help-description: '&8 - &d/rc help &7- отображает меню справки... Ты тут!'
-command-help-title: '&eДоступные команды:'
-command-help-usage: '&e/rc help'
-
-# Перезагрузка
-command-reload-description: '&8 - &d/rc reload &7- Перезагрузить плагин.'
-command-reload-usage: '&e/rc reload'
-command-reload-reloaded: '&eДанные плагина,конфигурация и языковые файлы были перезагружены.'
+# Сообщения об ошибках обработчика аргументов
+argument-handler-player: "Этот игрок не в сети!"
+argument-handler-channel: "Этот канал не существует!"
+argument-handler-chatcolor: "Это недопустимый цвет!"
+argument-handler-timescale: "Это недопустимый масштаб времени!"
+argument-handler-integer: "Это не число!"
+argument-handler-group: "Эта группа не существует!"
+argument-handler-group-member: "Этот игрок не в этой группе!"
+argument-handler-member-group: "Вы не в этой группе!"
 
 # Сообщения модерации
-blocked-caps: '&cВаше сообщение не удалось отправить,так как в нем слишком много заглавных букв!'
-blocked-spam: '&cПожалуйста подождите,а то очень похоже на спам!'
-blocked-language: '&cТы знал,это плохое слово! :('
-blocked-url: '&cПожалуйста, не отправляйте URL или IP!'
+blocked-caps: "&cВаше сообщение не может быть отправлено, так как оно содержит слишком много заглавных букв!"
+blocked-spam: "&cПожалуйста, не спамьте!"
+blocked-language: "&cВы использовали плохое слово. :("
+blocked-url: "&cПожалуйста, не отправляйте URL-адреса или IP-адреса!"
 
-# Сообщения команд
-command-message-description: '&8 - &d/msg &7- Отправить личное сообщение игроку.'
-command-message-usage: '&e/msg <player> <message>'
-command-message-enter-message: '&cВведите сообщение!'
+# Сообщение базовой команды
+base-command-color: "&e"
+base-command-help: "&eИспользуйте &b/%cmd% help &eдля получения информации о команде."
 
-# Ответ
-command-reply-description: '&8 - &d/reply &7- Ответь на сообщение от другого игрока.'
-command-reply-usage: '&e/reply'
-command-reply-enter-message: '&cВведите сообщение!'
-command-reply-no-one: '&cМы не знаем,кому ты хочешь ответить...'
+# Команда помощи
+command-help-description: "Отображает меню помощи... Вы прибыли"
+command-help-title: "&eДоступные команды:"
+command-help-list-description: "&8 - &d/%cmd% %subcmd% &7- %desc%"
+command-help-list-description-no-sub: "&8 - &d/%cmd% &7- %desc%"
 
-# Режим Шпиона
-command-socialspy-description: '&8 - &d/socialspy &7- Переключает возможность просмотра личных сообщений.'
-command-socialspy-usage: '&e/socialspy <type>'
-command-socialspy-enabled: '&eТы &aвключил&r&e режим шпиона в категории &b%type%&e.'
-command-socialspy-disabled: '&eТы &cвключил&r&e режим шпиона в категории &b%type% &espy.'
-command-socialspy-message: 'сообщения'
-command-socialspy-channel: 'канал'
-command-socialspy-group: 'группа'
-command-socialspy-all: 'ВСЁ (сообщения,канал и группа)'
+# Команда перезагрузки
+command-reload-description: "Перезагружает плагин"
+command-reload-reloaded: "&eДанные плагина, конфигурация и файлы локализации были перезагружены."
 
-# Отвключение сообщений
-command-togglemessage-description: '&8 - &d/togglemessage &7- Переключает возможность получать сообщения.'
-command-togglemessage-usage: '&e/togglemessage'
-command-togglemessage-on: '&eТы &aВключил&e принятие сообщений!'
-command-togglemessage-off: '&eТы &cВыключил&e принятие сообщений!'
+# Команда вещания
+command-broadcast-description: "Отправить сообщение на сервер или в канал"
+
+# Команда отладки
+command-debug-description: "Переключает режим отладки"
+command-debug-on: "&eРежим отладки теперь &aвключен&e. Используйте &b/rc debug &eснова для сохранения информации отладки."
+command-debug-off: "&eРежим отладки теперь &cвыключен&e."
+command-debug-once: "&eРежим отладки теперь &aвключен&e. Он автоматически отключится после отправки сообщения."
+
+# Команда канала
+command-channel-description: "Присоединиться к каналу или отправить сообщение"
+command-channel-joined: "&eТеперь вы используете канал &b%id%&e."
+command-channel-custom-usage: "&e/%channel% &e[сообщение]"
+command-channel-not-joinable: "&cЭтот канал не может быть присоединен."
+command-channel-cannot-message: "&cВы не можете отправить сообщение в этот канал."
+
+# Команда цвета чата
+command-chatcolor-description: "Изменить цвет вашего чата по умолчанию"
+command-chatcolor-success: "&eВаш новый цвет чата: &f%color%&e."
+command-chatcolor-removed: "&eВаш цвет чата был удален."
+command-chatcolor-player: "&eВы установили цвет чата для &b%player% &eна &f%color%&e."
+command-chatcolor-removed-player: "&eВы удалили цвет чата для &b%player%&e."
+command-chatcolor-gradient: "Градиент"
+command-chatcolor-rainbow: "Радуга"
+
+# Команда игнорирования
+command-ignore-description: "Перестать видеть сообщения игрока"
+command-ignore-ignored: "&eТеперь вы игнорируете &b%player%&e."
+command-ignore-unignored: "&eТеперь вы больше не игнорируете &b%player%&e."
+command-ignore-cannot-ignore: "&cВы не можете игнорировать этого игрока!"
+
+# Команда списка игнорирования
+command-ignorelist-description: "Показать, кого вы игнорируете"
+command-ignorelist-title: "&eВы игнорируете %amount% игроков:"
+command-ignorelist-color: "&e"
+command-ignorelist-separator: "&7, &e"
+
+# Команда сообщения
+command-message-description: "Отправить личное сообщение игроку"
+
+# Команда заглушения
+command-mute-description: "Заглушить игрока"
+command-mute-success: "&eВы заглушили &b%player% &eна &b%time% &b%scale%&e."
+command-mute-indefinite: "&eВы заглушили &b%player% &eна неопределённое время."
+command-mute-muted: "&eВы были заглушены."
+command-mute-cannot-be-muted: "&cВы не можете заглушить этого игрока!"
+command-mute-cannot-send: "&cВы не можете отправлять сообщения, пока вы заглушены!"
+command-mute-unmuted: "&eВы больше не заглушены."
+command-mute-scale-required: "&cПожалуйста, укажите временной интервал!"
+command-mute-second: "секунда"
+command-mute-seconds: "секунды"
+command-mute-minute: "минута"
+command-mute-minutes: "минуты"
+command-mute-hour: "час"
+command-mute-hours: "часы"
+command-mute-day: "день"
+command-mute-days: "дни"
+command-mute-month: "месяц"
+command-mute-months: "месяцы"
+command-mute-year: "год"
+command-mute-years: "годы"
+
+# Команда цвета ника
+command-nickcolor-description: "Изменить цвет вашего ника"
+command-nickcolor-success: "&eВаш новый ник: &f%name%&e."
+command-nickcolor-removed: "&eЦвет вашего ника был удалён."
+command-nickcolor-player: "&eВы установили ник &b%player% &eна &f%name%&e."
+command-nickcolor-removed-player: "&eВы удалили цвет ника у &b%player%&e."
+
+# Команда ника
+command-nickname-description: "Изменить ваше отображаемое имя"
+command-nickname-success: "&eВаш новый ник: &f%name%&e."
+command-nickname-player: "&b%player% &eтеперь имеет ник: &f%name%&e."
+command-nickname-too-short: "&cЭтот ник слишком короткий!"
+command-nickname-too-long: "&cЭтот ник слишком длинный!"
+command-nickname-not-allowed: "&cЭтот ник не разрешён!"
+command-nickname-colors-only: "&cВы можете использовать только цвета в вашем нике!"
+command-nickname-taken: "&cЭтот ник уже занят!"
+
+# Команда настоящего имени
+command-realname-description: "Просмотр настоящего имени игрока"
+command-realname-success: "&eНастоящее имя &b%name% &eэто: &b%player%&e."
+
+# Команда ответа
+command-reply-description: "Ответить на сообщение от игрока"
+command-reply-no-one: "&cНекому отвечать..."
+
+# Команда SocialSpy
+command-socialspy-description: "Переключить возможность видеть личные сообщения"
+command-socialspy-enabled: "&eВы &aвключили &b%type% &eшпионаж."
+command-socialspy-disabled: "&eВы &cвыключили &b%type% &eшпионаж."
+command-socialspy-message: "сообщение"
+command-socialspy-channel: "канал"
+command-socialspy-group: "группа"
+command-socialspy-all: "сообщения, канал и группа"
+
+# Команда ToggleEmoji
+command-toggleemoji-description: "Переключить форматирование эмодзи"
+command-toggleemoji-enabled: "&eВы &aвключили &eформатирование эмодзи."
+command-toggleemoji-disabled: "&eВы &cвыключили &eформатирование сообщений."
+
+# Команда ToggleMessage
+command-togglemessage-description: "Переключить получение сообщений"
+command-togglemessage-enabled: "&eВы &aвключили &eполучение сообщений."
+command-togglemessage-disabled: "&eВы &cвыключили &eполучение сообщений."
 command-togglemessage-cannot-message: '&cВы не можете отправить сообщение этому игроку!'
 
-# отключение звуков
-command-togglesound-description: '&8 - &d/togglesound &7- Переключает звуки сообщений и тегов.'
-command-togglesound-usage: '&e/togglesound <messages/tags/all>'
-command-togglesound-on: '&eТы &aвключил&e получение звуков при &b%type%&e.'
-command-togglesound-off: '&eТы &cвыключил&e получение звуков при &b%type%&e.'
-command-togglesound-messages: 'Сообщения'
-command-togglesound-tags: 'Теги'
-command-togglesound-all: 'Всё'
+# Команда ToggleSound
+command-togglesound-description: "Переключить звуки сообщений и упоминаний"
+command-togglesound-enabled: "&eВы &aвключили &eзвуки при получении &b%type%&e."
+command-togglesound-disabled: "&eВы &cвыключили &eзвуки при получении &b%type%&e."
+command-togglesound-messages: "сообщения"
+command-togglesound-tags: "упоминания"
+command-togglesound-all: "все"
 
-# отключение эмоджи
-command-toggleemoji-description: '&8 - &d/toggleemoji &7- Переключает форматирование эмодзи.'
-command-toggleemoji-usage: '&e/toggleemoji'
-command-toggleemoji-on: '&eТы &aвключил&e эмоджи.'
-command-toggleemoji-off: '&eТы &cвыключил&e эмоджи.'
+# Команда unmute
+command-unmute-description: "Снять заглушение с игрока"
+command-unmute-success: "&b%player% &eбольше не заглушен."
 
-# Каналы
-command-channel-description: '&8 - &d/channel &7- Отправить сообщение в канале чата.'
-command-channel-usage: '&e/channel <channel> [message]'
-command-channel-not-found: '&cKанал не найден.'
-command-channel-joined: '&eТы сейчас используешь &b%id% &eканал.'
-command-channel-custom-usage: '&e/%channel% &e<message>'
-command-channel-not-joinable: '&cК этому каналу невозможно подключиться.'
-command-channel-cannot-message: '&cВы не можете отправить сообщение в этом канале!'
+# Команда справки по чату
+command-chat-help-list-description: "&8 - &c/%cmd% %subcmd% &7- %desc%"
+command-chat-help-list-description-no-args: "&8 - &c/%cmd% %subcmd% &7- %desc%"
 
-# Чат
-command-chat-description: '&8 - &d/chat &7- Отображает меню справки администратора.'
-command-chat-usage: '&e/chat help'
+# Команда очистки чата
+command-chat-clear-description: "Очистить канал чата"
+command-chat-clear-cleared: "&eКанал &b%channel% &eбыл очищен."
 
-# Чат помощь
-command-chat-help-description: '&8 - &c/chat help &7-Отображает меню справки администратора... Вы прибыли.'
-command-chat-help-usage: '&8 - &e/chat help'
-command-chat-help-title: '&eДоступные команды:'
+# Команда информации о чате
+command-chat-info-description: "Просмотр информации о канале чата"
+command-chat-info-title: "&7[&c%id% Информация&7]"
+command-chat-info-format: "&7| &eПо умолчанию: &b%default% &7| &eЗаглушен: &b%muted% &7| &eКоманды: &c%commands% &7| &eМиры: &a%worlds% &7| &eПрисоединение: &b%joinable% &7| &eDiscord: &b%discord% &7| &eУчастники: &b%players% &7| &eСерверы: &b%servers%"
+command-chat-info-true: "правда"
+command-chat-info-false: "ложь"
+command-chat-info-none: "Нет"
 
-# Чат очистка
-command-chat-clear-description: '&8 - &c/chat clear &7- Очистить чат.'
-command-chat-clear-usage: '&e/chat clear [channel]'
-command-chat-clear-cleared: '&eЧат &b%channel% &eбыл очищен'
+# Команда перемещения в чате
+command-chat-move-description: "Переместить игрока в выбранный канал"
+command-chat-move-success: "&b%player% &eбыл перемещен в &b%channel%&e."
+command-chat-move-moved: "&eВы были перемещены в канал &b%channel%&e."
 
-# Перемещение между чатами
-command-chat-move-description: '&8 - &c/chat move &7- Перемещает в выбранный канал.'
-command-chat-move-usage: '&e/chat move <player> <channel>'
-command-chat-move-success: '&b%player% &eОтправился в &b%channel%&e. чат'
-command-chat-move-moved: '&eТебя отправили путешествовать в &b%channel% &eчат.'
+# Команда заглушения чата
+command-chat-mute-description: "Заглушить канал чата"
+command-chat-mute-muted: "&eКанал &b%channel% &eбыл заглушен."
+command-chat-mute-unmuted: "&eКанал &b%channel% &eбольше не заглушен."
+channel-muted: "&cВы не можете отправлять сообщения, пока этот канал заглушен."
 
-# блокировка чатов
-command-chat-mute-description: '&8 - &c/chat mute &7- Отключает канал чата.'
-command-chat-mute-usage: '&e/chat mute <channel>'
-command-chat-mute-muted: '&b%channel% &eчат был заблокирован.'
-command-chat-mute-unmuted: '&b%channel% &eчат был разблокирован'
-channel-muted: '&cЧат на технических работах :)'
+# Команда sudo для чата
+command-chat-sudo-description: "Отправить сообщение в чат от имени другого игрока"
 
-# Выполнение
-command-chat-sudo-description: '&8 - &c/chat sudo &7- Отправьте сообщение в чате от имени другого игрока.'
-command-chat-sudo-usage: '&e/chat sudo <player> <channel> <message>'
+# Команда переключения видимости чата
+command-chat-toggle-description: "Переключить видимость канала"
+command-chat-toggle-on: "&eТеперь вы видите канал &b%channel%&e."
+command-chat-toggle-off: "&eТеперь вы не видите канал &b%channel%&e."
 
-# Помощь по чату
-command-chat-info-description: '&8 - &c/chat info &7- Просмотр информации о канале чата.'
-command-chat-info-usage: '&e/chat info <channel>'
-command-chat-info-title: '&7[&c%id% Info&7]'
-command-chat-info-format: '&7| &eПервоначальный: &b%default% &7| &eМут: &b%muted% &7| &eКоманды: &c%commands% &7| &eМиры: &a%worlds% &7| &eCоединяемый: &b%joinable% &7| &eДС: &b%discord% &7| &eУчастники: &b%players% &7| &eСервера: &b%servers%'
-command-chat-info-true: 'Да'
-command-chat-info-false: 'Нет'
-command-chat-info-none: 'Ничего'
+# Команда медленного режима чата
+command-chat-slowmode-description: "Включить медленный режим для канала"
+command-chat-slowmode-on: "&eВключен медленный режим &b%speed%s &eв канале &b%channel%&e."
+command-chat-slowmode-off: "&eМедленный режим отключен в канале &b%channel%&e."
 
-# Группы
-command-gc-description: '&8 - &d/gc &7- Отображает меню справки группового чата.'
-command-gc-usage: '&e/gc help'
-no-gc: '&cУ вас нет собственного группового чата!'
-gc-invalid: '&cВы не находитесь в этом групповом чате!'
-gc-does-not-exist: '&cЭтого группового чата не существует!'
-gc-limit: '&cВы больше не сможете присоединяться ни к каким групповым чатам!'
+# Общие сообщения о групповых чатах
+gc-limit: "&cВы не можете присоединиться к большему количеству групповых чатов!"
+gc-no-invites: "&cУ вас нет приглашений в группы :("
+gc-not-invited: "&cЭта группа вас не пригласила!"
+no-gc: "&cУ вас нет группового чата!"
+gc-invalid: "&cВы не состоите в этом групповом чате!"
+gc-does-not-exist: "&cЭтот групповой чат не существует!"
 
-# Группы чат
-command-gc-help-description: '&8 - &b/gc help &7- Отображает меню справки группового чата... Что то нужно?'
-command-gc-help-usage: '&e/gc help'
+# Команда помощи по групповым чатам
+command-gc-help-list-description: "&8 - &b/%cmd% %subcmd% &7- %desc%"
+command-gc-help-list-description-no-args: "&8 - &b/%cmd% %subcmd% &7- %desc%"
 
-# Группы чат создание
-command-gc-create-description: '&8 - &b/gc create &7- Создает новый групповой чат.'
-command-gc-create-usage: '&e/gc create <айди> <отображаемое имя>'
-command-gc-create-success: '&eВы создали новый групповой чат под названием &b%name%&e. Используйте &b/gc invite &, чтобы пригласить игрока.'
-command-gc-create-fail: '&cУ вас уже есть групповой чат!'
-command-gc-already-exists: '&cГрупповой чат с таким названием уже существует!'
+# Команда принятия приглашения в групповой чат
+command-gc-accept-description: "Принять приглашение в групповой чат"
+command-gc-accept-success: "&eВы присоединились к групповому чату &b%name%&e."
+command-gc-accept-accepted: "&b%player% &eприсоединился к групповому чату &b%name%&e."
+command-gc-accept-hover: "&eНажмите, чтобы принять приглашение"
+command-gc-accept-accept: "&a&lПринять"
 
-# Группы чат пригласить
-command-gc-invite-description: '&8 - &b/gc invite &7- Приглашает игрока в групповой чат.'
-command-gc-invite-usage: '&e/gc invite <игрок>'
-command-gc-invite-full: '&bВ вашем групповом чате уже 128 участников!'
-command-gc-invite-success: '&eВы пригласили &b%player% &eв &b%name% &eгрупповой чат.'
-command-gc-invite-invited: '&b%player% &eпригласил вас в групповой чат &b%name% &e.'
-command-gc-invite-member: '&cЭтот игрок уже в группе!'
+# Команда создания группового чата
+command-gc-create-description: "Создать новый групповой чат"
+command-gc-create-success: "&eВы создали новый групповой чат под названием &b%name%&e. Используйте &b/gc invite &eчтобы пригласить игрока."
+command-gc-create-fail: "&cУ вас уже есть групповой чат!"
+command-gc-already-exists: "&cГрупповой чат с таким именем уже существует!"
 
-# Группы чат выгон
-command-gc-kick-description: '&8 - &b/gc kick &7- Выгоняет игрока из группового чата.'
-command-gc-kick-usage: '&e/gc kick <игрок>'
-command-gc-kick-success: '&b%player% &eбыл выгнан из &b%name%&e.'
-command-gc-kick-kicked: '&eВас вышвырнули из &b%name% &eчата.'
-command-gc-kick-invalid-player: '&cЭтого игрока нет в вашем групповом чате!'
-command-gc-kick-self: '&cТы не можешь выгнать себя!'
+# Команда отклонения приглашения в групповой чат
+command-gc-deny-description: "Отклонить приглашение в групповой чат"
+command-gc-deny-success: "&eВы отклонили приглашение от &b%name%&e."
+command-gc-deny-denied: "&b%player% &eотклонил ваше приглашение в групповой чат."
+command-gc-deny-hover: "&cНажмите, чтобы отклонить приглашение"
+command-gc-deny-deny: "&c&lОтклонить"
 
-# Группы чат соглашение
-command-gc-accept-description: '&8 - &b/gc accept &7-Принимает приглашение в групповой чат.'
-command-gc-accept-usage: '&e/gc accept [owner]'
-command-gc-accept-success: '&eВы присоединились к групповому чату &b%name% &e.'
-command-gc-accept-accepted: '&b%player% &eприсоединился к групповому чату &b%name% &e.'
-command-gc-accept-no-invites: '&cУ вас нет групповых приглашений :('
-command-gc-accept-not-invited: '&cЭта группа вас не приглашала!'
-command-gc-accept-hover: '&aНажмите, чтобы принять приглашение'
-command-gc-accept-accept: '&a&lПринять'
+# Команда роспуска группового чата
+command-gc-disband-description: "Удалить свой групповой чат"
+command-gc-disband-success: "&eГрупповой чат &b%name% &e, в котором вы состояли, был распущен..."
+command-gc-disband-admin: "&eВы распустили групповой чат &b%name%&e."
 
-# Группы чат отказ
-command-gc-deny-description: '&8 - &b/gc deny &7- Отклоняет приглашение в групповой чат.'
-command-gc-deny-usage: '&e/gc deny [owner]'
-command-gc-deny-success: '&eВы отклонили приглашение &b%name%&e.'
-command-gc-deny-denied: '&b%player% &eотклонено ваше приглашение в групповой чат.'
-command-gc-deny-hover: '&cНажмите, чтобы отклонить приглашение'
-command-gc-deny-deny: '&c&lОтклонить'
+# Команда информации о групповом чате
+command-gc-info-description: "Просмотр информации о групповом чате"
+command-gc-info-title: "&7[&b%group% &bИнформация&7]"
+command-gc-info-format: "&eID: &b%id% &7| &eВладелец: &b%owner% &7| &eУчастники: &b%members%"
 
-# Группы чат уйти
-command-gc-leave-description: '&8 - &b/gc leave &7- Уйти из группы'
-command-gc-leave-usage: '&e/gc leave <group>'
-command-gc-leave-success: '&eВы покинули групповой чат &b%name%&e.'
-command-gc-leave-left: '&b%player% &eпокинул групповой чат &b%name%&e.'
-command-gc-leave-own: '&cТы не можешь покинуть группу, используй &b/gc disband &cДля удаления.'
+# Команда приглашения в групповой чат
+command-gc-invite-description: "Пригласить игрока в ваш групповой чат"
+command-gc-invite-full: "&cВаш групповой чат уже содержит 128 участников!"
+command-gc-invite-success: "&eВы пригласили &b%player% &eв групповой чат &b%name%&e."
+command-gc-invite-invited: "&b%player% &eпригласил вас в групповой чат &b%name%&e."
+command-gc-invite-member: "&cЭтот игрок уже в группе!"
 
-# Группы чат
-command-gc-disband-description: '&8 - &b/gc disband &7- Удаляет ваш групповой чат.'
-command-gc-disband-usage: '&e/gc disband [group]'
-command-gc-disband-success: '&eГрупповой чат, &b%name%&e был расформирован...'
-command-gc-disband-admin: '&eBы распустили групповой чат &b%name% &.'
+# Команда исключения из группового чата
+command-gc-kick-description: "Исключить игрока из вашего группового чата"
+command-gc-kick-success: "&b%player% &eбыл исключен из группового чата &b%name%&e."
+command-gc-kick-kicked: "&eВы были исключены из группового чата &b%name%&e."
+command-gc-invalid-player: "&cЭтот игрок не состоит в вашем групповом чате!"
+command-gc-kick-self: "&cВы не можете исключить себя!"
 
-# Группы
-command-gc-members-description: '&8 - &b/gc members &7- Список участников группового чата.'
-command-gc-members-usage: '&e/gc members <group>'
-command-gc-members-title: '&8[&bУчастники %name% &8]'
-command-gc-members-owner: '&8- &e:star: &b%player%'
-command-gc-members-member: '&8- &b%player%'
+# Команда выхода из группового чата
+command-gc-leave-description: "Выйти из группового чата"
+command-gc-leave-success: "&eВы вышли из группового чата &b%name%&e."
+command-gc-leave-left: "&b%player% &eвышел из группового чата &b%name%&e."
+command-gc-leave-own: "&cВы не можете покинуть свой собственный групповой чат! Используйте &b/gc disband &cчтобы удалить свой групповой чат."
 
-# Группы
-command-gc-rename-description: '&8 - &b/gc rename &7- Изменить имя чата.'
-command-gc-rename-usage: '&e/gc rename <group> <name>'
-command-gc-rename-success: '&eТеперь ваш групповой чат называется &b%name%&e.'
+# Команда списка групповых чатов
+command-gc-list-description: "Просмотр списка всех групповых чатов"
+command-gc-list-title: "&7[&bГруппы&7]"
+command-gc-list-format: "&8- &8[&b%group%&8] &eID: &b%id%"
+command-gc-list-more: "&eИспользуйте &b/gc info <group> &eдля получения дополнительной информации."
 
-# Группы
-command-gc-info-description: '&8 - &b/gc info &7- Просмотр информации о групповом чате.'
-command-gc-info-usage: '&e/gc info <group>'
-command-gc-info-title: '&7[&b%group% &bInfo&7]'
-command-gc-info-format: '&eАйди: &b%id% &7| &eВладелец: &b%owner% &7| &eУчастники: &b%members%'
+# Команда участников группового чата
+command-gc-members-description: "Список участников группового чата"
+command-gc-members-title: "&8[&b%name% &bУчастники&8]"
+command-gc-members-owner: "&e- &e:star: &b%player%"
+command-gc-members-member: "&e- &b%player%"
 
-# Группы
-command-gc-list-description: '&8 - &b/gc list &7- Просмотреть список всех групповых чатов.'
-command-gc-list-usage: '&e/gc list'
-command-gc-list-title: '&7[&bГруппы&7]'
-command-gc-list-format: '&8- &8[%group%&8] &eID: &b%id%'
-command-gc-list-more: '&eИспользуйте &b/gc info <группа> &eдля получения дополнительной информации.'
+# Команда сообщений в групповом чате
+command-gcm-description: "Отправить сообщение в групповой чат."
 
-# Группы
-command-gcm-description: '&8 - &d/gcm &7- Отправляет сообщение в групповом чате.'
-command-gcm-usage: '&e/gcm <group> <message>'
-command-gcm-enter-message: '&cПожалуйста, введите сообщение.'
+# Команда переименования группового чата
+command-gc-rename-description: "Переименовать свой групповой чат"
+command-gc-rename-success: "&eВаш групповой чат теперь называется &b%name%&e."
 
-# цвета
-command-color-description: '&8 - &d/color &7- Изменить твой цвет чата'
-command-color-usage: '&e/color <color/игрок> [color/remove]'
-command-color-success: '&eЦвет твоего чата &f%color%&e.'
-command-color-invalid: '&eЭто недопустимый цвет!'
-command-color-removed: '&eЦвет вашего чата был удален.'
-command-color-gradient: 'Жирный'
-command-color-rainbow: 'Радужный'
-command-color-others: "&eВы установили цвет чата игрока &b%player%&e на &f%color%&e."
-command-color-others-removed: "&eВы удалили цвет чата игрока &b%player%&e."
-
-# мут
-command-mute-description: '&8 - &d/mute &7- Выдать мут'
-command-mute-usage: '&e/mute <player> [time] [days/months/years]'
-command-mute-success: '&eВы получили мут &b%player% &eНа &b%time% &b%scale%&e.'
-command-mute-indefinite: '&eВы получили мут &b%player% &eВы не можете отправить сообщение, пока вы отключены!.'
-command-mute-muted: '&eТебе дали мут.'
-command-mute-cannot-be-muted: '&cТы не можешь дать ему мут!'
-command-mute-cannot-send: '&cВы не можете отправить сообщение, пока вы в муте!'
-command-mute-unmuted: '&eВы больше не в муте.'
-command-mute-second: 'секунда'
-command-mute-minute: 'минута'
-command-mute-hour: 'час'
-command-mute-day: 'день'
-command-mute-month: 'месяц'
-command-mute-year: 'год'
-command-mute-seconds: 'секунды'
-command-mute-minutes: 'минуты'
-command-mute-hours: 'часы'
-command-mute-days: 'дня'
-command-mute-months: 'месяца'
-command-mute-years: 'года'
-
-# размут
-command-unmute-description: '&8 - &d/unmute &7- Убрать мут.'
-command-unmute-usage: '&e/unmute <player>'
-command-unmute-success: '&b%player% &eБольше не в муте'
-
-# никнейм
-command-nickname-description: '&8 - &d/nickname &7- Изменить никнейм'
-command-nickname-usage: '&e/nickname <name/player> [name/off]'
-command-nickname-success: '&eТвой новый никнейм: &f%name%&e.'
-command-nickname-other: '&b%player%&e поменял никнейм на: &f%name%&e.'
-command-nickname-too-short: '&cНикнейм короткий!'
-command-nickname-too-long: '&cНикнейм длинный!'
-command-nickname-not-allowed: '&cЭтот никнейм запрещён!'
-command-nickname-colors-only: '&cВы можете использовать только цвета в своем нике!'
-
-# игноор
-command-ignore-description: '&8 - &d/ignore &7- Не позволяет вам видеть сообщения игрока.'
-command-ignore-usage: '&e/ignore <player>'
-command-ignore-ignored: '&eВы игнорируете &b%player%&e.'
-command-ignore-unignored: '&eВы не игнорите &b%player%&e.'
-command-ignore-list-title: '&eВы игнорируете %amount% игроков:'
-command-ignore-list-color: '&e'
-command-ignore-list-separator: '&7, &e'
-
-# Откладка
-command-debug-description: '&8 - &d/rc debug &7- Переключает режим отладки.'
-command-debug-usage: '&e/rc debug'
-command-debug-on: '&eРежим отладки теперь включен. Используйте &b/rc debug &еще раз, чтобы сохранить отладочную информацию.'
-command-debug-off: '&eРежим отладки теперь &coff&e.'
-
-# Цветной ник
-command-nickcolor-description: '&8 - &d/nickcolor &7- Изменить цвет никнейма.'
-command-nickcolor-usage: '&e/nickcolor <color/игрок> [color/remove]'
-command-nickcolor-success: '&eваш новый ник - это: &f%name%&e.'
-command-nickcolor-invalid: '&eЭто недопустимый цвет!'
-command-nickcolor-removed: '&eВаш ник color был удален.'
-command-nickcolor-others: "&eВы установили цвет ника игрока &b%player%&e на &f%color%&e."
-command-nickcolor-others-removed: "&eВы удалили цвет ника игрока &b%player%&e."
-
-# Отключение
-command-chat-toggle-description: '&8 - &c/chat toggle &7- Переключает просмотр канала.'
-command-chat-toggle-usage: '&e/chat toggle <channel>'
-command-chat-toggle-on: '&eТеперь вы увидите &b%channel% &канал.'
-command-chat-toggle-off: '&eВы больше не будете видеть канал &b%% &channel.'
-
-# настоящего имени
-command-realname-description: "&8 - &d/realname &7- Просмотр настоящего имени игрока."
-command-realname-usage: '&e/realname <игрок>'
-command-realname-success: "&eНастоящее имя игрока %name%: &b%player%&e."
+# Команда повышения участника группового чата
+command-gc-promote-description: "Повысить участника группы до владельца"
+command-gc-promote-already-owner: "&cВы уже являетесь владельцем этого группового чата!"
+command-gc-promote-success: "&b%player% &eтеперь владелец группового чата &b%name%&e!"
+command-gc-promote-promoted: "&eТеперь вы являетесь владельцем группового чата &b%name%&e!"

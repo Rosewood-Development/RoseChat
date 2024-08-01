@@ -1,27 +1,22 @@
-# zh_CN 翻译，翻译者FireworkPolymer
+# zh_CN
 # 插件信息前缀
-prefix: '&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] '
+prefix: "&7[<g:#8A2387:#E94057:#F27121>RoseChat&7] "
 
 # 命令信息
 no-permission: '&c你没有权限使用此命令!'
-player-not-found: '&c此玩家不在线!'
-player-only: '&c控制台不可使用此命令!'
-invalid-arguments: '&c使用方法: &e%syntax%&c.'
-not-a-number: '&c输入的内容不是数字!'
+only-player: '&c控制台不可使用此命令!'
+invalid-argument: "&c%message%"
 message-blank: '&c请输入消息!'
 
-# 基础命令消息
-base-command-help: '&e使用 &b/rc help &e来获取命令信息.'
-
-# 帮助命令
-command-help-description: '&8 - &d/rc help &7- 展示帮助菜单，就是你现在所处的地方...'
-command-help-title: '&e可用命令:'
-command-help-usage: '&e/rc help'
-
-# 重载命令
-command-reload-description: '&8 - &d/rc reload &7- 重载插件.'
-command-reload-usage: '&e/rc reload'
-command-reload-reloaded: '&e插件数据, 配置文件, 和本地语言文件已重载.'
+# 参数处理错误消息
+argument-handler-player: "此玩家不在线！"
+argument-handler-channel: "该频道不存在！"
+argument-handler-chatcolor: "这不是一个有效的颜色！"
+argument-handler-timescale: "这不是一个有效的时间尺度！"
+argument-handler-integer: "输入的内容不是数字！"
+argument-handler-group: "该组不存在！"
+argument-handler-group-member: "该玩家不在这个群聊中！"
+argument-handler-member-group: "您不在这个群聊中！"
 
 # 管理消息
 blocked-caps: '&c你的消息因大写字母太多无法发送!'
@@ -29,273 +24,262 @@ blocked-spam: '&c请不要刷屏!'
 blocked-language: '&c不准说坏坏的东西 :('
 blocked-url: '&c请勿发送链接或IP地址!'
 
-# 私聊命令
-command-message-description: '&8 - &d/msg &7- 私聊玩家.'
-command-message-usage: '&e/msg <玩家名> <消息>'
-command-message-enter-message: '&c请输入消息!'
+# 基础命令消息
+base-command-color: "&e"
+base-command-help: '&e使用 &b/%cmd% &e来获取命令信息.'
 
-# 回复命令
-command-reply-description: '&8 - &d/reply &7- 回复另一个玩家的消息.'
-command-reply-usage: '&e/reply'
-command-reply-enter-message: '&c请输入消息!'
-command-reply-no-one: '&c没有需要回复的玩家...'
+# 帮助命令
+command-help-description: '展示帮助菜单，就是你现在所处的地方...'
+command-help-title: '&e可用命令:'
+command-help-list-description: "&8 - &d/%cmd% %subcmd% &7- %desc%"
+command-help-list-description-no-sub: "&8 - &d/%cmd% &7- %desc%"
 
-# 监听命令
-command-socialspy-description: '&8 - &d/socialspy &7- 切换私聊信息监听状态.'
-command-socialspy-usage: '&e/socialspy <监听种类>'
-command-socialspy-enabled: '&e你&a开启了&b%type%&e的监听.'
-command-socialspy-disabled: '&e你&c关闭了&b%type%&e的监听.'
-command-socialspy-message: '私聊'
-command-socialspy-channel: '频道'
-command-socialspy-group: '群聊'
-command-socialspy-all: '私聊,频道和群聊'
+# 重载命令
+command-reload-description: '重载插件.'
+command-reload-reloaded: '&e插件数据, 配置文件, 和本地语言文件已重载.'
 
-# 切换接受消息命令
-command-togglemessage-description: '&8 - &d/togglemessage &7- 切换是否接受私聊.'
-command-togglemessage-usage: '&e/togglemessage'
-command-togglemessage-on: '&e你现在&a接受&e私聊 .'
-command-togglemessage-off: '&e你现在&c拒绝&e私聊.'
-command-togglemessage-cannot-message: '&c你不能私聊此玩家!'
+# 广播命令
+command-broadcast-description: "向服务器或频道广播一条消息"
 
-# 切换消息声音命令
-command-togglesound-description: '&8 - &d/togglesound &7- 切换私聊和使用聊天标签时是否播放声音.'
-command-togglesound-usage: '&e/togglesound <messages/tags/all>'
-command-togglesound-on: '&e你现在&a允许接收&b%type%&e时的声音.'
-command-togglesound-off: '&e你现在&c拒绝接收&b%type%&e时的声音.'
-command-togglesound-messages: '私聊'
-command-togglesound-tags: '使用聊天标签'
-command-togglesound-all: '私聊和使用聊天标签'
-
-# 切换表情命令
-command-toggleemoji-description: '&8 - &d/toggleemoji &7- 切换表情的显示与否.'
-command-toggleemoji-usage: '&e/toggleemoji'
-command-toggleemoji-on: '&e你&a开启了&e表情显示.'
-command-toggleemoji-off: '&e你&c关闭了&e表情显示.'
+# 调试命令
+command-debug-description: '切换调试模式.'
+command-debug-on: '&e调试模式已开启。使用 &b/rc debug &e再次开启调试信息保存.'
+command-debug-off: '&e调试模式已关闭。'
+command-debug-once: "&e调试模式已&a开启&e。在发送消息后将自动禁用。"
 
 # 频道命令
-command-channel-description: '&8 - &d/channel &7- 在聊天频道中发送消息.'
-command-channel-usage: '&e/channel <频道名> [消息]'
-command-channel-not-found: '&c此频道不存在.'
+command-channel-description: '在聊天频道中发送消息.'
 command-channel-joined: '&e你正在&b%id%&e频道中聊天.'
 command-channel-custom-usage: '&e/%channel% &e<消息>'
 command-channel-not-joinable: '&c无法加入此频道.'
 command-channel-cannot-message: '&c你无法在此频道发送消息!'
 
-# 聊天命令
-command-chat-description: '&8 - &d/chat &7- 显示管理员帮助菜单.'
-command-chat-usage: '&e/chat help'
+# Chat Color Command
+command-chatcolor-description: "更改默认聊天颜色"
+command-chatcolor-success: "&e你的新聊天颜色是 &f%color%&e。"
+command-chatcolor-removed: "&e你的聊天颜色已被移除。"
+command-chatcolor-player: "&e你已将 &b%player%&e 的聊天颜色设置为 &f%color%&e。"
+command-chatcolor-removed-player: "&e你已移除 &b%player%&e 的聊天颜色。"
+command-chatcolor-gradient: "渐变"
+command-chatcolor-rainbow: "彩虹"
 
-# 聊天命令帮助菜单
-command-chat-help-description: '&8 - &c/chat help &7- 显示管理员帮助菜单，就是你现在所处的地方...'
-command-chat-help-usage: '&8 - &e/chat help'
-command-chat-help-title: '&e可用命令:'
+# Ignore Command
+command-ignore-description: "不再接收某玩家的消息"
+command-ignore-ignored: "&e你现在忽略了 &b%player%&e。"
+command-ignore-unignored: "&e你不再忽略 &b%player%&e。"
+command-ignore-cannot-ignore: "&c你不能忽略这个玩家！"
 
-# 清空聊天命令
-command-chat-clear-description: '&8 - &c/chat clear &7- 清空聊天栏.'
-command-chat-clear-usage: '&e/chat clear [频道名]'
-command-chat-clear-cleared: '&b%channel%&e频道中的信息已被清空.'
+# Ignorelist Command
+command-ignorelist-description: "显示你忽略的玩家"
+command-ignorelist-title: "&e你忽略了 %amount% 个玩家："
+command-ignorelist-color: "&e"
+command-ignorelist-separator: "&7, &e"
 
-# 聊天移动命令
-command-chat-move-description: '&8 - &c/chat move &7- 将玩家移动到指定频道.'
-command-chat-move-usage: '&e/chat move <玩家名> <频道名>'
-command-chat-move-success: '&b%player%&e已被移动到&b%channel%&e频道.'
-command-chat-move-moved: '&e你被移动到了&b%channel%&e频道.'
+# Message Command
+command-message-description: "私聊某玩家"
 
-# 聊天禁言命令
-command-chat-mute-description: '&8 - &c/chat mute &7- 禁言一个频道.'
-command-chat-mute-usage: '&e/chat mute <频道名>'
-command-chat-mute-muted: '&e&b%channel%&e频道已被禁言.'
-command-chat-mute-unmuted: '&e&b%channel%&e频道已解除禁言.'
-channel-muted: '&c频道被禁言时无法发送消息.'
+# Mute Command
+command-mute-description: "禁言某玩家"
+command-mute-success: "&e你已禁言 &b%player% &e，时长 &b%time% &b%scale%&e。"
+command-mute-indefinite: "&e你已无限期禁言 &b%player%&e。"
+command-mute-muted: "&e你已被禁言。"
+command-mute-cannot-be-muted: "&c你不能禁言这个玩家！"
+command-mute-cannot-send: "&c你被禁言期间不能发送消息！"
+command-mute-unmuted: "&e你已被解除禁言。"
+command-mute-scale-required: "&c请提供一个时间尺度！"
+command-mute-second: "秒"
+command-mute-seconds: "秒"
+command-mute-minute: "分钟"
+command-mute-minutes: "分钟"
+command-mute-hour: "小时"
+command-mute-hours: "小时"
+command-mute-day: "天"
+command-mute-days: "天"
+command-mute-month: "月"
+command-mute-months: "月"
+command-mute-year: "年"
+command-mute-years: "年"
 
-# 聊天执行命令
-command-chat-sudo-description: '&8 - &c/chat sudo &7- 以某个玩家的身份发送消息.'
-command-chat-sudo-usage: '&e/chat sudo <玩家名> <频道名> <消息>'
+# Nick Color Command
+command-nickcolor-description: "更改昵称颜色"
+command-nickcolor-success: "&e你的新昵称是: &f%name%&e。"
+command-nickcolor-removed: "&e你的昵称颜色已被移除。"
+command-nickcolor-player: "&e你已将 &b%player%&e 的昵称设置为 &f%name%&e。"
+command-nickcolor-removed-player: "&e你已移除 &b%player%&e 的昵称颜色。"
 
-# 聊天信息命令
-command-chat-info-description: '&8 - &c/chat info &7- 查看聊天频道的信息.'
-command-chat-info-usage: '&e/chat info <频道名>'
-command-chat-info-title: '&7[&c%id% 的信息&7]'
-command-chat-info-format: '| &e是否为默认频道: &b%default% &7| &e是否被禁言: &b%muted% &7| &e进入频道命令: &c%commands% &7| &e特定世界: &a%worlds% &7| &e是否可加入此频道: &b%joinable% &7| &e此频道的Discord: &b%discord% &7| &e玩家数量: &b%players% &7| &e所在服务器: &b%servers%'
-command-chat-info-true: '是'
-command-chat-info-false: '否'
-command-chat-info-none: '无'
+# Nickname Command
+command-nickname-description: "更改显示名称"
+command-nickname-success: "&e你的新昵称是: &f%name%&e。"
+command-nickname-player: "&b%player%&e 的新昵称是: &f%name%&e。"
+command-nickname-too-short: "&c这个昵称太短了！"
+command-nickname-too-long: "&c这个昵称太长了！"
+command-nickname-not-allowed: "&c这个昵称不允许！"
+command-nickname-colors-only: "&c你的昵称只能使用颜色！"
+command-nickname-taken: "&c这个名字已被占用！"
 
-# 群聊命令
-command-gc-description: '&8 - &d/gc &7- 显示群聊帮助菜单.'
-command-gc-usage: '&e/gc help'
-no-gc: '&c你没有创建任何群聊!'
-gc-invalid: '&c你不在此群聊中!'
-gc-does-not-exist: '&c此群聊不存在!'
-gc-limit: '&c你不能加入更多群聊了!'
+# Realname Command
+command-realname-description: "查看玩家的真实姓名"
+command-realname-success: "&b%name%&e 的真实姓名是: &b%player%&e。"
 
-# 群聊帮助命令
-command-gc-help-description: '&8 - &b/gc help &7- 展示群聊帮助菜单.'
-command-gc-help-usage: '&e/gc help'
+# Reply Command
+command-reply-description: "回复玩家的消息"
+command-reply-no-one: "&c没有人可以回复..."
 
-# 创建群聊命令
-command-gc-create-description: '&8 - &b/gc create &7- 创建新群聊.'
-command-gc-create-usage: '&e/gc create <id> <显示名>'
-command-gc-create-success: '&e你创建了一个叫做 &b%name%&e 的群聊.请使用 &b/gc invite &e来邀请玩家进入你的群聊.'
-command-gc-create-fail: '&c你已经创建了一个群聊了!'
-command-gc-already-exists: '&c叫做这个名字的群聊已经存在了!'
+# SocialSpy Command
+command-socialspy-description: "切换查看私聊消息的功能"
+command-socialspy-enabled: "&e你已 &a启用 &b%type% &e的监视功能。"
+command-socialspy-disabled: "&e你已 &c禁用 &b%type% &e的监视功能。"
+command-socialspy-message: "消息"
+command-socialspy-channel: "频道"
+command-socialspy-group: "群组"
+command-socialspy-all: "消息、频道和群组"
 
-# 群聊邀请命令
-command-gc-invite-description: '&8 - &b/gc invite &7- 邀请玩家至你的群聊.'
-command-gc-invite-usage: '&e/gc invite <玩家名>'
-command-gc-invite-full: '&b你的群聊已经有128个玩家了!'
-command-gc-invite-success: '&e你已邀请&b%player%&e到群聊&b%name%.'
-command-gc-invite-invited: '&b%player% &e邀请你进入群聊&b%name%.'
-command-gc-invite-member: '&c此玩家已经是群聊内成员了!'
+# ToggleEmoji Command
+command-toggleemoji-description: "切换表情格式"
+command-toggleemoji-enabled: "&e你已 &a启用 &e表情格式。"
+command-toggleemoji-disabled: "&e你已 &c禁用 &e表情格式。"
 
-# 群聊踢出命令
-command-gc-kick-description: '&8 - &b/gc kick &7- 将玩家从群聊中踢出.'
-command-gc-kick-usage: '&e/gc kick <玩家名>'
-command-gc-kick-success: '&b%player%&e被踢出群聊&b%name%.'
-command-gc-kick-kicked: '&e你被踢出了&b%name%.'
-command-gc-kick-invalid-player: '&c此玩家不在你的群聊里!'
-command-gc-kick-self: '&c你不能把自己踢出去!'
+# ToggleMessage Command
+command-togglemessage-description: "切换接收消息"
+command-togglemessage-enabled: "&e你已 &a启用 &e接收消息。"
+command-togglemessage-disabled: "&e你已 &c禁用 &e接收消息。"
+command-togglemessage-cannot-message: '&c你不能给这个玩家发送消息！'
 
-# 接受群聊邀请命令
-command-gc-accept-description: '&8 - &b/gc accept &7- 接受群聊邀请.'
-command-gc-accept-usage: '&e/gc accept [群主]'
-command-gc-accept-success: '&e你加入了群聊&b%name%.'
-command-gc-accept-accepted: '&b%player%&e加入了&b%name%.'
-command-gc-accept-no-invites: '&c你没有群聊邀请 :('
-command-gc-accept-not-invited: '&c这个群聊没有邀请你!'
-command-gc-accept-hover: '&a点击接受邀请'
-command-gc-accept-accept: '&a&l接受'
+# ToggleSound Command
+command-togglesound-description: "切换消息和标签声音"
+command-togglesound-enabled: "&e你已 &a启用 &e接收 &b%type%&e 时的声音。"
+command-togglesound-disabled: "&e你已 &c禁用 &e接收 &b%type%&e 时的声音。"
+command-togglesound-messages: "消息"
+command-togglesound-tags: "标签"
+command-togglesound-all: "所有"
 
-# 群聊拒绝邀请命令
-command-gc-deny-description: '&8 - &b/gc deny &7- 拒绝群聊的邀请.'
-command-gc-deny-usage: '&e/gc deny [群主]'
-command-gc-deny-success: '&e你拒绝了&b%name%&e的邀请.'
-command-gc-deny-denied: '&b%player%&e拒绝了你的邀请.'
-command-gc-deny-hover: '&c点击拒绝邀请'
-command-gc-deny-deny: '&c&l拒绝'
+# Unmute Command
+command-unmute-description: "解除玩家的禁言"
+command-unmute-success: "&b%player% &e不再被禁言。"
 
-# 离开群聊命令
-command-gc-leave-description: '&8 - &b/gc leave &7- 退出群聊.'
-command-gc-leave-usage: '&e/gc leave <群聊ID>'
-command-gc-leave-success: '&e你离开了群聊&b%name%.'
-command-gc-leave-left: '&b%player%&e离开了群聊&b%name%.'
-command-gc-leave-own: '&c你不能离开自己的群聊!请使用 &b/gc disband &c来解散你的群聊.'
+# Chat Help Command
+command-chat-help-list-description: "&8 - &c/%cmd% %subcmd% &7- %desc%"
+command-chat-help-list-description-no-args: "&8 - &c/%cmd% %subcmd% &7- %desc%"
 
-# 解散群聊命令
-command-gc-disband-description: '&8 - &b/gc disband &7- 解散群聊.'
-command-gc-disband-usage: '&e/gc disband [群聊ID]'
-command-gc-disband-success: '&e你所在的群聊&b%name%&e已被解散...'
-command-gc-disband-admin: '&e你解散了群聊&b%name%.'
+# Chat Clear Command
+command-chat-clear-description: "清空聊天频道"
+command-chat-clear-cleared: "&e&b%channel% &e频道已被清空。"
 
-# 群成员命令
-command-gc-members-description: '&8 - &b/gc members &7- 列出群聊的群成员.'
-command-gc-members-usage: '&e/gc members <群聊ID>'
-command-gc-members-title: '&8[&b%name% &b的群成员&8]'
-command-gc-members-owner: '&8- &e:star: &b%player%[群主]'
-command-gc-members-member: '&8- &b%player%'
+# Chat Info Command
+command-chat-info-description: "查看聊天频道信息"
+command-chat-info-title: "&7[&c%id% 信息&7]"
+command-chat-info-format: "&7| &e默认: &b%default% &7| &e静音: &b%muted% &7| &e命令: &c%commands% &7| &e世界: &a%worlds% &7| &e可加入: &b%joinable% &7| &eDiscord: &b%discord% &7| &e成员: &b%players% &7| &e服务器: &b%servers%"
+command-chat-info-true: "是"
+command-chat-info-false: "否"
+command-chat-info-none: "无"
 
-# 改群名命令
-command-gc-rename-description: '&8 - &b/gc rename &7- 改群名.'
-command-gc-rename-usage: '&e/gc rename <群聊ID> <新名称>'
-command-gc-rename-success: '&e你的群聊被更名为&b%name%&e.'
+# Chat Move Command
+command-chat-move-description: "将玩家移动到选定的频道"
+command-chat-move-success: "&b%player% &e已被移动到 &b%channel%&e。"
+command-chat-move-moved: "&e你已被移动到 &b%channel% &e频道。"
 
-# 群聊信息命令
-command-gc-info-description: '&8 - &b/gc info &7- 显示一个群聊的信息.'
-command-gc-info-usage: '&e/gc info <群聊ID>'
-command-gc-info-title: '&7[&b%group% &b信息&7]'
-command-gc-info-format: '&eID: &b%id% &7| &e群主: &b%owner% &7| &e群员人数: &b%members%'
+# Chat Mute Command
+command-chat-mute-description: "禁言聊天频道"
+command-chat-mute-muted: "&e&b%channel% &e频道已被禁言。"
+command-chat-mute-unmuted: "&e&b%channel% &e频道已解除禁言。"
+channel-muted: "&c这个频道被禁言期间你不能发送消息。"
+
+# Chat Sudo Command
+command-chat-sudo-description: "以其他玩家身份发送聊天消息"
+
+# Chat Toggle Command
+command-chat-toggle-description: "切换是否查看某频道"
+command-chat-toggle-on: "&e你现在将看到 &b%channel% &e频道。"
+command-chat-toggle-off: "&e你将不再看到 &b%channel% &e频道。"
+
+# Chat Slowmode Command
+command-chat-slowmode-description: "为频道启用慢模式"
+command-chat-slowmode-on: "&e在 &b%channel%&e 启用了 &b%speed%s &e慢模式。"
+command-chat-slowmode-off: "&e在 &b%channel%&e 关闭了慢模式。"
+
+# Generic Group Chat Messages
+gc-limit: "&c你不能加入更多的群组聊天！"
+gc-no-invites: "&c你没有群组邀请 :("
+gc-not-invited: "&c这个群组没有邀请你！"
+no-gc: "&c你不拥有任何群组聊天！"
+gc-invalid: "&c你不在这个群组聊天中！"
+gc-does-not-exist: "&c这个群组聊天不存在！"
+
+# Group Chat Help Command
+command-gc-help-list-description: "&8 - &b/%cmd% %subcmd% &7- %desc%"
+command-gc-help-list-description-no-args: "&8 - &b/%cmd% %subcmd% &7- %desc%"
+
+# Group Chat Accept Command
+command-gc-accept-description: "接受群组聊天邀请"
+command-gc-accept-success: "&e你已加入 &b%name% &e群组聊天。"
+command-gc-accept-accepted: "&b%player% &e已加入 &b%name% &e群组聊天。"
+command-gc-accept-hover: "&e点击接受邀请"
+command-gc-accept-accept: "&a&l接受"
+
+# Group Chat Create Command
+command-gc-create-description: "创建一个新的群组聊天"
+command-gc-create-success: "&e你已创建一个名为 &b%name%&e 的群组聊天。使用 &b/gc invite &e邀请玩家。"
+command-gc-create-fail: "&c你已经拥有一个群组聊天！"
+command-gc-already-exists: "&c一个名为此名称的群组聊天已存在！"
+
+# Group Chat Deny Command
+command-gc-deny-description: "拒绝群组聊天邀请"
+command-gc-deny-success: "&e你已拒绝 &b%name%&e 的邀请。"
+command-gc-deny-denied: "&b%player% &e拒绝了你的群组聊天邀请。"
+command-gc-deny-hover: "&c点击拒绝邀请"
+command-gc-deny-deny: "&c&l拒绝"
+
+# Group Chat Disband Command
+command-gc-disband-description: "删除你的群组聊天"
+command-gc-disband-success: "&e你所在的 &b%name% &e群组聊天已被解散..."
+command-gc-disband-admin: "&e你解散了 &b%name% &e群组聊天。"
+
+# Group Chat Info Command
+command-gc-info-description: "查看群组聊天信息"
+command-gc-info-title: "&7[&b%group% &b信息&7]"
+command-gc-info-format: "&eID: &b%id% &7| &e所有者: &b%owner% &7| &e成员: &b%members%"
+
+# Group Chat Invite Command
+command-gc-invite-description: "邀请玩家加入你的群组聊天"
+command-gc-invite-full: "&c你的群组聊天已满 128 名成员！"
+command-gc-invite-success: "&e你已邀请 &b%player% &e加入 &b%name% &e群组聊天。"
+command-gc-invite-invited: "&b%player% &e已邀请你加入 &b%name% &e群组聊天。"
+command-gc-invite-member: "&c此玩家已在群组中！"
+
+# Group Chat Kick Command
+command-gc-kick-description: "将玩家踢出你的群组聊天"
+command-gc-kick-success: "&b%player% &e已从 &b%name% &e群组聊天中被踢出。"
+command-gc-kick-kicked: "&e你已被踢出 &b%name% &e群组聊天。"
+command-gc-invalid-player: "&c此玩家不在你的群组聊天中！"
+command-gc-kick-self: "&c你不能踢自己！"
+
+# Group Chat Leave Command
+command-gc-leave-description: "将你从群组聊天中移除"
+command-gc-leave-success: "&e你已离开 &b%name% &e群组聊天。"
+command-gc-leave-left: "&b%player% &e已离开 &b%name% &e群组聊天。"
+command-gc-leave-own: "&c你不能离开自己的群组聊天！使用 &b/gc disband &c删除你的群组聊天。"
 
 # Group Chat List Command
-command-gc-list-description: '&8 - &b/gc list &7- 查看所有群聊的列表.'
-command-gc-list-usage: '&e/gc list'
-command-gc-list-title: '&7[&b群&7]'
-command-gc-list-format: "&8- &8[%group%&8] &eID: &b%owner%"
-command-gc-list-more: '&e使用 &b/gc info <group> &e获取更多信息。'
+command-gc-list-description: "查看所有群组聊天的列表"
+command-gc-list-title: "&7[&b群组&7]"
+command-gc-list-format: "&8- &8[&b%group%&8] &eID: &b%id%"
+command-gc-list-more: "&e使用 &b/gc info <group> &e获取更多信息。"
 
-# 群聊发消息命令
-command-gcm-description: '&8 - &d/gcm &7- 在群聊中发消息.'
-command-gcm-usage: '&e/gcm <群聊ID> <消息>'
-command-gcm-enter-message: '&c请输入消息.'
+# Group Chat Members Command
+command-gc-members-description: "列出群组聊天的成员"
+command-gc-members-title: "&8[&b%name% &b成员&8]"
+command-gc-members-owner: "&e- &e:star: &b%player%"
+command-gc-members-member: "&e- &b%player%"
 
-# Color Command
-command-color-description: '&8 - &d/color &7- 改变默认聊天颜色.'
-command-color-usage: '&e/color <颜色/玩家名> [颜色/remove]'
-command-color-success: '&e你的聊天颜色现在为&f%color%&e.'
-command-color-invalid: '&e此颜色不存在!'
-command-color-removed: '&e你移除了你的聊天颜色.'
-command-color-gradient: '渐变色'
-command-color-rainbow: '彩虹色'
-command-color-others: "&e你已将玩家&b%player%&e的聊天颜色设置为&f%color%&e。"
-command-color-others-removed: "&e你已移除玩家&b%player%&e的聊天颜色。"
+# Group Chat Message Command
+command-gcm-description: "在群组聊天中发送消息。"
 
-# 禁言命令
-command-mute-description: '&8 - &d/mute &7- 禁言玩家.'
-command-mute-usage: '&e/mute <玩家名> [时间] [days(天)/months(月)/years(年)]'
-command-mute-success: '&e你禁言了 &b%player% &b%time%&b%scale%&e.'
-command-mute-indefinite: '&e你禁言了 &b%player% &e很久很久.'
-command-mute-muted: '&e你已被禁言.'
-command-mute-cannot-be-muted: '&c不能禁言此玩家!'
-command-mute-cannot-send: '&c被禁言时不能发送消息!'
-command-mute-unmuted: '&e你的禁言已解除.'
-command-mute-second: '秒'
-command-mute-minute: '分'
-command-mute-hour: '小时'
-command-mute-month: '月'
-command-mute-day: '天'
-command-mute-year: '年'
-command-mute-seconds: '秒'
-command-mute-minutes: '分'
-command-mute-hours: '小时'
-command-mute-days: '天'
-command-mute-months: '月'
-command-mute-years: '年'
+# Group Chat Rename Command
+command-gc-rename-description: "重命名你的群组聊天"
+command-gc-rename-success: "&e你的群组聊天现在叫做 &b%name%&e。"
 
-# 解除禁言命令
-command-unmute-description: '&8 - &d/unmute &7- 解除玩家禁言.'
-command-unmute-usage: '&e/unmute <玩家名>'
-command-unmute-success: '&b%player% &e的禁言已被解除.'
-
-# 昵称命令
-command-nickname-description: '&8 - &d/nickname &7- 更改昵称.'
-command-nickname-usage: '&e/nickname <昵称/玩家名> [昵称/off(关闭)]'
-command-nickname-success: '&e你的昵称现在为: &f%name%&e.'
-command-nickname-other: '&b%player%&e的昵称现在为: &f%name%&e.'
-command-nickname-too-short: '&c这个昵称太短了!'
-command-nickname-too-long: '&c这个昵称太长了!'
-command-nickname-not-allowed: '&c不允许使用此昵称!'
-command-nickname-colors-only: '&c你只能在昵称中使用颜色！'
-
-# 屏蔽命令
-command-ignore-description: '&8 - &d/ignore &7- 屏蔽某人的命令.'
-command-ignore-usage: '&e/ignore <玩家名>'
-command-ignore-ignored: '&e你现在屏蔽了 &b%player%&e.'
-command-ignore-unignored: '&e你不再屏蔽 &b%player%&e.'
-command-ignore-list-title: '&e你正在忽略 %amount% 名玩家：'
-command-ignore-list-color: '&e'
-command-ignore-list-separator: '&7, &e'
-
-# 调试命令
-command-debug-description: '&8 - &d/rc debug &7- 切换调试模式.'
-command-debug-usage: '&e/rc debug'
-command-debug-on: '&e调试模式已开启。使用 &b/rc debug &e再次开启调试信息保存.'
-command-debug-off: '&e调试模式已关闭。'
-
-# 昵称颜色命令
-command-nickcolor-description: '&8 - &d/nickcolor &7- 更改昵称颜色.'
-command-nickcolor-usage: '&e/nickcolor <颜色/玩家名> [颜色/remove]'
-command-nickcolor-success: '&e你的新昵称为：&f%name%&e.'
-command-nickcolor-invalid: '&e这不是一个有效的颜色！'
-command-nickcolor-removed: '&e你的昵称颜色已移除.'
-command-nickcolor-others: "&e你已将玩家&b%player%&e的昵称颜色设置为&f%color%&e。"
-command-nickcolor-others-removed: "&e你已移除玩家&b%player%&e的昵称颜色。"
-
-# 切换频道可见性命令
-command-chat-toggle-description: '&8 - &c/chat toggle &7- 切换频道可见性.'
-command-chat-toggle-usage: '&e/chat toggle <channel>'
-command-chat-toggle-on: '&e你现在可以看到 &b%channel% &e频道.'
-command-chat-toggle-off: '&e你将不再看到 &b%channel% &e频道.'
-
-# 真实姓名
-command-realname-description: "&8 - &d/realname &7- 查看玩家的真实姓名."
-command-realname-usage: '&e/realname <玩家名>'
-command-realname-success: "&e玩家%name%的真实姓名是: &b%player%&e."
+# Group Chat Promote Command
+command-gc-promote-description: "将群组成员提升为所有者"
+command-gc-promote-already-owner: "&c你已经是这个群组聊天的所有者了！"
+command-gc-promote-success: "&b%player% &e现在是 &b%name%&e 的所有者！"
+command-gc-promote-promoted: "&e你现在是 &b%name%&e 的所有者！"
