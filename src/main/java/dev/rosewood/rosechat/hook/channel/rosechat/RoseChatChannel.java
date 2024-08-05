@@ -229,9 +229,10 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 outputs = event.getComponents().outputs();
 
                 receiver.send(parsedMessage.content());
-                receiver.getPlayerData().getMessageLog().addDeletableMessage(
-                        new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage.outputs()),
-                                false, null, this.getId()));
+                if (receiver.getPlayerData() != null)
+                    receiver.getPlayerData().getMessageLog().addDeletableMessage(
+                            new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage.outputs()),
+                                    false, null, this.getId()));
             } else {
                 PreParseMessageEvent preParseEvent = new PreParseMessageEvent(message, receiver, direction);
                 Bukkit.getPluginManager().callEvent(preParseEvent);
@@ -255,7 +256,8 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 DeletableMessage deletableMessage = message.createDeletableMessage(
                         ComponentSerializer.toString(postParseEvent.getComponents().content()), discordId);
 
-                receiver.getPlayerData().getMessageLog().addDeletableMessage(deletableMessage);
+                if (receiver.getPlayerData() != null)
+                    receiver.getPlayerData().getMessageLog().addDeletableMessage(deletableMessage);
             }
 
             if (!receiver.isPlayer())
@@ -264,7 +266,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             if (!outputs.getTaggedPlayers().contains(receiver.getUUID()))
                 return;
 
-            if (!receiver.getPlayerData().hasTagSounds() || outputs.getTagSound() == null)
+            if ((receiver.getPlayerData() != null && !receiver.getPlayerData().hasTagSounds()) || outputs.getTagSound() == null)
                 return;
 
             Player player = receiver.asPlayer();

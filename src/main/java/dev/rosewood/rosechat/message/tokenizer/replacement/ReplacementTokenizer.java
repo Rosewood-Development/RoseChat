@@ -68,6 +68,8 @@ public class ReplacementTokenizer extends Tokenizer {
 
                 if (!replacement.getOutput().hasColorRetention()) token.encapsulate();
 
+                token.ignoreTokenizer(this);
+
                 return new TokenizerResult(token.build(), originalContent.length());
             } else {
                 // Continue if the input is not the replacement
