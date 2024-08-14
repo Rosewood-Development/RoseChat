@@ -123,6 +123,7 @@ public class ReplacementManager extends Manager {
                 case "is-content-regex" -> input.setIsContentRegex(inputSection.getBoolean("is-content-regex"));
                 case "is-inline-regex" -> input.setIsInlineRegex(inputSection.getBoolean("is-inline-regex"));
                 case "can-toggle" -> input.setCanToggle(inputSection.getBoolean("can-toggle"));
+                case "is-emoji" -> input.setIsEmoji(inputSection.getBoolean("is-emoji"));
                 case "permission" -> input.setPermission(inputSection.getString("permission"));
             }
         }

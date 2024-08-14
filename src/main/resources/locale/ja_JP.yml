@@ -157,6 +157,14 @@ command-togglesound-all: "すべて"
 command-unmute-description: "プレイヤーのミュートを解除します"
 command-unmute-success: "&b%player% &eのミュートが解除されました。"
 
+# pingコマンド
+command-ping-description: "自分にメッセージを送ります"
+command-ping-default-reply: "&eじゃーん！"
+
+# Emoji コマンド
+command-emoji-description: "利用可能な絵文字を表示"
+command-emoji-default-reply: "&e表示したい絵文字を入力してください！ :star:"
+
 # チャットヘルプコマンド
 command-chat-help-list-description: "&8 - &c/%cmd% %subcmd% &7- %desc%"
 command-chat-help-list-description-no-args: "&8 - &c/%cmd% %subcmd% &7- %desc%"

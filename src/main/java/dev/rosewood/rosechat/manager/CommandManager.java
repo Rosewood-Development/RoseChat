@@ -6,12 +6,14 @@ import dev.rosewood.rosechat.command.command.BroadcastCommand;
 import dev.rosewood.rosechat.command.command.ChannelCommand;
 import dev.rosewood.rosechat.command.command.ChatColorCommand;
 import dev.rosewood.rosechat.command.command.DeleteMessageCommand;
+import dev.rosewood.rosechat.command.command.EmojiCommand;
 import dev.rosewood.rosechat.command.command.IgnoreCommand;
 import dev.rosewood.rosechat.command.command.IgnorelistCommand;
 import dev.rosewood.rosechat.command.command.MessageCommand;
 import dev.rosewood.rosechat.command.command.MuteCommand;
 import dev.rosewood.rosechat.command.command.NickColorCommand;
 import dev.rosewood.rosechat.command.command.NicknameCommand;
+import dev.rosewood.rosechat.command.command.PingCommand;
 import dev.rosewood.rosechat.command.command.RealnameCommand;
 import dev.rosewood.rosechat.command.command.ReplyCommand;
 import dev.rosewood.rosechat.command.command.SocialSpyCommand;
@@ -56,7 +58,9 @@ public class CommandManager extends AbstractCommandManager {
                 ToggleEmojiCommand::new,
                 ToggleMessageCommand::new,
                 ToggleSoundCommand::new,
-                UnmuteCommand::new
+                UnmuteCommand::new,
+                PingCommand::new,
+                EmojiCommand::new
         );
     }
 

@@ -157,6 +157,14 @@ command-togglesound-all: "all"
 command-unmute-description: "Removes a player's mute"
 command-unmute-success: "&b%player% &eis no longer muted."
 
+# Ping Command
+command-ping-description: "Send a message to yourself"
+command-ping-default-reply: "&ePong!"
+
+# Emoji Command
+command-emoji-description: "View your available emoji"
+command-emoji-default-reply: "&eEnter an emoji to view it! :star:"
+
 # Chat Help Command
 command-chat-help-list-description: "&8 - &c/%cmd% %subcmd% &7- %desc%"
 command-chat-help-list-description-no-args: "&8 - &c/%cmd% %subcmd% &7- %desc%"

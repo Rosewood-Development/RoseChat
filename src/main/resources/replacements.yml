@@ -9,6 +9,7 @@ star:
   input:
     text: ':star:'
     can-toggle: true
+    is-emoji: true
   # The replacement, ":star:" will turn into "✸" when sent.
   output:
     text: '✸'
@@ -18,6 +19,7 @@ rosewood:
   input:
     text: ':rosewood:'
     can-toggle: true
+    is-emoji: true
   output:
     text: "\uE000"
     # When the replacement is hovered over, this text will be shown.
@@ -27,6 +29,7 @@ heart:
   input:
     text: '<3'
     can-toggle: true
+    is-emoji: true
   output:
     text: "\u2764"
 

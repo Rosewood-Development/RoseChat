@@ -157,6 +157,14 @@ command-togglesound-all: "все"
 command-unmute-description: "Снять заглушение с игрока"
 command-unmute-success: "&b%player% &eбольше не заглушен."
 
+# Команда Ping
+command-ping-description: "Отправить сообщение самому себе"
+command-ping-default-reply: "&ePong!"
+
+# Команда Emoji
+command-emoji-description: "Просмотр доступных смайликов"
+command-emoji-default-reply: "&eВведите смайлик, чтобы просмотреть его! :star:"
+
 # Команда справки по чату
 command-chat-help-list-description: "&8 - &c/%cmd% %subcmd% &7- %desc%"
 command-chat-help-list-description-no-args: "&8 - &c/%cmd% %subcmd% &7- %desc%"
