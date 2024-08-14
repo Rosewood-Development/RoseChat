@@ -48,10 +48,6 @@ public class ChatColorCommand extends RoseChatCommand {
     @RoseExecutable
     public void execute(CommandContext context, String color) {
         RosePlayer player = new RosePlayer(context.getSender());
-        if (player.isConsole()) {
-            player.sendLocaleMessage("only-player");
-            return;
-        }
 
         if (color.isEmpty()) {
             this.removeColor(player, player);
@@ -122,7 +118,7 @@ public class ChatColorCommand extends RoseChatCommand {
             colorStr = colorStr.replace('_', ' ');
         }
 
-        if (!player.getUUID().equals(target.getUUID()))
+        if (player.getUUID() == null || !player.getUUID().equals(target.getUUID()))
             player.sendLocaleMessage("command-chatcolor-player",
                     StringPlaceholders.of(
                             "player", target.getName(),
