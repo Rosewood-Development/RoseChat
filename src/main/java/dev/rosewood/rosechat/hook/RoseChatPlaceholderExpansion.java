@@ -17,12 +17,12 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
-    public String onPlaceholderRequest(Player player, String placeholder) {
+    public String onRequest(OfflinePlayer player, String placeholder) {
         if (placeholder == null)
             return null;
 
@@ -84,7 +84,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
-        if (playerData == null)
+        if (!player.hasPlayedBefore() || playerData == null)
             return null;
 
         if (placeholder.startsWith("placeholder_")) {
@@ -101,20 +101,21 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             if (channel == null)
                 return null;
 
-            ChannelMessageOptions options = channel.getMessageLog().getAndRemoveNextMessage(player);
+            ChannelMessageOptions options = channel.getMessageLog().getAndRemoveNextMessage(player.getPlayer());
             if (options == null)
                 return null;
 
             return options.message();
         }
 
+        String displayName = (player.getPlayer() != null ? player.getPlayer().getDisplayName() : player.getName());
         return switch (placeholder) {
             case "chat_color" -> playerData.getColor();
             case "nickname" -> playerData.getNickname();
             case "nickname_stripped" -> playerData.getNickname() == null ? null : ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
-            case "name" -> playerData.getNickname() == null ? player.getDisplayName() : playerData.getNickname();
+            case "name" -> playerData.getNickname() == null ? displayName : playerData.getNickname();
             case "name_stripped" -> playerData.getNickname() == null ?
-                    ChatColor.stripColor(player.getDisplayName()) : ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
+                    ChatColor.stripColor(displayName) : ChatColor.stripColor(HexUtils.colorify(playerData.getNickname()));
             case "current_channel" -> playerData.getCurrentChannel().getId();
             case "is_muted" -> playerData.isMuted() ? "yes" : "no";
             case "mute_time" -> String.valueOf(playerData.getMuteExpirationTime());

@@ -85,7 +85,7 @@ public class PlayerListener implements Listener {
             playerDataManager.getPlayerData(player.getUUID()).save();
             playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
             playerDataManager.unloadPlayerData(player.getUUID());
-        }, 5L);
+        }, 20L * 60L);
     }
 
     @EventHandler
