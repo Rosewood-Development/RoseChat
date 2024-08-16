@@ -78,7 +78,8 @@ public class DataManager extends AbstractDataManager {
                     playerData.setColor(color);
                     playerData.setNickname(nickname);
                     playerData.setIsInGroupChannel(isCurrentlyChannelGroupChannel);
-                    playerData.setDisplayName(strippedDisplayName);
+                    if (strippedDisplayName != null)
+                        playerData.setDisplayName(strippedDisplayName);
 
                     if (muteTime > 0)
                         playerData.mute(muteTime);
