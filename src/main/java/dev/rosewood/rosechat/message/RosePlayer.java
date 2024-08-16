@@ -483,7 +483,8 @@ public class RosePlayer {
         if (oldChannel != null)
             oldChannel.onLeave(this);
 
-        channel.onJoin(this);
+        if (!isGroupChannel)
+            channel.onJoin(this);
 
         this.getPlayerData().setActiveChannel(channel);
         this.getPlayerData().setCurrentChannel(channel);

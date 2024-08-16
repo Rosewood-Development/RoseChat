@@ -1,7 +1,6 @@
 package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -15,6 +14,7 @@ import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +61,7 @@ public class GroupDisbandCommand extends RoseChatCommand {
         if (!success)
             return;
 
-        List<UUID> members = group.getMembers();
+        List<UUID> members = new ArrayList<>(group.getMembers());
         for (UUID uuid : members) {
             Player member = Bukkit.getPlayer(uuid);
             if (member == null)
@@ -69,8 +69,8 @@ public class GroupDisbandCommand extends RoseChatCommand {
 
             RosePlayer roseMember = new RosePlayer(member);
             PlayerData data = this.getAPI().getPlayerData(member.getUniqueId());
-            if (data.getCurrentChannel() == group)
-                data.setCurrentChannel(roseMember.findChannel());
+            if (data.isCurrentChannelGroupChannel() && data.getCurrentChannel().getId().equalsIgnoreCase(group.getId()))
+                player.switchChannel(roseMember.findChannel());
 
             this.getLocaleManager().sendComponentMessage(member, "command-gc-disband-success",
                     StringPlaceholders.of("name", group.getName()));
