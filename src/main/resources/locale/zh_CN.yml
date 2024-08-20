@@ -28,6 +28,9 @@ blocked-url: '&c请勿发送链接或IP地址!'
 base-command-color: "&e"
 base-command-help: '&e使用 &b/%cmd% &e来获取命令信息.'
 
+# 手持物品
+no-held-item: "&c如果你没有持有物品，就不能使用物品标签！"
+
 # 帮助命令
 command-help-description: '展示帮助菜单，就是你现在所处的地方...'
 command-help-title: '&e可用命令:'

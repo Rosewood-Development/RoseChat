@@ -130,6 +130,9 @@ public final class Settings {
                         "The can-join-group-channels setting will not take affect.");
     public static final RoseSetting<Boolean> REMOVE_COLOR_CODES = create(CHAT_SETTINGS, "remove-color-codes", BOOLEAN, false,
             "Should color codes be removed if a player attempts to send colors without having permission?");
+    public static final RoseSetting<Boolean> ALLOW_NO_HELD_ITEM = create(CHAT_SETTINGS, "allow-no-held-item", BOOLEAN, true,
+            "Should players be allowed to use the held item replacement if they are not holding an item?",
+                        "If false, the 'no-held-item' locale message will be sent.");
 
     public static final RoseSetting<CommentedConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,

@@ -24,6 +24,9 @@ blocked-spam: "&cPlease do not spam!"
 blocked-language: "&cYou used a bad word. :("
 blocked-url: "&cPlease do not send URLs or IPs!"
 
+# Held Item
+no-held-item: "&cYou cannot use the item tag if you are not holding an item!"
+
 # Base Command Message
 base-command-color: "&e"
 base-command-help: "&eUse &b/%cmd% help &efor command information."

@@ -24,6 +24,9 @@ blocked-spam: "&cスパムしないでください！"
 blocked-language: "&c&c無礼な言葉を使いました (;_;)"
 blocked-url: "&cURLかIPをセンドしないでください！"
 
+# アイテム
+no-held-item: "&cアイテムを持っていないと、アイテムタグを使うことはできません！"
+
 # メイン・コマンド・メッセージ
 base-command-color: "&e"
 base-command-help: '&eコマンドインフォメーションには&b/%cmd% &eを使います。'

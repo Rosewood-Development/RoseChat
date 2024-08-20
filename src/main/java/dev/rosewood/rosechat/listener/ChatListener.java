@@ -5,6 +5,8 @@ import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import org.bukkit.Bukkit;
@@ -12,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class ChatListener implements Listener {
 
@@ -48,6 +51,19 @@ public class ChatListener implements Listener {
         if (data.isMuted() && !player.hasPermission("rosechat.mute.bypass")) {
             player.sendLocaleMessage("command-mute-cannot-send");
             return;
+        }
+
+        // Don't send the message if the player is using [item] and isn't holding an item.
+        String heldItemReplacement = Settings.HELD_ITEM_REPLACEMENT.get();
+        if (heldItemReplacement != null && player.isPlayer()) {
+            Replacement replacement = this.api.getReplacementById(heldItemReplacement);
+            if (replacement != null && message.contains(replacement.getInput().getText())) {
+                ItemStack stack = player.asPlayer().getInventory().getItemInMainHand();
+                if (stack.getAmount() == 0 && !Settings.ALLOW_NO_HELD_ITEM.get()) {
+                    player.sendLocaleMessage("no-held-item");
+                    return;
+                }
+            }
         }
 
         // Check if the message is using a shout command and send the message if they are.
