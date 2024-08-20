@@ -12,7 +12,6 @@ import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayDeque;
@@ -80,7 +79,7 @@ public class MessageTokenizer {
                 String originalContent = content;
 
                 this.parses++;
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction);
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction, token.getPlaceholders());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;

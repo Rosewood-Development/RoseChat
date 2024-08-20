@@ -225,9 +225,14 @@ url:
 # This placeholder allows an item to be shown in chat.
 # The %item_name% placeholder is used for the name of the item.
 # The %item% placeholder is used for the item itself.
+# This placeholder uses a condition to display the item amount if there is more than one item.
 item:
   text:
-    default: "&7» &e%item_name% &7«"
+    condition: "%amount%"
+    value: 1
+    more: "&7» &e%amount%x %item_name% &7«"
+    equal: "&7» &e%item_name% &7«"
+    less: ""
   hover:
     action: SHOW_ITEM
     default:

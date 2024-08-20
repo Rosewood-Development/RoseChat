@@ -21,7 +21,7 @@ public class TokenizerParams {
     private final StringPlaceholders placeholders;
     private final MessageDirection direction;
 
-    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput, MessageDirection direction) {
+    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput, MessageDirection direction, StringPlaceholders placeholders) {
         this.outputs = new MessageOutputs();
         this.sender = message.getSender();
         this.receiver = receiver;
@@ -31,7 +31,7 @@ public class TokenizerParams {
         this.location = message.getLocation();
         this.locationPermission = message.getLocationPermission();
         this.channel = message.getChannel();
-        this.placeholders = message.getPlaceholders();
+        this.placeholders = StringPlaceholders.builder().addAll(message.getPlaceholders()).addAll(placeholders).build();
         this.direction = direction;
     }
 

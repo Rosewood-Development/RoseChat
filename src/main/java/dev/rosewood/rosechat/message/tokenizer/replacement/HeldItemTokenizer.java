@@ -67,6 +67,7 @@ public class HeldItemTokenizer extends Tokenizer {
             ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
             String json = NMSAdapter.getHandler().getItemStackAsString(params.getSender().asPlayer(), item);
+            int amount = item.getAmount();
 
             ItemMeta itemMeta = item.getItemMeta();
             String itemName = item.hasItemMeta() && itemMeta.hasDisplayName()
@@ -77,6 +78,7 @@ public class HeldItemTokenizer extends Tokenizer {
                     .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_ITEM, json))
                     .placeholder("item_name", itemName)
                     .placeholder("item", json)
+                    .placeholder("amount", amount)
                     .ignoreTokenizer(this)
                     .ignoreTokenizer(Tokenizers.REPLACEMENT)
                     .encapsulate()
