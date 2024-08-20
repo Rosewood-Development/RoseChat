@@ -7,6 +7,7 @@ no-permission: "&cУ вас нет разрешения на это!"
 only-player: "&cЭту команду может использовать только игрок."
 invalid-argument: "&c%message%"
 message-blank: "&cПожалуйста, введите сообщение!"
+command-usage: "&cИспользование: &b/%cmd% %args%"
 
 # Сообщения об ошибках обработчика аргументов
 argument-handler-player: "Этот игрок не в сети!"

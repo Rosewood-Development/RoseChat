@@ -31,15 +31,8 @@ public class TokenizerParams {
         this.location = message.getLocation();
         this.locationPermission = message.getLocationPermission();
         this.channel = message.getChannel();
+        this.placeholders = placeholders;
         this.direction = direction;
-
-        StringPlaceholders.Builder builder = StringPlaceholders.builder();
-        if (message.getPlaceholders() != null)
-            builder.addAll(message.getPlaceholders());
-
-        if (placeholders != null)
-            builder.addAll(placeholders);
-        this.placeholders = builder.build();
     }
 
     public MessageOutputs getOutputs() {

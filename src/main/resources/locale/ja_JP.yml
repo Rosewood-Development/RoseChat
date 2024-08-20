@@ -7,6 +7,7 @@ no-permission: "&cこれをするのは許可がありません！"
 only-player: "&cプレイヤーだけはこのコマンドを使えます！"
 invalid-argument: "&c%message%"
 message-blank: "&cメッセージを入力してください！"
+command-usage: "&c使い方: &b/%cmd% %args%"
 
 # アーギュメントハンドラー・エラー・メッセージ
 argument-handler-player: "このプレイヤーはオンラインではありません！"

@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import java.text.DecimalFormat;
@@ -79,7 +80,14 @@ public class MessageTokenizer {
                 String originalContent = content;
 
                 this.parses++;
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction, token.getPlaceholders());
+                StringPlaceholders.Builder builder = StringPlaceholders.builder();
+                if (this.roseMessage.getPlaceholders() != null)
+                    builder.addAll(this.roseMessage.getPlaceholders());
+
+                if (token.getPlaceholders() != null)
+                    builder.addAll(token.getPlaceholders());
+
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction, builder.build());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;

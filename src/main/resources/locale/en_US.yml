@@ -7,6 +7,7 @@ no-permission: "&cYou don't have permission for that!"
 only-player: "&cThis command can only be used by a player."
 invalid-argument: "&c%message%"
 message-blank: "&cPlease enter a message!"
+command-usage: "&cUsage: &b/%cmd% %args%"
 
 # Argument Handler Error Messages
 argument-handler-player: "This player is not online!"
