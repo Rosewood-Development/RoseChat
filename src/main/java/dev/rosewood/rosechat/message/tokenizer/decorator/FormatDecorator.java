@@ -42,13 +42,7 @@ public class FormatDecorator extends TokenDecorator {
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (!(newDecorator instanceof FormatDecorator other))
-            return false;
-
-        if (other.chatColor == ChatColor.RESET)
-            return true;
-
-        return other.chatColor == this.chatColor;
+        return newDecorator.getType() == DecoratorType.STYLING && !(newDecorator instanceof FontDecorator);
     }
 
     @Override
