@@ -133,6 +133,9 @@ public final class Settings {
     public static final RoseSetting<Boolean> ALLOW_NO_HELD_ITEM = create(CHAT_SETTINGS, "allow-no-held-item", BOOLEAN, true,
             "Should players be allowed to use the held item replacement if they are not holding an item?",
                         "If false, the 'no-held-item' locale message will be sent.");
+    public static final RoseSetting<Boolean> ALLOW_CHAT_SUGGESTIONS = create(CHAT_SETTINGS, "allow-chat-suggestions", BOOLEAN, true,
+            "Can players use tab to display emoji, replacement, and placeholder suggestions in chat?",
+                        "This allows players to see their available replacements when sending a message in chat. Requires 1.19+");
 
     public static final RoseSetting<CommentedConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,

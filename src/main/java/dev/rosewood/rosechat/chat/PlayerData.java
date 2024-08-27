@@ -38,6 +38,7 @@ public class PlayerData {
     private final List<UUID> ignoringPlayers;
     private final List<String> hiddenChannels;
 
+    private List<String> chatCompletions;
     private long muteTime;
     private MuteTask activeMuteTask;
 
@@ -59,6 +60,7 @@ public class PlayerData {
         this.groupInvites = new ArrayList<>();
         this.ignoringPlayers = new ArrayList<>();
         this.hiddenChannels = new ArrayList<>();
+        this.chatCompletions = new ArrayList<>();
     }
 
     /**
@@ -405,6 +407,17 @@ public class PlayerData {
      */
     public void setActiveChannel(Channel activeChannel) {
         this.activeChannel = activeChannel;
+    }
+
+    /**
+     * @return A list of chat completions based on the player's permissions.
+     */
+    public List<String> getChatCompletions() {
+        return this.chatCompletions;
+    }
+
+    public void setChatCompletions(List<String> chatCompletions) {
+        this.chatCompletions = chatCompletions;
     }
 
 }

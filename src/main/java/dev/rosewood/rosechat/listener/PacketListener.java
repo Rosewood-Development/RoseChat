@@ -67,7 +67,7 @@ public class PacketListener {
 
         }
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(plugin, priority, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this.plugin, priority, (NMSUtil.getVersionNumber() >= 19 ? types : legacyTypes)) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 if (!Settings.ENABLE_DELETING_MESSAGES.get())

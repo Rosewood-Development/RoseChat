@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,6 +36,9 @@ public class ChatListener implements Listener {
 
         player.validateMuteExpiry();
         player.validateChatColor();
+
+        if (NMSUtil.getVersionNumber() >= 19 && Settings.ALLOW_CHAT_SUGGESTIONS.get())
+            player.validateChatCompletion();
 
         // Don't send the message if the player doesn't have permission.
         if (!player.hasPermission("rosechat.chat")) {

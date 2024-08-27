@@ -7,10 +7,12 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
+import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
@@ -384,6 +386,42 @@ public class RosePlayer {
     public void validateChatColor() {
         if (!MessageUtils.canColor(this, this.getPlayerData().getColor(), PermissionArea.CHATCOLOR))
             this.getPlayerData().setColor("");
+    }
+
+    /**
+     * Removes and re-adds the chat completions for the player.
+     */
+    public void validateChatCompletion() {
+        if (!this.isPlayer())
+            return;
+
+        Player player = this.asPlayer();
+        player.removeCustomChatCompletions(this.getPlayerData().getChatCompletions());
+
+        List<String> completions = new ArrayList<>();
+
+        for (Replacement replacement : api.getReplacements()) {
+            if (replacement.getInput().isRegex() || replacement.getInput().isInlineRegex())
+                continue;
+
+            String text = replacement.getInput().getText() == null ?
+                    replacement.getInput().getPrefix() : replacement.getInput().getText();
+
+            String permission = replacement.getInput().getPermission() == null ?
+                    "rosechat.replacement." + replacement.getId() : replacement.getInput().getPermission();
+            if (this.hasPermission(permission))
+                completions.add(text);
+        }
+
+        for (CustomPlaceholder placeholder : api.getPlaceholderManager().getPlaceholders().values()) {
+            if (!this.hasPermission("rosechat.placeholder." + placeholder.getId()))
+                continue;
+
+            completions.add("{" + placeholder.getId() + "}");
+        }
+
+        player.addCustomChatCompletions(completions);
+        this.getPlayerData().setChatCompletions(completions);
     }
 
     /**
