@@ -12,6 +12,8 @@ public enum PermissionArea {
     NICKNAME,
     // When setting a chat color.
     CHATCOLOR,
+    // When using on a sign.
+    SIGN,
     // Removes all need for permissions.
     NONE
 

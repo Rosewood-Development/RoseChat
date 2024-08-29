@@ -136,6 +136,10 @@ public final class Settings {
     public static final RoseSetting<Boolean> ALLOW_CHAT_SUGGESTIONS = create(CHAT_SETTINGS, "allow-chat-suggestions", BOOLEAN, true,
             "Can players use tab to display emoji, replacement, and placeholder suggestions in chat?",
                         "This allows players to see their available replacements when sending a message in chat. Requires 1.19+");
+    public static final RoseSetting<Boolean> ENABLE_ON_SIGNS = create(CHAT_SETTINGS, "enable-on-signs", BOOLEAN, true,
+            "Can players use RoseChat features on signs?",
+                        "Players will require the sign permissions. For example, 'rosechat.replacements.sign', to use replacements on signs.",
+                        "Players will also need the individual permissions, such as 'rosechat.replacement.heart'.");
 
     public static final RoseSetting<CommentedConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,

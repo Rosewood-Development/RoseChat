@@ -23,6 +23,7 @@ import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
+import dev.rosewood.rosechat.listener.SignListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.CommandManager;
@@ -83,6 +84,7 @@ public class RoseChat extends RosePlugin {
 
         // Register Listeners
         pluginManager.registerEvents(new PlayerListener(this), this);
+        pluginManager.registerEvents(new SignListener(), this);
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord",
