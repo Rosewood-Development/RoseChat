@@ -84,7 +84,7 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         PlayerData playerData = api.getPlayerData(player.getUniqueId());
-        if (!player.hasPlayedBefore() || playerData == null)
+        if (playerData == null)
             return null;
 
         if (placeholder.startsWith("placeholder_")) {
