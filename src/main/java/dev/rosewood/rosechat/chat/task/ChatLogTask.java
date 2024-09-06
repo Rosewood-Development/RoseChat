@@ -19,10 +19,12 @@ public class ChatLogTask extends BukkitRunnable {
 
     public ChatLogTask(RoseChat plugin, ConsoleMessageLog log) throws IOException {
         this.log = log;
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         String date = sdf.format(new Date());
-        Files.createDirectories(Path.of(plugin.getDataFolder() + "/log/"));
-        this.file = Files.createFile(Path.of(plugin.getDataFolder() + "/log/" + date + ".log")).toFile();
+        Path folder = Files.createDirectories(Path.of(plugin.getDataFolder() + "/log/"));
+        this.file = Files.createFile(folder.resolve(date + ".log")).toFile();
+
         this.runTaskTimerAsynchronously(plugin, 0L, 30L * 20L);
     }
 

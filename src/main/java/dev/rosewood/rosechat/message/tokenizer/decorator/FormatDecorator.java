@@ -42,7 +42,8 @@ public class FormatDecorator extends TokenDecorator {
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return newDecorator.getType() == DecoratorType.STYLING && !(newDecorator instanceof FontDecorator);
+        return newDecorator.getType() == DecoratorType.STYLING &&
+                !(newDecorator instanceof FontDecorator) && !(newDecorator instanceof FormatDecorator);
     }
 
     @Override
