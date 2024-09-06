@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import java.text.Normalizer;
@@ -350,7 +349,6 @@ public class MessageUtils {
      */
     public static boolean canColor(RosePlayer sender, String str, PermissionArea area) {
         Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
-        Matcher formatMatcher = VALID_LEGACY_REGEX_FORMATTING.matcher(str);
         Matcher hexMatcher = HEX_REGEX.matcher(str);
         Matcher gradientMatcher = GRADIENT_PATTERN.matcher(str);
         Matcher rainbowMatcher = RAINBOW_PATTERN.matcher(str);
@@ -362,10 +360,15 @@ public class MessageUtils {
         boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." + ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
         boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
         boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + location);
-        boolean canFormat = !formatMatcher.find() || sender.hasPermission("rosechat.format." + location);
         boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + location);
         boolean canGradient = !gradientMatcher.find() || sender.hasPermission("rosechat.gradient." + location);
         boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + location);
+
+        boolean canBold = !str.contains("&l") || sender.hasPermission("rosechat.bold." + location);
+        boolean canUnderline = !str.contains("&n") || sender.hasPermission("rosechat.underline." + location);
+        boolean canStrikethrough = !str.contains("&m") || sender.hasPermission("rosechat.strikethrough." + location);
+        boolean canItalic = !str.contains("&o") || sender.hasPermission("rosechat.italic." + location);
+        boolean canFormat = canBold && canUnderline && canStrikethrough && canItalic;
 
         return canColor && canMagic && canFormat && canHex && canGradient && canRainbow;
     }

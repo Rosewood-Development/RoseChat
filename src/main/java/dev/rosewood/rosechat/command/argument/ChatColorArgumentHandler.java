@@ -55,8 +55,24 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
             suggestions.add("&a");
 
         if (this.permissionArea == null ||
-                context.getSender().hasPermission("rosechat.format." + this.permissionArea))
+                context.getSender().hasPermission("rosechat.bold." + this.permissionArea))
             suggestions.add("&l");
+
+        if (this.permissionArea == null ||
+                context.getSender().hasPermission("rosechat.strikethrough." + this.permissionArea))
+            suggestions.add("&m");
+
+        if (this.permissionArea == null ||
+                context.getSender().hasPermission("rosechat.underline." + this.permissionArea))
+            suggestions.add("&n");
+
+        if (this.permissionArea == null ||
+                context.getSender().hasPermission("rosechat.italic." + this.permissionArea))
+            suggestions.add("&o");
+
+        if (this.permissionArea == null ||
+                context.getSender().hasPermission("rosechat.magic." + this.permissionArea))
+            suggestions.add("&k");
 
         if (this.permissionArea == null ||
                 context.getSender().hasPermission("rosechat.hex." + this.permissionArea))

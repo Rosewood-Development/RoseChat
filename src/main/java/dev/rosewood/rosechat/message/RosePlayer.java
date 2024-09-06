@@ -462,8 +462,10 @@ public class RosePlayer {
     public void send(String message) {
         if (this.isPlayer())
             this.asPlayer().sendMessage(message);
-        else if (this.isConsole())
+        else if (this.isConsole()) {
+            this.logToConsole(message);
             Bukkit.getConsoleSender().sendMessage(message);
+        }
     }
 
     /**
@@ -474,12 +476,19 @@ public class RosePlayer {
         if (this.isPlayer())
             this.asPlayer().spigot().sendMessage(message);
         else if (this.isConsole()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("[HH:mm:ss] ");
-            String time = sdf.format(new Date());
-
-            RoseChat.getInstance().getConsoleLog().addMessage(time + TextComponent.toPlainText(message));
+            this.logToConsole(TextComponent.toPlainText(message));
             Bukkit.getConsoleSender().spigot().sendMessage(message);
         }
+    }
+
+    private void logToConsole(String message) {
+        RoseChat plugin = RoseChat.getInstance();
+        if (plugin.getConsoleLog() == null)
+            return;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("[HH:mm:ss] ");
+        String time = sdf.format(new Date());
+        RoseChat.getInstance().getConsoleLog().addMessage(time + message);
     }
 
     /**
