@@ -69,6 +69,8 @@ public final class Settings {
     public static final RoseSetting<Boolean> ENABLE_DELETING_MESSAGES = create(MODERATION_SETTINGS, "enable-deleting-messages", BOOLEAN, true,
             "Should deleting messages be enabled?",
                         "Requires ProtocolLib");
+    public static final RoseSetting<Boolean> SAVE_CHAT_LOG_TO_FILE = create(MODERATION_SETTINGS, "save-chat-log-to-file", BOOLEAN, false,
+            "Should the plugin keep track of every message sent by players and store them in a file?");
 
     public static final RoseSetting<CommentedConfigurationSection> NICKNAME_SETTINGS = create("nickname-settings", "Nickname Settings");
     public static final RoseSetting<Integer> MINIMUM_NICKNAME_LENGTH = create(NICKNAME_SETTINGS, "minimum-nickname-length", INTEGER, 3,

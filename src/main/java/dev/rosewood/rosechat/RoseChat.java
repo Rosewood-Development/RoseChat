@@ -1,6 +1,8 @@
 package dev.rosewood.rosechat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.chat.log.ConsoleMessageLog;
+import dev.rosewood.rosechat.chat.task.ChatLogTask;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.RoseChatPlaceholderExpansion;
 import dev.rosewood.rosechat.hook.channel.bentobox.BentoBoxChannelProvider;
@@ -49,6 +51,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -62,6 +65,8 @@ public class RoseChat extends RosePlugin {
     private DiscordChatProvider discord;
     private NicknameProvider nicknameProvider;
     private ChatListener chatListener;
+    private ConsoleMessageLog consoleLog;
+    private ChatLogTask chatLogTask;
 
     public RoseChat() {
         super(-1, 5608,
@@ -127,12 +132,28 @@ public class RoseChat extends RosePlugin {
         }
 
         this.registerChannelHooks(pluginManager);
+
+        if (Settings.SAVE_CHAT_LOG_TO_FILE.get()) {
+            if (this.consoleLog != null && this.chatLogTask != null)
+                this.chatLogTask.save();
+
+            try {
+                this.consoleLog = new ConsoleMessageLog();
+                this.chatLogTask = new ChatLogTask(this, this.consoleLog);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Bukkit.getLogger().warning("An error occurred while creating a chat log.");
+            }
+        }
     }
 
     @Override
     public void disable() {
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         this.getServer().getMessenger().unregisterIncomingPluginChannel(this);
+
+        if (this.chatLogTask != null)
+            this.chatLogTask.save();
     }
 
     @Override
@@ -222,6 +243,10 @@ public class RoseChat extends RosePlugin {
 
     public NicknameProvider getNicknameProvider() {
         return this.nicknameProvider;
+    }
+
+    public ConsoleMessageLog getConsoleLog() {
+        return this.consoleLog;
     }
 
     @Override

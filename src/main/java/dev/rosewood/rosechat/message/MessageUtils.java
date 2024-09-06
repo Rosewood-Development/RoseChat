@@ -185,7 +185,7 @@ public class MessageUtils {
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
-            Bukkit.getConsoleSender().spigot().sendMessage(parsedMessage);
+            new RosePlayer(Bukkit.getConsoleSender()).send(parsedMessage);
 
         // Parse for the channel spies.
         for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {

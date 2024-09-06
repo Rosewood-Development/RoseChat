@@ -24,8 +24,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -471,8 +473,13 @@ public class RosePlayer {
     public void send(BaseComponent[] message) {
         if (this.isPlayer())
             this.asPlayer().spigot().sendMessage(message);
-        else if (this.isConsole())
+        else if (this.isConsole()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("[HH:mm:ss] ");
+            String time = sdf.format(new Date());
+
+            RoseChat.getInstance().getConsoleLog().addMessage(time + TextComponent.toPlainText(message));
             Bukkit.getConsoleSender().spigot().sendMessage(message);
+        }
     }
 
     /**
