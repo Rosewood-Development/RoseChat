@@ -13,6 +13,7 @@ import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,6 +23,9 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
@@ -85,15 +89,42 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
+        RosePlayer player = new RosePlayer(event.getPlayer());
+
         Bukkit.getScheduler().runTaskLaterAsynchronously(RoseChat.getInstance(), () -> {
             if (!event.getPlayer().isOnline()) {
                 PlayerDataManager playerDataManager = this.plugin.getManager(PlayerDataManager.class);
-                RosePlayer player = new RosePlayer(event.getPlayer());
                 playerDataManager.getPlayerData(player.getUUID()).save();
                 playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
                 playerDataManager.unloadPlayerData(player.getUUID());
             }
         }, 20L * 60L);
+
+        GroupChannel group = player.getOwnedGroupChannel();
+        if (group == null)
+            return;
+
+        if (Settings.DISBAND_GROUP_ON_OWNER_DISCONNECT.get()) {
+            boolean success = group.disband();
+            if (!success)
+                return;
+
+            RoseChatAPI api = RoseChatAPI.getInstance();
+            List<UUID> members = new ArrayList<>(group.getMembers());
+            for (UUID uuid : members) {
+                Player member = Bukkit.getPlayer(uuid);
+                if (member == null)
+                    continue;
+
+                RosePlayer roseMember = new RosePlayer(member);
+                PlayerData data = api.getPlayerData(member.getUniqueId());
+                if (data.isCurrentChannelGroupChannel() && data.getCurrentChannel().getId().equalsIgnoreCase(group.getId()))
+                    roseMember.switchChannel(roseMember.findChannel());
+
+                api.getLocaleManager().sendComponentMessage(member, "command-gc-disband-success",
+                        StringPlaceholders.of("name", group.getName()));
+            }
+        }
     }
 
     @EventHandler

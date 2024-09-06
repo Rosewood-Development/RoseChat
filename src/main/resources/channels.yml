@@ -20,10 +20,6 @@ global:
   # This sets the channel as the default channel, players will be placed into it when they first join the server.
   default: true
 
-  # This is the format of the channel.
-  # The format uses custom placeholders defined in custom-placeholders.yml
-  format: '{prefix}{player}{separator}{message}'
-
   # Can messages from this channel be sent and read while in other channels?
   visible-anywhere: true
 

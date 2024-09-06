@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.command.group;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -53,16 +54,18 @@ public class GroupLeaveCommand extends RoseChatCommand {
         player.sendLocaleMessage("command-gc-leave-success",
                 StringPlaceholders.of("name", group.getName()));
 
-        for (UUID uuid : group.getMembers()) {
-            Player member = Bukkit.getPlayer(uuid);
-            if (member == null)
-                continue;
+        if (Settings.SEND_GROUP_LEAVE_TO_ALL_MEMBERS.get()) {
+            for (UUID uuid : group.getMembers()) {
+                Player member = Bukkit.getPlayer(uuid);
+                if (member == null)
+                    continue;
 
-            this.getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
-                    StringPlaceholders.of(
-                            "player", name,
-                            "name", group.getName()
-                    ));
+                this.getLocaleManager().sendComponentMessage(member, "command-gc-leave-left",
+                        StringPlaceholders.of(
+                                "player", name,
+                                "name", group.getName()
+                        ));
+            }
         }
     }
 

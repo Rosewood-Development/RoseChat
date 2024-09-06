@@ -128,6 +128,11 @@ public final class Settings {
     public static final RoseSetting<Boolean> ADD_GROUP_CHANNELS_TO_CHANNEL_LIST = create(CHAT_SETTINGS, "add-group-channels-to-channel-list", BOOLEAN, true,
             "Should group channels be accessible using /channel instead of /gcm?",
                         "The can-join-group-channels setting will not take affect.");
+    public static final RoseSetting<Boolean> SEND_GROUP_LEAVE_TO_ALL_MEMBERS = create(CHAT_SETTINGS, "send-group-leave-to-all-members", BOOLEAN, true,
+            "Should the message, sent when a player leaves a group, be sent to all members of the group?");
+    public static final RoseSetting<Boolean> DISBAND_GROUP_ON_OWNER_DISCONNECT = create(CHAT_SETTINGS, "disband-group-on-owner-disconnect", BOOLEAN, false,
+            "Should group channels be disbanded when the owner disconnects?",
+                        "Enabling this allows for temporary group chats. Owners can still use /group promote to select a new owner.");
     public static final RoseSetting<Boolean> REMOVE_COLOR_CODES = create(CHAT_SETTINGS, "remove-color-codes", BOOLEAN, false,
             "Should color codes be removed if a player attempts to send colors without having permission?");
     public static final RoseSetting<Boolean> ALLOW_NO_HELD_ITEM = create(CHAT_SETTINGS, "allow-no-held-item", BOOLEAN, true,
