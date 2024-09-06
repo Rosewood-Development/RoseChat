@@ -214,7 +214,7 @@ public final class Settings {
 
     public static final RoseSetting<CommentedConfigurationSection> MARKDOWN_FORMATS = create("markdown-formats", "Markdown Format Settings");
     public static final RoseSetting<String> MARKDOWN_FORMAT_BOLD = create(MARKDOWN_FORMATS, "bold", STRING, "&l%message%&L");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_UNDERLINE = create(MARKDOWN_FORMATS, "underline", STRING, "&n%message&N");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_UNDERLINE = create(MARKDOWN_FORMATS, "underline", STRING, "&n%message%&N");
     public static final RoseSetting<String> MARKDOWN_FORMAT_STRIKETHROUGH = create(MARKDOWN_FORMATS, "strikethrough", STRING, "&m%message%&M");
     public static final RoseSetting<String> MARKDOWN_FORMAT_ITALIC = create(MARKDOWN_FORMATS, "italic", STRING, "&o%message%&O");
     public static final RoseSetting<String> MARKDOWN_FORMAT_SPOILER = create(MARKDOWN_FORMATS, "spoiler", STRING, "<spoiler>%message%</spoiler>");

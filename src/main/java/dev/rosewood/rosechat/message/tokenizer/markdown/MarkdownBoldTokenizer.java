@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class MarkdownBoldTokenizer extends Tokenizer {
 
-    public static final Pattern PATTERN = Pattern.compile("\\*ó\\*([\\s\\S]+?)\\*\\*(?!\\*)");
+    public static final Pattern PATTERN = Pattern.compile("\\*\\*([\\s\\S]+?)\\*\\*(?!\\*)");
 
     public MarkdownBoldTokenizer() {
         super("markdown_bold");
