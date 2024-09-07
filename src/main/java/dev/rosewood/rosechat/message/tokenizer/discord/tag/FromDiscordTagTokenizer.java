@@ -3,10 +3,15 @@ package dev.rosewood.rosechat.message.tokenizer.discord.tag;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,9 +73,41 @@ public class FromDiscordTagTokenizer extends Tokenizer {
             }
         }
 
-        // TODO: Allow spaces in names - Requires tokenizer recursion fix
-        String finalTag = prefix + (isRole ? discord.getRoleFromId(content) : discord.getUserFromId(content));
-        return new TokenizerResult(Token.group(finalTag).build(), originalContent.length());
+        Token.Builder token;
+        if (isRole) {
+            token = Token.group(prefix + discord.getRoleFromId(content))
+                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
+                    .ignoreTokenizer(Tokenizers.PREFIXED_REPLACEMENT)
+                    .ignoreTokenizer(Tokenizers.INLINE_REPLACEMENT)
+                    .ignoreTokenizer(Tokenizers.BUNGEE_PAPI_PLACEHOLDER)
+                    .ignoreTokenizer(Tokenizers.PAPI_PLACEHOLDER)
+                    .ignoreTokenizer(Tokenizers.ROSECHAT_PLACEHOLDER);
+        } else {
+            UUID uuid = discord.getUUIDFromId(content);
+            if (uuid == null) {
+                token = Token.group(prefix + discord.getUserFromId(content))
+                        .ignoreTokenizer(Tokenizers.REPLACEMENT)
+                        .ignoreTokenizer(Tokenizers.PREFIXED_REPLACEMENT)
+                        .ignoreTokenizer(Tokenizers.INLINE_REPLACEMENT)
+                        .ignoreTokenizer(Tokenizers.BUNGEE_PAPI_PLACEHOLDER)
+                        .ignoreTokenizer(Tokenizers.PAPI_PLACEHOLDER)
+                        .ignoreTokenizer(Tokenizers.ROSECHAT_PLACEHOLDER)
+                        .ignoreTokenizer(Tokenizers.FORMAT)
+                        .ignoreTokenizer(Tokenizers.RAINBOW)
+                        .ignoreTokenizer(Tokenizers.GRADIENT);
+            } else {
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                RosePlayer player = new RosePlayer(offlinePlayer);
+
+                if (player.isOffline())
+                    return new TokenizerResult(Token.text(prefix + discord.getUserFromId(content)), originalContent.length());
+
+                token = Token.group(prefix + player.getName());
+            }
+        }
+
+        token.encapsulate();
+        return new TokenizerResult(token.build(), originalContent.length());
     }
 
 }

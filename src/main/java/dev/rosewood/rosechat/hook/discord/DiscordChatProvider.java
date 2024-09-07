@@ -45,6 +45,13 @@ public interface DiscordChatProvider {
     String getUserFromId(String id);
 
     /**
+     *
+     * @param id The ID of the user.
+     * @return The {@link UUID} of the player.
+     */
+    UUID getUUIDFromId(String id);
+
+    /**
      * @param id The ID of the role.
      * @return The name of the role.
      */

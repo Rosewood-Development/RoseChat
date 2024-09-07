@@ -24,7 +24,6 @@ public abstract class Channel {
     protected String id;
     protected ChannelSettings settings;
     protected SlowmodeTask slowmodeTask;
-    private boolean isDefault;
     private boolean isMuted;
     private int slowmodeSpeed;
 
@@ -147,7 +146,7 @@ public abstract class Channel {
         String nullValue = localeManager.getLocaleMessage("command-chat-info-none");
 
         return this.settings.toPlaceholders(nullValue)
-                .add("default", this.isDefault ? trueValue : falseValue)
+                .add("default", this.getSettings().isDefault() ? trueValue : falseValue)
                 .add("members", this.getMemberCount())
                 .add("players", this.getMemberCount())
                 .add("servers", this.getServers().isEmpty() ? nullValue : this.getServers().toString())
@@ -264,14 +263,6 @@ public abstract class Channel {
 
     public ChannelSettings getSettings() {
         return this.settings;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(boolean aDefault) {
-        this.isDefault = aDefault;
     }
 
 }

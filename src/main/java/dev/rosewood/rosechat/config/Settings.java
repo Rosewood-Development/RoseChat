@@ -127,7 +127,7 @@ public final class Settings {
     public static final RoseSetting<Boolean> CAN_JOIN_GROUP_CHANNELS = create(CHAT_SETTINGS, "can-join-group-channels", BOOLEAN, true,
             "Should players be allowed to join group channels like normal channels?",
                         "A player can use '/gcmsg <channel>' without a message to join the channel.");
-    public static final RoseSetting<Boolean> ADD_GROUP_CHANNELS_TO_CHANNEL_LIST = create(CHAT_SETTINGS, "add-group-channels-to-channel-list", BOOLEAN, true,
+    public static final RoseSetting<Boolean> ADD_GROUP_CHANNELS_TO_CHANNEL_LIST = create(CHAT_SETTINGS, "add-group-channels-to-channel-list", BOOLEAN, false,
             "Should group channels be accessible using /channel instead of /gcm?",
                         "The can-join-group-channels setting will not take affect.");
     public static final RoseSetting<Boolean> SEND_GROUP_LEAVE_TO_ALL_MEMBERS = create(CHAT_SETTINGS, "send-group-leave-to-all-members", BOOLEAN, true,

@@ -288,6 +288,11 @@ public class DiscordSRVProvider implements DiscordChatProvider {
     }
 
     @Override
+    public UUID getUUIDFromId(String id) {
+        return this.discord.getAccountLinkManager().getUuid(id);
+    }
+
+    @Override
     public String getRoleFromId(String id) {
         Role role = this.discord.getMainGuild().getRoleById(id);
         if (role == null)
@@ -295,9 +300,9 @@ public class DiscordSRVProvider implements DiscordChatProvider {
 
         String color = "FFFFFF";
         if (role.getColor() != null)
-            return "#" + Integer.toHexString(role.getColorRaw()) + role.getName().replace(" ", "_");
+            return "#" + Integer.toHexString(role.getColorRaw()) + role.getName();
 
-        return "#" + (color.length() == 5 ? "0" + color : color) + role.getName().replace(" ", "_");
+        return "#" + (color.length() == 5 ? "0" + color : color) + role.getName();
     }
 
     @Override
