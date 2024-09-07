@@ -23,7 +23,9 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.TabCompleteEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -221,6 +223,33 @@ public class PlayerListener implements Listener {
                     }
 
                     event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onTabComplete(TabCompleteEvent event) {
+        String input = event.getBuffer();
+
+        for (Channel channel : RoseChatAPI.getInstance().getChannels()) {
+            if (!channel.getSettings().getOverrideCommands().isEmpty()) {
+                for (String command : channel.getSettings().getOverrideCommands()) {
+                    if (!input.toLowerCase().startsWith("/" + command.toLowerCase() + " "))
+                        continue;
+
+                    event.setCompletions(Collections.singletonList("[message]"));
+                    return;
+                }
+            }
+
+            if (!channel.getSettings().getCommands().isEmpty()) {
+                for (String command : channel.getSettings().getCommands()) {
+                    if (!input.toLowerCase().startsWith("/" + command.toLowerCase() + " "))
+                        continue;
+
+                    event.setCompletions(Collections.singletonList("[message]"));
+                    return;
                 }
             }
         }
