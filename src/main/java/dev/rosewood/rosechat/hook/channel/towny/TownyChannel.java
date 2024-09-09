@@ -97,9 +97,13 @@ public class TownyChannel extends RoseChatChannel implements Listener {
     }
 
     private boolean hasTeam(RosePlayer player) {
-        Town town = TownyAPI.getInstance().getTown(player.getUUID());
-        Nation nation = TownyAPI.getInstance().getNation(player.getUUID());
-        return (this.channelType != TownyChannelType.TOWN || town != null) && (this.channelType != TownyChannelType.NATION || nation != null);
+        if (!player.isPlayer())
+            return false;
+
+        Town town = TownyAPI.getInstance().getTown(player.asPlayer());
+        Nation nation = TownyAPI.getInstance().getNation(player.asPlayer());
+
+        return (this.channelType == TownyChannelType.TOWN && town != null) || (this.channelType == TownyChannelType.NATION && nation != null);
     }
 
     @Override

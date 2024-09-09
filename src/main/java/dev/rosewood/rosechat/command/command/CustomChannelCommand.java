@@ -32,7 +32,7 @@ public class CustomChannelCommand extends Command {
 
             if (player.isPlayer()) {
                 if (!channel.canJoinByCommand(player)) {
-                    player.sendLocaleMessage("no-permission");
+                    player.sendLocaleMessage("command-channel-not-joinable");
                     return false;
                 }
             }

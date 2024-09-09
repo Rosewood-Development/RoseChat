@@ -56,7 +56,7 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'
 
     // Plugin Support
-    compileOnly 'com.palmergames.bukkit.towny:towny:0.100.2.0'
+    compileOnly 'com.palmergames.bukkit.towny:towny:0.100.3.0'
     compileOnly 'com.gmail.nossr50.mcMMO:mcMMO:2.2.012'
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.3.0'

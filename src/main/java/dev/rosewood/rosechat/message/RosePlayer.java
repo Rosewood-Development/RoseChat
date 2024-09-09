@@ -534,7 +534,7 @@ public class RosePlayer {
         if (channelChangeEvent.isCancelled())
             return false;
 
-        if (oldChannel != null)
+        if (oldChannel != null && !this.getPlayerData().isCurrentChannelGroupChannel())
             oldChannel.onLeave(this);
 
         if (!isGroupChannel)
