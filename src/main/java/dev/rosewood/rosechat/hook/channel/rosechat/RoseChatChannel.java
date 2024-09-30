@@ -443,6 +443,12 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             if (spy == null)
                 continue;
 
+            if (this.members.contains(spy.getUniqueId()))
+                continue;
+
+            if (new RosePlayer(spy).getChannel() == this)
+                continue;
+
             // Avoid sending the message to the sender.
             if (message.getSender().getUUID() != null && message.getSender().getUUID().equals(spy.getUniqueId()))
                 continue;
