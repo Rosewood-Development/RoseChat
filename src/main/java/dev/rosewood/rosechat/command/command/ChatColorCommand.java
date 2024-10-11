@@ -113,7 +113,12 @@ public class ChatColorCommand extends RoseChatCommand {
         } else if (colorStr.startsWith("<g")) {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-gradient");
         } else if (replacement == null) {
-            colorStr = colorStr.substring(1);
+            if (colorStr.contains("#")) {
+                colorStr = (colorStr.contains("<") || colorStr.contains("{")) ?
+                        colorStr.substring(2, colorStr.length() - 1) : colorStr.substring(1);
+            } else {
+                colorStr = colorStr.substring(1);
+            }
         } else {
             colorStr = colorStr.replace('_', ' ');
         }
