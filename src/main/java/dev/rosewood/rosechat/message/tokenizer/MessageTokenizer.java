@@ -87,7 +87,7 @@ public class MessageTokenizer {
                 if (token.getPlaceholders() != null)
                     builder.addAll(token.getPlaceholders());
 
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.direction, builder.build());
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.roseMessage.shouldUsePlayerChatColor(), this.direction, builder.build());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;

@@ -28,6 +28,7 @@ public class RoseMessage {
     private String playerInput;
     private Channel channel;
     private StringPlaceholders placeholders;
+    private boolean usePlayerChatColor;
 
     /**
      * Creates a new RoseMessage to be parsed later.
@@ -51,6 +52,7 @@ public class RoseMessage {
         this.sender = sender;
         this.location = location;
         this.uuid = UUID.randomUUID();
+        this.usePlayerChatColor = true;
     }
 
     /**
@@ -224,6 +226,14 @@ public class RoseMessage {
         this.discordId = discordId;
     }
 
+    public void setUsePlayerChatColor(boolean usePlayerChatColor) {
+        this.usePlayerChatColor = usePlayerChatColor;
+    }
+
+    public boolean shouldUsePlayerChatColor() {
+        return this.usePlayerChatColor;
+    }
+    
     /**
      * @return The {@link StringPlaceholders} that this message should use.
      */
@@ -238,5 +248,5 @@ public class RoseMessage {
     public static RoseMessage forLocation(RosePlayer sender, PermissionArea location) {
         return new RoseMessage(sender, location);
     }
-
+    
 }

@@ -54,7 +54,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             if (params.getSender().getPlayerData() == null)
                 return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
 
-            String color = params.getSender().getPlayerData().getColor();
+            String color = params.shouldUsePlayerChatColor() ? params.getSender().getPlayerData().getColor() : "";
             return new TokenizerResult(Token.group(color + params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
         }
 

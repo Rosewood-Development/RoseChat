@@ -82,7 +82,7 @@ public class ChatColorCommand extends RoseChatCommand {
         targetData.setColor("");
         targetData.save();
 
-        if (!player.getUUID().equals(target.getUUID()))
+        if (player.isConsole() || !player.getUUID().equals(target.getUUID()))
             player.sendLocaleMessage("command-chatcolor-removed-player",
                     StringPlaceholders.of("player", target.getName()));
         target.sendLocaleMessage("command-chatcolor-removed");

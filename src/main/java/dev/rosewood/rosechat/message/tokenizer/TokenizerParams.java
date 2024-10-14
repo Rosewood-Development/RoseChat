@@ -14,6 +14,7 @@ public class TokenizerParams {
     private final RosePlayer receiver;
     private final String input;
     private final boolean containsPlayerInput;
+    private final boolean usePlayerChatColor;
     private final String playerInput;
     private final PermissionArea location;
     private final String locationPermission;
@@ -21,12 +22,14 @@ public class TokenizerParams {
     private final StringPlaceholders placeholders;
     private final MessageDirection direction;
 
-    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput, MessageDirection direction, StringPlaceholders placeholders) {
+    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput,
+                           boolean usePlayerChatColor, MessageDirection direction, StringPlaceholders placeholders) {
         this.outputs = new MessageOutputs();
         this.sender = message.getSender();
         this.receiver = receiver;
         this.input = input;
         this.containsPlayerInput = containsPlayerInput;
+        this.usePlayerChatColor = usePlayerChatColor;
         this.playerInput = message.getPlayerInput();
         this.location = message.getLocation();
         this.locationPermission = message.getLocationPermission();
@@ -53,6 +56,10 @@ public class TokenizerParams {
 
     public boolean containsPlayerInput() {
         return this.containsPlayerInput;
+    }
+
+    public boolean shouldUsePlayerChatColor() {
+        return this.usePlayerChatColor;
     }
 
     public String getPlayerInput() {
