@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -34,13 +35,17 @@ public class ReplacementTokenizer extends Tokenizer {
                 if (!matcher.find())
                     continue;
 
-                // Check permissions
-                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
-                    return null;
-
                 String originalContent = matcher.group();
                 if (!input.startsWith(originalContent))
                     continue;
+
+                // Check permissions
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission())) {
+                    if (Settings.REMOVE_REPLACEMENTS.get())
+                        return new TokenizerResult(Token.text(""), originalContent.length());
+
+                    return null;
+                }
 
                 String content = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
                         && replacement.getOutput().getDiscordOutput() != null ?
@@ -77,8 +82,12 @@ public class ReplacementTokenizer extends Tokenizer {
                     continue;
 
                 // Check permissions
-                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission())) {
+                    if (Settings.REMOVE_REPLACEMENTS.get())
+                        return new TokenizerResult(Token.text(""), replacement.getInput().getText().length());
+
                     return null;
+                }
 
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.
                 if (replacement.getInput().canToggle()) {

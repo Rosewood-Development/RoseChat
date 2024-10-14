@@ -137,6 +137,8 @@ public final class Settings {
                         "Enabling this allows for temporary group chats. Owners can still use /group promote to select a new owner.");
     public static final RoseSetting<Boolean> REMOVE_COLOR_CODES = create(CHAT_SETTINGS, "remove-color-codes", BOOLEAN, false,
             "Should color codes be removed if a player attempts to send colors without having permission?");
+    public static final RoseSetting<Boolean> REMOVE_REPLACEMENTS = create(CHAT_SETTINGS, "remove-replacements", BOOLEAN, false,
+            "Should replacements be removed if a player attempts to send a replacement without having permission?");
     public static final RoseSetting<Boolean> ALLOW_NO_HELD_ITEM = create(CHAT_SETTINGS, "allow-no-held-item", BOOLEAN, true,
             "Should players be allowed to use the held item replacement if they are not holding an item?",
                         "If false, the 'no-held-item' locale message will be sent.");

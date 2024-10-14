@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -63,10 +64,6 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     continue;
                 }
             }
-
-            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission()))
-                return null;
-
             if (suffix != null) {
                 if (!input.contains(suffix))
                     continue;
@@ -74,6 +71,14 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 int endIndex = input.lastIndexOf(suffix) + suffix.length();
                 String originalContent = input.substring(0, endIndex);
                 String content = input.substring(prefix.length(), input.lastIndexOf(suffix));
+
+                if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission())) {
+                    if (Settings.REMOVE_REPLACEMENTS.get())
+                        return new TokenizerResult(Token.text(content), originalContent.length());
+
+                    return null;
+                }
+
                 return this.createTagToken(params, originalContent, content, replacement, prefix);
             }
 
@@ -86,6 +91,13 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                 if (endIndex == -1) endIndex = input.length();
                 originalContent = input.substring(0, endIndex);
                 tagContent = input.substring(prefix.length(), endIndex);
+            }
+
+            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission())) {
+                if (Settings.REMOVE_REPLACEMENTS.get())
+                    return new TokenizerResult(Token.text(tagContent), prefix.length() + tagContent.length());
+
+                return null;
             }
 
             return this.createTagToken(params, originalContent, tagContent, replacement, prefix);
