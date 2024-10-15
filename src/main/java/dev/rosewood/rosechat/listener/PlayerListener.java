@@ -93,13 +93,13 @@ public class PlayerListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         RosePlayer player = new RosePlayer(event.getPlayer());
 
+        PlayerDataManager playerDataManager = this.plugin.getManager(PlayerDataManager.class);
+        playerDataManager.getPlayerData(player.getUUID()).save();
+        playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
+
+        // Delay unloading to keep data cached while the player is leaving.
         Bukkit.getScheduler().runTaskLaterAsynchronously(RoseChat.getInstance(), () -> {
-            if (!event.getPlayer().isOnline()) {
-                PlayerDataManager playerDataManager = this.plugin.getManager(PlayerDataManager.class);
-                playerDataManager.getPlayerData(player.getUUID()).save();
-                playerDataManager.getPlayerData(player.getUUID()).getCurrentChannel().onLeave(player);
-                playerDataManager.unloadPlayerData(player.getUUID());
-            }
+            playerDataManager.unloadPlayerData(player.getUUID());
         }, 20L * 60L);
 
         GroupChannel group = player.getOwnedGroupChannel();
