@@ -12,13 +12,14 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,17 +28,20 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class SignListener implements Listener {
+public class SidedSignListener implements Listener {
 
-    public static final NamespacedKey LINES_KEY = new NamespacedKey(RoseChat.getInstance(), "lines");
+    public static final NamespacedKey FRONT_LINES_KEY = new NamespacedKey(RoseChat.getInstance(), "front");
+    public static final NamespacedKey BACK_LINES_KEY = new NamespacedKey(RoseChat.getInstance(), "back");
 
     private final RoseChat plugin;
     private final Map<Material, DyeColor> dyeColors;
 
-    public SignListener(RoseChat plugin) {
+    public SidedSignListener(RoseChat plugin) {
         this.plugin = plugin;
         this.dyeColors = new HashMap<>(){{
            this.put(Material.WHITE_DYE, DyeColor.WHITE);
@@ -69,6 +73,7 @@ public class SignListener implements Listener {
 
         Player player = event.getPlayer();
         Sign sign = (Sign) event.getClickedBlock().getState();
+        SignSide side = sign.getTargetSide(player);
 
         // Open the sign if the player isn't holding an item.
         if (event.getItem() == null) {
@@ -87,13 +92,13 @@ public class SignListener implements Listener {
                 }
             }
 
-            if (event.getItem().getType() == Material.GLOW_INK_SAC && !sign.isGlowingText()) {
-                sign.setGlowingText(true);
+            if (event.getItem().getType() == Material.GLOW_INK_SAC && !side.isGlowingText()) {
+                side.setGlowingText(true);
                 sign.update();
                 event.setCancelled(true);
                 return;
-            } else if (event.getItem().getType() == Material.INK_SAC && sign.isGlowingText()) {
-                sign.setGlowingText(false);
+            } else if (event.getItem().getType() == Material.INK_SAC && side.isGlowingText()) {
+                side.setGlowingText(false);
                 sign.update();
                 event.setCancelled(true);
                 return;
@@ -105,37 +110,37 @@ public class SignListener implements Listener {
                 return;
 
             DyeColor color = this.dyeColors.get(event.getItem().getType());
-            if (sign.getColor() == color) {
+            if (sign.getTargetSide(player).getColor() == color) {
                 event.setCancelled(openUnformattedSign(player, sign));
                 return;
             }
 
             Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
                 Sign updatedSign = (Sign) event.getClickedBlock().getState();
-                if (!updatedSign.getPersistentDataContainer().has(LINES_KEY))
+                SignSide updatedSide = updatedSign.getTargetSide(event.getPlayer());
+                SignSide frontSide = updatedSign.getSide(Side.FRONT);
+                boolean isFrontSide = (updatedSide == frontSide);
+                if (!updatedSign.getPersistentDataContainer().has(isFrontSide ? FRONT_LINES_KEY : BACK_LINES_KEY))
                     return;
 
-                String unformattedLinesStr = sign.getPersistentDataContainer().get(LINES_KEY,
-                        PersistentDataType.STRING);
-                if (unformattedLinesStr == null)
-                    return;
-
-                String[] unformattedLines = unformattedLinesStr.split("\n");
-                if (unformattedLines.length == 0)
+                List<String> unformattedLines = updatedSign.getPersistentDataContainer().get(isFrontSide ? FRONT_LINES_KEY : BACK_LINES_KEY,
+                        PersistentDataType.LIST.strings());
+                if (unformattedLines == null || unformattedLines.isEmpty())
                     return;
 
                 event.setCancelled(true);
 
                 // Grab the unformatted lines from the PDC so the player can see them when editing.
-                for (int i = 0; i < unformattedLines.length; i++)
-                    sign.setLine(i, unformattedLines[i]);
+                for (int i = 0; i < unformattedLines.size(); i++)
+                    updatedSide.setLine(i, unformattedLines.get(i));
 
                 updatedSign.update();
             }, 0L);
 
             Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
                 Sign updatedSign = (Sign) event.getClickedBlock().getState();
-                this.updateSign(player, updatedSign, updatedSign.getLines());
+                SignSide updatedSide = updatedSign.getTargetSide(player);
+                this.updateSign(player, updatedSign, updatedSide.getLines());
             }, 0L);
 
             return;
@@ -151,8 +156,8 @@ public class SignListener implements Listener {
 
         // Store the unformatted lines in PDC to edit later.
         Sign sign = (Sign) event.getBlock().getState();
-        sign.getPersistentDataContainer().set(LINES_KEY,
-                PersistentDataType.STRING, StringUtils.join(sign.getLines(), "\n"));
+        sign.getPersistentDataContainer().set(event.getSide() == Side.FRONT ? FRONT_LINES_KEY : BACK_LINES_KEY,
+                PersistentDataType.LIST.strings(), Arrays.asList(event.getLines()));
 
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
             this.updateSign(event.getPlayer(), sign, event.getLines());
@@ -160,7 +165,8 @@ public class SignListener implements Listener {
     }
 
     private void updateSign(Player player, Sign sign, String[] lines) {
-        DyeColor signColor = sign.getColor();
+        SignSide side = sign.getTargetSide(player);
+        DyeColor signColor = side.getColor();
         if (signColor == null)
             return;
 
@@ -184,33 +190,33 @@ public class SignListener implements Listener {
                     builder.color(ChatColor.of(hexColor));
             }
 
-            sign.setLine(i, TextComponent.toLegacyText(builder.create()));
+            side.setLine(i, TextComponent.toLegacyText(builder.build()));
         }
 
         sign.update();
     }
 
     private boolean openUnformattedSign(Player player, Sign sign) {
-        if (!sign.getPersistentDataContainer().has(LINES_KEY))
+        SignSide targetSide = sign.getTargetSide(player);
+        SignSide frontSide = sign.getSide(Side.FRONT);
+        boolean isFrontSide = (targetSide == frontSide);
+
+        if (!sign.getPersistentDataContainer().has(isFrontSide ? FRONT_LINES_KEY : BACK_LINES_KEY))
             return false;
 
-        String unformattedLinesStr = sign.getPersistentDataContainer().get(LINES_KEY,
-                PersistentDataType.STRING);
-        if (unformattedLinesStr == null)
-            return false;
-
-        String[] unformattedLines = unformattedLinesStr.split("\n");
-        if (unformattedLines.length == 0)
+        List<String> unformattedLines = sign.getPersistentDataContainer().get(isFrontSide ? FRONT_LINES_KEY : BACK_LINES_KEY,
+                PersistentDataType.LIST.strings());
+        if (unformattedLines == null || unformattedLines.isEmpty())
             return false;
 
         // Grab the unformatted lines from the PDC so the player can see them when editing.
-        for (int i = 0; i < unformattedLines.length; i++)
-            sign.setLine(i, unformattedLines[i]);
+        for (int i = 0; i < unformattedLines.size(); i++)
+            targetSide.setLine(i, unformattedLines.get(i));
 
         sign.update();
 
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () ->
-                player.openSign(sign), 2L);
+                player.openSign(sign, isFrontSide ? Side.FRONT : Side.BACK), 2L);
         return true;
     }
 

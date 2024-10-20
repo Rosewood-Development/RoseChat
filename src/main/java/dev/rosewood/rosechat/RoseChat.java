@@ -25,6 +25,7 @@ import dev.rosewood.rosechat.listener.ChatListener;
 import dev.rosewood.rosechat.listener.DiscordSRVListener;
 import dev.rosewood.rosechat.listener.PacketListener;
 import dev.rosewood.rosechat.listener.PlayerListener;
+import dev.rosewood.rosechat.listener.SidedSignListener;
 import dev.rosewood.rosechat.listener.SignListener;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
@@ -89,7 +90,12 @@ public class RoseChat extends RosePlugin {
 
         // Register Listeners
         pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new SignListener(), this);
+
+        if (NMSUtil.getVersionNumber() >= 20) {
+            pluginManager.registerEvents(new SidedSignListener(this), this);
+        } else {
+            pluginManager.registerEvents(new SignListener(this), this);
+        }
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord",
