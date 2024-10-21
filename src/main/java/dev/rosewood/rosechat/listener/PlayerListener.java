@@ -99,8 +99,9 @@ public class PlayerListener implements Listener {
 
         // Delay unloading to keep data cached while the player is leaving.
         Bukkit.getScheduler().runTaskLaterAsynchronously(RoseChat.getInstance(), () -> {
-            playerDataManager.unloadPlayerData(player.getUUID());
-        }, 20L * 60L);
+            if (!player.asPlayer().isOnline())
+                playerDataManager.unloadPlayerData(player.getUUID());
+        }, 20L * 30L);
 
         GroupChannel group = player.getOwnedGroupChannel();
         if (group == null)
