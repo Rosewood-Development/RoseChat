@@ -41,6 +41,7 @@ repositories {
     maven { url = 'https://nexus.iridiumdevelopment.net/repository/maven-releases/' }
     maven { url = 'https://repo.pcgamingfreaks.at/repository/maven-everything/' }
     maven { url = 'https://repo.essentialsx.net/releases/' }
+    maven { url = 'https://repo.william278.net/releases' }
 }
 
 dependencies {
@@ -68,6 +69,7 @@ dependencies {
     compileOnly 'com.songoda:skyblock:2.5.0'
     compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.7.5'
     compileOnly 'net.essentialsx:EssentialsX:2.20.1'
+    compileOnly 'net.william278.husktowns:husktowns-bukkit:3.0.6'
 }
 
 processResources {

@@ -24,6 +24,7 @@ softdepend:
   - FabledSkyblock
   - MarriageMaster
   - InteractiveChat
+  - HuskTowns
 permissions:
   rosechat.*:
     description: Inherits all plugin permissions.
