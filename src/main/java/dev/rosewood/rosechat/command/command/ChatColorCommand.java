@@ -118,6 +118,9 @@ public class ChatColorCommand extends RoseChatCommand {
             if (colorStr.contains("#")) {
                 colorStr = (colorStr.contains("<") || colorStr.contains("{")) ?
                         colorStr.substring(2, colorStr.length() - 1) : colorStr.substring(1);
+
+                if (colorStr.startsWith("#"))
+                    colorStr = colorStr.substring(1);
             } else {
                 colorStr = colorStr.substring(1);
             }
