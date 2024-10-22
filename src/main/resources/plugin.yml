@@ -71,6 +71,7 @@ permissions:
       rosechat.underline: true
       rosechat.realname: true
       rosechat.helditem: true
+      rosechat.seeblocked: true
   rosechat.basecommand:
     description: Allows using the rc command.
     default: true
@@ -365,4 +366,7 @@ permissions:
       default: op
     rosechat.url:
       description: Allows using url markdown to Discord.
+      default: op
+    rosechat.seeblocked:
+      description: Allows staff to see messages that were blocked.
       default: op

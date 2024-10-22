@@ -24,6 +24,7 @@ blocked-caps: '&c你的消息因大写字母太多无法发送!'
 blocked-spam: '&c请不要刷屏!'
 blocked-language: '&c不准说坏坏的东西 :('
 blocked-url: '&c请勿发送链接或IP地址!'
+blocked-message: "&e%player% &c尝试发送消息&e%message%&c，但已被阻止。"
 
 # 基础命令消息
 base-command-color: "&e"

@@ -16,6 +16,8 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class GroupRenameCommand extends RoseChatCommand {
 
@@ -55,6 +57,15 @@ public class GroupRenameCommand extends RoseChatCommand {
         if (outputs.isBlocked()) {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(player);
+
+            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                    rosePlayer.sendLocaleMessage("blocked-message",
+                            StringPlaceholders.of("player", player.getName(),
+                                    "message", name));
+                }
+            }
 
             return;
         }

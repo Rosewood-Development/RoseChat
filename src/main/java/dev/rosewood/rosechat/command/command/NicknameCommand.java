@@ -27,6 +27,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class NicknameCommand extends RoseChatCommand {
 
@@ -77,6 +78,15 @@ public class NicknameCommand extends RoseChatCommand {
         if (outputs.isBlocked()) {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(player);
+
+            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                    rosePlayer.sendLocaleMessage("blocked-message",
+                            StringPlaceholders.of("player", nicknameMessage.getSender().getName(),
+                                    "message", nickname));
+                }
+            }
             return;
         }
 

@@ -89,8 +89,10 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
         if (this.permissionArea == null ||
                 context.getSender().hasPermission("rosechat.replacements." + this.permissionArea.toLowerCase())) {
             for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
+                String permission = replacement.getInput().getPermission() == null ? "rosechat.replacement." + replacement.getId() :
+                        replacement.getInput().getPermission();
                 if (replacement.getOutput().hasColorRetention()
-                        && context.getSender().hasPermission("rosechat.replacement." + replacement.getId()))
+                        && context.getSender().hasPermission(permission))
                     suggestions.add(replacement.getId());
             }
         }

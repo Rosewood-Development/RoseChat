@@ -95,7 +95,10 @@ public class ChatColorCommand extends RoseChatCommand {
         // Allow color replacements.
         Replacement replacement = this.getAPI().getReplacementById(color);
         if (replacement != null) {
-            if (!player.hasPermission("rosechat.replacement." + replacement.getId())
+            String permission = replacement.getInput().getPermission() == null ? "rosechat.replacement." + replacement.getId() :
+                    replacement.getInput().getPermission();
+
+            if (!player.hasPermission(permission)
                     || !player.hasPermission("rosechat.replacements.chatcolor")) {
                 player.sendLocaleMessage("no-permission");
                 return;
@@ -106,7 +109,6 @@ public class ChatColorCommand extends RoseChatCommand {
 
         targetData.setColor(color);
         targetData.save();
-
 
         if (colorStr.startsWith("<r")) {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-rainbow");

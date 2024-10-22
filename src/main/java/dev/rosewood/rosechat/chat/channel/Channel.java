@@ -10,8 +10,10 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -122,6 +124,16 @@ public abstract class Channel {
         if (outputs.isBlocked()) {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(message.getSender());
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.hasPermission("rosechat.seeblocked")) {
+                    RosePlayer rosePlayer = new RosePlayer(player);
+                    rosePlayer.sendLocaleMessage("blocked-message",
+                            StringPlaceholders.of("player", message.getSender().getName(),
+                                    "message", input));
+                }
+            }
+
             return null;
         }
 

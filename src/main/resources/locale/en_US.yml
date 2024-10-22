@@ -24,6 +24,7 @@ blocked-caps: "&cYour message could not be sent as it contains too many capital 
 blocked-spam: "&cPlease do not spam!"
 blocked-language: "&cYou used a bad word. :("
 blocked-url: "&cPlease do not send URLs or IPs!"
+blocked-message: "&e%player% &cattempted to say &e%message%&c, but it was blocked."
 
 # Held Item
 no-held-item: "&cYou cannot use the item tag if you are not holding an item!"

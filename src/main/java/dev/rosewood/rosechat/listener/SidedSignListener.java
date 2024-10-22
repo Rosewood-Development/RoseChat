@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -231,6 +232,16 @@ public class SidedSignListener implements Listener {
         if (outputs.isBlocked()) {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(player);
+
+            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                    rosePlayer.sendLocaleMessage("blocked-message",
+                            StringPlaceholders.of("player", message.getSender().getName(),
+                                    "message", text));
+                }
+            }
+
             return null;
         }
 

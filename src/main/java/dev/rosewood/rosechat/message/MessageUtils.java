@@ -165,6 +165,16 @@ public class MessageUtils {
         if (outputs.isBlocked()) {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(sender);
+
+            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                    rosePlayer.sendLocaleMessage("blocked-message",
+                            StringPlaceholders.of("player", roseMessage.getSender().getName(),
+                                    "message", message));
+                }
+            }
+
             return;
         }
 
