@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.command.group;
 
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.GroupArgumentHandler;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
@@ -58,12 +59,14 @@ public class GroupRenameCommand extends RoseChatCommand {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(player);
 
-            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
-                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
-                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
-                    rosePlayer.sendLocaleMessage("blocked-message",
-                            StringPlaceholders.of("player", player.getName(),
-                                    "message", name));
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+                for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                    if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                        RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                        rosePlayer.sendLocaleMessage("blocked-message",
+                                StringPlaceholders.of("player", player.getName(),
+                                        "message", name));
+                    }
                 }
             }
 

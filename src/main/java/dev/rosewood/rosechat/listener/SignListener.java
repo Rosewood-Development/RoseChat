@@ -227,12 +227,14 @@ public class SignListener implements Listener {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(player);
 
-            for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
-                if (staffPlayer.hasPermission("rosechat.seeblocked")) {
-                    RosePlayer rosePlayer = new RosePlayer(staffPlayer);
-                    rosePlayer.sendLocaleMessage("blocked-message",
-                            StringPlaceholders.of("player", message.getSender().getName(),
-                                    "message", text));
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+                for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
+                    if (staffPlayer.hasPermission("rosechat.seeblocked")) {
+                        RosePlayer rosePlayer = new RosePlayer(staffPlayer);
+                        rosePlayer.sendLocaleMessage("blocked-message",
+                                StringPlaceholders.of("player", message.getSender().getName(),
+                                        "message", text));
+                    }
                 }
             }
 

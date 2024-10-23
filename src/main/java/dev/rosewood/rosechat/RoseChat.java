@@ -200,7 +200,7 @@ public class RoseChat extends RosePlugin {
                 DiscordSRV.api.subscribe(discordListener);
                 DiscordSRV.getPlugin().getJda().addEventListener(discordListener);
             }
-        }, 60L);
+        }, 90L);
 
         if (pluginManager.isPluginEnabled("Essentials"))
             this.nicknameProvider = new EssentialsHook();
