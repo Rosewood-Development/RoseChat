@@ -7,9 +7,12 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MarkdownBlockQuoteTokenizer extends Tokenizer {
+
+    private static final Pattern PATTERN = Pattern.compile(Pattern.quote("%message%"));
 
     public MarkdownBlockQuoteTokenizer() {
         super("markdown_block_quote");
@@ -29,24 +32,29 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
             return null;
 
         String content = input.substring(2);
-
         String format = Settings.MARKDOWN_FORMAT_BLOCK_QUOTES.get();
 
-        String[] splits = format.split(Pattern.quote("%message%"));
-        if (splits.length == 1) {
+        if (!format.contains("%message%")) {
             return new TokenizerResult(Token.group(
                     Token.group(format).ignoreTokenizer(this).build(),
                     Token.group(content).ignoreTokenizer(this).containsPlayerInput().build()
             ).build(), input.length());
-        } else {
-            List<Token> chunks = new ArrayList<>(splits.length * 2 - 1);
-            for (int i = 0; i < splits.length; i++) {
-                chunks.add(Token.group(splits[i]).ignoreTokenizer(this).build());
-                if (i != splits.length - 1)
-                    chunks.add(Token.group(content).ignoreTokenizer(this).containsPlayerInput().build());
-            }
-            return new TokenizerResult(Token.group(chunks).build(), input.length());
         }
+
+        Matcher matcher = PATTERN.matcher(format);
+        List<Token> chunks = new ArrayList<>();
+        int contentIndex = 0;
+        while (matcher.find()) {
+            if (contentIndex != matcher.start())
+                chunks.add(Token.group(format.substring(contentIndex, matcher.start())).ignoreTokenizer(this).build());
+            chunks.add(Token.group(content).ignoreTokenizer(this).containsPlayerInput().build());
+            contentIndex = matcher.end();
+        }
+
+        if (contentIndex < format.length())
+            chunks.add(Token.group(format.substring(contentIndex)).ignoreTokenizer(this).build());
+
+        return new TokenizerResult(Token.group(chunks).build(), input.length());
     }
 
 }
