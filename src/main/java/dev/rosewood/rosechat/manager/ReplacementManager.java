@@ -6,6 +6,8 @@ import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
+import dev.rosewood.rosegarden.utils.NMSUtil;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import java.io.File;
@@ -148,7 +150,13 @@ public class ReplacementManager extends Manager {
                 case "discord-output" -> output.setDiscordOutput(outputSection.getString("discord-output"));
                 case "sound" -> {
                     try {
-                        Sound sound = Sound.valueOf(outputSection.getString("sound").toUpperCase());
+                        String value = outputSection.getString("sound", "");
+                        Sound sound;
+                        if (NMSUtil.getVersionNumber() > 21 || (NMSUtil.getVersionNumber() == 21 && NMSUtil.getMinorVersionNumber() >= 3)) {
+                            sound = Registry.SOUNDS.match(value);
+                        } else {
+                            sound = Sound.valueOf(value.toUpperCase());
+                        }
                         output.setSound(sound);
                     } catch (Exception ignored) {
                     }

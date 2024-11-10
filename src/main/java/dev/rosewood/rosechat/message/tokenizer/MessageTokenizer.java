@@ -112,10 +112,9 @@ public class MessageTokenizer {
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
 
-        if (token.getType() == TokenType.GROUP)
-            for (Token child : token.getChildren())
-                if (child.getType() == TokenType.GROUP)
-                    this.tokenizeContent(child, depth + 1);
+        for (Token child : token.getChildren())
+            if (child.getType() == TokenType.GROUP)
+                this.tokenizeContent(child, depth + 1);
     }
 
     public <T> T toComponents(TokenComposer<T> composer) {
