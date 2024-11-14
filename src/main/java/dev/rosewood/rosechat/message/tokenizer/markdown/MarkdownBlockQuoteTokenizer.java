@@ -2,17 +2,12 @@ package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.TokenPatternSplitter;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MarkdownBlockQuoteTokenizer extends Tokenizer {
-
-    private static final Pattern PATTERN = Pattern.compile(Pattern.quote("%message%"));
 
     public MarkdownBlockQuoteTokenizer() {
         super("markdown_block_quote");
@@ -41,20 +36,16 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
             ).build(), input.length());
         }
 
-        Matcher matcher = PATTERN.matcher(format);
-        List<Token> chunks = new ArrayList<>();
-        int contentIndex = 0;
-        while (matcher.find()) {
-            if (contentIndex != matcher.start())
-                chunks.add(Token.group(format.substring(contentIndex, matcher.start())).ignoreTokenizer(this).build());
-            chunks.add(Token.group(content).ignoreTokenizer(this).containsPlayerInput().build());
-            contentIndex = matcher.end();
-        }
+        Token token = new TokenPatternSplitter()
+                .matchConsumer(match -> {
+                    match.ignoreTokenizer(this);
+                    match.containsPlayerInput();
+                })
+                .otherConsumer(other -> other.ignoreTokenizer(this))
+                .pattern("%message%", content)
+                .apply(format);
 
-        if (contentIndex < format.length())
-            chunks.add(Token.group(format.substring(contentIndex)).ignoreTokenizer(this).build());
-
-        return new TokenizerResult(Token.group(chunks).build(), input.length());
+        return new TokenizerResult(token, input.length());
     }
 
 }
