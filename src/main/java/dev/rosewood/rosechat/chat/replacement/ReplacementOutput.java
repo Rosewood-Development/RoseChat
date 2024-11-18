@@ -8,7 +8,7 @@ public class ReplacementOutput {
     private String hover;
     private String font;
     private String discordOutput;
-    private Sound sound;
+    private String sound;
     private boolean tagOnlinePlayers;
     private boolean matchLength;
     private boolean colorRetention;
@@ -60,11 +60,11 @@ public class ReplacementOutput {
         this.discordOutput = discordOutput;
     }
 
-    public Sound getSound() {
+    public String getSound() {
         return this.sound;
     }
 
-    public void setSound(Sound sound) {
+    public void setSound(String sound) {
         this.sound = sound;
     }
 

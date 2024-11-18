@@ -3,6 +3,8 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
 import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
+import dev.rosewood.rosechat.config.SettingSerializers;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
@@ -146,13 +148,7 @@ public class ReplacementManager extends Manager {
                 case "color-retention" -> output.setHasColorRetention(outputSection.getBoolean("color-retention"));
                 case "font" -> output.setFont(outputSection.getString("font"));
                 case "discord-output" -> output.setDiscordOutput(outputSection.getString("discord-output"));
-                case "sound" -> {
-                    try {
-                        Sound sound = Sound.valueOf(outputSection.getString("sound").toUpperCase());
-                        output.setSound(sound);
-                    } catch (Exception ignored) {
-                    }
-                }
+                case "sound" -> output.setSound(outputSection.getString("sound"));
             }
         }
 

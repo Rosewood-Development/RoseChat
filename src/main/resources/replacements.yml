@@ -86,7 +86,7 @@ player:
     text: '{player-tag}'
     # If a player is found within the text, it will change the text to their display name.
     tag-online-players: true
-    sound: BLOCK_NOTE_BLOCK_PLING
+    sound: minecraft:block.note_block.pling
 
 # This is an inline replacement.
 # This allows for grabbing two different parts of text without using regex.

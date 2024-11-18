@@ -108,10 +108,11 @@ public final class Settings {
     public static final RoseSetting<Integer> BUNGEECORD_MESSAGE_TIMEOUT = create(CHAT_SETTINGS, "bungeecord-message-timeout", INTEGER, 500,
             "How long should the server wait when sending a message to another server?",
                         "Requires BungeeCord");
-    public static final RoseSetting<Sound> MESSAGE_SOUND = create(CHAT_SETTINGS, "message-sound", SOUND, Sound.BLOCK_NOTE_BLOCK_PLING,
+    public static final RoseSetting<String> MESSAGE_SOUND = create(CHAT_SETTINGS, "message-sound", STRING, Sound.BLOCK_NOTE_BLOCK_PLING.getKey().toString(),
             "The sound that will be sent to a player when they receive a message.",
                         "Players can individually disable this in-game with /togglesound.",
-                        "Valid sounds can be found at: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html",
+                        "Sounds are namespaced to allow custom sounds from resource packs.",
+                        "A list of vanilla sounds can be found at: https://www.digminecraft.com/lists/sound_list_pc.php",
                         "Set to 'none' to disable.");
     public static final RoseSetting<Boolean> USE_MARKDOWN_FORMATTING = create(CHAT_SETTINGS, "use-markdown-formatting-in-game", BOOLEAN, true,
             "Should players be allowed to use markdown formatting in-game?",
