@@ -3,6 +3,8 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
 import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
+import dev.rosewood.rosechat.config.SettingSerializers;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;

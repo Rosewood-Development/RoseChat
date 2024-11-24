@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.replacement.Replacement;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageDirection;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -101,6 +102,10 @@ public class ReplacementTokenizer extends Tokenizer {
                         && replacement.getOutput().getDiscordOutput() != null ?
                         replacement.getOutput().getDiscordOutput() :
                         replacement.getOutput().getText();
+
+                // Recolour emojis on signs so they don't display as black.
+                if (params.getLocation() == PermissionArea.SIGN && replacement.getInput().isEmoji())
+                    content = "&f" + content + "&r";
 
                 Token.Builder token = Token.group(content)
                         .decorate(FontDecorator.of(replacement.getOutput().getFont()))

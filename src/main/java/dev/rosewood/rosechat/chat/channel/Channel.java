@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.log.ChannelMessageLog;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.task.SlowmodeTask;
+import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -125,12 +126,14 @@ public abstract class Channel {
             if (outputs.getWarning() != null)
                 outputs.getWarning().send(message.getSender());
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.hasPermission("rosechat.seeblocked")) {
-                    RosePlayer rosePlayer = new RosePlayer(player);
-                    rosePlayer.sendLocaleMessage("blocked-message",
-                            StringPlaceholders.of("player", message.getSender().getName(),
-                                    "message", input));
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("rosechat.seeblocked")) {
+                        RosePlayer rosePlayer = new RosePlayer(player);
+                        rosePlayer.sendLocaleMessage("blocked-message",
+                                StringPlaceholders.of("player", message.getSender().getName(),
+                                        "message", input));
+                    }
                 }
             }
 

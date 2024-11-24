@@ -10,7 +10,7 @@ import java.util.UUID;
 public class MessageOutputs {
 
     private final List<UUID> taggedPlayers;
-    private Sound tagSound;
+    private String tagSound;
     private final Set<String> missingPermissions;
 
     public MessageOutputs() {
@@ -22,11 +22,11 @@ public class MessageOutputs {
         return this.taggedPlayers;
     }
 
-    public Sound getTagSound() {
+    public String getTagSound() {
         return this.tagSound;
     }
 
-    public void setTagSound(Sound tagSound) {
+    public void setTagSound(String tagSound) {
         this.tagSound = tagSound;
     }
 

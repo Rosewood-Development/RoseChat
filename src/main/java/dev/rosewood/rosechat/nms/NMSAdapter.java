@@ -16,14 +16,15 @@ public class NMSAdapter {
             String name = Bukkit.getServer().getClass().getPackage().getName();
             isPaper = !name.contains("R"); // Used for checking if we should use obfuscation on modern versions.
 
-            if (major == 20 && minor >= 5)
+            if (major == 20 && minor >= 5) {
                 name = "v1_20_R4";
-            else if (major >= 21)
-                name = "v1_21_R1";
-            else if (major == 16)
+            } else if (major == 16) {
                 name = "v1_16_R1";
-            else
+            } else if (major == 21) {
+                name = minor >= 3 ? "v1_21_R2" : "v1_21_R1";
+            } else {
                 name = "v1_20_R3"; // Versions 1.17 - 1.20.4 are the same.
+            }
 
             nmsHandler = (NMSHandler) Class.forName("dev.rosewood.rosechat.nms." + name).getConstructor().newInstance();
         } catch (Exception ignored) {}
