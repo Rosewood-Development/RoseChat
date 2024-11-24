@@ -42,9 +42,10 @@ public class DataManager extends AbstractDataManager {
     public PlayerData getPlayerData(UUID uuid) {
         ChannelManager channelManager = this.rosePlugin.getManager(ChannelManager.class);
 
-        AtomicReference<PlayerData> value = new AtomicReference<>(null);
+        AtomicReference<PlayerData> value = new AtomicReference<>();
         this.databaseConnector.connect(connection -> {
             String dataQuery = "SELECT * FROM " + this.getTablePrefix() + "player_data WHERE uuid = ?";
+            PlayerData playerData;
             try (PreparedStatement statement = connection.prepareStatement(dataQuery)) {
                 statement.setString(1, uuid.toString());
                 ResultSet result = statement.executeQuery();
@@ -66,7 +67,7 @@ public class DataManager extends AbstractDataManager {
                             RoseChatAPI.getInstance().getGroupChatById(currentChannel) : channelManager.getChannel(currentChannel);
                     String strippedDisplayName = result.getString("stripped_name");
 
-                    PlayerData playerData = new PlayerData(uuid);
+                    playerData = new PlayerData(uuid);
                     playerData.setMessageSpy(messageSpy);
                     playerData.setChannelSpy(channelSpy);
                     playerData.setGroupSpy(groupSpy);
@@ -83,10 +84,8 @@ public class DataManager extends AbstractDataManager {
 
                     if (muteTime > 0)
                         playerData.mute(muteTime);
-
-                    value.set(playerData);
                 } else {
-                    value.set(new PlayerData(uuid));
+                    playerData = new PlayerData(uuid);
                 }
             }
 
@@ -97,7 +96,7 @@ public class DataManager extends AbstractDataManager {
 
                 if (result.next()) {
                     UUID ignored = UUID.fromString(result.getString("ignored_uuid"));
-                    value.get().ignore(ignored);
+                    playerData.ignore(ignored);
                 }
             }
 
@@ -107,9 +106,11 @@ public class DataManager extends AbstractDataManager {
                 ResultSet result = statement.executeQuery();
 
                 if (result.next()) {
-                    value.get().hideChannel(result.getString("channel"));
+                    playerData.hideChannel(result.getString("channel"));
                 }
             }
+
+            value.set(playerData);
         });
 
         return value.get();

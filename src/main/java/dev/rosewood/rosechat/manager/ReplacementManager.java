@@ -150,19 +150,7 @@ public class ReplacementManager extends Manager {
                 case "color-retention" -> output.setHasColorRetention(outputSection.getBoolean("color-retention"));
                 case "font" -> output.setFont(outputSection.getString("font"));
                 case "discord-output" -> output.setDiscordOutput(outputSection.getString("discord-output"));
-                case "sound" -> {
-                    try {
-                        String value = outputSection.getString("sound", "");
-                        Sound sound;
-                        if (NMSUtil.getVersionNumber() > 21 || (NMSUtil.getVersionNumber() == 21 && NMSUtil.getMinorVersionNumber() >= 3)) {
-                            sound = Registry.SOUNDS.match(value);
-                        } else {
-                            sound = Sound.valueOf(value.toUpperCase());
-                        }
-                        output.setSound(sound);
-                    } catch (Exception ignored) {
-                    }
-                }
+                case "sound" -> output.setSound(outputSection.getString("sound"));
             }
         }
 
