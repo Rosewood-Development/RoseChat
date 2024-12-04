@@ -21,7 +21,11 @@ public class NMSAdapter {
             } else if (major == 16) {
                 name = "v1_16_R1";
             } else if (major == 21) {
-                name = minor >= 3 ? "v1_21_R2" : "v1_21_R1";
+                name = switch (minor) {
+                    case 1, 2 -> "v1_21_R1";
+                    case 3 -> "v1_21_R2";
+                    default -> "v1_21_R3";
+                };
             } else {
                 name = "v1_20_R3"; // Versions 1.17 - 1.20.4 are the same.
             }
