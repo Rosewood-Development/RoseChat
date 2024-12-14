@@ -217,14 +217,14 @@ public final class Settings {
     public static final RoseSetting<String> EDITED_DISCORD_MESSAGE_FORMAT = create(CHAT_FORMATS, "edited-discord-message", STRING, "{edited}",
             "The format of an edited discord message.");
 
-    public static final RoseSetting<CommentedConfigurationSection> MARKDOWN_FORMATS = create("markdown-formats", "Markdown Format Settings");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_BOLD = create(MARKDOWN_FORMATS, "bold", STRING, "&l%message%&L");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_UNDERLINE = create(MARKDOWN_FORMATS, "underline", STRING, "&n%message%&N");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_STRIKETHROUGH = create(MARKDOWN_FORMATS, "strikethrough", STRING, "&m%message%&M");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_ITALIC = create(MARKDOWN_FORMATS, "italic", STRING, "&o%message%&O");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_SPOILER = create(MARKDOWN_FORMATS, "spoiler", STRING, "<spoiler>%message%</spoiler>");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_ONE = create(MARKDOWN_FORMATS, "code-block-one", STRING, "`%message%`");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE = create(MARKDOWN_FORMATS, "code-block-multiple", STRING, "```%message%```");
+    public static final RoseSetting<CommentedConfigurationSection> MARKDOWN_FORMATS = create("markdown-formats", "Markdown Format Settings", "Use %input_1% to substitute the player message");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_BOLD = create(MARKDOWN_FORMATS, "bold", STRING, "&l%input_1%&L");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_UNDERLINE = create(MARKDOWN_FORMATS, "underline", STRING, "&n%input_1%&N");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_STRIKETHROUGH = create(MARKDOWN_FORMATS, "strikethrough", STRING, "&m%input_1%&M");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_ITALIC = create(MARKDOWN_FORMATS, "italic", STRING, "&o%input_1%&O");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_SPOILER = create(MARKDOWN_FORMATS, "spoiler", STRING, "<spoiler>%input_1%</spoiler>");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_ONE = create(MARKDOWN_FORMATS, "code-block-one", STRING, "`%input_1%`");
+    public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE = create(MARKDOWN_FORMATS, "code-block-multiple", STRING, "```%input_1%```");
     public static final RoseSetting<String> MARKDOWN_FORMAT_BLOCK_QUOTES = create(MARKDOWN_FORMATS, "block-quotes", STRING, "&2> &o");
     public static final RoseSetting<String> MARKDOWN_FORMAT_URL = create(MARKDOWN_FORMATS, "url", STRING, "{url}");
     public static final RoseSetting<String> DISCORD_FORMAT_CHANNEL = create(MARKDOWN_FORMATS, "channel-link", STRING, "{discord-channel-link}");

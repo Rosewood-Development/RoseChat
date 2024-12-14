@@ -19,9 +19,6 @@ public class MarkdownBoldTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!this.hasTokenPermission(params, "rosechat.bold"))
-            return null;
-
         if (!input.startsWith("**"))
             return null;
 
@@ -29,12 +26,24 @@ public class MarkdownBoldTokenizer extends Tokenizer {
         if (!matcher.find() || matcher.start() != 0)
             return null;
 
+        if (!this.hasTokenPermission(params, "rosechat.bold"))
+            return null;
+
         String originalContent = input.substring(0, matcher.end());
         String content = originalContent.substring(2, originalContent.length() - 2);
-
         String format = Settings.MARKDOWN_FORMAT_BOLD.get();
-        content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
-        return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());
+
+        if (!format.contains("%input_1%")) {
+            return new TokenizerResult(Token.group(
+                    Token.group(format).ignoreTokenizer(this).build(),
+                    Token.group(content).ignoreTokenizer(this).containsPlayerInput().build()
+            ).build(), originalContent.length());
+        }
+
+        return new TokenizerResult(Token.group(format)
+                .placeholder("input_1", content)
+                .ignoreTokenizer(this)
+                .build(), originalContent.length());
     }
 
 }

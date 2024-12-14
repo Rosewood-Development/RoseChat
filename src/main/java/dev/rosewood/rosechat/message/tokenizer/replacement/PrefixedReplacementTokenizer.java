@@ -186,8 +186,8 @@ public class PrefixedReplacementTokenizer extends Tokenizer {
                     .decorate(FontDecorator.of(replacement.getOutput().getFont()))
                     .placeholder("message", originalContent)
                     .placeholder("extra", originalContent)
-                    .placeholder("tagged", "%group_1%")
                     .placeholders(groupPlaceholders.build())
+                    .placeholders(placeholders)
                     .ignoreTokenizer(this)
                     .encapsulate();
 

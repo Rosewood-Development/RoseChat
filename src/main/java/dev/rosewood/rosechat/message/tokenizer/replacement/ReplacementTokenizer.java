@@ -33,19 +33,17 @@ public class ReplacementTokenizer extends Tokenizer {
 
             if (replacement.getInput().isRegex()) {
                 Matcher matcher = RoseChatAPI.getInstance().getReplacementManager().getCompiledPatterns().get(replacement.getId() + "-text").matcher(input);
-                if (!matcher.find())
+                if (!matcher.find() || matcher.start() != 0)
                     continue;
 
                 String originalContent = matcher.group();
-                if (!input.startsWith(originalContent))
-                    continue;
 
                 // Check permissions
                 if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", replacement.getInput().getPermission())) {
                     if (Settings.REMOVE_REPLACEMENTS.get())
                         return new TokenizerResult(Token.text(""), originalContent.length());
 
-                    return null;
+                    continue;
                 }
 
                 String content = params.getDirection() == MessageDirection.MINECRAFT_TO_DISCORD
@@ -87,7 +85,7 @@ public class ReplacementTokenizer extends Tokenizer {
                     if (Settings.REMOVE_REPLACEMENTS.get())
                         return new TokenizerResult(Token.text(""), replacement.getInput().getText().length());
 
-                    return null;
+                    continue;
                 }
 
                 // Return if the replacement is an emoji, and the player has emoji formatting disabled.

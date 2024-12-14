@@ -1,7 +1,5 @@
 package dev.rosewood.rosechat.chat.replacement;
 
-import org.bukkit.Sound;
-
 public class ReplacementOutput {
 
     private String text;

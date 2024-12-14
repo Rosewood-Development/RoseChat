@@ -18,9 +18,6 @@ public class MarkdownCodeTokenizer extends Tokenizer {
         if (!input.startsWith("`"))
             return null;
 
-        if (!this.hasTokenPermission(params, "rosechat.code"))
-            return null;
-
         int lastIndex = 0;
 
         char[] chars = input.toCharArray();
@@ -34,13 +31,24 @@ public class MarkdownCodeTokenizer extends Tokenizer {
         if (lastIndex == 0)
             return null;
 
+        if (!this.hasTokenPermission(params, "rosechat.code"))
+            return null;
+
         String originalContent = input.substring(0, lastIndex + 1);
         String content = input.substring(1, lastIndex);
-
         String format = Settings.MARKDOWN_FORMAT_CODE_BLOCK_ONE.get();
-        content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
 
-        return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());
+        if (!format.contains("%input_1%")) {
+            return new TokenizerResult(Token.group(
+                    Token.group(format).ignoreTokenizer(this).build(),
+                    Token.group(content).ignoreTokenizer(this).containsPlayerInput().build()
+            ).build(), originalContent.length());
+        }
+
+        return new TokenizerResult(Token.group(format)
+                .placeholder("input_1", content)
+                .ignoreTokenizer(this)
+                .build(), originalContent.length());
     }
 
 }
