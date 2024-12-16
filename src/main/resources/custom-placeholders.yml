@@ -203,18 +203,18 @@ spoiler-tag:
     default: "&0⬛"
   hover:
     default:
-      - "%group_1%"
+      - "%input_1%"
 
 hover-tag:
   text:
-    default: "%group_2%"
+    default: "%input_2%"
   hover:
     default:
-      - "%group_1%"
+      - "%input_1%"
 
 url:
   text:
-    default: "&9&n%group_1%"
+    default: "&9&n%input_1%"
   hover:
     default:
       - "&7Click to Open"
