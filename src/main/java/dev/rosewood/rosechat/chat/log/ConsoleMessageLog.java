@@ -33,6 +33,4 @@ public class ConsoleMessageLog {
         return this.messages;
     }
 
-    // TODO Save to file
-
 }

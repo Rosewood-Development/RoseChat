@@ -113,8 +113,12 @@ public class PacketListener {
                     if (deleteClientButton == null)
                         return;
 
+                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true, null);
+                    deletableMessage.setOriginal(messageJson);
+
                     messageJson = ComponentSerializer.toString(deleteClientButton);
-                    data.getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true, null));
+                    deletableMessage.setJson(messageJson);
+                    data.getMessageLog().addDeletableMessage(deletableMessage);
 
                     // Overwrite the packet since packet fields are final in 1.19
                     PacketContainer newPacket = new PacketContainer(PacketType.Play.Server.CHAT);
@@ -220,12 +224,14 @@ public class PacketListener {
 
     private PacketContainer createSystemPacket(String json) {
         // Overwrite the packet since packet fields are final in 1.19
-        PacketContainer packet = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
+        PacketContainer packet = new PacketContainer(NMSUtil.getVersionNumber() >= 19 ? PacketType.Play.Server.SYSTEM_CHAT : PacketType.Play.Server.CHAT);
 
         if (NMSUtil.getVersionNumber() > 20 || (NMSUtil.getVersionNumber() == 20 && NMSUtil.getMinorVersionNumber() >= 4)) {
             packet.getChatComponents().write(0, WrappedChatComponent.fromJson(json));
-        } else {
+        } else if (NMSUtil.getVersionNumber() == 19) {
             packet.getStrings().write(0, json);
+        } else {
+            packet.getChatComponents().write(0, WrappedChatComponent.fromJson(json));
         }
 
         return packet;

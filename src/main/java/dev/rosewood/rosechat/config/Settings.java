@@ -4,7 +4,6 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.config.RoseSettingSerializer;
-import org.bukkit.Sound;
 import org.bukkit.event.EventPriority;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +107,7 @@ public final class Settings {
     public static final RoseSetting<Integer> BUNGEECORD_MESSAGE_TIMEOUT = create(CHAT_SETTINGS, "bungeecord-message-timeout", INTEGER, 500,
             "How long should the server wait when sending a message to another server?",
                         "Requires BungeeCord");
-    public static final RoseSetting<String> MESSAGE_SOUND = create(CHAT_SETTINGS, "message-sound", STRING, Sound.BLOCK_NOTE_BLOCK_PLING.getKey().toString(),
+    public static final RoseSetting<String> MESSAGE_SOUND = create(CHAT_SETTINGS, "message-sound", STRING, "minecraft:block.note_block.pling",
             "The sound that will be sent to a player when they receive a message.",
                         "Players can individually disable this in-game with /togglesound.",
                         "Sounds are namespaced to allow custom sounds from resource packs.",
