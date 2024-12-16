@@ -16,9 +16,6 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!this.hasTokenPermission(params, "rosechat.spoiler"))
-            return null;
-
         String spoiler = Settings.MARKDOWN_FORMAT_SPOILER.get();
         String prefix = spoiler.substring(0, spoiler.indexOf("%message%"));
         String suffix = spoiler.substring(spoiler.indexOf("%message%") + "%message%".length());
@@ -26,6 +23,9 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
             return null;
 
         if (!input.endsWith(suffix))
+            return null;
+
+        if (!this.hasTokenPermission(params, "rosechat.spoiler"))
             return null;
 
         String originalContent = input.substring(0, input.lastIndexOf(suffix) + suffix.length());

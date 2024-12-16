@@ -78,23 +78,16 @@ public class MessageTokenizer {
 
                 long startTime = System.nanoTime();
                 String originalContent = content;
-
                 this.parses++;
-                StringPlaceholders.Builder builder = StringPlaceholders.builder();
-                if (this.roseMessage.getPlaceholders() != null)
-                    builder.addAll(this.roseMessage.getPlaceholders());
 
-                if (token.getPlaceholders() != null)
-                    builder.addAll(token.getPlaceholders());
-
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token.containsPlayerInput(), this.roseMessage.shouldUsePlayerChatColor(), this.direction, builder.build());
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token, this.roseMessage.shouldUsePlayerChatColor(), this.direction);
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;
 
                 Token child = result.token();
-                child.parent = token;
                 token.getChildren().add(child);
+                token.getChildren().forEach(x -> x.parent = token); // Make sure all children have their parent assigned
                 content = content.substring(result.consumed());
                 this.outputs.merge(params.getOutputs());
 

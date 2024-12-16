@@ -19,6 +19,7 @@ import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownStrikethroughTok
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownUnderlineTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.placeholder.TokenPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.replacement.InlineReplacementTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.replacement.PrefixedReplacementTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.replacement.ReplacementTokenizer;
@@ -54,6 +55,7 @@ public class Tokenizers {
     public static final Tokenizer SHADER_COLORS = new ShaderTokenizer();
     public static final Tokenizer COLOR = new ColorTokenizer();
     public static final Tokenizer FORMAT = new FormatTokenizer();
+    public static final Tokenizer TOKEN_PLACEHOLDER = new TokenPlaceholderTokenizer();
     public static final Tokenizer ROSECHAT_PLACEHOLDER = new RoseChatPlaceholderTokenizer();
     public static final Tokenizer PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(false);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(true);
@@ -64,6 +66,7 @@ public class Tokenizers {
 
     public static final TokenizerBundle DEFAULT_BUNDLE = new TokenizerBundle("default",
             ROSECHAT_PLACEHOLDER,
+            TOKEN_PLACEHOLDER,
             PAPI_PLACEHOLDER,
             GRADIENT,
             RAINBOW,
@@ -89,6 +92,7 @@ public class Tokenizers {
 
     public static final TokenizerBundle BUNGEE_BUNDLE = new TokenizerBundle("bungee",
             ROSECHAT_PLACEHOLDER,
+            TOKEN_PLACEHOLDER,
             BUNGEE_PAPI_PLACEHOLDER,
             GRADIENT,
             RAINBOW,
@@ -102,6 +106,7 @@ public class Tokenizers {
 
     public static final TokenizerBundle DEFAULT_DISCORD_BUNDLE = new TokenizerBundle("default_discord",
             ROSECHAT_PLACEHOLDER,
+            TOKEN_PLACEHOLDER,
             PAPI_PLACEHOLDER,
             GRADIENT,
             RAINBOW,

@@ -238,7 +238,7 @@ public class RoseMessage {
      * @return The {@link StringPlaceholders} that this message should use.
      */
     public StringPlaceholders getPlaceholders() {
-        return this.placeholders;
+        return this.placeholders == null ? StringPlaceholders.empty() : this.placeholders;
     }
 
     public static RoseMessage forChannel(RosePlayer sender, Channel channel) {

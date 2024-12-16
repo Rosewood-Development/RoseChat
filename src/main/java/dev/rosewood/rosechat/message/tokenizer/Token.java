@@ -52,7 +52,7 @@ public class Token {
         if (this.content == null)
             return "";
 
-        return this.getPlaceholders().apply(this.content);
+        return this.content;
     }
 
     /**

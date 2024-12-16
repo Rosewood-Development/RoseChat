@@ -10,31 +10,21 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 public class TokenizerParams {
 
     private final MessageOutputs outputs;
-    private final RosePlayer sender;
+    private final RoseMessage message;
     private final RosePlayer receiver;
     private final String input;
-    private final boolean containsPlayerInput;
+    private final Token parentToken;
     private final boolean usePlayerChatColor;
-    private final String playerInput;
-    private final PermissionArea location;
-    private final String locationPermission;
-    private final Channel channel;
-    private final StringPlaceholders placeholders;
     private final MessageDirection direction;
 
-    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, boolean containsPlayerInput,
-                           boolean usePlayerChatColor, MessageDirection direction, StringPlaceholders placeholders) {
+    public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, Token parentToken,
+                           boolean usePlayerChatColor, MessageDirection direction) {
         this.outputs = new MessageOutputs();
-        this.sender = message.getSender();
+        this.message = message;
         this.receiver = receiver;
         this.input = input;
-        this.containsPlayerInput = containsPlayerInput;
+        this.parentToken = parentToken;
         this.usePlayerChatColor = usePlayerChatColor;
-        this.playerInput = message.getPlayerInput();
-        this.location = message.getLocation();
-        this.locationPermission = message.getLocationPermission();
-        this.channel = message.getChannel();
-        this.placeholders = placeholders;
         this.direction = direction;
     }
 
@@ -43,7 +33,7 @@ public class TokenizerParams {
     }
 
     public RosePlayer getSender() {
-        return this.sender;
+        return this.message.getSender();
     }
 
     public RosePlayer getReceiver() {
@@ -55,7 +45,7 @@ public class TokenizerParams {
     }
 
     public boolean containsPlayerInput() {
-        return this.containsPlayerInput;
+        return this.parentToken.containsPlayerInput();
     }
 
     public boolean shouldUsePlayerChatColor() {
@@ -63,23 +53,26 @@ public class TokenizerParams {
     }
 
     public String getPlayerInput() {
-        return this.playerInput;
+        return this.message.getPlayerInput();
     }
 
     public PermissionArea getLocation() {
-        return this.location;
+        return this.message.getLocation();
     }
 
     public String getLocationPermission() {
-        return this.locationPermission;
+        return this.message.getLocationPermission();
     }
 
     public Channel getChannel() {
-        return this.channel;
+        return this.message.getChannel();
     }
 
     public StringPlaceholders getPlaceholders() {
-        return this.placeholders;
+        StringPlaceholders.Builder builder = StringPlaceholders.builder();
+        builder.addAll(this.message.getPlaceholders());
+        builder.addAll(this.parentToken.getPlaceholders());
+        return builder.build();
     }
 
     public MessageDirection getDirection() {
