@@ -46,7 +46,7 @@ public class PlayerListener implements Listener {
 
         // Ensure group chats are loaded first.
         RoseChatAPI.getInstance().getGroupManager().loadMemberGroupChats(player.getUUID(), (gcs) -> {
-            PlayerData playerData = playerDataManager.getPlayerDataSynchronous(player.getUUID());
+            PlayerData playerData = playerDataManager.getPlayerData(player.getUUID());
 
             // Set the display name when the player logs in
             if (playerData.getNickname() != null)

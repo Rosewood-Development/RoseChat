@@ -7,9 +7,9 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
+import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public class PlayerDataManager extends Manager {
     public PlayerDataManager(RosePlugin rosePlugin) {
         super(rosePlugin);
         
-        this.playerData = new HashMap<>();
+        this.playerData = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -55,8 +55,15 @@ public class PlayerDataManager extends Manager {
         this.playerData.clear();
     }
 
+    /**
+     * Gets the PlayerData synchronously. May cause a database query on the main thread.
+     * Only use this if you expect the player data to already be loaded.
+     *
+     * @param uuid The UUID of the player to load.
+     * @return The PlayerData for the player.
+     */
     public PlayerData getPlayerData(UUID uuid) {
-        return this.playerData.get(uuid);
+        return this.playerData.computeIfAbsent(uuid, this.dataManager::getPlayerData);
     }
 
     public void getPlayerData(UUID uuid, Consumer<PlayerData> callback) {
@@ -70,21 +77,6 @@ public class PlayerDataManager extends Manager {
             this.playerData.put(uuid, playerData);
             callback.accept(playerData);
         });
-    }
-
-    /**
-     * Gets the PlayerData synchronously. May cause a database query on the main thread.
-     *
-     * @param uuid The UUID of the player to load.
-     * @return The PlayerData for the player.
-     */
-    public PlayerData getPlayerDataSynchronous(UUID uuid) {
-        if (this.playerData.containsKey(uuid))
-            return this.playerData.get(uuid);
-
-        PlayerData playerData = this.dataManager.getPlayerData(uuid);
-        this.playerData.put(uuid, playerData);
-        return playerData;
     }
 
     public void updatePlayerData(PlayerData playerData) {

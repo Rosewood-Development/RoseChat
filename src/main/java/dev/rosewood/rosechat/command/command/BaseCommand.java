@@ -20,11 +20,7 @@ public class BaseCommand extends PrimaryCommand {
                 .arguments(ArgumentsDefinition.builder()
                         .optionalSub(
                                 new HelpCommand(this.rosePlugin, this),
-                                new ReloadCommand(this.rosePlugin,
-                                        CommandInfo.builder("reload")
-                                                .descriptionKey("command-reload-description")
-                                                .permission("rosechat.reload")
-                                                .build()),
+                                new ReloadCommand(this.rosePlugin),
                                 new DebugCommand(this.rosePlugin)
                         ))
                 .build();

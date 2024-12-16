@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,11 +20,11 @@ public class Token {
     private final boolean encapsulate;
     private final Set<Tokenizer> ignoredTokenizers;
 
-    private Token(TokenType type, String content, List<TokenDecorator> decorators, boolean containsPlayerInput,
+    private Token(TokenType type, String content, List<Token> children, List<TokenDecorator> decorators, boolean containsPlayerInput,
                   StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
         this.type = type;
         this.content = content;
-        this.children = new ArrayList<>();
+        this.children = children;
         this.decorators = decorators;
         this.containsPlayerInput = containsPlayerInput;
         this.placeholders = placeholders;
@@ -47,6 +48,9 @@ public class Token {
     public String getContent() {
         if (this.type == TokenType.DECORATOR)
             throw new IllegalStateException("Cannot get content of a token that is of type DECORATOR");
+
+        if (this.content == null)
+            return "";
 
         return this.getPlaceholders().apply(this.content);
     }
@@ -131,17 +135,26 @@ public class Token {
     }
 
     public static Token decorator(TokenDecorator decorator) {
-        return new Builder(TokenType.DECORATOR, null).decorate(decorator).build();
+        return new Builder(TokenType.DECORATOR, "").decorate(decorator).build();
     }
 
     public static Builder group(String rawContent) {
         return new Builder(TokenType.GROUP, rawContent);
     }
 
+    public static Builder group(List<Token> children) {
+        return new Builder(TokenType.GROUP, children);
+    }
+
+    public static Builder group(Token... children) {
+        return group(Arrays.asList(children));
+    }
+
     public static class Builder {
 
         private final TokenType tokenType;
         private final String content;
+        private final List<Token> children;
         private final List<TokenDecorator> decorators;
         private boolean containsPlayerInput;
         private StringPlaceholders.Builder placeholders;
@@ -150,7 +163,16 @@ public class Token {
 
         private Builder(TokenType tokenType, String content) {
             this.tokenType = tokenType;
-            this.content = content;
+            this.content = content == null ? "" : content;
+            this.children = new ArrayList<>();
+            this.decorators = new ArrayList<>();
+            this.containsPlayerInput = false;
+        }
+
+        private Builder(TokenType tokenType, List<Token> children) {
+            this.tokenType = tokenType;
+            this.content = "";
+            this.children = new ArrayList<>(children);
             this.decorators = new ArrayList<>();
             this.containsPlayerInput = false;
         }
@@ -198,6 +220,7 @@ public class Token {
             return new Token(
                     this.tokenType,
                     this.content,
+                    this.children,
                     this.decorators,
                     this.containsPlayerInput,
                     this.placeholders == null ? StringPlaceholders.empty() : this.placeholders.build(),
