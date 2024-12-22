@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.manager;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.command.command.CustomChannelCommand;
 import dev.rosewood.rosechat.config.Settings;
@@ -9,7 +10,6 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.CommentedFileConfiguration;
 import dev.rosewood.rosegarden.manager.Manager;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
@@ -212,17 +212,27 @@ public class ChannelManager extends Manager {
             RosePlayer rosePlayer = new RosePlayer(player);
 
             for (WorldGuardChannel channel : this.getWorldGuardChannels()) {
+
                 // If the player is in the channel and not in the region, then kick them from the channel.
                 if (channel.getMembers().contains(player.getUniqueId()) && !channel.isInWhitelistedRegion(rosePlayer)) {
                     Channel newChannel = rosePlayer.findChannel();
-                    rosePlayer.switchChannel(newChannel);
+                    if (newChannel.getMembers().contains(player.getUniqueId()))
+                        break;
+
+                    if (rosePlayer.switchChannel(newChannel)) {
+                        String joinMessage = newChannel.getSettings().getFormats().get("join-message");
+                        if (joinMessage != null)
+                            rosePlayer.send(RoseChatAPI.getInstance().parse(rosePlayer, rosePlayer, joinMessage));
+                    }
+
                     break;
                 }
 
                 if (!channel.getMembers().contains(player.getUniqueId()) && channel.isInWhitelistedRegion(rosePlayer)) {
                     if (rosePlayer.switchChannel(channel)) {
-                        this.localeManager.sendMessage(player,
-                                "command-channel-joined", StringPlaceholders.of("id", channel.getId()));
+                        String joinMessage = channel.getSettings().getFormats().get("join-message");
+                        if (joinMessage != null)
+                            rosePlayer.send(RoseChatAPI.getInstance().parse(rosePlayer, rosePlayer, joinMessage));
                     }
 
                     break;
