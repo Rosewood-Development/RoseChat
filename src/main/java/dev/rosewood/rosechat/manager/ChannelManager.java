@@ -83,8 +83,6 @@ public class ChannelManager extends Manager {
                 for (Class<? extends Channel> channelClass : channelProvider.getChannels()) {
                     Channel channel = channelClass.getDeclaredConstructor(ChannelProvider.class).newInstance(channelProvider);
                     channel.onLoad();
-                    if (channel.getSettings().isDefault())
-                        this.defaultChannel = channel;
 
                     this.channels.put(channel.getId(), channel);
 
@@ -128,6 +126,9 @@ public class ChannelManager extends Manager {
 
         // If a channel does not have a format, set the format to the same as the default channel.
         for (Channel channel : this.channels.values()) {
+            if (channel.getSettings().isDefault())
+                this.defaultChannel = channel;
+
             if (!channel.getSettings().getFormats().containsKey("chat"))
                 channel.getSettings().getFormats().put("chat", this.defaultChannel.getSettings().getFormats().get("chat"));
 
@@ -143,6 +144,12 @@ public class ChannelManager extends Manager {
 
             this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
                     "&eLoaded " + provider + " channels: " + channels.substring(1, channels.length() - 1));
+        }
+
+        if (this.defaultChannel == null) {
+            this.defaultChannel = this.channels.entrySet().iterator().next().getValue();
+            this.localeManager.sendCustomMessage(Bukkit.getConsoleSender(), this.localeManager.getLocaleMessage("prefix") +
+                    "&eNo default channel was found! The default channel has been automatically set to: " + this.defaultChannel.getId());
         }
     }
 
