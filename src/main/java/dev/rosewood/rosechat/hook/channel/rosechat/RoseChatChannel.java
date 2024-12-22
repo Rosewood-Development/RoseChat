@@ -190,6 +190,12 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
         }
 
         // Handle messages to be sent on this server.
+
+        // Return if the channel has a format set, but it is specifically empty.
+        String format = this.settings.getFormats().get("chat");
+        if (format != null && format.isEmpty())
+            return;
+
         RoseMessage message = RoseMessage.forChannel(options.sender(), this);
         message.setPlaceholders(this.getInfoPlaceholders().build());
 
