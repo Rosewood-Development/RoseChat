@@ -124,6 +124,9 @@ public class WorldGuardChannel extends RoseChatChannel {
 
     @Override
     public List<Player> getSpies(Predicate<Player> condition) {
+        if (condition == null)
+            return super.getSpies(null);
+
         return super.getSpies(condition.or(player -> ((!this.whitelist.isEmpty() && !isInWhitelistedRegion(new RosePlayer(player)))
                 || (this.whitelist.isEmpty() && isInBlacklistedRegion(new RosePlayer(player))))));
     }
