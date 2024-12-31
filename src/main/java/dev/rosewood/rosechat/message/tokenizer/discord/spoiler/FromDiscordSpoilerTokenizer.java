@@ -34,7 +34,7 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
         String content = input.substring(2, lastIndex - 1);
 
         String format = Settings.MARKDOWN_FORMAT_SPOILER.get();
-        content = format.contains("%message%") ? format.replace("%message%", content) : format + content;
+        content = format.contains("%input_1%") ? format.replace("%input_1%", content) : format + content;
 
         return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());
     }
