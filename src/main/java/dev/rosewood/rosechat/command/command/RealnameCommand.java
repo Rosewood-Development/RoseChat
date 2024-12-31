@@ -38,7 +38,7 @@ public class RealnameCommand extends RoseChatCommand {
             this.getLocaleManager().sendComponentMessage(context.getSender(), "command-realname-success",
                     StringPlaceholders.of(
                             "player", target.getRealName(),
-                            "name", nickname
+                            "name", nickname == null ? target.getRealName() : nickname
                             ));
         });
     }
