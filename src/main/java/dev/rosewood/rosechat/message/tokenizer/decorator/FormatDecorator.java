@@ -21,19 +21,15 @@ public class FormatDecorator extends TokenDecorator {
         if (this.chatColor == ChatColor.BOLD) {
             if (this.value)
                 component.setBold(true);
-
         } else if (this.chatColor == ChatColor.ITALIC) {
             if (this.value)
                 component.setItalic(true);
-
         } else if (this.chatColor == ChatColor.UNDERLINE) {
             if (this.value)
                 component.setUnderlined(true);
-
         } else if (this.chatColor == ChatColor.STRIKETHROUGH) {
             if (this.value)
                 component.setStrikethrough(true);
-
         } else if (this.chatColor == ChatColor.MAGIC) {
             if (this.value)
                 component.setObfuscated(true);
@@ -42,8 +38,21 @@ public class FormatDecorator extends TokenDecorator {
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return newDecorator.getType() == DecoratorType.STYLING &&
-                !(newDecorator instanceof FontDecorator) && !(newDecorator instanceof FormatDecorator);
+        if (newDecorator.getType() == DecoratorType.STYLING) {
+            if (newDecorator instanceof FormatDecorator otherFormat) {
+                if (otherFormat.chatColor == ChatColor.RESET)
+                    return true;
+
+                if (otherFormat.chatColor == this.chatColor) {
+                    return !otherFormat.value && this.value;
+                } else {
+                    return false;
+                }
+            } else {
+                return !(newDecorator instanceof FontDecorator);
+            }
+        }
+        return false;
     }
 
     @Override
