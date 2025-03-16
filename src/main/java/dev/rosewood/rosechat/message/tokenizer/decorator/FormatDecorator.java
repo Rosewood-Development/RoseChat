@@ -38,21 +38,17 @@ public class FormatDecorator extends TokenDecorator {
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (newDecorator.getType() == DecoratorType.STYLING) {
-            if (newDecorator instanceof FormatDecorator otherFormat) {
-                if (otherFormat.chatColor == ChatColor.RESET)
-                    return true;
+        if (newDecorator instanceof FormatDecorator otherFormat) {
+            if (otherFormat.chatColor == ChatColor.RESET)
+                return true;
 
-                if (otherFormat.chatColor == this.chatColor) {
-                    return !otherFormat.value && this.value;
-                } else {
-                    return false;
-                }
+            if (otherFormat.chatColor == this.chatColor) {
+                return !otherFormat.value && this.value;
             } else {
-                return !(newDecorator instanceof FontDecorator);
+                return false;
             }
         }
-        return false;
+        return newDecorator instanceof ColorDecorator;
     }
 
     @Override
