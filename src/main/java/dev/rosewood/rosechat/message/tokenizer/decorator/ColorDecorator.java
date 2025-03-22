@@ -7,6 +7,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import java.awt.Color;
 import java.util.function.Function;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class ColorDecorator extends TokenDecorator {
 
@@ -32,7 +33,7 @@ public class ColorDecorator extends TokenDecorator {
         if (this.colorGenerator == null && this.colorGeneratorFunction != null)
             this.colorGenerator = this.colorGeneratorFunction.apply(tokenizer.findDecoratorContentLength(parent, this));
 
-        if (this.colorGenerator != null)
+        if (this.colorGenerator != null && (!(component instanceof TextComponent textComponent) || !textComponent.getText().isBlank()))
             component.setColor(this.colorGenerator.nextChatColor());
     }
 
