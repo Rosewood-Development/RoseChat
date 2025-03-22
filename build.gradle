@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'dev.rosewood'
-version = 'Beta-31'
+version = 'Beta-32'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
