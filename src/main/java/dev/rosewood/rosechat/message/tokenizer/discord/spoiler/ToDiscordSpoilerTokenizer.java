@@ -17,8 +17,13 @@ public class ToDiscordSpoilerTokenizer extends Tokenizer {
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
         String spoiler = Settings.MARKDOWN_FORMAT_SPOILER.get();
-        String prefix = spoiler.substring(0, spoiler.indexOf("%input_1%"));
-        String suffix = spoiler.substring(spoiler.indexOf("%input_1%") + "%input_1%".length());
+        if (!spoiler.contains("%input_1%"))
+            return null;
+
+        int inputIndex = spoiler.indexOf("%input_1%");
+
+        String prefix = spoiler.substring(0, inputIndex);
+        String suffix = spoiler.substring(inputIndex + "%input_1%".length());
         if (!input.startsWith(prefix))
             return null;
 

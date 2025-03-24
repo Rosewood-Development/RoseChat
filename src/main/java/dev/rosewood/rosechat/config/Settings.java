@@ -225,7 +225,6 @@ public final class Settings {
     public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_ONE = create(MARKDOWN_FORMATS, "code-block-one", STRING, "`%input_1%`");
     public static final RoseSetting<String> MARKDOWN_FORMAT_CODE_BLOCK_MULTIPLE = create(MARKDOWN_FORMATS, "code-block-multiple", STRING, "```%input_1%```");
     public static final RoseSetting<String> MARKDOWN_FORMAT_BLOCK_QUOTES = create(MARKDOWN_FORMATS, "block-quotes", STRING, "&2> &o");
-    public static final RoseSetting<String> MARKDOWN_FORMAT_URL = create(MARKDOWN_FORMATS, "url", STRING, "{url}");
     public static final RoseSetting<String> DISCORD_FORMAT_CHANNEL = create(MARKDOWN_FORMATS, "channel-link", STRING, "{discord-channel-link}");
 
     private static <T> RoseSetting<T> create(RoseSetting<CommentedConfigurationSection> section, String key, RoseSettingSerializer<T> serializer, T defaultValue, String... comments) {

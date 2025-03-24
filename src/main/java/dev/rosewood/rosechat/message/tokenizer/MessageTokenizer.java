@@ -208,7 +208,7 @@ public class MessageTokenizer {
             switch (child.getType()) {
                 case TEXT -> {
                     if (counting.get())
-                        length += child.getContent().length();
+                        length += child.getContent().replaceAll("\\s", "").length();
                 }
                 case DECORATOR -> {
                     if (counting.get() && child.getDecorators().stream().anyMatch(decorator::isOverwrittenBy)) {
