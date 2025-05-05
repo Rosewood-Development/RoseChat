@@ -42,7 +42,7 @@ public class GroupCreateCommand extends RoseChatCommand {
     @RoseExecutable
     public void execute(CommandContext context, String id) {
         RosePlayer player = new RosePlayer(context.getSender());
-        this.execute(player, id, player.getName() + "'s GroupChat");
+        this.execute(player, id, player.getRealName() + "'s GroupChat");
     }
 
     @RoseExecutable
