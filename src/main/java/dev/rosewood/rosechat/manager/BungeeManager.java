@@ -189,10 +189,11 @@ public class BungeeManager extends Manager {
      * Sends a BungeeCord message to a specific player.
      * @param sender The {@link RosePlayer} who sent the message.
      * @param receiver The name of the player who received the message.
+     * @param json The formatted message to be sent.
      * @param message The unformatted message to be sent.
      * @param callback A callback to check if the message was received.
      */
-    public void sendDirectMessage(RosePlayer sender, String receiver, String message, Consumer<Boolean> callback) {
+    public void sendDirectMessage(RosePlayer sender, String receiver, String json, String message, Consumer<Boolean> callback) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(outputStream);
 
@@ -201,7 +202,8 @@ public class BungeeManager extends Manager {
             out.writeUTF(sender.getUUID().toString());
             out.writeUTF(sender.getPermissionGroup());
             out.writeUTF(this.getPlayerPermissions(sender));
-            out.writeUTF(message);
+            out.writeUTF(json == null ? "" : json);
+            out.writeUTF(PlaceholderAPIHook.applyPlaceholders(sender.isPlayer() ? sender.asPlayer() : null, message));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -221,16 +223,20 @@ public class BungeeManager extends Manager {
      * @param senderUUID The {@link UUID} of the player who sent the message.
      * @param group The permission group of the player who sent the message.
      * @param permissions A list of RoseChat permissions that the sender has.
+     * @param json The formatted message being received.
      * @param message The unformatted message being received.
      */
-    public void receiveDirectMessage(Player player, String senderStr, UUID senderUUID, String group, List<String> permissions, String message) {
+    public void receiveDirectMessage(Player player, String senderStr, UUID senderUUID, String group, List<String> permissions, String json, String message) {
         PlayerData playerData = this.rosePlugin.getManager(PlayerDataManager.class).getPlayerData(player.getUniqueId());
         if (playerData.getIgnoringPlayers().contains(senderUUID))
             return;
 
         RosePlayer sender = new RosePlayer(senderStr, group);
         sender.setIgnoredPermissions(permissions);
-        MessageUtils.sendPrivateMessage(sender, player.getName(), message);
+        if (json == null || json.isEmpty())
+            MessageUtils.sendPrivateMessage(sender, player.getName(), message);
+        else
+            MessageUtils.sendPrivateJsonMessage(sender, player.getName(), json, message);
     }
 
     //

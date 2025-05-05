@@ -6,14 +6,17 @@ import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
+import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -198,7 +201,7 @@ public class MessageUtils {
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
             new RosePlayer(Bukkit.getConsoleSender()).send(parsedMessage);
 
-        // Parse for the channel spies.
+        // Parse for the spies.
         for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
             // Don't send the spy message if the spy is the sender or receiver.
             if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID()))
@@ -233,8 +236,10 @@ public class MessageUtils {
                     sender.send(parsedSentMessage);
                     Bukkit.getConsoleSender().spigot().sendMessage(parsedReceivedMessage);
                 } else {
-                    // If the target is not valid, but the name isn't console, we should see if it is a bungee player.
-                    RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, message, (success) -> {
+                    boolean keepFormat = Settings.KEEP_MESSAGE_FORMAT.get();
+                    String bungeeMessage = keepFormat ? ComponentSerializer.toString(parsedReceivedMessage) : null;
+
+                    RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
                         if (success) {
                             // If the message was received successfully, send the sent message to the sender.
                             sender.send(parsedSentMessage);
@@ -286,6 +291,81 @@ public class MessageUtils {
                 }
             });
         }
+    }
+
+    /**
+     * Sends a private JSON message from one player to another.
+     * This message originated from another server connected to a network.
+     * @param sender The {@link RosePlayer} who sent the message.
+     * @param targetName The name of the player receiving the message.
+     * @param json The JSON message to send.
+     * @param input The input of the message to send.
+     */
+    public static void sendPrivateJsonMessage(RosePlayer sender, String targetName, String json, String input) {
+        RoseChatAPI api = RoseChatAPI.getInstance();
+
+        Player target = MessageUtils.getPlayerExact(targetName);
+        if (target == null)
+            return;
+
+        RosePlayer messageTarget = new RosePlayer(target);
+
+        RosePlayer console = new RosePlayer(Bukkit.getConsoleSender());
+        RoseMessage consoleMessage = RoseMessage.forLocation(sender, PermissionArea.MESSAGE);
+        consoleMessage.setPlayerInput(input);
+        console.send(consoleMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get()).content());
+
+        RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.MESSAGE);
+        roseMessage.setPlayerInput(json);
+
+        for (UUID uuid : api.getPlayerDataManager().getMessageSpies()) {
+            if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID()))
+                continue;
+
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy == null)
+                continue;
+
+            RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
+                BaseComponent[] parsedSpyMessage = consoleMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get()).content();
+                spy.spigot().sendMessage(parsedSpyMessage);
+            });
+        }
+
+        String jsonMessage = applyJSONPlaceholders(roseMessage.getPlayerInput());
+        MessageTokenizerResults<BaseComponent[]> parsedMessage = parseJSONMessage(messageTarget, jsonMessage);
+
+        PlayerReceiveMessageEvent receiveEvent = new PlayerReceiveMessageEvent(sender, messageTarget, roseMessage, parsedMessage);
+        Bukkit.getPluginManager().callEvent(receiveEvent);
+        if (receiveEvent.isCancelled())
+            return;
+
+        BaseComponent[] message = receiveEvent.getComponents().content();
+
+        messageTarget.send(message);
+        PlayerData data = messageTarget.getPlayerData();
+        if (data != null && data.hasMessageSounds() && Settings.MESSAGE_SOUND.get() != null)
+            target.playSound(target.getLocation(), Settings.MESSAGE_SOUND.get(), 1.0f, 1.0f);
+    }
+
+    public static String applyJSONPlaceholders(String message) {
+        String output = message;
+
+        if (PlaceholderAPIHook.enabled()) {
+            Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(message);
+            while (matcher.find())
+                output = output.replace(matcher.group(), matcher.group().replace("%other_", ""));
+        }
+
+        return output;
+    }
+
+    public static MessageTokenizerResults<BaseComponent[]> parseJSONMessage(RosePlayer receiver, String json) {
+        BaseComponent[] parsed = ComponentSerializer.parse(receiver.isPlayer() ?
+                PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), json) :
+                json);
+
+        return new MessageTokenizerResults<>(parsed, new MessageOutputs());
     }
 
     /**

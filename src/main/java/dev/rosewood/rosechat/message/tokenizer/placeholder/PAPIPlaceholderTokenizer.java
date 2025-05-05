@@ -7,6 +7,8 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,18 +39,19 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
             return null;
 
         String originalContent = matcher.group();
-
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
-            if (!params.getReceiver().isPlayer())
+            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(params.getReceiver().getRealName());
+            if (offlineReceiver == null || !offlineReceiver.hasPlayedBefore()) {
                 content = originalContent;
-            else {
+            } else {
                 content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
-                content = PlaceholderAPIHook.applyPlaceholders(params.getReceiver().asPlayer(), content.replaceFirst("other_", ""));
+                content = PlaceholderAPIHook.applyPlaceholders(offlineReceiver, content.replaceFirst("other_", ""));
             }
         } else {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(params.getSender().getRealName());
             content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent);
-            content = PlaceholderAPIHook.applyPlaceholders(params.getSender().asPlayer(), content);
+            content = PlaceholderAPIHook.applyPlaceholders(offlinePlayer, content);
         }
 
         // If we haven't changed, don't allow tokenizing this text anymore

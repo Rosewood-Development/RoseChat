@@ -104,6 +104,9 @@ public final class Settings {
     public static final RoseSetting<Boolean> ALLOW_BUNGEECORD_MESSAGES = create(CHAT_SETTINGS, "allow-bungeecord-messages", BOOLEAN, true,
             "Should players be allowed to message other players on connected servers?",
                         "Requires BungeeCord");
+    public static final RoseSetting<Boolean> KEEP_MESSAGE_FORMAT = create(CHAT_SETTINGS, "keep-message-format", BOOLEAN, false,
+            "Should the message format be kept when sending a message to another server?",
+                        "Requires BungeeCord");
     public static final RoseSetting<Integer> BUNGEECORD_MESSAGE_TIMEOUT = create(CHAT_SETTINGS, "bungeecord-message-timeout", INTEGER, 500,
             "How long should the server wait when sending a message to another server?",
                         "Requires BungeeCord");
