@@ -24,6 +24,7 @@ import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -47,6 +48,9 @@ public final class RoseChatAPI {
     private final RoseChat plugin;
     private Class<?> spigotConfigClass;
     private Field bungeeField;
+    private Class<?> paperConfigClass;
+    private Object velocityObject;
+    private Field velocityEnabledField;
 
     private RoseChatAPI() {
         this.plugin = RoseChat.getInstance();
@@ -426,6 +430,31 @@ public final class RoseChatAPI {
      * @return True if the server is on BungeeCord.
      */
     public boolean isBungee() {
+        if (NMSUtil.isPaper()) {
+            if (this.paperConfigClass == null || this.velocityObject == null || this.velocityEnabledField == null) {
+                try {
+                    this.paperConfigClass = Class.forName("io.papermc.paper.configuration.GlobalConfiguration");
+                    Field paperConfigField = this.paperConfigClass.getDeclaredField("instance");
+                    paperConfigField.setAccessible(true);
+                    Object instance = paperConfigField.get(null);
+                    Object proxies = instance.getClass().getDeclaredField("proxies").get(instance);
+                    this.velocityObject = proxies.getClass().getDeclaredField("velocity").get(proxies);
+                    this.velocityEnabledField = this.velocityObject.getClass().getDeclaredField("enabled");
+                    return this.velocityEnabledField.getBoolean(this.velocityObject);
+                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    return this.velocityEnabledField.getBoolean(this.velocityObject);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return false;
+        }
+
         if (this.spigotConfigClass == null || this.bungeeField == null) {
             try {
                 this.spigotConfigClass = Class.forName("org.spigotmc.SpigotConfig");
