@@ -318,6 +318,18 @@ permissions:
   rosechat.nickname.others:
     description: Allows setting the nickname of another player.
     default: op
+  rosechat.nickname.bypass.min:
+    description: Bypasses the minimum length requirement of a nickname.
+    default: false
+  rosechat.nickname.bypass.max:
+    description: Bypasses the maximum length requirement of a nickname.
+    default: false
+  rosechat.nickname.bypass.space:
+    description: Bypasses the no space requirement of a nickname.
+    default: false
+  rosechat.nickname.bypass.nonalpha:
+    description: Bypasses the non-alphanumeric requirement of a nickname.
+    default: false
   rosechat.nickcolor:
     description: Allows using the nickcolor command.
     default: op

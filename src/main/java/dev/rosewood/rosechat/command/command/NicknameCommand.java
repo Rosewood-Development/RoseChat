@@ -162,24 +162,33 @@ public class NicknameCommand extends RoseChatCommand {
         String nickname = message.getPlayerInput();
         String strippedNickname = ChatColor.stripColor(HexUtils.colorify(nickname));
 
-        if (strippedNickname.length() < Math.max(1, Settings.MINIMUM_NICKNAME_LENGTH.get())) {
-            player.sendLocaleMessage("command-nickname-too-short");
-            return false;
+
+        if (!player.hasPermission("rosechat.nickname.bypass.min")) {
+            if (strippedNickname.length() < Math.max(1, Settings.MINIMUM_NICKNAME_LENGTH.get())) {
+                player.sendLocaleMessage("command-nickname-too-short");
+                return false;
+            }
         }
 
-        if (strippedNickname.length() > Settings.MAXIMUM_NICKNAME_LENGTH.get()) {
-            player.sendLocaleMessage("command-nickname-too-long");
-            return false;
+        if (!player.hasPermission("rosechat.nickname.bypass.max")) {
+            if (strippedNickname.length() > Settings.MAXIMUM_NICKNAME_LENGTH.get()) {
+                player.sendLocaleMessage("command-nickname-too-long");
+                return false;
+            }
         }
 
-        if (!Settings.ALLOW_SPACES_IN_NICKNAMES.get() && strippedNickname.contains(" ")) {
-            player.sendLocaleMessage("command-nickname-not-allowed");
-            return false;
+        if (!player.hasPermission("rosechat.nickname.bypass.space")) {
+            if (!Settings.ALLOW_SPACES_IN_NICKNAMES.get() && strippedNickname.contains(" ")) {
+                player.sendLocaleMessage("command-nickname-not-allowed");
+                return false;
+            }
         }
 
-        if (!Settings.ALLOW_NONALPHANUMERIC_CHARACTERS.get() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
-            player.sendLocaleMessage("command-nickname-not-allowed");
-            return false;
+        if (!player.hasPermission("rosechat.nickname.bypass.nonalpha")) {
+            if (!Settings.ALLOW_NONALPHANUMERIC_CHARACTERS.get() && !MessageUtils.isAlphanumericSpace(strippedNickname)) {
+                player.sendLocaleMessage("command-nickname-not-allowed");
+                return false;
+            }
         }
 
         // Parse the nickname to make sure the player isn't missing any permissions.
