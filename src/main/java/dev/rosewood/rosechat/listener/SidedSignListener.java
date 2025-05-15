@@ -18,6 +18,8 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
@@ -78,6 +80,9 @@ public class SidedSignListener implements Listener {
 
         Player player = event.getPlayer();
         Sign sign = (Sign) event.getClickedBlock().getState();
+        if (sign.isWaxed())
+            return;
+
         SignSide side = sign.getTargetSide(player);
 
         // Open the sign if the player isn't holding an item.
@@ -106,6 +111,17 @@ public class SidedSignListener implements Listener {
                 side.setGlowingText(false);
                 sign.update();
                 event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (NMSUtil.getVersionNumber() >= 20) {
+            if (event.getItem().getType() == Material.HONEYCOMB && !sign.isWaxed()) {
+                sign.setWaxed(true);
+                sign.update();
+                sign.getWorld().spawnParticle(Particle.WAX_ON, sign.getX() + 0.5, sign.getY() + 0.75, sign.getZ() + 0.5, 20, 0.25, 0.25, 0.25, 1);
+                player.playSound(sign.getLocation(), Sound.ITEM_HONEYCOMB_WAX_ON, 0.75f, 1.0f);
+                event.setCancelled(false);
                 return;
             }
         }
