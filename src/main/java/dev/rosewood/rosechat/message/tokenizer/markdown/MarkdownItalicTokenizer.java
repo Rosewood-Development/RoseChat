@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.markdown;
 
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -19,7 +20,7 @@ public class MarkdownItalicTokenizer extends Tokenizer {
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
-        if (!input.startsWith("*"))
+        if (!input.startsWith("*") && !input.startsWith("_"))
             return null;
 
         Matcher matcher = PATTERN.matcher(input);
@@ -32,6 +33,9 @@ public class MarkdownItalicTokenizer extends Tokenizer {
         String originalContent = input.substring(0, matcher.end());
         String content = originalContent.substring(1, originalContent.length() - 1);
         String format = Settings.MARKDOWN_FORMAT_ITALIC.get();
+
+        if (MessageUtils.getPlayer("_" + content + "_") != null)
+            return null;
 
         if (!format.contains("%input_1%")) {
             return new TokenizerResult(Token.group(
