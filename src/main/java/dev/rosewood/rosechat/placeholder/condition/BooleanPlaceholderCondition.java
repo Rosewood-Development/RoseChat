@@ -33,8 +33,8 @@ public class BooleanPlaceholderCondition extends PlaceholderCondition {
         Player rightPlayer = this.right == null ? null : this.right.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
         String leftCondition = this.left == null ? null : this.left.replace("other_", "");
         String rightCondition = this.right == null ? null : this.right.replace("other_", "");
-        String leftParsed = this.left == null ? null : this.parsePlaceholders(leftPlayer, viewer == null ? null : viewer.asPlayer(), leftCondition, placeholders);
-        String rightParsed = this.right == null ? null : this.parsePlaceholders(rightPlayer, viewer == null ? null : viewer.asPlayer(), rightCondition, placeholders);
+        String leftParsed = this.left == null || this.left.startsWith("\\%") ? null : this.parsePlaceholders(leftPlayer, viewer == null ? null : viewer.asPlayer(), leftCondition, placeholders);
+        String rightParsed = this.right == null || this.right.startsWith("\\%") ? null : this.parsePlaceholders(rightPlayer, viewer == null ? null : viewer.asPlayer(), rightCondition, placeholders);
 
         boolean result;
         if (this.operator != null) {
