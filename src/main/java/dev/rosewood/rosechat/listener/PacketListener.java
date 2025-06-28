@@ -19,6 +19,9 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -26,9 +29,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import java.lang.reflect.Field;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class PacketListener {
 

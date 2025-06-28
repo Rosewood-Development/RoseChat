@@ -2,9 +2,9 @@ package dev.rosewood.rosechat.placeholder.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * A placeholder condition that contains multiple conditions.

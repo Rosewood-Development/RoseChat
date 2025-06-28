@@ -2,10 +2,10 @@ package dev.rosewood.rosechat.message.tokenizer.shader;
 
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
-import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
+import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
@@ -16,6 +17,10 @@ import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.text.Normalizer;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -28,16 +33,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
-import java.text.Normalizer;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @SuppressWarnings("deprecation")
 public class MessageUtils {
 
     public static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
-    public static final Pattern URL_PATTERN = Pattern.compile("(http(s)?://)?[-a-zA-Z0-9@:%._+~#=]{2,32}\\.[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)");
+    public static final Pattern URL_PATTERN = Pattern.compile("(http(s)?://)?[-a-zA-Z0-9@:%_+~#=]{2,32}(?<!\\.)\\.(?!\\.)[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+~#?&/=]*(?<!\\.)\\.?(?!\\.))*");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_PARSED = Pattern.compile("§[0-9a-fA-F]");
     public static final Pattern VALID_LEGACY_REGEX_FORMATTING = Pattern.compile("&[k-oK-OrR]");
@@ -144,15 +145,18 @@ public class MessageUtils {
             if (!api.isBungee() && target == null) {
                 sender.sendLocaleMessage("invalid-argument",
                         StringPlaceholders.of("message",
-                                RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
+                                RoseChatAPI.getInstance().getLocaleManager()
+                                        .getLocaleMessage("argument-handler-player")));
                 return;
             }
 
             if (api.isBungee()) {
-                if (api.getBungeeManager().getAllPlayers().isEmpty() || !api.getBungeeManager().getAllPlayers().contains(messageTarget.getRealName())) {
+                if (api.getBungeeManager().getAllPlayers().isEmpty()
+                        || !api.getBungeeManager().getAllPlayers().contains(messageTarget.getRealName())) {
                     sender.sendLocaleMessage("invalid-argument",
                             StringPlaceholders.of("message",
-                                    RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
+                                    RoseChatAPI.getInstance().getLocaleManager()
+                                            .getLocaleMessage("argument-handler-player")));
                     return;
                 }
             }
@@ -166,10 +170,13 @@ public class MessageUtils {
 
         // If the message is blocked, send a warning to the player.
         if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
+            if (outputs.getWarningMessage() != null) {
+                sender.send(outputs.getWarningMessage());
+            } else if (outputs.getWarning() != null) {
                 outputs.getWarning().send(sender);
+            }
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
                     if (staffPlayer.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(staffPlayer);
@@ -204,7 +211,8 @@ public class MessageUtils {
         // Parse for the spies.
         for (UUID uuid : RoseChatAPI.getInstance().getPlayerDataManager().getMessageSpies()) {
             // Don't send the spy message if the spy is the sender or receiver.
-            if ((sender.isPlayer() && uuid.equals(sender.getUUID())) || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID()))
+            if ((sender.isPlayer() && uuid.equals(sender.getUUID()))
+                    || messageTarget.isPlayer() && uuid.equals(messageTarget.getUUID()))
                 continue;
 
             // If the spy isn't valid, continue.
@@ -227,7 +235,8 @@ public class MessageUtils {
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get()).content();
 
-            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget, Settings.MESSAGE_RECEIVED_FORMAT.get());
+            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget,
+                    Settings.MESSAGE_RECEIVED_FORMAT.get());
             BaseComponent[] parsedReceivedMessage = receivedMessageOutput.content();
 
             if (target == null) {
@@ -239,7 +248,8 @@ public class MessageUtils {
                     boolean keepFormat = Settings.KEEP_MESSAGE_FORMAT.get();
                     String bungeeMessage = keepFormat ? ComponentSerializer.toString(parsedReceivedMessage) : null;
 
-                    RoseChatAPI.getInstance().getBungeeManager().sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
+                    RoseChatAPI.getInstance().getBungeeManager()
+                            .sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
                         if (success) {
                             // If the message was received successfully, send the sent message to the sender.
                             sender.send(parsedSentMessage);
@@ -247,7 +257,8 @@ public class MessageUtils {
                             // If the message was not received successfully, then the player is assumed to not be online.
                             sender.sendLocaleMessage("invalid-argument",
                                     StringPlaceholders.of("message",
-                                            RoseChatAPI.getInstance().getLocaleManager().getLocaleMessage("argument-handler-player")));
+                                            RoseChatAPI.getInstance().getLocaleManager()
+                                                    .getLocaleMessage("argument-handler-player")));
                         }
                     });
                 }
@@ -255,7 +266,8 @@ public class MessageUtils {
                 // The sender should receive the message first.
                 sender.send(parsedSentMessage);
 
-                PlayerReceiveMessageEvent receiveEvent = new PlayerReceiveMessageEvent(sender, messageTarget, roseMessage, receivedMessageOutput);
+                PlayerReceiveMessageEvent receiveEvent = new PlayerReceiveMessageEvent(sender, messageTarget,
+                        roseMessage, receivedMessageOutput);
                 Bukkit.getPluginManager().callEvent(receiveEvent);
                 if (receiveEvent.isCancelled())
                     return;
@@ -282,7 +294,8 @@ public class MessageUtils {
         String nickname = sender.getPlayerData().getNickname();
         if (Settings.UPDATE_DISPLAY_NAMES.get() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME).parse(sender, sender.getPlayerData().getNickname());
+                MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME)
+                        .parse(sender, sender.getPlayerData().getNickname());
                 sender.setDisplayName(TextComponent.toLegacyText(components.content()));
 
                 if (RoseChat.getInstance().getNicknameProvider() != null) {
@@ -449,7 +462,8 @@ public class MessageUtils {
         boolean hasColor = colorMatcher.find();
         boolean usePerColorPerms = Settings.USE_PER_COLOR_PERMISSIONS.get();
         boolean hasLocationPermission = sender.hasPermission("rosechat.color." + location);
-        boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." + ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
+        boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." +
+                ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
         boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
         boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + location);
         boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + location);

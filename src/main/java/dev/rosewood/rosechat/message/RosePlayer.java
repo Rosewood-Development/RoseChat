@@ -7,7 +7,7 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
@@ -15,6 +15,13 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -24,13 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Class for managing players and console messages.
@@ -86,11 +86,13 @@ public class RosePlayer {
         if (player != null) {
             this.offlinePlayer = player;
             this.name = player.getName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
+            this.group = this.api.getVault() == null ?
+                    "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.offlinePlayer = offlinePlayer;
             this.name = offlinePlayer.getName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(null, offlinePlayer);
+            this.group = this.api.getVault() == null ?
+                    "default" : this.api.getVault().getPrimaryGroup(null, offlinePlayer);
         }
     }
 
@@ -402,17 +404,20 @@ public class RosePlayer {
 
         List<String> completions = new ArrayList<>();
 
-        for (Replacement replacement : api.getReplacements()) {
-            if (replacement.getInput().isRegex() || replacement.getInput().isInlineRegex())
+        for (Filter filter : api.getFilters()) {
+            if (filter.useRegex() || filter.matches().isEmpty())
                 continue;
 
-            String text = replacement.getInput().getText() == null ?
-                    replacement.getInput().getPrefix() : replacement.getInput().getText();
+            if (!filter.addToSuggestions())
+                continue;
 
-            String permission = replacement.getInput().getPermission() == null ?
-                    "rosechat.replacement." + replacement.getId() : replacement.getInput().getPermission();
-            if (this.hasPermission(permission))
-                completions.add(text);
+            for (String match : filter.matches()) {
+                if (filter.hasPermission(this))
+                    completions.add(match);
+            }
+
+            if (filter.prefix() != null && filter.hasPermission(this))
+                completions.add(filter.prefix());
         }
 
         for (CustomPlaceholder placeholder : api.getPlaceholderManager().getPlaceholders().values()) {

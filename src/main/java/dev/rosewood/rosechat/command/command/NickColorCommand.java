@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.command.command;
 
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.ChatColorArgumentHandler;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
@@ -86,15 +86,15 @@ public class NickColorCommand extends RoseChatCommand {
 
     private void setColor(RosePlayer player, RosePlayer target, String color) {
         // Allow color replacements.
-        Replacement replacement = this.getAPI().getReplacementById(color);
-        if (replacement != null) {
-            if (!player.hasPermission("rosechat.replacement." + replacement.getId())
+        Filter filter = this.getAPI().getFilterById(color);
+        if (filter != null) {
+            if (!filter.hasPermission(player)
                     || !player.hasPermission("rosechat.replacements.nickname")) {
                 player.sendLocaleMessage("no-permission");
                 return;
             }
 
-            color = replacement.getOutput().getText();
+            color = filter.replacement();
         }
 
         boolean success = target.setNicknameColor(color);

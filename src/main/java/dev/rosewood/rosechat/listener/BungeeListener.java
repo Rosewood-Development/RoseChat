@@ -2,14 +2,14 @@ package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.BungeeManager;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class BungeeListener implements PluginMessageListener {
 

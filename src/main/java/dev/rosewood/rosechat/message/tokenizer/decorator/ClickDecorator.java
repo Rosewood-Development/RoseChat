@@ -2,10 +2,10 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 
 public class ClickDecorator extends TokenDecorator {
 

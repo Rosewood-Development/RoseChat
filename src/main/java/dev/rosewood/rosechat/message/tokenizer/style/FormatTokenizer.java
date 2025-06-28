@@ -4,12 +4,12 @@ import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
-import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
+import net.md_5.bungee.api.ChatColor;
 
 public class FormatTokenizer extends Tokenizer {
 

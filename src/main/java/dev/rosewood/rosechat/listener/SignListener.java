@@ -1,7 +1,9 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
@@ -9,6 +11,8 @@ import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.HashMap;
+import java.util.Map;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -29,8 +33,6 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SignListener implements Listener {
 
@@ -228,10 +230,15 @@ public class SignListener implements Listener {
         MessageRules.RuleOutputs outputs = rules.apply(message, text);
 
         if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
-                outputs.getWarning().send(player);
+            if (outputs.getWarning() != null) {
+                if (outputs.getWarningMessage() != null) {
+                    player.send(outputs.getWarningMessage());
+                } else {
+                    outputs.getWarning().send(player);
+                }
+            }
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
                     if (staffPlayer.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(staffPlayer);

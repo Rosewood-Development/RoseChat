@@ -2,11 +2,10 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public class TokenDecorators {
 

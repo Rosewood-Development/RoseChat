@@ -1,9 +1,9 @@
 package dev.rosewood.rosechat.chat.log;
 
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.entity.Player;
 
 public class ChannelMessageLog {
 

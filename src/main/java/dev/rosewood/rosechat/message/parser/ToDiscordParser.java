@@ -6,8 +6,8 @@ import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 
 public class ToDiscordParser implements MessageParser<String> {
 

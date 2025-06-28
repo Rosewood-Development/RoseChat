@@ -1,16 +1,20 @@
 package dev.rosewood.rosechat.message.wrapper;
 
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.message.MessageBlockedEvent;
 import dev.rosewood.rosechat.api.event.message.MessageFilteredEvent;
 import dev.rosewood.rosechat.chat.FilterWarning;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.MessageUtils;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 public class MessageRules {
 
@@ -139,7 +143,8 @@ public class MessageRules {
         Matcher matcher = MessageUtils.URL_PATTERN.matcher(outputs.getFilteredMessage());
         while (matcher.find()) {
             String url = outputs.getFilteredMessage().substring(matcher.start(), matcher.end());
-            outputs.transformMessage(x -> x.replace(url, ChatColor.STRIKETHROUGH + url.replace(".", " ") + ChatColor.RESET));
+            outputs.transformMessage(x -> x.replace(url, ChatColor.STRIKETHROUGH +
+                    url.replace(".", " ") + ChatColor.RESET));
             hasURL = true;
         }
 
@@ -154,37 +159,50 @@ public class MessageRules {
     }
 
     private void filterLanguage(RoseMessage message, RuleOutputs outputs) {
-        if (!Settings.SWEAR_CHECKING_ENABLED.get())
-            return;
-
-        if (message.getSender().hasPermission("rosechat.language." + message.getLocationPermission()))
-            return;
-
         String strippedMessage = MessageUtils.stripAccents(outputs.getFilteredMessage().toLowerCase());
 
-        for (String swear : Settings.BLOCKED_SWEARS.get()) {
-            for (String word : strippedMessage.split(" ")) {
-                double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
+        for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+            if (!filter.block() || !filter.hasPermission(message.getSender()))
+                continue;
 
-                if ((1 - difference) <= (Settings.SWEAR_FILTER_SENSITIVITY.get() / 100.0)) {
-                    if (Settings.WARN_ON_BLOCKED_SWEAR_SENT.get())
-                        outputs.setWarning(FilterWarning.SWEAR);
+            // Exact match if sensitivity is 0.
+            if (filter.sensitivity() == 0) {
+                for (String word : outputs.getFilteredMessage().toLowerCase().split(" ")) {
+                    for (String blocked : filter.matches()) {
+                        if (word.equalsIgnoreCase(blocked)) {
+                            if (filter.message() != null)
+                                outputs.setWarningMessage(filter.message());
 
-                    outputs.setBlocked(true);
-                    return;
+                            if (filter.notifyStaff())
+                                outputs.setNotifyStaff(true);
+
+                            outputs.setBlocked(true);
+
+                            outputs.getServerCommands().addAll(filter.serverCommands());
+                            outputs.getPlayerCommands().addAll(filter.playerCommands());
+                            return;
+                        }
+                    }
                 }
-            }
-        }
+            } else {
+                for (String word : strippedMessage.split(" ")) {
+                    for (String blocked : filter.matches()) {
+                        double difference = MessageUtils.getLevenshteinDistancePercent(blocked, word);
 
-        for (String replacements : Settings.SWEAR_REPLACEMENTS.get()) {
-            String[] swearReplacement = replacements.split(":");
-            String swear = swearReplacement[0];
-            String replacement = swearReplacement[1];
+                        if ((1 - difference) <= filter.sensitivity() / 100.0) {
+                            if (filter.message() != null)
+                                outputs.setWarningMessage(filter.message());
 
-            for (String word : outputs.getFilteredMessage().split(" ")) {
-                double difference = MessageUtils.getLevenshteinDistancePercent(swear, word);
-                if ((1 - difference) <= (Settings.SWEAR_FILTER_SENSITIVITY.get() / 100.0)) {
-                    outputs.transformMessage(x -> x.replace(word, replacement));
+                            if (filter.notifyStaff())
+                                outputs.setNotifyStaff(true);
+
+                            outputs.setBlocked(true);
+
+                            outputs.getServerCommands().addAll(filter.serverCommands());
+                            outputs.getPlayerCommands().addAll(filter.playerCommands());
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -237,10 +255,16 @@ public class MessageRules {
 
         private boolean blocked;
         private FilterWarning warning;
+        private String warningMessage;
         private String message;
+        private boolean notifyStaff;
+        private final List<String> serverCommands;
+        private final List<String> playerCommands;
 
         public RuleOutputs(String message) {
             this.message = message;
+            this.serverCommands = new ArrayList<>();
+            this.playerCommands = new ArrayList<>();
         }
 
         public boolean isBlocked() {
@@ -259,8 +283,32 @@ public class MessageRules {
             this.warning = warning;
         }
 
+        public String getWarningMessage() {
+            return this.warningMessage;
+        }
+
+        public void setWarningMessage(String warningMessage) {
+            this.warningMessage = warningMessage;
+        }
+
+        public boolean shouldNotifyStaff() {
+            return this.notifyStaff;
+        }
+
+        public void setNotifyStaff(boolean notifyStaff) {
+            this.notifyStaff = notifyStaff;
+        }
+
         public String getFilteredMessage() {
             return this.message;
+        }
+
+        public List<String> getServerCommands() {
+            return this.serverCommands;
+        }
+
+        public List<String> getPlayerCommands() {
+            return this.playerCommands;
         }
 
         public void transformMessage(Function<String, String> transformer) {

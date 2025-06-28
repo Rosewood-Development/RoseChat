@@ -3,14 +3,14 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.ComponentStyle;
 import net.md_5.bungee.api.chat.HoverEvent;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @SuppressWarnings("deprecation")
 public class HoverDecorator extends TokenDecorator {

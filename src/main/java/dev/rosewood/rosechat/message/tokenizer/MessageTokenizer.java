@@ -10,9 +10,6 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayDeque;
@@ -25,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessageTokenizer {
 
@@ -39,7 +38,8 @@ public class MessageTokenizer {
     private final MessageDirection direction;
     private int parses = 0;
 
-    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
+                             Tokenizers.TokenizerBundle... tokenizerBundles) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
         this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
@@ -65,7 +65,8 @@ public class MessageTokenizer {
                 current = current.parent;
             }
 
-            throw new RuntimeException("Exceeded a depth of 15 when tokenizing message; this is probably due to infinite recursion somewhere. Token stack: " + tokens.stream().map(t -> t.getType().name() + ":" + t.getContent()).collect(Collectors.joining(" -> ")));
+            throw new RuntimeException("Exceeded a depth of 15 when tokenizing message; this is probably due to infinite recursion somewhere. Token stack: " +
+                    tokens.stream().map(t -> t.getType().name() + ":" + t.getContent()).collect(Collectors.joining(" -> ")));
         }
 
         String content = token.getContent();
@@ -80,7 +81,8 @@ public class MessageTokenizer {
                 String originalContent = content;
                 this.parses++;
 
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token, this.roseMessage.shouldUsePlayerChatColor(), this.direction);
+                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token,
+                        this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs, token.getIgnoredFilters());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;
@@ -89,7 +91,6 @@ public class MessageTokenizer {
                 token.getChildren().add(child);
                 token.getChildren().forEach(x -> x.parent = token); // Make sure all children have their parent assigned
                 content = content.substring(result.consumed());
-                this.outputs.merge(params.getOutputs());
 
                 if (DEBUG_MANAGER.isEnabled() && tokenizer != Tokenizers.CHARACTER) {
                     String finalContent = content;
@@ -129,10 +130,12 @@ public class MessageTokenizer {
                                                           TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
         if (message == null) {
             if (roseMessage.getPlayerInput() != null) {
-                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. " +
+                        "A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
                 message = RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER;
             } else {
-                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with an empty string instead. A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
+                new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with an empty string instead. " +
+                        "A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
                 message = "";
             }
         }

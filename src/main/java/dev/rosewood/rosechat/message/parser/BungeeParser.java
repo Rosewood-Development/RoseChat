@@ -5,8 +5,8 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
+import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 public class BungeeParser implements MessageParser<BaseComponent[]> {

@@ -1,9 +1,10 @@
 package dev.rosewood.rosechat.command.argument;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.PermissionArea;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
@@ -31,9 +32,13 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
         if (input.equalsIgnoreCase("remove") || input.equalsIgnoreCase("off"))
             return "";
 
-        for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-            if (replacement.getOutput().hasColorRetention() && replacement.getId().equalsIgnoreCase(input))
-                return input;
+        for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+            if (!filter.colorRetention())
+                continue;
+
+            for (String match : filter.matches())
+                if (match.equalsIgnoreCase(input))
+                    return input;
         }
 
         // Return if the colorized string contains no color.
@@ -88,12 +93,10 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
 
         if (this.permissionArea == null ||
                 context.getSender().hasPermission("rosechat.replacements." + this.permissionArea.toLowerCase())) {
-            for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-                String permission = replacement.getInput().getPermission() == null ? "rosechat.replacement." + replacement.getId() :
-                        replacement.getInput().getPermission();
-                if (replacement.getOutput().hasColorRetention()
-                        && context.getSender().hasPermission(permission))
-                    suggestions.add(replacement.getId());
+            for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+                if (filter.colorRetention()
+                        && filter.hasPermission(new RosePlayer(context.getSender())))
+                    suggestions.addAll(filter.matches());
             }
         }
 

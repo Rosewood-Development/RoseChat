@@ -217,7 +217,7 @@ permissions:
     description: Allows using the togglemessage command.
     default: op
   rosechat.togglemessage.bypass:
-    description: Allows bypassing a toggle message.
+    description: Allows bypassing a canToggle message.
     default: op
   rosechat.togglesound:
     description: Allows using the togglesound command.
@@ -259,7 +259,7 @@ permissions:
     description: Allows using the chat info command.
     default: op
   rosechat.chat.toggle:
-    description: Allows using the chat toggle command.
+    description: Allows using the chat canToggle command.
     default: op
   rosechat.chatcolor:
     description: Allows using the chatcolor command.

@@ -1,0 +1,214 @@
+# This file allows specific words and phrases to be filtered.
+# These can be used to block messages, replace words, add emojis, and more!
+# These can also be used with custom placeholders from custom-placeholders.yml
+# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#replacementsyml
+
+black:
+  matches:
+    - "<black>"
+  is-tag: true
+  replacement: "&0"
+  color-retention: true
+
+dark_blue:
+  matches:
+    - "<dark_blue>"
+  is-tag: true
+  replacement: "&1"
+  color-retention: true
+
+dark_green:
+  matches:
+    - "<dark_green>"
+  is-tag: true
+  replacement: "&2"
+  color-retention: true
+
+dark_aqua:
+  matches:
+    - "<dark_aqua>"
+  is-tag: true
+  replacement: "&3"
+  color-retention: true
+
+dark_red:
+  matches:
+    - "<dark_red>"
+  is-tag: true
+  replacement: "&4"
+  color-retention: true
+
+dark_purple:
+  matches:
+    - "<dark_purple>"
+  is-tag: true
+  replacement: "&5"
+  color-retention: true
+
+gold:
+  matches:
+    - "<gold>"
+  is-tag: true
+  replacement: "&6"
+  color-retention: true
+
+gray:
+  matches:
+    - "<gray>"
+  is-tag: true
+  replacement: "&7"
+  color-retention: true
+
+dark_gray:
+  matches:
+    - "<dark_gray>"
+  is-tag: true
+  replacement: "&8"
+  color-retention: true
+
+blue:
+  matches:
+    - "<blue>"
+  is-tag: true
+  replacement: "&9"
+  color-retention: true
+
+green:
+  matches:
+    - "<green>"
+  is-tag: true
+  replacement: "&a"
+  color-retention: true
+
+aqua:
+  matches:
+    - "<aqua>"
+  is-tag: true
+  replacement: "&b"
+  color-retention: true
+
+red:
+  matches:
+    - "<red>"
+  is-tag: true
+  replacement: "&c"
+  color-retention: true
+
+light_purple:
+  matches:
+    - "<light_purple>"
+  is-tag: true
+  replacement: "&d"
+  color-retention: true
+
+yellow:
+  matches:
+    - "<yellow>"
+  is-tag: true
+  replacement: "&e"
+  color-retention: true
+
+white:
+  matches:
+    - "<white>"
+  is-tag: true
+  replacement: "&f"
+  color-retention: true
+
+olive:
+  matches:
+    - "<olive>"
+  is-tag: true
+  replacement: "#808000"
+  color-retention: true
+
+obfuscated:
+  matches:
+    - "<obfuscated>"
+  is-tag: true
+  replacement: "&k"
+  color-retention: true
+
+bold:
+  matches:
+    - "<bold>"
+  is-tag: true
+  replacement: "&l"
+  color-retention: true
+
+strikethrough:
+  matches:
+    - "<strikethrough>"
+  is-tag: true
+  replacement: "&m"
+  color-retention: true
+
+underlined:
+  matches:
+    - "<underlined>"
+  is-tag: true
+  replacement: "&n"
+  color-retention: true
+
+italic:
+  matches:
+    - "<italic>"
+  is-tag: true
+  replacement: "&o"
+  color-retention: true
+
+pride:
+  matches:
+    - "<pride>"
+  is-tag: true
+  replacement: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+  color-retention: true
+
+progress:
+  matches:
+    - "<progress>"
+  is-tag: true
+  replacement: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+  color-retention: true
+
+trans:
+  matches:
+    - "<trans>"
+  is-tag: true
+  replacement: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>"
+  color-retention: true
+
+bi:
+  matches:
+    - "<bi>"
+  is-tag: true
+  replacement: "<g:#D60270:#9B4F96:#0037A7>"
+  color-retention: true
+
+pan:
+  matches:
+    - "<pan>"
+  is-tag: true
+  replacement: "<g:#FF1C8D:#FFD700:#1AB3FF>"
+  color-retention: true
+
+nb:
+  matches:
+    - "<nb>"
+  is-tag: true
+  replacement: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>"
+  color-retention: true
+
+lesbian:
+  matches:
+    - "<lesbian>"
+  is-tag: true
+  replacement: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>"
+  color-retention: true
+
+ace:
+  matches:
+    - "<ace>"
+  is-tag: true
+  replacement: "<g:#000000:#A4A4A4:#FFFFFF:#810081>"
+  color-retention: true

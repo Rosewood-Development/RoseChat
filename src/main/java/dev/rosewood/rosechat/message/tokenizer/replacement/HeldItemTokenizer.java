@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.replacement;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -50,43 +50,47 @@ public class HeldItemTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        Replacement replacement = this.api.getReplacementById(Settings.HELD_ITEM_REPLACEMENT.get());
-        if (replacement == null)
+        Filter filter = this.api.getFilterById(Settings.HELD_ITEM_REPLACEMENT.get());
+        if (filter == null)
             return null;
 
         String input = params.getInput();
-        if (!input.startsWith(replacement.getInput().getText()))
-            return null;
+        for (String match : filter.matches()) {
+            if (!input.startsWith(match))
+                return null;
 
-        if (!params.getSender().isPlayer()
-                || !this.hasTokenPermission(params, "rosechat.helditem")
-                || params.getSender().asPlayer().getEquipment() == null)
-            return new TokenizerResult(Token.text(input), input.length());
+            if (!params.getSender().isPlayer()
+                    || !this.hasTokenPermission(params, "rosechat.helditem")
+                    || params.getSender().asPlayer().getEquipment() == null)
+                return new TokenizerResult(Token.text(input), input.length());
 
-        try {
-            ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
+            try {
+                ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
-            String json = NMSAdapter.getHandler().getItemStackAsString(params.getSender().asPlayer(), item);
-            int amount = item.getAmount();
+                String json = NMSAdapter.getHandler().getItemStackAsString(params.getSender().asPlayer(), item);
+                int amount = item.getAmount();
 
-            ItemMeta itemMeta = item.getItemMeta();
-            String itemName = item.hasItemMeta() && itemMeta.hasDisplayName()
-                    ? itemMeta.getDisplayName() 
-                    : WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
+                ItemMeta itemMeta = item.getItemMeta();
+                String itemName = item.hasItemMeta() && itemMeta.hasDisplayName()
+                        ? itemMeta.getDisplayName()
+                        : WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
 
-            return new TokenizerResult(Token.group(replacement.getOutput().getText())
-                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_ITEM, json))
-                    .placeholder("item_name", itemName)
-                    .placeholder("item", json)
-                    .placeholder("amount", amount)
-                    .ignoreTokenizer(this)
-                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
-                    .encapsulate()
-                    .build(), replacement.getInput().getText().length());
+                return new TokenizerResult(Token.group(filter.replacement())
+                        .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_ITEM, json))
+                        .placeholder("item_name", itemName)
+                        .placeholder("item", json)
+                        .placeholder("amount", amount)
+                        .ignoreTokenizer(this)
+                        .ignoreTokenizer(Tokenizers.FILTER)
+                        .encapsulate()
+                        .build(), match.length());
 
-        } catch (Exception e) {
-            return null;
+            } catch (Exception e) {
+                return null;
+            }
         }
+
+        return null;
     }
 
 }

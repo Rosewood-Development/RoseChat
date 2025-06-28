@@ -6,12 +6,12 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 public class PAPIPlaceholderTokenizer extends Tokenizer {
 
@@ -38,6 +38,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         if (!this.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
             return null;
 
+        System.out.println("papi parse me");
         String originalContent = matcher.group();
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {

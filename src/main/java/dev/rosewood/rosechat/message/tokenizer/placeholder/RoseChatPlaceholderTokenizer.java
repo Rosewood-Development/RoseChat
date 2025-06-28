@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -11,12 +12,12 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 
 public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
@@ -42,6 +43,10 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         if (!this.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder.rosechat." + placeholderValue))
             return null;
 
+        RosePlayer receiver = params.getOutputs().getPlaceholderTarget() == null ?
+                params.getReceiver() : params.getOutputs().getPlaceholderTarget();
+        params.getOutputs().setPlaceholderTarget(null);
+
         // Hardcoded special {message} placeholder to inject the player's message
         // Do not let the {message} placeholder be used if the message contains player input
         if (placeholder.equals(MESSAGE_PLACEHOLDER) && !params.containsPlayerInput()) {
@@ -62,20 +67,23 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         if (roseChatPlaceholder == null)
             return null;
 
-        StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), params.getReceiver(), params.getChannel(), params.getPlaceholders()).build();
-        String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), params.getReceiver(), placeholders));
+        StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), receiver, params.getChannel(), params.getPlaceholders()).build();
+        String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), receiver, placeholders));
 
         List<String> formattedHover = new ArrayList<>();
         if (roseChatPlaceholder.get("hover") != null) {
-            List<String> hover = roseChatPlaceholder.get("hover").parseToStringList(params.getSender(), params.getReceiver(), placeholders);
+            List<String> hover = roseChatPlaceholder.get("hover").parseToStringList(params.getSender(), receiver, placeholders);
             for (String s : hover) {
                 formattedHover.add(placeholders.apply(s));
             }
         }
 
-        String click = roseChatPlaceholder.get("click") == null ? null : placeholders.apply(roseChatPlaceholder.get("click").parseToString(params.getSender(), params.getReceiver(), placeholders));
-        ClickEvent.Action clickAction = roseChatPlaceholder.get("click") == null ? null : roseChatPlaceholder.get("click").getClickAction();
-        HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ? null : roseChatPlaceholder.get("hover").getHoverAction();
+        String click = roseChatPlaceholder.get("click") == null ?
+                null : placeholders.apply(roseChatPlaceholder.get("click").parseToString(params.getSender(), receiver, placeholders));
+        ClickEvent.Action clickAction = roseChatPlaceholder.get("click") == null ?
+                null : roseChatPlaceholder.get("click").getClickAction();
+        HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ?
+                null : roseChatPlaceholder.get("hover").getHoverAction();
 
         Token.Builder tokenBuilder = Token.group(content);
         if (!formattedHover.isEmpty())

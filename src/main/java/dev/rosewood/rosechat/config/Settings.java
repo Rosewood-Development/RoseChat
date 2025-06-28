@@ -4,13 +4,17 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.config.RoseSettingSerializer;
-import org.bukkit.event.EventPriority;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import static dev.rosewood.rosechat.config.SettingSerializers.*;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.*;
+import org.bukkit.event.EventPriority;
+import static dev.rosewood.rosechat.config.SettingSerializers.EVENT_PRIORITY;
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.BOOLEAN;
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.DOUBLE;
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.INTEGER;
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.STRING;
+import static dev.rosewood.rosegarden.config.RoseSettingSerializers.STRING_LIST;
 
 public final class Settings {
 
@@ -50,21 +54,6 @@ public final class Settings {
     public static final RoseSetting<Boolean> WARN_ON_URL_SENT = create(MODERATION_SETTINGS, "warn-on-url-sent", BOOLEAN, true,
             "Should the plugin send a warning message (defined in the locale file) when a player sends a message that contains a URL or IP address?",
                         "This requires url-censoring-enabled to be false, as the message will not be sent.");
-    public static final RoseSetting<Boolean> SWEAR_CHECKING_ENABLED = create(MODERATION_SETTINGS, "swear-checking-enabled", BOOLEAN, true,
-            "Should the plugin check for swear words?");
-    public static final RoseSetting<Double> SWEAR_FILTER_SENSITIVITY = create(MODERATION_SETTINGS, "swear-filter-sensitivity", DOUBLE, 25.0,
-            "The sensitivity of the swear filter.",
-                        "A higher number will catch words that are more different.",
-                        "For example, a low sensitivity will catch bitch and bítch, but a high sensitivity may catch batch.",
-                        "A lower value may be preferred to prevent catching real words.");
-    public static final RoseSetting<List<String>> BLOCKED_SWEARS = create(MODERATION_SETTINGS, "blocked-swears", STRING_LIST, Collections.singletonList("bitch"),
-            "If a player sends a message that contains one of these words, then the message will not be sent.");
-    public static final RoseSetting<Boolean> WARN_ON_BLOCKED_SWEAR_SENT = create(MODERATION_SETTINGS, "warn-on-blocked-swear-sent", BOOLEAN, true,
-            "Should the plugin send a warning message (defined in the locale file) when a player sends a message with a blocked wear word?");
-    public static final RoseSetting<List<String>> SWEAR_REPLACEMENTS = create(MODERATION_SETTINGS, "swear-replacements", STRING_LIST, Arrays.asList("fuck:f***", "ass:butt"),
-            "If a player sends a message that contains one of these words, then the word will be replaced.",
-                        "Note: This does not affect words like 'assassin'.",
-                        "Format: 'contains:replaced'");
     public static final RoseSetting<Boolean> ENABLE_DELETING_MESSAGES = create(MODERATION_SETTINGS, "enable-deleting-messages", BOOLEAN, true,
             "Should deleting messages be enabled?",
                         "Requires ProtocolLib");
@@ -150,7 +139,7 @@ public final class Settings {
     public static final RoseSetting<Boolean> ALLOW_CHAT_SUGGESTIONS = create(CHAT_SETTINGS, "allow-chat-suggestions", BOOLEAN, true,
             "Can players use tab to display emoji, replacement, and placeholder suggestions in chat?",
                         "This allows players to see their available replacements when sending a message in chat. Requires 1.19+");
-    public static final RoseSetting<Boolean> ENABLE_ON_SIGNS = create(CHAT_SETTINGS, "enable-on-signs", BOOLEAN, true,
+    public static final RoseSetting<Boolean> ENABLE_ON_SIGNS = create(CHAT_SETTINGS, "enable-on-signs", BOOLEAN, false,
             "Can players use RoseChat features on signs?",
                         "Players will require the sign permissions. For example, 'rosechat.replacements.sign', to use replacements on signs.",
                         "Players will also need the individual permissions, such as 'rosechat.replacement.heart'.");

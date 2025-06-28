@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.tag;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
@@ -9,11 +9,11 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 public class FromDiscordTagTokenizer extends Tokenizer {
 
@@ -58,27 +58,25 @@ public class FromDiscordTagTokenizer extends Tokenizer {
             params.getOutputs().getTaggedPlayers().addAll(discord.getPlayersWithRole(content));
 
             // Format and play the tag sound appropriately if a role is tagged.
-            for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-                if (replacement.getInput().getPrefix() == null)
+            for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+                if (filter.prefix() == null)
                     continue;
 
-                if (!replacement.getInput().getPrefix().equals(prefix))
+                if (!filter.tagPlayers())
                     continue;
 
-                if (!replacement.getOutput().shouldTagOnlinePlayers())
-                    break;
+                if (!filter.prefix().equals(prefix))
+                    continue;
 
-                if (replacement.getOutput().getSound() != null)
-                    params.getOutputs().setTagSound(replacement.getOutput().getSound());
+                if (filter.sound() != null)
+                    params.getOutputs().setSound(filter.sound());
             }
         }
 
         Token.Builder token;
         if (isRole) {
             token = Token.group(prefix + discord.getRoleFromId(content))
-                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
-                    .ignoreTokenizer(Tokenizers.PREFIXED_REPLACEMENT)
-                    .ignoreTokenizer(Tokenizers.INLINE_REPLACEMENT)
+                    .ignoreTokenizer(Tokenizers.FILTER)
                     .ignoreTokenizer(Tokenizers.BUNGEE_PAPI_PLACEHOLDER)
                     .ignoreTokenizer(Tokenizers.PAPI_PLACEHOLDER)
                     .ignoreTokenizer(Tokenizers.ROSECHAT_PLACEHOLDER);
@@ -86,9 +84,7 @@ public class FromDiscordTagTokenizer extends Tokenizer {
             UUID uuid = discord.getUUIDFromId(content);
             if (uuid == null) {
                 token = Token.group(prefix + discord.getUserFromId(content))
-                        .ignoreTokenizer(Tokenizers.REPLACEMENT)
-                        .ignoreTokenizer(Tokenizers.PREFIXED_REPLACEMENT)
-                        .ignoreTokenizer(Tokenizers.INLINE_REPLACEMENT)
+                        .ignoreTokenizer(Tokenizers.FILTER)
                         .ignoreTokenizer(Tokenizers.BUNGEE_PAPI_PLACEHOLDER)
                         .ignoreTokenizer(Tokenizers.PAPI_PLACEHOLDER)
                         .ignoreTokenizer(Tokenizers.ROSECHAT_PLACEHOLDER)

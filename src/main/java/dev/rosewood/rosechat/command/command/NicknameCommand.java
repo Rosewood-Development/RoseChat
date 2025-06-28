@@ -1,10 +1,12 @@
 package dev.rosewood.rosechat.command.command;
 
 import dev.rosewood.rosechat.RoseChat;
+import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.DataManager;
+import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
@@ -76,10 +78,15 @@ public class NicknameCommand extends RoseChatCommand {
         RuleOutputs outputs = rules.apply(nicknameMessage, nickname);
 
         if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
-                outputs.getWarning().send(player);
+            if (outputs.getWarning() != null) {
+                if (outputs.getWarningMessage() != null) {
+                    player.send(outputs.getWarningMessage());
+                } else {
+                    outputs.getWarning().send(player);
+                }
+            }
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
                     if (staffPlayer.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(staffPlayer);

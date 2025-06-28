@@ -12,8 +12,8 @@ import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.parser.RoseChatParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
 import java.util.UUID;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 /**
  * A wrapper for chat messages which can be used to parse a message for a given receiver.

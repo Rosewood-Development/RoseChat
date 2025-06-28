@@ -3,9 +3,7 @@ package dev.rosewood.rosechat.api;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
-import dev.rosewood.rosechat.chat.replacement.ReplacementInput;
-import dev.rosewood.rosechat.chat.replacement.ReplacementOutput;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
@@ -13,11 +11,11 @@ import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
 import dev.rosewood.rosechat.manager.BungeeManager;
 import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
+import dev.rosewood.rosechat.manager.FilterManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
-import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
@@ -26,17 +24,17 @@ import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-import net.milkbowl.vault.permission.Permission;
-import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import net.milkbowl.vault.permission.Permission;
+import org.bukkit.entity.Player;
 
 /**
  * The API for the RoseChat plugin.
@@ -231,48 +229,43 @@ public final class RoseChatAPI {
     }
 
     /**
-     * Creates a new replacement.
-     * @param id The ID to use.
-     * @param input The {@link ReplacementInput} for the replacement.
-     * @param output The {@link ReplacementOutput} of the replacement.
-     * @return The new chat replacement.
+     * Creates a new filter.
+     * @param filter The {@link Filter} to register.
+     * @return The new filter.
      */
-    public Replacement createReplacement(String id, ReplacementInput input, ReplacementOutput output) {
-        Replacement replacement = new Replacement(id);
-        replacement.setInput(input);
-        replacement.setOutput(output);
-        this.getReplacementManager().addReplacement(replacement);
-        return replacement;
+    public Filter createFilter(Filter filter) {
+        this.getFilterManager().addFilter(filter.id(), filter);
+        return filter;
     }
 
     /**
-     * Deletes a replacement.
-     * @param replacement The {@link Replacement} to delete.
+     * Deletes a filter.
+     * @param filter The {@link Filter} to delete.
      */
-    public void deleteReplacement(Replacement replacement) {
-        this.getReplacementManager().deleteReplacement(replacement);
+    public void deleteFilter(Filter filter) {
+        this.getFilterManager().deleteFilter(filter.id());
     }
 
     /**
      * @param id The ID to use.
      * @return The replacement found, or null if it doesn't exist.
      */
-    public Replacement getReplacementById(String id) {
-        return this.getReplacementManager().getReplacement(id);
+    public Filter getFilterById(String id) {
+        return this.getFilterManager().getFilter(id);
     }
 
     /**
      * @return A list of all replacements.
      */
-    public List<Replacement> getReplacements() {
-        return new ArrayList<>(this.getReplacementManager().getReplacements().values());
+    public List<Filter> getFilters() {
+        return new ArrayList<>(this.getFilterManager().getFilters().values());
     }
 
     /**
      * @return A list of all replacement IDs.
      */
     public List<String> getReplacementIDs() {
-        return new ArrayList<>(this.getReplacementManager().getReplacements().keySet());
+        return new ArrayList<>(this.getFilterManager().getFilters().keySet());
     }
 
     /**
@@ -394,8 +387,8 @@ public final class RoseChatAPI {
     /**
      * @return An instance of the replacement manager.
      */
-    public ReplacementManager getReplacementManager() {
-        return this.plugin.getManager(ReplacementManager.class);
+    public FilterManager getFilterManager() {
+        return this.plugin.getManager(FilterManager.class);
     }
 
     /**

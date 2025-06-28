@@ -1,9 +1,9 @@
 package dev.rosewood.rosechat.nms;
 
+import java.lang.reflect.Method;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.lang.reflect.Method;
 
 public class v1_21_R3 implements NMSHandler {
 
@@ -24,12 +24,15 @@ public class v1_21_R3 implements NMSHandler {
             this.obcPlayerGetHandle = obcPlayerClass.getMethod("getHandle");
             this.saveNMSItemStack = nmsItemStackClass.getMethod("save", holderLookupClass);
         } else {
-            Class<?> obcItemStackClass = Class.forName("org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack");
+            String name = Bukkit.getServer().getClass().getPackage().getName();
+            String version = name.substring(name.lastIndexOf('.') + 1);
+
+            Class<?> obcItemStackClass = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftItemStack");
             this.obcItemStackAsNMSCopy = obcItemStackClass.getMethod("asNMSCopy", ItemStack.class);
             Class<?> nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
 
             Class<?> holderLookupClass = Class.forName("net.minecraft.core.HolderLookup$a");
-            Class<?> obcPlayerClass = Class.forName("org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer");
+            Class<?> obcPlayerClass = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer");
             this.obcPlayerGetHandle = obcPlayerClass.getMethod("getHandle");
             this.saveNMSItemStack = nmsItemStackClass.getMethod("a", holderLookupClass);
         }

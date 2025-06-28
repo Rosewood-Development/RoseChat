@@ -33,11 +33,11 @@ import dev.rosewood.rosechat.manager.ChannelManager;
 import dev.rosewood.rosechat.manager.CommandManager;
 import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.manager.DiscordEmojiManager;
+import dev.rosewood.rosechat.manager.FilterManager;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
-import dev.rosewood.rosechat.manager.ReplacementManager;
 import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
 import dev.rosewood.rosechat.nms.NMSAdapter;
 import dev.rosewood.rosegarden.RosePlugin;
@@ -46,6 +46,11 @@ import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import github.scarsz.discordsrv.DiscordSRV;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
@@ -53,11 +58,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RoseChat extends RosePlugin {
 
@@ -82,7 +82,8 @@ public class RoseChat extends RosePlugin {
     public void enable() {
         if (!NMSAdapter.isValidVersion()) {
             LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                    localeManager.getLocaleMessage("prefix") +
                     "&eThe [item] placeholder is not supported on this Minecraft version.");
         }
 
@@ -118,15 +119,17 @@ public class RoseChat extends RosePlugin {
                 this.chatListener = new ChatListener();
             }
 
-            Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, priority, (listener, event) -> {
-                if (event instanceof AsyncPlayerChatEvent chatEvent) {
-                    this.chatListener = (ChatListener) listener;
-                    this.chatListener.onChat(chatEvent);
-                }
-            }, this, true);
+            Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, priority,
+                    (listener, event) -> {
+                        if (event instanceof AsyncPlayerChatEvent chatEvent) {
+                            this.chatListener = (ChatListener) listener;
+                            this.chatListener.onChat(chatEvent);
+                        }
+                    }, this, true);
         } catch (IllegalArgumentException e) {
             LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                    localeManager.getLocaleMessage("prefix") +
                     "&eThe chat-event-priority is not a valid EventPriority");
         }
 
@@ -167,7 +170,7 @@ public class RoseChat extends RosePlugin {
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return Arrays.asList(
                 ChannelManager.class,
-                ReplacementManager.class,
+                FilterManager.class,
                 PlaceholderManager.class,
                 PlayerDataManager.class,
                 GroupManager.class,
@@ -180,16 +183,19 @@ public class RoseChat extends RosePlugin {
         LocaleManager localeManager = this.getManager(LocaleManager.class);
 
         if (pluginManager.getPlugin("Vault") != null) {
-            RegisteredServiceProvider<Permission> provider = this.getServer().getServicesManager().getRegistration(Permission.class);
+            RegisteredServiceProvider<Permission> provider = this.getServer().getServicesManager()
+                    .getRegistration(Permission.class);
             if (provider != null && provider.getProvider().hasGroupSupport())
                 this.vault = provider.getProvider();
         } else {
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                    localeManager.getLocaleMessage("prefix") +
                     "&eVault was not found! Group placeholders will be disabled.");
         }
 
         if (!PlaceholderAPIHook.enabled())
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+            localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                    localeManager.getLocaleMessage("prefix") +
                     "&ePlaceholderAPI was not found! Only RoseChat placeholders will work.");
         else new RoseChatPlaceholderExpansion().register();
 

@@ -18,9 +18,11 @@ import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import me.clip.placeholderapi.PlaceholderAPI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
@@ -28,11 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
 
 public class RoseChatChannel extends ConditionalChannel implements Spyable {
 
@@ -267,17 +264,32 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                     receiver.getPlayerData().getMessageLog().addDeletableMessage(deletableMessage);
             }
 
+            if (outputs.getMessage() != null)
+                receiver.send(outputs.getMessage());
+
+            if (message.getSender().getUUID().equals(receiver.getUUID())) {
+                Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
+                    for (String command : outputs.getServerCommands())
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                command.replace("%player%", message.getSender().getRealName()));
+
+                    for (String command : outputs.getPlayerCommands())
+                        Bukkit.dispatchCommand(message.getSender().isPlayer() ? message.getSender().asPlayer() : Bukkit.getConsoleSender(),
+                                command.replace("%player%", message.getSender().getRealName()));
+                });
+            }
+
             if (!receiver.isPlayer())
                 return;
 
             if (!outputs.getTaggedPlayers().contains(receiver.getUUID()))
                 return;
 
-            if ((receiver.getPlayerData() != null && !receiver.getPlayerData().hasTagSounds()) || outputs.getTagSound() == null)
+            if ((receiver.getPlayerData() != null && !receiver.getPlayerData().hasTagSounds()) || outputs.getSound() == null)
                 return;
 
             Player player = receiver.asPlayer();
-            player.playSound(player.getLocation(), outputs.getTagSound(), 1.0f, 1.0f);
+            player.playSound(player.getLocation(), outputs.getSound(), 1.0f, 1.0f);
         });
     }
 

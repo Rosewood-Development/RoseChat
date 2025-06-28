@@ -4,25 +4,23 @@ import dev.rosewood.rosechat.message.tokenizer.character.CharacterTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.ToDiscordURLTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.FromDiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.ToDiscordChannelTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownCodeTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownCodeBlockTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.emoji.DiscordCustomEmojiTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.emoji.DiscordEmojiTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownBlockQuoteTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.spoiler.FromDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.spoiler.ToDiscordSpoilerTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.tag.FromDiscordTagTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.tag.ToDiscordTagTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownBlockQuoteTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownBoldTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownCodeBlockTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownCodeTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownItalicTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownStrikethroughTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownUnderlineTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.TokenPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.InlineReplacementTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.PrefixedReplacementTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.ReplacementTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.replacement.FilterTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.ColorTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.FormatTokenizer;
@@ -59,9 +57,7 @@ public class Tokenizers {
     public static final Tokenizer ROSECHAT_PLACEHOLDER = new RoseChatPlaceholderTokenizer();
     public static final Tokenizer PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(false);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(true);
-    public static final Tokenizer INLINE_REPLACEMENT = new InlineReplacementTokenizer();
-    public static final Tokenizer PREFIXED_REPLACEMENT = new PrefixedReplacementTokenizer();
-    public static final Tokenizer REPLACEMENT = new ReplacementTokenizer();
+    public static final Tokenizer FILTER = new FilterTokenizer();
     public static final Tokenizer CHARACTER = new CharacterTokenizer();
 
     public static final TokenizerBundle DEFAULT_BUNDLE = new TokenizerBundle("default",
@@ -73,9 +69,7 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            INLINE_REPLACEMENT,
-            PREFIXED_REPLACEMENT,
-            REPLACEMENT,
+            FILTER,
             CHARACTER);
 
     public static final TokenizerBundle COLORS_BUNDLE = new TokenizerBundle("colors",
@@ -99,9 +93,7 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            INLINE_REPLACEMENT,
-            PREFIXED_REPLACEMENT,
-            REPLACEMENT,
+            FILTER,
             CHARACTER);
 
     public static final TokenizerBundle DEFAULT_DISCORD_BUNDLE = new TokenizerBundle("default_discord",
@@ -113,9 +105,7 @@ public class Tokenizers {
             SHADER_COLORS,
             COLOR,
             FORMAT,
-            INLINE_REPLACEMENT,
-            PREFIXED_REPLACEMENT,
-            REPLACEMENT,
+            FILTER,
             CHARACTER);
 
     public static final TokenizerBundle DISCORD_FORMATTING_BUNDLE = new TokenizerBundle("discord_formatting",
@@ -152,7 +142,8 @@ public class Tokenizers {
         }
 
         public void registerBefore(String before, Tokenizer tokenizer) {
-            this.registerBefore(this.tokenizers.stream().filter(x -> x.getName().equals(before)).findFirst().orElse(null), tokenizer);
+            this.registerBefore(this.tokenizers.stream().filter(x ->
+                    x.getName().equals(before)).findFirst().orElse(null), tokenizer);
         }
 
         public void registerAfter(Tokenizer after, Tokenizer tokenizer) {
@@ -164,7 +155,8 @@ public class Tokenizers {
         }
 
         public void registerAfter(String after, Tokenizer tokenizer) {
-            this.registerAfter(this.tokenizers.stream().filter(x -> x.getName().equals(after)).findFirst().orElse(null), tokenizer);
+            this.registerAfter(this.tokenizers.stream().filter(x ->
+                    x.getName().equals(after)).findFirst().orElse(null), tokenizer);
         }
     }
 

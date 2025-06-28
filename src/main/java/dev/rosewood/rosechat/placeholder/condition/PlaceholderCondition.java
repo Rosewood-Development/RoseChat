@@ -5,15 +5,15 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PlaceholderCondition {
 
@@ -115,7 +115,8 @@ public class PlaceholderCondition {
                 }
             } catch (IllegalArgumentException e) {
                 LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-                localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                        localeManager.getLocaleMessage("prefix") +
                         "&eThe " + this.section.getString(valueId) + " action is not a valid Click or Hover Event!");
             }
 

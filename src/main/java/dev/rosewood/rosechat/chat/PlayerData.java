@@ -8,11 +8,11 @@ import dev.rosewood.rosechat.chat.task.MuteTask;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class PlayerData {
 

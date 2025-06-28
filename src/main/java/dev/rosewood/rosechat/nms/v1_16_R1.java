@@ -1,9 +1,9 @@
 package dev.rosewood.rosechat.nms;
 
+import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import java.lang.reflect.Method;
 
 public class v1_16_R1 implements NMSHandler {
 
