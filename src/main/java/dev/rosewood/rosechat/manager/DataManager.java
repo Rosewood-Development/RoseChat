@@ -147,7 +147,7 @@ public class DataManager extends AbstractDataManager {
         AtomicBoolean contains = new AtomicBoolean();
 
         this.databaseConnector.connect(connection -> {
-            String query = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE stripped_name = ? AND uuid IS NOT ?";
+            String query = "SELECT 1 FROM " + this.getTablePrefix() + "player_data WHERE stripped_name = ? AND uuid != ?";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, nickname.toLowerCase());
                 statement.setString(2, nicknamer.toString());
