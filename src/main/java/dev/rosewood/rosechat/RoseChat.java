@@ -38,14 +38,17 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.manager.ReplacementManager;
-import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
-import dev.rosewood.rosechat.nms.NMSAdapter;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.config.RoseSetting;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import github.scarsz.discordsrv.DiscordSRV;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
@@ -53,11 +56,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RoseChat extends RosePlugin {
 
@@ -80,12 +78,6 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public void enable() {
-        if (!NMSAdapter.isValidVersion()) {
-            LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
-                    "&eThe [item] placeholder is not supported on this Minecraft version.");
-        }
-
         PluginManager pluginManager = Bukkit.getPluginManager();
         this.initHooks(pluginManager);
 
@@ -101,8 +93,6 @@ public class RoseChat extends RosePlugin {
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord",
                 new BungeeListener(this));
-
-        new HeldItemTokenizer();
     }
 
     @Override
