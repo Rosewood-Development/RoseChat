@@ -149,7 +149,7 @@ public class FilterTokenizer extends Tokenizer {
         content = this.applySignFix(params, filter, content);
 
         Token.Builder token = this.createFilterToken(params, filter, content);
-        return new TokenizerResult(token.build(), input.length());
+        return new TokenizerResult(token.build(), match.length());
     }
 
     private TokenizerResult handleRegexMatch(TokenizerParams params, Filter filter, Matcher matcher) {
