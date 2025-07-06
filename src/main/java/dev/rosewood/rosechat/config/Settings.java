@@ -1,26 +1,27 @@
 package dev.rosewood.rosechat.config;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosegarden.config.CommentedConfigurationSection;
 import dev.rosewood.rosegarden.config.RoseSetting;
-import dev.rosewood.rosegarden.config.RoseSettingSerializer;
+import dev.rosewood.rosegarden.config.SettingSerializer;
+import dev.rosewood.rosegarden.config.SettingHolder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventPriority;
-import static dev.rosewood.rosechat.config.SettingSerializers.EVENT_PRIORITY;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.BOOLEAN;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.DOUBLE;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.INTEGER;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.STRING;
-import static dev.rosewood.rosegarden.config.RoseSettingSerializers.STRING_LIST;
+import static dev.rosewood.rosechat.config.ChatSettingSerializers.EVENT_PRIORITY;
+import static dev.rosewood.rosegarden.config.SettingSerializers.BOOLEAN;
+import static dev.rosewood.rosegarden.config.SettingSerializers.DOUBLE;
+import static dev.rosewood.rosegarden.config.SettingSerializers.INTEGER;
+import static dev.rosewood.rosegarden.config.SettingSerializers.STRING;
+import static dev.rosewood.rosegarden.config.SettingSerializers.STRING_LIST;
 
-public final class Settings {
+public final class Settings implements SettingHolder {
 
     private static final List<RoseSetting<?>> KEYS = new ArrayList<>();
+    public static final Settings INSTANCE = new Settings();
 
-    public static final RoseSetting<CommentedConfigurationSection> MODERATION_SETTINGS = create("moderation-settings", "Moderation Settings");
+    public static final RoseSetting<ConfigurationSection> MODERATION_SETTINGS = create("moderation-settings", "Moderation Settings");
     public static final RoseSetting<Boolean> CAPS_CHECKING_ENABLED = create(MODERATION_SETTINGS, "caps-checking-enabled", BOOLEAN, true,
             "Should the plugin check for messages that contain too many capital letters?");
     public static final RoseSetting<Integer> MAXIMUM_CAPS_ALLOWED = create(MODERATION_SETTINGS, "maximum-caps-allowed", INTEGER, 5,
@@ -62,7 +63,7 @@ public final class Settings {
     public static final RoseSetting<Boolean> SEND_BLOCKED_MESSAGES_TO_STAFF = create(MODERATION_SETTINGS, "send-blocked-messages-to-staff", BOOLEAN, false,
             "Should blocked messages be sent to those with the 'rosechat.seeblocked' permission.");
 
-    public static final RoseSetting<CommentedConfigurationSection> NICKNAME_SETTINGS = create("nickname-settings", "Nickname Settings");
+    public static final RoseSetting<ConfigurationSection> NICKNAME_SETTINGS = create("nickname-settings", "Nickname Settings");
     public static final RoseSetting<Integer> MINIMUM_NICKNAME_LENGTH = create(NICKNAME_SETTINGS, "minimum-nickname-length", INTEGER, 3,
             "The minimum length a nickname can be.");
     public static final RoseSetting<Integer> MAXIMUM_NICKNAME_LENGTH = create(NICKNAME_SETTINGS, "maximum-nickname-length", INTEGER, 32,
@@ -81,7 +82,7 @@ public final class Settings {
     public static final RoseSetting<Boolean> ALLOW_DUPLICATE_NAMES = create(NICKNAME_SETTINGS, "allow-duplicate-names", BOOLEAN, true,
             "Should multiple players be allowed to use the same nickname?");
 
-    public static final RoseSetting<CommentedConfigurationSection> CHAT_SETTINGS = create("chat-settings", "General Miscellaneous Settings");
+    public static final RoseSetting<ConfigurationSection> CHAT_SETTINGS = create("chat-settings", "General Miscellaneous Settings");
     public static final RoseSetting<EventPriority> CHAT_EVENT_PRIORITY = create(CHAT_SETTINGS, "chat-event-priority", EVENT_PRIORITY, EventPriority.LOW,
             "The event priority for the chat listener.",
                         "This may need to be changed if another plugin does something with chat.",
@@ -144,7 +145,7 @@ public final class Settings {
                         "Players will require the sign permissions. For example, 'rosechat.replacements.sign', to use replacements on signs.",
                         "Players will also need the individual permissions, such as 'rosechat.replacement.heart'.");
 
-    public static final RoseSetting<CommentedConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
+    public static final RoseSetting<ConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,
             "Should DiscordSRV support be enabled?");
     public static final RoseSetting<Boolean> USE_IGN_WITH_DISCORD = create(DISCORD_SETTINGS, "use-minecraft-ign-with-discord", BOOLEAN, true,
@@ -174,7 +175,7 @@ public final class Settings {
                         "This must be enabled if you want to use Webhooks with DiscordSRV.",
                         "Enabling this will disable the ability to delete Discord messages from in-game.");
 
-    public static final RoseSetting<CommentedConfigurationSection> CHAT_FORMATS = create("chat-formats", "These are the other chat formats in the plugin.");
+    public static final RoseSetting<ConfigurationSection> CHAT_FORMATS = create("chat-formats", "These are the other chat formats in the plugin.");
     public static final RoseSetting<String> MESSAGE_SENT_FORMAT = create(CHAT_FORMATS, "message-sent", STRING, "{message-sent}{message}",
             "The format of a /message sent to another player.");
     public static final RoseSetting<String> MESSAGE_RECEIVED_FORMAT = create(CHAT_FORMATS, "message-received", STRING, "{message-received}{message}",
@@ -208,7 +209,7 @@ public final class Settings {
     public static final RoseSetting<String> EDITED_DISCORD_MESSAGE_FORMAT = create(CHAT_FORMATS, "edited-discord-message", STRING, "{edited}",
             "The format of an edited discord message.");
 
-    public static final RoseSetting<CommentedConfigurationSection> MARKDOWN_FORMATS = create("markdown-formats", "Markdown Format Settings", "Use %input_1% to substitute the player message");
+    public static final RoseSetting<ConfigurationSection> MARKDOWN_FORMATS = create("markdown-formats", "Markdown Format Settings", "Use %input_1% to substitute the player message");
     public static final RoseSetting<String> MARKDOWN_FORMAT_BOLD = create(MARKDOWN_FORMATS, "bold", STRING, "&l%input_1%&L");
     public static final RoseSetting<String> MARKDOWN_FORMAT_UNDERLINE = create(MARKDOWN_FORMATS, "underline", STRING, "&n%input_1%&N");
     public static final RoseSetting<String> MARKDOWN_FORMAT_STRIKETHROUGH = create(MARKDOWN_FORMATS, "strikethrough", STRING, "&m%input_1%&M");
@@ -219,27 +220,36 @@ public final class Settings {
     public static final RoseSetting<String> MARKDOWN_FORMAT_BLOCK_QUOTES = create(MARKDOWN_FORMATS, "block-quotes", STRING, "&2> &o");
     public static final RoseSetting<String> DISCORD_FORMAT_CHANNEL = create(MARKDOWN_FORMATS, "channel-link", STRING, "{discord-channel-link}");
 
-    private static <T> RoseSetting<T> create(RoseSetting<CommentedConfigurationSection> section, String key, RoseSettingSerializer<T> serializer, T defaultValue, String... comments) {
-        RoseSetting<T> setting = RoseSetting.backed(RoseChat.getInstance(), section.getKey() + "." + key,
+    private Settings() {
+
+    }
+
+    private static <T> RoseSetting<T> create(RoseSetting<ConfigurationSection> section, String key, SettingSerializer<T> serializer, T defaultValue, String... comments) {
+        RoseSetting<T> setting = RoseSetting.ofBackedValue(section.getKey() + "." + key, RoseChat.getInstance(),
                 serializer, defaultValue, comments);
         KEYS.add(setting);
         return setting;
     }
 
-    private static <T> RoseSetting<T> create(String key, RoseSettingSerializer<T> serializer, T defaultValue, String... comments) {
-        RoseSetting<T> setting = RoseSetting.backed(RoseChat.getInstance(), key, serializer, defaultValue, comments);
+    private static <T> RoseSetting<T> create(String key, SettingSerializer<T> serializer, T defaultValue, String... comments) {
+        RoseSetting<T> setting = RoseSetting.ofBackedValue(key, RoseChat.getInstance(), serializer, defaultValue, comments);
         KEYS.add(setting);
         return setting;
     }
 
-    private static RoseSetting<CommentedConfigurationSection> create(String key, String... comments) {
-        RoseSetting<CommentedConfigurationSection> setting = RoseSetting.backedSection(RoseChat.getInstance(), key, comments);
+    private static RoseSetting<ConfigurationSection> create(String key, String... comments) {
+        RoseSetting<ConfigurationSection> setting = RoseSetting.ofBackedSection(key, RoseChat.getInstance(), comments);
         KEYS.add(setting);
         return setting;
     }
 
     public static List<RoseSetting<?>> getKeys() {
         return Collections.unmodifiableList(KEYS);
+    }
+
+    @Override
+    public List<RoseSetting<?>> get() {
+        return KEYS;
     }
 
 }

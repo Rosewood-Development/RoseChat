@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import java.util.ArrayDeque;
@@ -9,15 +10,14 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.md_5.bungee.api.ChatColor;
 
 public class MarkdownTokenComposer implements TokenComposer<String> {
 
-    private static final Map<ChatColor, String> CHAT_COLOR_TO_MARKDOWN = new HashMap<>() {{
-        this.put(ChatColor.BOLD, "**");
-        this.put(ChatColor.ITALIC, "*");
-        this.put(ChatColor.UNDERLINE, "__");
-        this.put(ChatColor.STRIKETHROUGH, "~~");
+    private static final Map<FormatDecorator.FormatType, String> FORMAT_TO_MARKDOWN = new HashMap<>() {{
+        this.put(FormatDecorator.FormatType.BOLD, "**");
+        this.put(FormatDecorator.FormatType.ITALIC, "*");
+        this.put(FormatDecorator.FormatType.UNDERLINE, "__");
+        this.put(FormatDecorator.FormatType.STRIKETHROUGH, "~~");
     }};
 
     protected MarkdownTokenComposer() {
@@ -29,7 +29,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         return this.compose(token, new StringBuilder(), new ArrayDeque<>());
     }
 
-    protected String compose(Token token, StringBuilder stringBuilder, Deque<ChatColor> activeFormats) {
+    protected String compose(Token token, StringBuilder stringBuilder, Deque<FormatDecorator.FormatType> activeFormats) {
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot convert a token that is not of type GROUP");
 
@@ -38,7 +38,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
                 case TEXT -> stringBuilder.append(child.getContent());
                 case DECORATOR -> stringBuilder.append(this.decoratorsToMarkdown(child.getDecorators(), activeFormats));
                 case GROUP -> {
-                    Deque<ChatColor> childFormats = child.shouldEncapsulate() ? new ArrayDeque<>(activeFormats) : activeFormats;
+                    Deque<FormatDecorator.FormatType> childFormats = child.shouldEncapsulate() ? new ArrayDeque<>(activeFormats) : activeFormats;
                     this.compose(child, stringBuilder, childFormats);
                 }
             }
@@ -49,31 +49,31 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         return stringBuilder.toString();
     }
 
-    private String decoratorsToMarkdown(List<TokenDecorator> decorators, Deque<ChatColor> activeFormats) {
+    private String decoratorsToMarkdown(List<TokenDecorator> decorators, Deque<FormatDecorator.FormatType> activeFormats) {
         StringBuilder format = new StringBuilder();
 
         for (TokenDecorator decorator : decorators) {
             if (!(decorator instanceof FormatDecorator formatDecorator))
                 continue;
 
-            ChatColor chatColor = formatDecorator.getChatColor();
+            FormatDecorator.FormatType formatType = formatDecorator.getFormatType();
             if (formatDecorator.isMarker()) {
                 // Marker, this means end the markdown here, only end if it's active
-                if (activeFormats.remove(chatColor)) {
-                    String markdown = CHAT_COLOR_TO_MARKDOWN.get(chatColor);
+                if (activeFormats.remove(formatType)) {
+                    String markdown = FORMAT_TO_MARKDOWN.get(formatType);
                     format.append(markdown);
                 }
 
                 continue;
             }
 
-            if (chatColor == ChatColor.RESET) {
+            if (formatType == FormatDecorator.FormatType.RESET) {
                 format.append(this.squish(activeFormats));
             } else {
-                String markdown = CHAT_COLOR_TO_MARKDOWN.get(chatColor);
+                String markdown = FORMAT_TO_MARKDOWN.get(formatType);
                 if (markdown != null) {
                     format.append(markdown);
-                    activeFormats.add(chatColor);
+                    activeFormats.add(formatType);
                 }
             }
         }
@@ -81,14 +81,19 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         return format.toString();
     }
 
-    private String squish(Deque<ChatColor> existingDecorators) {
+    private String squish(Deque<FormatDecorator.FormatType> existingDecorators) {
         StringBuilder format = new StringBuilder();
         while (!existingDecorators.isEmpty()) {
-            ChatColor chatColor = existingDecorators.removeLast();
-            format.append(CHAT_COLOR_TO_MARKDOWN.get(chatColor));
+            FormatDecorator.FormatType formatType = existingDecorators.removeLast();
+            format.append(FORMAT_TO_MARKDOWN.get(formatType));
         }
 
         return format.toString();
+    }
+
+    @Override
+    public DecoratorFactory decorators() {
+        return DecoratorFactory.any();
     }
 
 }

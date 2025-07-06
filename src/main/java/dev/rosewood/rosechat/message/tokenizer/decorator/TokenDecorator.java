@@ -1,25 +1,11 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.Token;
-import net.md_5.bungee.api.chat.BaseComponent;
-
-public abstract class TokenDecorator {
-
-    private final DecoratorType type;
-
-    protected TokenDecorator(DecoratorType type) {
-        this.type = type;
-    }
+public interface TokenDecorator {
 
     /**
-     * Applies this decorator to the given component.
-     *
-     * @param component The component to apply this decorator to
-     * @param tokenizer The tokenizer
-     * @param parent The parent token
+     * @return the type of this decorator
      */
-    public abstract void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent);
+    DecoratorType getType();
 
     /**
      * Checks if this decorator is overwritten by the given decorator.
@@ -28,7 +14,7 @@ public abstract class TokenDecorator {
      * @param newDecorator The decorator to check compatibility with
      * @return true if this decorator is overwritten by the given decorator
      */
-    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+    default boolean isOverwrittenBy(TokenDecorator newDecorator) {
         return this.getClass() == newDecorator.getClass();
     }
 
@@ -38,7 +24,7 @@ public abstract class TokenDecorator {
      *
      * @return true if this decorator is a marker decorator
      */
-    protected boolean isMarker() {
+    default boolean isMarker() {
         return false;
     }
 
@@ -48,15 +34,8 @@ public abstract class TokenDecorator {
      *
      * @return true if this decorator blocks text stitching
      */
-    public boolean blocksTextStitching() {
+    default boolean blocksTextStitching() {
         return false;
-    }
-
-    /**
-     * @return the type of this decorator
-     */
-    public DecoratorType getType() {
-        return this.type;
     }
 
 }

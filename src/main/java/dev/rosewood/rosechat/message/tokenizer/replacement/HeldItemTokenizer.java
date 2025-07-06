@@ -3,17 +3,13 @@ package dev.rosewood.rosechat.message.tokenizer.replacement;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
-import dev.rosewood.rosechat.nms.NMSAdapter;
-import net.md_5.bungee.api.chat.HoverEvent;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.apache.commons.text.WordUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -27,16 +23,6 @@ public class HeldItemTokenizer extends Tokenizer {
         super("held_item");
 
         this.api = RoseChatAPI.getInstance();
-
-        try {
-            NMSAdapter.getHandler().initialiseMethods();
-        } catch (Exception e) {
-            e.printStackTrace();
-            LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-            localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
-                    "&eNo NMS save method was found for " + Bukkit.getServer().getBukkitVersion() + ". [item] has been disabled.");
-            return;
-        }
 
         // Example of how to register tokenizers
         if (HELD_ITEM_TOKENIZER == null) {
@@ -67,16 +53,24 @@ public class HeldItemTokenizer extends Tokenizer {
             try {
                 ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
-                String json = NMSAdapter.getHandler().getItemStackAsString(params.getSender().asPlayer(), item);
-                int amount = item.getAmount();
-
                 ItemMeta itemMeta = item.getItemMeta();
-                String itemName = item.hasItemMeta() && itemMeta.hasDisplayName()
-                        ? itemMeta.getDisplayName()
-                        : WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
+                if (itemMeta == null)
+                    return new TokenizerResult(Token.text(input), input.length());
+
+                int amount = item.getAmount();
+                String json = itemMeta.getAsString();
+
+                String itemName;
+                if (itemMeta.hasDisplayName()) {
+                    itemName = itemMeta.getDisplayName();
+                } else if (NMSUtil.getVersionNumber() >= 21 && itemMeta.hasItemName()) {
+                    itemName = itemMeta.getItemName();
+                } else {
+                    itemName = WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
+                }
 
                 return new TokenizerResult(Token.group(filter.replacement())
-                        .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_ITEM, json))
+                        .decorate(params.decorators().hover(item, json))
                         .placeholder("item_name", itemName)
                         .placeholder("item", json)
                         .placeholder("amount", amount)
@@ -84,7 +78,6 @@ public class HeldItemTokenizer extends Tokenizer {
                         .ignoreTokenizer(Tokenizers.FILTER)
                         .encapsulate()
                         .build(), match.length());
-
             } catch (Exception e) {
                 return null;
             }

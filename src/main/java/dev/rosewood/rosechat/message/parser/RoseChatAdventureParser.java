@@ -5,30 +5,33 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.Component;
 
-public class BungeeParser implements MessageParser<BaseComponent[]> {
+public class RoseChatAdventureParser implements MessageParser<Component> {
 
     @Override
-    public MessageTokenizerResults<BaseComponent[]> parse(RoseMessage message, RosePlayer viewer, String format) {
+    public MessageTokenizerResults<Component> parse(RoseMessage message, RosePlayer viewer, String format) {
         if (Settings.USE_MARKDOWN_FORMATTING.get()) {
-            return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.SERVER_TO_SERVER,
+            return MessageTokenizer.tokenizeAndCompose(message, viewer, format, MessageDirection.PLAYER_TO_SERVER,
+                    TokenComposer.adventure()::decorated,
                     Tokenizers.DISCORD_EMOJI_BUNDLE,
                     Tokenizers.MARKDOWN_BUNDLE,
                     Tokenizers.DISCORD_FORMATTING_BUNDLE,
-                    Tokenizers.BUNGEE_BUNDLE);
+                    Tokenizers.DEFAULT_BUNDLE);
         } else {
-            return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.SERVER_TO_SERVER,
+            return MessageTokenizer.tokenizeAndCompose(message, viewer, format, MessageDirection.PLAYER_TO_SERVER,
+                    TokenComposer.adventure()::decorated,
                     Tokenizers.DISCORD_EMOJI_BUNDLE,
-                    Tokenizers.BUNGEE_BUNDLE);
+                    Tokenizers.DEFAULT_BUNDLE);
         }
     }
 
     @Override
     public MessageDirection getMessageDirection() {
-        return MessageDirection.SERVER_TO_SERVER;
+        return MessageDirection.PLAYER_TO_SERVER;
     }
 
 }

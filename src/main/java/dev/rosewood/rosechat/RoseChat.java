@@ -39,9 +39,8 @@ import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
 import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.tokenizer.replacement.HeldItemTokenizer;
-import dev.rosewood.rosechat.nms.NMSAdapter;
 import dev.rosewood.rosegarden.RosePlugin;
-import dev.rosewood.rosegarden.config.RoseSetting;
+import dev.rosewood.rosegarden.config.SettingHolder;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.manager.Manager;
 import dev.rosewood.rosegarden.utils.NMSUtil;
@@ -80,7 +79,7 @@ public class RoseChat extends RosePlugin {
 
     @Override
     public void enable() {
-        if (!NMSAdapter.isValidVersion()) {
+        if (NMSUtil.getVersionNumber() < 18) {
             LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
             localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
                     localeManager.getLocaleMessage("prefix") +
@@ -266,8 +265,8 @@ public class RoseChat extends RosePlugin {
     }
 
     @Override
-    protected List<RoseSetting<?>> getRoseConfigSettings() {
-        return Settings.getKeys();
+    protected SettingHolder getRoseConfigSettingHolder() {
+        return Settings.INSTANCE;
     }
 
     @Override

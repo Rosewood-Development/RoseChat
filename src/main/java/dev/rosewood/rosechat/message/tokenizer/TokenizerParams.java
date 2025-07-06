@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Set;
@@ -18,9 +19,11 @@ public class TokenizerParams {
     private final boolean usePlayerChatColor;
     private final MessageDirection direction;
     private final Set<String> ignoredFilters;
+    private final DecoratorFactory decoratorFactory;
 
     public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, Token parentToken,
-                           boolean usePlayerChatColor, MessageDirection direction, MessageOutputs outputs, Set<String> ignoredFilters) {
+                           boolean usePlayerChatColor, MessageDirection direction, MessageOutputs outputs,
+                           Set<String> ignoredFilters, DecoratorFactory decoratorFactory) {
         this.outputs = outputs;
         this.message = message;
         this.receiver = receiver;
@@ -29,6 +32,7 @@ public class TokenizerParams {
         this.usePlayerChatColor = usePlayerChatColor;
         this.direction = direction;
         this.ignoredFilters = ignoredFilters;
+        this.decoratorFactory = decoratorFactory;
     }
 
     public MessageOutputs getOutputs() {
@@ -84,6 +88,10 @@ public class TokenizerParams {
 
     public Set<String> getIgnoredFilters() {
         return this.ignoredFilters;
+    }
+
+    public DecoratorFactory decorators() {
+        return this.decoratorFactory;
     }
 
 }

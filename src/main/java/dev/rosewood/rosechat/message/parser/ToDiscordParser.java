@@ -14,12 +14,12 @@ public class ToDiscordParser implements MessageParser<String> {
     @Override
     public MessageTokenizerResults<String> parse(RoseMessage message, RosePlayer viewer, String format) {
         if (Settings.USE_MARKDOWN_FORMATTING.get()) {
-            return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.MINECRAFT_TO_DISCORD, TokenComposer.markdown(),
+            return MessageTokenizer.tokenizeAndCompose(message, viewer, format, MessageDirection.MINECRAFT_TO_DISCORD, TokenComposer::markdown,
                     Tokenizers.TO_DISCORD_BUNDLE,
                     Tokenizers.DISCORD_FORMATTING_BUNDLE,
                     Tokenizers.DEFAULT_DISCORD_BUNDLE);
         } else {
-            return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.MINECRAFT_TO_DISCORD, TokenComposer.markdown(),
+            return MessageTokenizer.tokenizeAndCompose(message, viewer, format, MessageDirection.MINECRAFT_TO_DISCORD, TokenComposer::markdown,
                     Tokenizers.TO_DISCORD_BUNDLE,
                     Tokenizers.DEFAULT_DISCORD_BUNDLE);
         }

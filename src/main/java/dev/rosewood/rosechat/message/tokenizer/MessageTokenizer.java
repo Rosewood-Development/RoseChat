@@ -1,11 +1,13 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
+import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
@@ -33,27 +35,27 @@ public class MessageTokenizer {
     private final List<Tokenizer> tokenizers;
     private final RoseMessage roseMessage;
     private final RosePlayer viewer;
-    private final Token rootToken;
-    private final MessageOutputs outputs;
     private final MessageDirection direction;
+    private final MessageOutputs outputs;
+    private DecoratorFactory lastDecoratorFactory;
     private int parses = 0;
 
-    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
-                             Tokenizers.TokenizerBundle... tokenizerBundles) {
+    private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, MessageDirection direction, MessageOutputs outputs,
+                             List<Tokenizer> tokenizers) {
         this.roseMessage = roseMessage;
         this.viewer = viewer;
-        this.tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
-        this.rootToken = Token.group(format).build();
-        this.outputs = new MessageOutputs();
+        this.tokenizers = tokenizers;
+        this.outputs = outputs;
         this.direction = direction;
     }
 
-    public MessageOutputs tokenizeContent() {
-        this.tokenizeContent(this.rootToken, 0);
-        return this.outputs;
+    public void tokenize(Token token, DecoratorFactory decorators) {
+        this.lastDecoratorFactory = decorators;
+        this.tokenize(token, decorators, 0);
     }
 
-    public void tokenizeContent(Token token, int depth) {
+    private void tokenize(Token token, DecoratorFactory decorators, int depth) {
+        this.lastDecoratorFactory = decorators;
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot tokenize a token that is not of type GROUP");
 
@@ -70,6 +72,7 @@ public class MessageTokenizer {
         }
 
         String content = token.getContent();
+        MessageOutputs messageOutputs = new MessageOutputs();
 
         outer:
         while (!content.isEmpty()) {
@@ -82,7 +85,8 @@ public class MessageTokenizer {
                 this.parses++;
 
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token,
-                        this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs, token.getIgnoredFilters());
+                        this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs,
+                        token.getIgnoredFilters(), decorators);
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;
@@ -108,55 +112,45 @@ public class MessageTokenizer {
 
         for (Token child : token.getChildren())
             if (child.getType() == TokenType.GROUP)
-                this.tokenizeContent(child, depth + 1);
+                this.tokenize(child, decorators, depth + 1);
     }
 
-    public <T> T toComponents(TokenComposer<T> composer) {
-        return this.toComponents(this.rootToken, composer);
-    }
-
-    public <T> T toComponents(Token token, TokenComposer<T> composer) {
+    public <T> T compose(Token token, TokenComposer<T> composer) {
         return composer.compose(token);
     }
 
-    public static MessageTokenizerResults<BaseComponent[]> tokenize(RoseMessage roseMessage, RosePlayer viewer,
-                                                                    String message, MessageDirection direction,
-                                                                    Tokenizers.TokenizerBundle... tokenizerBundles) {
-        return tokenize(roseMessage, viewer, message, direction, null, tokenizerBundles);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> MessageTokenizerResults<T> tokenize(RoseMessage roseMessage, RosePlayer viewer, String message, MessageDirection direction,
-                                                          TokenComposer<T> composer, Tokenizers.TokenizerBundle... tokenizerBundles) {
-        if (message == null) {
+    public static <T> MessageTokenizerResults<T> tokenizeAndCompose(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
+                                                                    Function<MessageTokenizer, TokenComposer<T>> composerFunction, Tokenizers.TokenizerBundle... tokenizerBundles) {
+        if (format == null) {
             if (roseMessage.getPlayerInput() != null) {
                 new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. " +
                         "A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
-                message = RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER;
+                format = RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER;
             } else {
                 new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with an empty string instead. " +
                         "A harmless stacktrace will be printed below so this can be fixed.").printStackTrace();
-                message = "";
+                format = "";
             }
         }
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, message, direction, tokenizerBundles);
+        List<Tokenizer> tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
+        MessageOutputs outputs = new MessageOutputs();
+        MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, direction, outputs, tokenizers);
+        TokenComposer<T> composer = composerFunction.apply(tokenizer);
 
-        if (composer == null) // a null composer means this will always be BaseComponent[], so this is safe
-            composer = (TokenComposer<T>) TokenComposer.decorated(tokenizer);
-
-        MessageOutputs outputs = tokenizer.tokenizeContent();
-        T components = tokenizer.toComponents(composer);
+        Token token = Token.group(format).build();
+        tokenizer.tokenize(token, composer.decorators());
+        T components = tokenizer.compose(token, composer);
 
         if (DEBUG_MANAGER.isEnabled()) {
             DEBUG_MANAGER.addMessage(() ->
                     "Completed Tokenizing: " + (components instanceof String ? components : TextComponent.toPlainText((BaseComponent[]) components)) + "\n"
                     + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
-                            "ms to tokenize " + countTokens(tokenizer.rootToken) + " tokens " + tokenizer.parses + " times \n");
+                            "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.parses + " times \n");
         }
 
-        return new MessageTokenizerResults<T>(components, outputs);
+        return new MessageTokenizerResults<>(components, outputs);
     }
 
     private static int countTokens(Token token) {
@@ -200,6 +194,10 @@ public class MessageTokenizer {
 
     public int findDecoratorContentLength(Token source, TokenDecorator decorator) {
         return this.findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
+    }
+
+    public DecoratorFactory getLastDecoratorFactory() {
+        return this.lastDecoratorFactory;
     }
 
     private int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {

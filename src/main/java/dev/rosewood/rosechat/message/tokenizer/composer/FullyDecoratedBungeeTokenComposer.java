@@ -3,16 +3,17 @@ package dev.rosewood.rosechat.message.tokenizer.composer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
-import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorators;
+import dev.rosewood.rosechat.message.tokenizer.composer.decorator.BungeeTokenDecorators;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[]> {
+public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComponent[]> {
 
     private final MessageTokenizer tokenizer;
 
-    protected FullyDecoratedTokenComposer(MessageTokenizer tokenizer) {
+    protected FullyDecoratedBungeeTokenComposer(MessageTokenizer tokenizer) {
         this.tokenizer = tokenizer;
     }
 
@@ -21,7 +22,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
         return this.compose(token, this.createDecorators());
     }
 
-    protected BaseComponent[] compose(Token token, TokenDecorators contextDecorators) {
+    protected BaseComponent[] compose(Token token, BungeeTokenDecorators contextDecorators) {
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot convert a token that is not of type GROUP");
 
@@ -36,7 +37,7 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
                 case TEXT -> contentBuilder.append(child.getContent());
                 case DECORATOR -> contextDecorators.add(child.getDecorators());
                 case GROUP -> {
-                    TokenDecorators childDecorators = child.shouldEncapsulate() ? this.createDecorators(contextDecorators) : contextDecorators;
+                    BungeeTokenDecorators childDecorators = child.shouldEncapsulate() ? this.createDecorators(contextDecorators) : contextDecorators;
                     for (BaseComponent component : this.compose(child, childDecorators))
                         componentBuilder.append(component, ComponentBuilder.FormatRetention.NONE);
                 }
@@ -51,21 +52,21 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
             return components;
 
         TextComponent wrapperComponent = new TextComponent(components);
-        TokenDecorators wrapperDecorators = this.createDecorators();
+        BungeeTokenDecorators wrapperDecorators = this.createDecorators();
         wrapperDecorators.add(token.getDecorators());
         wrapperDecorators.apply(wrapperComponent, this.tokenizer, token);
         return new BaseComponent[]{wrapperComponent};
     }
 
-    protected TokenDecorators createDecorators() {
-        return new TokenDecorators();
+    protected BungeeTokenDecorators createDecorators() {
+        return new BungeeTokenDecorators();
     }
 
-    protected TokenDecorators createDecorators(TokenDecorators contextDecorators) {
-        return new TokenDecorators(contextDecorators);
+    protected BungeeTokenDecorators createDecorators(BungeeTokenDecorators contextDecorators) {
+        return new BungeeTokenDecorators(contextDecorators);
     }
 
-    private void applyAndDecorate(ComponentBuilder componentBuilder, StringBuilder contentBuilder, Token token, TokenDecorators contextDecorators) {
+    private void applyAndDecorate(ComponentBuilder componentBuilder, StringBuilder contentBuilder, Token token, BungeeTokenDecorators contextDecorators) {
         String content = contentBuilder.toString();
         contentBuilder.setLength(0);
 
@@ -78,6 +79,11 @@ public class FullyDecoratedTokenComposer implements TokenComposer<BaseComponent[
             componentBuilder.append(content, ComponentBuilder.FormatRetention.NONE);
             contextDecorators.apply(componentBuilder.getCurrentComponent(), this.tokenizer, token);
         }
+    }
+
+    @Override
+    public DecoratorFactory decorators() {
+        return DecoratorFactory.bungee();
     }
 
 }

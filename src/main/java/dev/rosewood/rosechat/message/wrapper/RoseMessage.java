@@ -6,10 +6,10 @@ import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.BungeeParser;
-import dev.rosewood.rosechat.message.parser.FromDiscordParser;
+import dev.rosewood.rosechat.message.parser.BungeeProxyParser;
+import dev.rosewood.rosechat.message.parser.FromDiscordBungeeParser;
 import dev.rosewood.rosechat.message.parser.MessageParser;
-import dev.rosewood.rosechat.message.parser.RoseChatParser;
+import dev.rosewood.rosechat.message.parser.RoseChatBungeeParser;
 import dev.rosewood.rosechat.message.parser.ToDiscordParser;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
@@ -85,7 +85,7 @@ public class RoseMessage {
      * @return A {@link MessageTokenizerResults} containing the parsed message.
      */
     public MessageTokenizerResults<BaseComponent[]> parse(RosePlayer viewer, String format) {
-        RoseChatParser parser = new RoseChatParser();
+        RoseChatBungeeParser parser = new RoseChatBungeeParser();
         return this.parse(parser, viewer, format, null);
     }
 
@@ -99,7 +99,7 @@ public class RoseMessage {
      * @return A {@link MessageTokenizerResults} containing the parsed message.
      */
     public MessageTokenizerResults<BaseComponent[]> parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
-        FromDiscordParser parser = new FromDiscordParser();
+        FromDiscordBungeeParser parser = new FromDiscordBungeeParser();
         return this.parse(parser, viewer, format, discordId);
     }
 
@@ -125,7 +125,7 @@ public class RoseMessage {
      * @return A {@link MessageTokenizerResults} containing the parsed message.
      */
     public MessageTokenizerResults<BaseComponent[]> parseBungeeMessage(RosePlayer viewer, String format) {
-        BungeeParser parser = new BungeeParser();
+        BungeeProxyParser parser = new BungeeProxyParser();
         return this.parse(parser, viewer, format, null);
     }
 

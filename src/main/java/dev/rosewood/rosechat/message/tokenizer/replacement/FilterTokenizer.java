@@ -13,13 +13,11 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -383,12 +381,12 @@ public class FilterTokenizer extends Tokenizer {
 
     private Token.Builder createFilterToken(TokenizerParams params, Filter filter, String content) {
         Token.Builder token = Token.group(content)
-                .decorate(FontDecorator.of(filter.font()))
+                .decorate(params.decorators().font(filter.font()))
                 .ignoreTokenizer(Tokenizers.SHADER_COLORS)
                 .ignoreFilter(filter);
 
         if (filter.hover() != null)
-            token.decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, filter.hover()));
+            token.decorate(params.decorators().hover(filter.hover()));
 
         if (!filter.colorRetention())
             token.encapsulate();

@@ -1,16 +1,14 @@
 package dev.rosewood.rosechat.command.command;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.DataManager;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.RoseChatParser;
+import dev.rosewood.rosechat.message.parser.RoseChatBungeeParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
@@ -199,7 +197,7 @@ public class NicknameCommand extends RoseChatCommand {
         }
 
         // Parse the nickname to make sure the player isn't missing any permissions.
-        MessageTokenizerResults<BaseComponent[]> results = new RoseChatParser().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER);
+        MessageTokenizerResults<BaseComponent[]> results = new RoseChatBungeeParser().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER);
         MessageOutputs outputs = results.outputs();
         if (!outputs.getMissingPermissions().isEmpty()) {
             player.sendLocaleMessage("no-permission");

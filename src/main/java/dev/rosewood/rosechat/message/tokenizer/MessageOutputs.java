@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.entity.Player;
 
 public class MessageOutputs {
 
@@ -65,17 +64,14 @@ public class MessageOutputs {
         this.placeholderTarget = placeholderTarget;
     }
 
-    public void merge(MessageOutputs newOutputs) {
-        this.taggedPlayers.addAll(newOutputs.getTaggedPlayers());
-        this.missingPermissions.addAll(newOutputs.getMissingPermissions());
-        this.serverCommands.addAll(newOutputs.getServerCommands());
-        this.playerCommands.addAll(newOutputs.getPlayerCommands());
-
-        if (newOutputs.getSound() != null)
-            this.sound = newOutputs.getSound();
-
-        if (newOutputs.getMessage() != null)
-            this.message = newOutputs.getMessage();
+    public void reset() {
+        this.taggedPlayers.clear();
+        this.missingPermissions.clear();
+        this.serverCommands.clear();
+        this.playerCommands.clear();
+        this.sound = null;
+        this.message = null;
+        this.placeholderTarget = null;
     }
 
 }

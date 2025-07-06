@@ -6,7 +6,6 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
-import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -60,7 +59,7 @@ public class RainbowTokenizer extends Tokenizer {
 
         String content = matcher.group();
         return this.hasTokenPermission(params, "rosechat.rainbow")
-                ? new TokenizerResult(Token.decorator(ColorDecorator.of(generatorGenerator)), content.length())
+                ? new TokenizerResult(Token.decorator(params.decorators().color(generatorGenerator)), content.length())
                 : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length());
     }
 
