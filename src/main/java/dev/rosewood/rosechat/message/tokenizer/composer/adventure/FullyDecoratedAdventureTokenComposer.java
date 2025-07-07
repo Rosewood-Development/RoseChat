@@ -1,19 +1,19 @@
 package dev.rosewood.rosechat.message.tokenizer.composer.adventure;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.tokenizer.composer.decorator.AdventureTokenDecorators;
-import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
+import dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure.AdventureTokenDecorators;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class FullyDecoratedAdventureTokenComposer implements TokenComposer<Component> {
 
-    private final MessageTokenizer tokenizer;
+    public static final FullyDecoratedAdventureTokenComposer INSTANCE = new FullyDecoratedAdventureTokenComposer();
 
-    protected FullyDecoratedAdventureTokenComposer(MessageTokenizer tokenizer) {
-        this.tokenizer = tokenizer;
+    protected FullyDecoratedAdventureTokenComposer() {
+
     }
 
     @Override
@@ -51,7 +51,7 @@ public class FullyDecoratedAdventureTokenComposer implements TokenComposer<Compo
         Component wrapperComponent = Component.textOfChildren(componentBuilder);
         AdventureTokenDecorators wrapperDecorators = this.createDecorators();
         wrapperDecorators.add(token.getDecorators());
-        wrapperComponent = wrapperDecorators.apply(wrapperComponent, this.tokenizer, token);
+        wrapperComponent = wrapperDecorators.apply(wrapperComponent, token);
         return wrapperComponent;
     }
 
@@ -69,16 +69,21 @@ public class FullyDecoratedAdventureTokenComposer implements TokenComposer<Compo
 
         if (contextDecorators.blocksTextStitching()) {
             for (char c : content.toCharArray())
-                component = component.append(contextDecorators.apply(Component.text(c), this.tokenizer, token));
+                component = component.append(contextDecorators.apply(Component.text(c), token));
             return component;
         } else {
-            return component.append(contextDecorators.apply(Component.text(content), this.tokenizer, token));
+            return component.append(contextDecorators.apply(Component.text(content), token));
         }
     }
 
     @Override
-    public DecoratorFactory decorators() {
-        return DecoratorFactory.adventure();
+    public Component composeLegacyText(String text) {
+        return LegacyComponentSerializer.legacySection().deserialize(text);
+    }
+
+    @Override
+    public Component composeJson(String json) {
+        return GsonComponentSerializer.gson().deserialize(json);
     }
 
 }

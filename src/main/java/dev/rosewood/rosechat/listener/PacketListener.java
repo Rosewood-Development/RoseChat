@@ -280,7 +280,7 @@ public class PacketListener {
                         .add("id", message.getUUID().toString())
                         .add("type", "server")
                         .add("channel", message.getChannel())
-                        .build());
+                        .build()).buildComponents();
     }
 
     // Thanks, Nicole!

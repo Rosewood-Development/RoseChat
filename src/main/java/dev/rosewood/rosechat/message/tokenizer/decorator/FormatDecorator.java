@@ -2,19 +2,10 @@ package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import net.md_5.bungee.api.ChatColor;
 
-public abstract class FormatDecorator implements TokenDecorator {
+public record FormatDecorator(FormatType formatType, boolean value) implements TokenDecorator {
 
-    protected FormatType formatType;
-    protected boolean value;
-
-    protected FormatDecorator(FormatType formatType, boolean value) {
-        this.formatType = formatType;
-        this.value = value;
-    }
-
-    protected FormatDecorator(ChatColor chatColor, boolean value) {
-        this.formatType = chatColorToFormatType(chatColor);
-        this.value = value;
+    public FormatDecorator(ChatColor chatColor, boolean value) {
+        this(chatColorToFormatType(chatColor), value);
     }
 
     @Override
@@ -46,7 +37,7 @@ public abstract class FormatDecorator implements TokenDecorator {
         return this.formatType;
     }
 
-    protected static FormatType chatColorToFormatType(ChatColor chatColor) {
+    private static FormatType chatColorToFormatType(ChatColor chatColor) {
         return FormatType.values()[chatColor.ordinal() - ChatColor.MAGIC.ordinal()]; // I feel like I'm committing crimes
     }
 

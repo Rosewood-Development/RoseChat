@@ -20,6 +20,8 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.NMSUtil;
@@ -77,13 +79,13 @@ public final class RoseChatAPI {
      * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
      * @param placeholders A set of {@link StringPlaceholders} to be parsed in the message.
-     * @return A {@link BaseComponent} consisting of the parsed message.
+     * @return A {@link MessageTokenizerResults} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
+    public MessageTokenizerResults parse(RosePlayer sender, RosePlayer viewer, String format, StringPlaceholders placeholders) {
         RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.NONE);
         roseMessage.setPlaceholders(placeholders);
 
-        return roseMessage.parse(viewer, format).content();
+        return roseMessage.parse(viewer, format);
     }
 
     /**
@@ -91,10 +93,10 @@ public final class RoseChatAPI {
      * @param sender The {@link RosePlayer} sending the message.
      * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
-     * @return A {@link BaseComponent} consisting of the parsed message.
+     * @return A {@link MessageTokenizerResults} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format) {
-        return RoseMessage.forLocation(sender, PermissionArea.NONE).parse(viewer, format).content();
+    public MessageTokenizerResults parse(RosePlayer sender, RosePlayer viewer, String format) {
+        return RoseMessage.forLocation(sender, PermissionArea.NONE).parse(viewer, format);
     }
 
     /**
@@ -103,10 +105,10 @@ public final class RoseChatAPI {
      * @param viewer The {@link RosePlayer} receiving the message.
      * @param format The string to parse.
      * @param location The location that the chat message is in.
-     * @return A {@link BaseComponent} consisting of the parsed message.
+     * @return A {@link MessageTokenizerResults} consisting of the parsed message.
      */
-    public BaseComponent[] parse(RosePlayer sender, RosePlayer viewer, String format, PermissionArea location) {
-        return RoseMessage.forLocation(sender, location).parse(viewer, format).content();
+    public MessageTokenizerResults parse(RosePlayer sender, RosePlayer viewer, String format, PermissionArea location) {
+        return RoseMessage.forLocation(sender, location).parse(viewer, format);
     }
 
     /**
@@ -127,16 +129,18 @@ public final class RoseChatAPI {
             return;
 
         // Get the deleted message format.
-        BaseComponent[] format = this.parse(player, player, Settings.DELETED_MESSAGE_FORMAT.get(),
+        MessageTokenizerResults format = this.parse(player, player, Settings.DELETED_MESSAGE_FORMAT.get(),
                 DefaultPlaceholders.getFor(player, player)
                         .add("id", uuid.toString())
                         .add("type", messageToDelete.isClient() ? "client" : "server")
-                        .add("original", TextComponent.toLegacyText(ComponentSerializer.parse(messageToDelete.getOriginal())))
+                        .add("original", TokenComposer.legacy().composeJson(messageToDelete.getOriginal()))
                         .build());
 
+        String plainText = format.build(TokenComposer.plain());
+
         boolean updated = false;
-        if (format != null && !TextComponent.toPlainText(format).isEmpty()) {
-            String json = ComponentSerializer.toString(format);
+        if (!plainText.isEmpty()) {
+            String json = format.build(TokenComposer.json());
 
             if (player.hasPermission("rosechat.deletemessages.client")) {
                 BaseComponent[] withDeleteButton = MessageUtils.appendDeleteButton(player, player.getPlayerData(), uuid.toString(), json);

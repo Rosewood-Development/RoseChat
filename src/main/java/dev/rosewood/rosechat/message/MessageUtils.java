@@ -7,6 +7,8 @@ import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
+import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
@@ -200,8 +202,8 @@ public class MessageUtils {
             }
         }
 
-        // Parse the message for the console to generate the tokens
-        BaseComponent[] parsedMessage = roseMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get()).content();
+        // Parse the message for the console
+        MessageTokenizerResults parsedMessage = roseMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get());
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
@@ -220,8 +222,8 @@ public class MessageUtils {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                BaseComponent[] parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get()).content();
-                spy.spigot().sendMessage(parsedSpyMessage);
+                MessageTokenizerResults parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
+                parsedSpyMessage.sendMessage(spy);
             });
         }
 
@@ -232,20 +234,19 @@ public class MessageUtils {
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            BaseComponent[] parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get()).content();
+            MessageTokenizerResults parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get());
 
-            MessageTokenizerResults<BaseComponent[]> receivedMessageOutput = roseMessage.parse(messageTarget,
+            MessageTokenizerResults receivedMessageOutput = roseMessage.parse(messageTarget,
                     Settings.MESSAGE_RECEIVED_FORMAT.get());
-            BaseComponent[] parsedReceivedMessage = receivedMessageOutput.content();
 
             if (target == null) {
                 // If the target is not valid and the name is "Console", then send the message to the console.
                 if (targetName.equalsIgnoreCase("Console")) {
                     sender.send(parsedSentMessage);
-                    Bukkit.getConsoleSender().spigot().sendMessage(parsedReceivedMessage);
+                    receivedMessageOutput.sendMessage(Bukkit.getConsoleSender());
                 } else {
                     boolean keepFormat = Settings.KEEP_MESSAGE_FORMAT.get();
-                    String bungeeMessage = keepFormat ? ComponentSerializer.toString(parsedReceivedMessage) : null;
+                    String bungeeMessage = keepFormat ? receivedMessageOutput.build(TokenComposer.json()) : null;
 
                     RoseChatAPI.getInstance().getBungeeManager()
                             .sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
@@ -271,10 +272,8 @@ public class MessageUtils {
                 if (receiveEvent.isCancelled())
                     return;
 
-                parsedReceivedMessage = receiveEvent.getComponents().content();
-
                 // If the target is online, send the message.
-                messageTarget.send(parsedReceivedMessage);
+                messageTarget.send(receivedMessageOutput);
 
                 if (messageTarget.isPlayer()) {
                     Player targetPlayer = messageTarget.asPlayer();
@@ -293,9 +292,9 @@ public class MessageUtils {
         String nickname = sender.getPlayerData().getNickname();
         if (Settings.UPDATE_DISPLAY_NAMES.get() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                MessageTokenizerResults<BaseComponent[]> components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME)
+                MessageTokenizerResults components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME)
                         .parse(sender, sender.getPlayerData().getNickname());
-                sender.setDisplayName(TextComponent.toLegacyText(components.content()));
+                sender.setDisplayName(components);
 
                 if (RoseChat.getInstance().getNicknameProvider() != null) {
                     Player player = sender.asPlayer();
@@ -325,7 +324,7 @@ public class MessageUtils {
         RosePlayer console = new RosePlayer(Bukkit.getConsoleSender());
         RoseMessage consoleMessage = RoseMessage.forLocation(sender, PermissionArea.MESSAGE);
         consoleMessage.setPlayerInput(input);
-        console.send(consoleMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get()).content());
+        console.send(consoleMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get()));
 
         RoseMessage roseMessage = RoseMessage.forLocation(sender, PermissionArea.MESSAGE);
         roseMessage.setPlayerInput(json);
@@ -339,22 +338,20 @@ public class MessageUtils {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                BaseComponent[] parsedSpyMessage = consoleMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get()).content();
-                spy.spigot().sendMessage(parsedSpyMessage);
+                MessageTokenizerResults parsedSpyMessage = consoleMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
+                parsedSpyMessage.sendMessage(spy);
             });
         }
 
         String jsonMessage = applyJSONPlaceholders(roseMessage.getPlayerInput());
-        MessageTokenizerResults<BaseComponent[]> parsedMessage = parseJSONMessage(messageTarget, jsonMessage);
+        MessageTokenizerResults parsedMessage = parseJSONMessage(messageTarget, jsonMessage);
 
         PlayerReceiveMessageEvent receiveEvent = new PlayerReceiveMessageEvent(sender, messageTarget, roseMessage, parsedMessage);
         Bukkit.getPluginManager().callEvent(receiveEvent);
         if (receiveEvent.isCancelled())
             return;
 
-        BaseComponent[] message = receiveEvent.getComponents().content();
-
-        messageTarget.send(message);
+        messageTarget.send(parsedMessage);
         PlayerData data = messageTarget.getPlayerData();
         if (data != null && data.hasMessageSounds() && Settings.MESSAGE_SOUND.get() != null)
             target.playSound(target.getLocation(), Settings.MESSAGE_SOUND.get(), 1.0f, 1.0f);
@@ -372,12 +369,9 @@ public class MessageUtils {
         return output;
     }
 
-    public static MessageTokenizerResults<BaseComponent[]> parseJSONMessage(RosePlayer receiver, String json) {
-        BaseComponent[] parsed = ComponentSerializer.parse(receiver.isPlayer() ?
-                PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), json) :
-                json);
-
-        return new MessageTokenizerResults<>(parsed, new MessageOutputs());
+    public static MessageTokenizerResults parseJSONMessage(RosePlayer receiver, String json) {
+        String parsedJson = receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), json) : json;
+        return MessageTokenizerResults.fromJson(parsedJson);
     }
 
     /**
@@ -482,11 +476,12 @@ public class MessageUtils {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Settings.DELETE_CLIENT_MESSAGE_FORMAT.get();
 
-        BaseComponent[] deleteClientButton = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
+        MessageTokenizerResults results = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 DefaultPlaceholders.getFor(sender, sender)
                         .add("id", messageId)
                         .add("type", "client").build());
 
+        BaseComponent[] deleteClientButton = results.buildComponents();
         if (deleteClientButton == null || deleteClientButton.length == 0) {
             playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true, null));
             return null;

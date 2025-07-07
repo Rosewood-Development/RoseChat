@@ -1,0 +1,47 @@
+package dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure;
+
+import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
+import net.kyori.adventure.text.Component;
+
+public abstract class AdventureTokenDecorator<T extends TokenDecorator> implements TokenDecorator {
+
+    protected final T decorator;
+
+    public AdventureTokenDecorator(T decorator) {
+        this.decorator = decorator;
+    }
+
+    @Override
+    public DecoratorType getType() {
+        return this.decorator.getType();
+    }
+
+    /**
+     * Applies and returns a new component with the decorator applied.
+     *
+     * @param component The component to apply this decorator to
+     * @param parent The parent token
+     * @return A new component with the decorator applied
+     */
+    public abstract Component apply(Component component, Token parent);
+
+    @SuppressWarnings("unchecked")
+    static <T extends TokenDecorator> AdventureTokenDecorator<T> from(T decorator) {
+        return (AdventureTokenDecorator<T>) switch (decorator) {
+            case ClickDecorator clickDecorator -> new AdventureClickDecorator(clickDecorator);
+            case ColorDecorator colorDecorator -> new AdventureColorDecorator(colorDecorator);
+            case FontDecorator fontDecorator -> new AdventureFontDecorator(fontDecorator);
+            case FormatDecorator formatDecorator -> new AdventureFormatDecorator(formatDecorator);
+            case HoverDecorator hoverDecorator -> new AdventureHoverDecorator(hoverDecorator);
+            default -> throw new IllegalArgumentException("Unhandled decorator type: " + decorator.getClass().getName());
+        };
+    }
+
+}

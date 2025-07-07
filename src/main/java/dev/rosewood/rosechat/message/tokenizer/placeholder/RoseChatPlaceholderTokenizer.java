@@ -83,10 +83,10 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
         Token.Builder tokenBuilder = Token.group(content);
         if (!formattedHover.isEmpty())
-            tokenBuilder.decorate(params.decorators().hover(formattedHover));
+            tokenBuilder.decorate(new HoverDecorator(formattedHover));
 
         if (click != null)
-            tokenBuilder.decorate(params.decorators().click(clickAction, click));
+            tokenBuilder.decorate(new ClickDecorator(clickAction, click));
 
         if (params.containsPlayerInput())
             tokenBuilder.encapsulate();

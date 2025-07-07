@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import org.apache.commons.text.WordUtils;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +71,7 @@ public class HeldItemTokenizer extends Tokenizer {
                 }
 
                 return new TokenizerResult(Token.group(filter.replacement())
-                        .decorate(params.decorators().hover(item, json))
+                        .decorate(new HoverDecorator(item, json))
                         .placeholder("item_name", itemName)
                         .placeholder("item", json)
                         .placeholder("amount", amount)

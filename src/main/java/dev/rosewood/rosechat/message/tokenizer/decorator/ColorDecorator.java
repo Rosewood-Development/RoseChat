@@ -5,19 +5,14 @@ import java.awt.Color;
 import java.util.function.Function;
 import net.md_5.bungee.api.ChatColor;
 
-public abstract class ColorDecorator implements TokenDecorator {
+public record ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction, boolean solid) implements TokenDecorator {
 
-    protected final Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction;
-    protected HexUtils.ColorGenerator colorGenerator;
-
-    protected ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
-        this.colorGeneratorFunction = colorGeneratorFunction;
-        this.colorGenerator = null;
+    public ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
+        this(colorGeneratorFunction, false);
     }
 
-    protected ColorDecorator(ChatColor chatColor) {
-        this.colorGeneratorFunction = null;
-        this.colorGenerator = new SolidColorGenerator(chatColor);
+    public ColorDecorator(ChatColor chatColor) {
+        this(x -> new SolidColorGenerator(chatColor), true);
     }
 
     @Override
@@ -28,17 +23,17 @@ public abstract class ColorDecorator implements TokenDecorator {
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
         if (newDecorator instanceof FormatDecorator formatDecorator)
-            return formatDecorator.formatType == FormatDecorator.FormatType.RESET;
+            return formatDecorator.formatType() == FormatDecorator.FormatType.RESET;
 
         return TokenDecorator.super.isOverwrittenBy(newDecorator);
     }
 
     @Override
     public boolean blocksTextStitching() {
-        return !(this.colorGenerator instanceof SolidColorGenerator);
+        return !this.solid;
     }
 
-    protected record SolidColorGenerator(ChatColor chatColor) implements HexUtils.ColorGenerator {
+    private record SolidColorGenerator(ChatColor chatColor) implements HexUtils.ColorGenerator {
 
         @Override
         public ChatColor nextChatColor() {

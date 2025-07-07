@@ -1,13 +1,12 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
+import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
@@ -24,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessageTokenizer {
 
@@ -37,7 +34,6 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final MessageDirection direction;
     private final MessageOutputs outputs;
-    private DecoratorFactory lastDecoratorFactory;
     private int parses = 0;
 
     private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, MessageDirection direction, MessageOutputs outputs,
@@ -49,13 +45,11 @@ public class MessageTokenizer {
         this.direction = direction;
     }
 
-    public void tokenize(Token token, DecoratorFactory decorators) {
-        this.lastDecoratorFactory = decorators;
-        this.tokenize(token, decorators, 0);
+    public void tokenize(Token token) {
+        this.tokenize(token, 0);
     }
 
-    private void tokenize(Token token, DecoratorFactory decorators, int depth) {
-        this.lastDecoratorFactory = decorators;
+    private void tokenize(Token token, int depth) {
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot tokenize a token that is not of type GROUP");
 
@@ -72,7 +66,6 @@ public class MessageTokenizer {
         }
 
         String content = token.getContent();
-        MessageOutputs messageOutputs = new MessageOutputs();
 
         outer:
         while (!content.isEmpty()) {
@@ -86,7 +79,7 @@ public class MessageTokenizer {
 
                 TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token,
                         this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs,
-                        token.getIgnoredFilters(), decorators);
+                        token.getIgnoredFilters());
                 TokenizerResult result = tokenizer.tokenize(params);
                 if (result == null)
                     continue;
@@ -110,17 +103,33 @@ public class MessageTokenizer {
             throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
         }
 
-        for (Token child : token.getChildren())
+        this.tokenizeContentDecorators(token, depth);
+
+        for (Token child : token.getChildren()) {
+            this.tokenizeContentDecorators(child, depth);
             if (child.getType() == TokenType.GROUP)
-                this.tokenize(child, decorators, depth + 1);
+                this.tokenize(child, depth + 1);
+        }
     }
 
-    public <T> T compose(Token token, TokenComposer<T> composer) {
-        return composer.compose(token);
+    private void tokenizeContentDecorators(Token token, int depth) {
+        if (token.getType() != TokenType.TEXT) {
+            for (TokenDecorator decorator : token.getDecorators()) {
+                if (decorator.getType() == DecoratorType.CONTENT && decorator.getContent() != null) {
+                    Token.Builder decoratorContent = decorator.getContent();
+                    decoratorContent.placeholders(token.getPlaceholders());
+                    token.getIgnoredTokenizers().forEach(decoratorContent::ignoreTokenizer);
+                    token.getIgnoredFilters().forEach(decoratorContent::ignoreFilter);
+                    Token decoratorToken = decoratorContent.build();
+                    this.tokenize(decoratorToken, depth + 1);
+                    decorator.setContentToken(decoratorToken);
+                }
+            }
+        }
     }
 
-    public static <T> MessageTokenizerResults<T> tokenizeAndCompose(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
-                                                                    Function<MessageTokenizer, TokenComposer<T>> composerFunction, Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static MessageTokenizerResults tokenize(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
+                                                   Tokenizers.TokenizerBundle... tokenizerBundles) {
         if (format == null) {
             if (roseMessage.getPlayerInput() != null) {
                 new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. " +
@@ -137,20 +146,19 @@ public class MessageTokenizer {
         List<Tokenizer> tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
         MessageOutputs outputs = new MessageOutputs();
         MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, direction, outputs, tokenizers);
-        TokenComposer<T> composer = composerFunction.apply(tokenizer);
 
         Token token = Token.group(format).build();
-        tokenizer.tokenize(token, composer.decorators());
-        T components = tokenizer.compose(token, composer);
+        tokenizer.tokenize(token);
 
         if (DEBUG_MANAGER.isEnabled()) {
+            String plainText = TokenComposer.plain().compose(token);
             DEBUG_MANAGER.addMessage(() ->
-                    "Completed Tokenizing: " + (components instanceof String ? components : TextComponent.toPlainText((BaseComponent[]) components)) + "\n"
+                    "Completed Tokenizing: " + plainText + "\n"
                     + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
                             "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.parses + " times \n");
         }
 
-        return new MessageTokenizerResults<>(components, outputs);
+        return new MessageTokenizerResults(token, outputs);
     }
 
     private static int countTokens(Token token) {
@@ -192,15 +200,11 @@ public class MessageTokenizer {
         return mergedList;
     }
 
-    public int findDecoratorContentLength(Token source, TokenDecorator decorator) {
-        return this.findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
+    public static int findDecoratorContentLength(Token source, TokenDecorator decorator) {
+        return findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
     }
 
-    public DecoratorFactory getLastDecoratorFactory() {
-        return this.lastDecoratorFactory;
-    }
-
-    private int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {
+    private static int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {
         if (token.getType() != TokenType.GROUP)
             throw new IllegalStateException("Cannot find decorator content length of a token that is not of type GROUP");
 
@@ -221,7 +225,7 @@ public class MessageTokenizer {
                 }
                 case GROUP -> {
                     boolean countingBefore = counting.get();
-                    length += this.findDecoratorContentLength(child, decorator, counting);
+                    length += findDecoratorContentLength(child, decorator, counting);
                     if (child.shouldEncapsulate())
                         counting.set(countingBefore);
                 }

@@ -13,6 +13,8 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.List;
@@ -212,7 +214,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content));
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 
@@ -250,7 +252,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content));
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 
@@ -321,7 +323,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = TextComponent.toPlainText(RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content));
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 
@@ -381,12 +383,12 @@ public class FilterTokenizer extends Tokenizer {
 
     private Token.Builder createFilterToken(TokenizerParams params, Filter filter, String content) {
         Token.Builder token = Token.group(content)
-                .decorate(params.decorators().font(filter.font()))
+                .decorate(new FontDecorator(filter.font()))
                 .ignoreTokenizer(Tokenizers.SHADER_COLORS)
                 .ignoreFilter(filter);
 
         if (filter.hover() != null)
-            token.decorate(params.decorators().hover(filter.hover()));
+            token.decorate(new HoverDecorator(filter.hover()));
 
         if (!filter.colorRetention())
             token.encapsulate();

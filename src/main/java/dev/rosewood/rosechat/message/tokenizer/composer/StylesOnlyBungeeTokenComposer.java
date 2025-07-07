@@ -1,15 +1,17 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.composer.decorator.BungeeTokenDecorators;
+import dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee.BungeeTokenDecorators;
 import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import java.util.List;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public class StylesOnlyBungeeTokenComposer extends FullyDecoratedBungeeTokenComposer {
 
-    protected StylesOnlyBungeeTokenComposer(MessageTokenizer tokenizer) {
-        super(tokenizer);
+    public static final StylesOnlyBungeeTokenComposer INSTANCE = new StylesOnlyBungeeTokenComposer();
+
+    private StylesOnlyBungeeTokenComposer() {
+
     }
 
     @Override
@@ -20,6 +22,16 @@ public class StylesOnlyBungeeTokenComposer extends FullyDecoratedBungeeTokenComp
     @Override
     protected BungeeTokenDecorators createDecorators(BungeeTokenDecorators contextDecorators) {
         return new StyledTokenDecorators(contextDecorators);
+    }
+
+    @Override
+    public BaseComponent[] composeLegacyText(String text) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public BaseComponent[] composeJson(String json) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     private static class StyledTokenDecorators extends BungeeTokenDecorators {

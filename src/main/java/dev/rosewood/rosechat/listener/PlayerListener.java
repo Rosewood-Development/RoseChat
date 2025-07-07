@@ -52,7 +52,7 @@ public class PlayerListener implements Listener {
             if (playerData.getNickname() != null)
                 player.updateDisplayName();
             else
-                playerData.setDisplayName(event.getPlayer().getDisplayName());
+                playerData.setStrippedDisplayName(event.getPlayer().getDisplayName());
 
             // If the current channel is not a group channel, put the player in the right channel.
             if (!playerData.isCurrentChannelGroupChannel() || playerData.getCurrentChannel() == null) {

@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
@@ -15,6 +16,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -202,18 +205,25 @@ public class SidedSignListener implements Listener {
             if (line.isEmpty())
                 continue;
 
-            MessageTokenizerResults<BaseComponent[]> components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
-            if (components == null || components.content().length == 0)
+            MessageTokenizerResults components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
+            if (components == null)
                 continue;
 
-            ComponentBuilder builder = new ComponentBuilder();
-            for (BaseComponent component : components.content()) {
-                builder.append(component);
-                if (component.getColorRaw() == null)
-                    builder.color(ChatColor.of(hexColor));
-            }
+            String plainLine = components.build(TokenComposer.plain());
+            if (plainLine.isBlank())
+                continue;
 
-            side.setLine(i, TextComponent.toLegacyText(builder.build()));
+            if (NMSUtil.isPaper()) {
+                side.line(i, Component.textOfChildren(components.build(TokenComposer.adventure().decorated())).colorIfAbsent(TextColor.fromHexString(hexColor)));
+            } else {
+                ComponentBuilder builder = new ComponentBuilder();
+                for (BaseComponent component : components.buildComponents()) {
+                    builder.append(component);
+                    if (component.getColorRaw() == null)
+                        builder.color(ChatColor.of(hexColor));
+                }
+                side.setLine(i, TextComponent.toLegacyText(builder.build()));
+            }
         }
 
         sign.update();
@@ -243,7 +253,7 @@ public class SidedSignListener implements Listener {
         return true;
     }
 
-    private MessageTokenizerResults<BaseComponent[]>  parseLine(RosePlayer player, String text, PermissionArea area) {
+    private MessageTokenizerResults parseLine(RosePlayer player, String text, PermissionArea area) {
         RoseMessage message = RoseMessage.forLocation(player, area);
         message.setPlayerInput(text);
         message.setUsePlayerChatColor(false);

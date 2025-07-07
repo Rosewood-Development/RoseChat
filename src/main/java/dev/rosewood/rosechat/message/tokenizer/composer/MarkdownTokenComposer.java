@@ -2,7 +2,6 @@ package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
-import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import java.util.ArrayDeque;
@@ -13,6 +12,8 @@ import java.util.Map;
 
 public class MarkdownTokenComposer implements TokenComposer<String> {
 
+    public static final MarkdownTokenComposer INSTANCE = new MarkdownTokenComposer();
+
     private static final Map<FormatDecorator.FormatType, String> FORMAT_TO_MARKDOWN = new HashMap<>() {{
         this.put(FormatDecorator.FormatType.BOLD, "**");
         this.put(FormatDecorator.FormatType.ITALIC, "*");
@@ -20,7 +21,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         this.put(FormatDecorator.FormatType.STRIKETHROUGH, "~~");
     }};
 
-    protected MarkdownTokenComposer() {
+    private MarkdownTokenComposer() {
 
     }
 
@@ -92,8 +93,13 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
     }
 
     @Override
-    public DecoratorFactory decorators() {
-        return DecoratorFactory.any();
+    public String composeLegacyText(String text) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public String composeJson(String json) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
 }

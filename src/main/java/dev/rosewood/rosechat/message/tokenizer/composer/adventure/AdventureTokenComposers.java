@@ -1,6 +1,5 @@
 package dev.rosewood.rosechat.message.tokenizer.composer.adventure;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import net.kyori.adventure.text.Component;
 
@@ -15,15 +14,15 @@ public final class AdventureTokenComposers {
     /**
      * @return a fully decorated token composer, includes all decorator types
      */
-    public TokenComposer<Component> decorated(MessageTokenizer tokenizer) {
-        return new FullyDecoratedAdventureTokenComposer(tokenizer);
+    public TokenComposer<Component> decorated() {
+        return FullyDecoratedAdventureTokenComposer.INSTANCE;
     }
 
     /**
      * @return a token composer that only applies styles, ignores events such as hovers and clicks
      */
-    public TokenComposer<Component> styles(MessageTokenizer tokenizer) {
-        return new StylesOnlyAdventureTokenComposer(tokenizer);
+    public TokenComposer<Component> styles() {
+        return StylesOnlyAdventureTokenComposer.INSTANCE;
     }
 
 }

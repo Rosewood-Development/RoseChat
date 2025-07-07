@@ -12,6 +12,7 @@ import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
+import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -239,7 +240,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                             messageWrapper.setUUID(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
-                                    channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).content();
+                                    channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).buildComponents();
                             components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
                             deletableMessage.setJson(ComponentSerializer.toString(components));
 
@@ -282,7 +283,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         .add("type", message.isClient() ? "client" : "server")
                         .add("channel", message.getChannel())
                         .add("original", message.getOriginal() == null ?
-                                null : TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build());
+                                null : TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build()).buildComponents();
 
         ComponentBuilder builder = new ComponentBuilder();
         builder.append(components, ComponentBuilder.FormatRetention.NONE);
@@ -294,9 +295,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     public static String getColor(Member member) {
         if (member.getColor() != null)
             return Integer.toHexString(member.getColorRaw());
-
-        if (member.getRoles().isEmpty())
-            return "FFFFFF";
 
         for (Role role : member.getRoles()) {
             if (role.getColor() != null)

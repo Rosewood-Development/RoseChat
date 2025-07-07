@@ -1,5 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
+import dev.rosewood.rosechat.message.tokenizer.Token;
+
 public interface TokenDecorator {
 
     /**
@@ -36,6 +38,28 @@ public interface TokenDecorator {
      */
     default boolean blocksTextStitching() {
         return false;
+    }
+
+    /**
+     * @return the content of this Token as a builder if {@link #getType()} is {@code CONTENT}, nullable, will be tokenized
+     */
+    default Token.Builder getContent() {
+        return null;
+    }
+
+    /**
+     * Set the tokenized content of this token if {@link #getType()} is {@code CONTENT}, does nothing otherwise
+     * @param content the tokenized content to set
+     */
+    default void setContentToken(Token content) {
+
+    }
+
+    /**
+     * @return the content token, if set
+     */
+    default Token getContentToken() {
+        return null;
     }
 
 }

@@ -4,14 +4,17 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class TokenDecorators<T extends TokenDecorator> {
 
-    private final Class<T> type;
+    private final Function<TokenDecorator, T> wrapperFunction;
+    private final Class<T> wrappedType;
     protected final List<T> decorators;
 
-    public TokenDecorators(Class<T> type) {
-        this.type = type;
+    public TokenDecorators(Function<TokenDecorator, T> wrapperFunction, Class<T> wrappedType) {
+        this.wrapperFunction = wrapperFunction;
+        this.wrappedType = wrappedType;
         this.decorators = new ArrayList<>();
     }
 
@@ -27,9 +30,15 @@ public abstract class TokenDecorators<T extends TokenDecorator> {
             }
         }
 
-        for (TokenDecorator decorator : toAdd)
-            if (!decorator.isMarker() && this.type.isInstance(decorator))
-                this.decorators.add(this.type.cast(decorator));
+        for (TokenDecorator decorator : toAdd) {
+            if (!decorator.isMarker()) {
+                if (!this.wrappedType.isInstance(decorator)) {
+                    this.decorators.add(this.wrapperFunction.apply(decorator));
+                } else {
+                    this.decorators.add(this.wrappedType.cast(decorator));
+                }
+            }
+        }
     }
 
     public boolean blocksTextStitching() {

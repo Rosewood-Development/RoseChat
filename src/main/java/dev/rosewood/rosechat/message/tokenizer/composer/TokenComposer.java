@@ -1,9 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.adventure.AdventureTokenComposers;
-import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface TokenComposer<T> {
@@ -17,22 +15,35 @@ public interface TokenComposer<T> {
     T compose(Token token);
 
     /**
-     * @return the decorator factory for this context
+     * Composes and passes through raw text as this composed type.
+     *
+     * @param text The raw text to compose
+     * @return The composed text
+     * @throws UnsupportedOperationException if this method is not supported by the composer
      */
-    DecoratorFactory decorators();
+    T composeLegacyText(String text);
+
+    /**
+     * Composes and passes through raw json as this composed type.
+     *
+     * @param json The raw text to compose
+     * @return The composed json
+     * @throws UnsupportedOperationException if this method is not supported by the composer
+     */
+    T composeJson(String json);
 
     /**
      * @return a fully decorated token composer, includes all decorator types
      */
-    static TokenComposer<BaseComponent[]> decorated(MessageTokenizer tokenizer) {
-        return new FullyDecoratedBungeeTokenComposer(tokenizer);
+    static TokenComposer<BaseComponent[]> decorated() {
+        return FullyDecoratedBungeeTokenComposer.INSTANCE;
     }
 
     /**
      * @return a token composer that only applies styles, ignores events such as hovers and clicks
      */
-    static TokenComposer<BaseComponent[]> styles(MessageTokenizer tokenizer) {
-        return new StylesOnlyBungeeTokenComposer(tokenizer);
+    static TokenComposer<BaseComponent[]> styles() {
+        return StylesOnlyBungeeTokenComposer.INSTANCE;
     }
 
     /**
@@ -45,15 +56,29 @@ public interface TokenComposer<T> {
     /**
      * @return a token composer that applies no decoration, only raw text
      */
-    static TokenComposer<String> plain(MessageTokenizer tokenizer) {
-        return new PlainTokenComposer();
+    static TokenComposer<String> plain() {
+        return PlainTokenComposer.INSTANCE;
     }
 
     /**
      * @return a token composer that only applies formatting using markdown
      */
-    static TokenComposer<String> markdown(MessageTokenizer tokenizer) {
-        return new MarkdownTokenComposer();
+    static TokenComposer<String> markdown() {
+        return MarkdownTokenComposer.INSTANCE;
+    }
+
+    /**
+     * @return a token composer that outputs as a legacy formatted string
+     */
+    static TokenComposer<String> legacy() {
+        return LegacyTextComposer.INSTANCE;
+    }
+
+    /**
+     * @return a token composer that outputs as a json string
+     */
+    static TokenComposer<String> json() {
+        return JsonComposer.INSTANCE;
     }
 
 }

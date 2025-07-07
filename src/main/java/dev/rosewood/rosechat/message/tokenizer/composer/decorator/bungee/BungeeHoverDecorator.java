@@ -1,10 +1,8 @@
-package dev.rosewood.rosechat.message.tokenizer.decorator.bungee;
+package dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
-import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -14,40 +12,21 @@ import net.md_5.bungee.api.chat.ItemTag;
 import net.md_5.bungee.api.chat.hover.content.Item;
 import org.bukkit.inventory.ItemStack;
 
-public class BungeeHoverDecorator extends HoverDecorator implements BungeeTokenDecorator {
+public class BungeeHoverDecorator extends BungeeTokenDecorator<HoverDecorator> {
 
-    public BungeeHoverDecorator(List<String> content) {
-        super(content);
-    }
-
-    public BungeeHoverDecorator(String content) {
-        super(List.of(content));
-    }
-
-    public BungeeHoverDecorator(ItemStack itemStack, String nbt) {
-        super(itemStack, nbt);
+    public BungeeHoverDecorator(HoverDecorator decorator) {
+        super(decorator);
     }
 
     @Override
-    public void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent) {
-        switch (this.action) {
+    public void apply(BaseComponent component, Token parent) {
+        switch (this.decorator.action()) {
             case SHOW_TEXT -> {
-                if (this.content == null || this.content.isEmpty())
-                    return;
-
-                // Append all lines together separated by \n and run it all through the tokenizer so colors pass through newlines
-                // I can't believe this works
-                String combinedContent = String.join("\n", this.content);
+                Token token = this.decorator.getContentToken();
+                BaseComponent[] hover = TokenComposer.styles().compose(token);
 
                 ComponentBuilder componentBuilder = new ComponentBuilder();
                 ComponentStyle styleAccumulator = new ComponentStyle();
-
-                Token.Builder builder = Token.group(combinedContent).placeholders(parent.getPlaceholders());
-                parent.getIgnoredTokenizers().forEach(builder::ignoreTokenizer);
-
-                Token token = builder.build();
-                tokenizer.tokenize(token, tokenizer.getLastDecoratorFactory());
-                BaseComponent[] hover = tokenizer.compose(token, TokenComposer.styles(tokenizer));
                 for (BaseComponent hoverComponent : hover) {
                     this.patchAndAccumulateStyles(styleAccumulator, hoverComponent);
                     componentBuilder.append(hoverComponent, ComponentBuilder.FormatRetention.NONE);
@@ -55,7 +34,10 @@ public class BungeeHoverDecorator extends HoverDecorator implements BungeeTokenD
 
                 component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, componentBuilder.create()));
             }
-            case SHOW_ITEM -> component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(this.item.getType().getKey().toString(), this.item.getAmount(), ItemTag.ofNbt(this.content.getFirst()))));
+            case SHOW_ITEM -> {
+                ItemStack item = this.decorator.item();
+                component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().toString(), item.getAmount(), ItemTag.ofNbt(item.getItemMeta().getAsString()))));
+            }
         }
     }
 

@@ -1,11 +1,10 @@
 package dev.rosewood.rosechat.message.parser;
 
-import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
 import dev.rosewood.rosechat.message.wrapper.RoseMessage;
 
-public interface MessageParser<T> {
+public interface MessageParser {
 
     /**
      * Parses the message using the tokenizer.
@@ -14,11 +13,22 @@ public interface MessageParser<T> {
      * @param format The format to parse into.
      * @return A {@link MessageTokenizerResults} containing the parsed message.
      */
-    MessageTokenizerResults<T> parse(RoseMessage message, RosePlayer viewer, String format);
+    MessageTokenizerResults parse(RoseMessage message, RosePlayer viewer, String format);
 
-    /**
-     * @return The direction of the parsed message.
-     */
-    MessageDirection getMessageDirection();
+    static MessageParser roseChat() {
+        return RoseChatParser.INSTANCE;
+    }
+
+    static MessageParser bungeeProxy() {
+        return BungeeProxyParser.INSTANCE;
+    }
+
+    static MessageParser fromDiscord() {
+        return FromDiscordParser.INSTANCE;
+    }
+
+    static MessageParser toDiscord() {
+        return ToDiscordParser.INSTANCE;
+    }
 
 }

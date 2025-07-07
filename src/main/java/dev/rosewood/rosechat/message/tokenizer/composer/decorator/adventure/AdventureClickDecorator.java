@@ -1,18 +1,17 @@
-package dev.rosewood.rosechat.message.tokenizer.decorator.adventure;
+package dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 
-public class AdventureClickDecorator extends ClickDecorator implements AdventureTokenDecorator {
+public class AdventureClickDecorator extends AdventureTokenDecorator<ClickDecorator> {
 
     private final ClickEvent.Action clickEventAction;
 
-    public AdventureClickDecorator(Action action, String value) {
-        super(action, value);
-        this.clickEventAction = switch (this.action) {
+    public AdventureClickDecorator(ClickDecorator decorator) {
+        super(decorator);
+        this.clickEventAction = switch (decorator.action()) {
             case OPEN_URL -> ClickEvent.Action.OPEN_URL;
             case OPEN_FILE -> ClickEvent.Action.OPEN_FILE;
             case RUN_COMMAND -> ClickEvent.Action.RUN_COMMAND;
@@ -23,9 +22,9 @@ public class AdventureClickDecorator extends ClickDecorator implements Adventure
     }
 
     @Override
-    public Component apply(Component component, MessageTokenizer tokenizer, Token parent) {
-        String value = parent.getPlaceholders().apply(this.value);
-        if (this.action == Action.OPEN_URL && !PATTERN.matcher(value).find())
+    public Component apply(Component component, Token parent) {
+        String value = parent.getPlaceholders().apply(this.decorator.value());
+        if (this.decorator.action() == ClickDecorator.Action.OPEN_URL && !ClickDecorator.PATTERN.matcher(value).find())
             value = "https://" + value;
 
         return component.clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(this.clickEventAction, value));

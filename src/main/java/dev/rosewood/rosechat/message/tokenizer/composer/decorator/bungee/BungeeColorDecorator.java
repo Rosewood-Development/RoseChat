@@ -1,0 +1,27 @@
+package dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee;
+
+import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
+import dev.rosewood.rosegarden.utils.HexUtils;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+
+public class BungeeColorDecorator extends BungeeTokenDecorator<ColorDecorator> {
+
+    private HexUtils.ColorGenerator colorGenerator;
+
+    public BungeeColorDecorator(ColorDecorator decorator) {
+        super(decorator);
+    }
+
+    @Override
+    public void apply(BaseComponent component, Token parent) {
+        if (this.colorGenerator == null && this.decorator.colorGeneratorFunction() != null)
+            this.colorGenerator = this.decorator.colorGeneratorFunction().apply(MessageTokenizer.findDecoratorContentLength(parent, this));
+
+        if (this.colorGenerator != null && (!(component instanceof TextComponent textComponent) || !textComponent.getText().isBlank()))
+            component.setColor(this.colorGenerator.nextChatColor());
+    }
+
+}

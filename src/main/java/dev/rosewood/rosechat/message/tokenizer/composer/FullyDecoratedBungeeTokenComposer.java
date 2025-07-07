@@ -1,20 +1,19 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
-import dev.rosewood.rosechat.message.tokenizer.composer.decorator.BungeeTokenDecorators;
-import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorFactory;
+import dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee.BungeeTokenDecorators;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComponent[]> {
 
-    private final MessageTokenizer tokenizer;
+    public static final FullyDecoratedBungeeTokenComposer INSTANCE = new FullyDecoratedBungeeTokenComposer();
 
-    protected FullyDecoratedBungeeTokenComposer(MessageTokenizer tokenizer) {
-        this.tokenizer = tokenizer;
+    protected FullyDecoratedBungeeTokenComposer() {
+
     }
 
     @Override
@@ -54,7 +53,7 @@ public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComp
         TextComponent wrapperComponent = new TextComponent(components);
         BungeeTokenDecorators wrapperDecorators = this.createDecorators();
         wrapperDecorators.add(token.getDecorators());
-        wrapperDecorators.apply(wrapperComponent, this.tokenizer, token);
+        wrapperDecorators.apply(wrapperComponent, token);
         return new BaseComponent[]{wrapperComponent};
     }
 
@@ -73,17 +72,22 @@ public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComp
         if (contextDecorators.blocksTextStitching()) {
             for (char c : content.toCharArray()) {
                 componentBuilder.append(String.valueOf(c), ComponentBuilder.FormatRetention.NONE);
-                contextDecorators.apply(componentBuilder.getCurrentComponent(), this.tokenizer, token);
+                contextDecorators.apply(componentBuilder.getCurrentComponent(), token);
             }
         } else {
             componentBuilder.append(content, ComponentBuilder.FormatRetention.NONE);
-            contextDecorators.apply(componentBuilder.getCurrentComponent(), this.tokenizer, token);
+            contextDecorators.apply(componentBuilder.getCurrentComponent(), token);
         }
     }
 
     @Override
-    public DecoratorFactory decorators() {
-        return DecoratorFactory.bungee();
+    public BaseComponent[] composeLegacyText(String text) {
+        return TextComponent.fromLegacyText(text);
+    }
+
+    @Override
+    public BaseComponent[] composeJson(String json) {
+        return ComponentSerializer.parse(json);
     }
 
 }

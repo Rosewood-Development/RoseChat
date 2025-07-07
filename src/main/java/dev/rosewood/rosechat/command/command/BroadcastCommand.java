@@ -50,7 +50,7 @@ public class BroadcastCommand extends RoseChatCommand {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 RosePlayer viewer = new RosePlayer(player);
 
-                BaseComponent[] components = RoseChatAPI.getInstance().parse(sender, viewer, message,
+                MessageTokenizerResults components = RoseChatAPI.getInstance().parse(sender, viewer, message,
                         DefaultPlaceholders.getFor(sender, viewer).build());
                 viewer.send(components);
             }

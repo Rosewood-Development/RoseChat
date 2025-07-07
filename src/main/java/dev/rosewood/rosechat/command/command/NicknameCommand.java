@@ -8,8 +8,9 @@ import dev.rosewood.rosechat.manager.DataManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.RoseChatBungeeParser;
+import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
+import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.wrapper.MessageRules;
 import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
@@ -137,10 +138,10 @@ public class NicknameCommand extends RoseChatCommand {
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             if (!Settings.ALLOW_DUPLICATE_NAMES.get()) {
                 RoseMessage message = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
-                MessageTokenizerResults<BaseComponent[]> components = message.parse(target, nickname);
+                MessageTokenizerResults components = message.parse(target, nickname);
 
-                String displayName = TextComponent.toLegacyText(components.content());
-                if (RoseChat.getInstance().getManager(DataManager.class).containsNickname(target.getUUID(), ChatColor.stripColor(HexUtils.colorify(displayName).toLowerCase()))) {
+                String displayName = components.build(TokenComposer.plain()).toLowerCase();
+                if (RoseChat.getInstance().getManager(DataManager.class).containsNickname(target.getUUID(), displayName)) {
                     player.sendLocaleMessage("command-nickname-taken");
                     return;
                 }
@@ -197,8 +198,7 @@ public class NicknameCommand extends RoseChatCommand {
         }
 
         // Parse the nickname to make sure the player isn't missing any permissions.
-        MessageTokenizerResults<BaseComponent[]> results = new RoseChatBungeeParser().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER);
-        MessageOutputs outputs = results.outputs();
+        MessageOutputs outputs = MessageParser.roseChat().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER).outputs();
         if (!outputs.getMissingPermissions().isEmpty()) {
             player.sendLocaleMessage("no-permission");
             return false;

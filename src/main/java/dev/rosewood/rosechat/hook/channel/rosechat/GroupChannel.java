@@ -77,7 +77,7 @@ public class GroupChannel extends Channel {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() ->
-                    member.send(message.parse(member, format).content()));
+                    member.send(message.parse(member, format)));
         }
 
         // Send the message to the spies.
@@ -92,7 +92,7 @@ public class GroupChannel extends Channel {
 
             RosePlayer rosePlayer = new RosePlayer(player);
             RoseChat.MESSAGE_THREAD_POOL.execute(() ->
-                    rosePlayer.send(message.parse(rosePlayer, Settings.GROUP_SPY_FORMAT.get()).content()));
+                    rosePlayer.send(message.parse(rosePlayer, Settings.GROUP_SPY_FORMAT.get())));
         }
     }
 

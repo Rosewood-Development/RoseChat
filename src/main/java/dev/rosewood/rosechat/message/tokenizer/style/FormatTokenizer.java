@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import java.util.regex.Matcher;
 import net.md_5.bungee.api.ChatColor;
 
@@ -36,7 +37,7 @@ public class FormatTokenizer extends Tokenizer {
         boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
         if (formatCode == ChatColor.RESET) {
             if (!enableFormat) // Full format reset
-                return new TokenizerResult(Token.decorator(params.decorators().format(formatCode, false)), content.length());
+                return new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, false)), content.length());
 
             // Reset reapplies the player's chat color
             PlayerData playerData = params.getSender().getPlayerData();
@@ -44,7 +45,7 @@ public class FormatTokenizer extends Tokenizer {
             return new TokenizerResult(Token.group("&R" + chatColor).build(), content.length());
         }
 
-        return new TokenizerResult(Token.decorator(params.decorators().format(formatCode, enableFormat)), content.length());
+        return new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, enableFormat)), content.length());
     }
 
     public String getPermissionForFormat(char format) {
