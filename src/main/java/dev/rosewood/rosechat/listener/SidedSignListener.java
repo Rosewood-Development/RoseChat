@@ -214,6 +214,8 @@ public class SidedSignListener implements Listener {
                 continue;
 
             if (NMSUtil.isPaper()) {
+                // TODO: Not sure if I can put this into the MessageTokenizerResults like sendMessage and setDisplayName are
+                // Would it cause classloader issues on versions where SidedSign doesn't exist?
                 side.line(i, Component.textOfChildren(components.build(TokenComposer.adventure().decorated())).colorIfAbsent(TextColor.fromHexString(hexColor)));
             } else {
                 ComponentBuilder builder = new ComponentBuilder();

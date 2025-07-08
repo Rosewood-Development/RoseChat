@@ -27,7 +27,7 @@ public class MessageTokenizerResults {
         return (T) this.builtComponentsCache.computeIfAbsent(composer, x -> x.compose(this.token));
     }
 
-    public BaseComponent[] buildComponents() {
+    public BaseComponent[] buildComponents() { // Anything using this directly should probably be using something else instead to be more platform-independent
         return this.build(TokenComposer.decorated());
     }
 

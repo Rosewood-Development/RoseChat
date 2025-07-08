@@ -17,7 +17,11 @@ public interface TokenDecorator {
      * @return true if this decorator is overwritten by the given decorator
      */
     default boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return this.getClass() == newDecorator.getClass();
+        return this.getRoot().getClass() == newDecorator.getRoot().getClass();
+    }
+
+    default TokenDecorator getRoot() {
+        return this;
     }
 
     /**

@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ShadowColorDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import net.md_5.bungee.api.chat.BaseComponent;
 
@@ -23,6 +24,11 @@ public abstract class BungeeTokenDecorator<T extends TokenDecorator> implements 
         return this.decorator.getType();
     }
 
+    @Override
+    public TokenDecorator getRoot() {
+        return this.decorator;
+    }
+
     /**
      * Applies this decorator to the given component.
      *
@@ -36,6 +42,7 @@ public abstract class BungeeTokenDecorator<T extends TokenDecorator> implements 
         return (BungeeTokenDecorator<T>) switch (decorator) {
             case ClickDecorator clickDecorator -> new BungeeClickDecorator(clickDecorator);
             case ColorDecorator colorDecorator -> new BungeeColorDecorator(colorDecorator);
+            case ShadowColorDecorator shadowColorDecorator -> new BungeeShadowColorDecorator(shadowColorDecorator);
             case FontDecorator fontDecorator -> new BungeeFontDecorator(fontDecorator);
             case FormatDecorator formatDecorator -> new BungeeFormatDecorator(formatDecorator);
             case HoverDecorator hoverDecorator -> new BungeeHoverDecorator(hoverDecorator);

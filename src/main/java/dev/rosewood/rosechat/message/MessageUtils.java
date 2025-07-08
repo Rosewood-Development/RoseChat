@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.api.event.player.PlayerReceiveMessageEvent;
 import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
@@ -38,6 +39,7 @@ import org.bukkit.metadata.MetadataValue;
 @SuppressWarnings("deprecation")
 public class MessageUtils {
 
+    public static final char SHADOW_PREFIX = '$';
     public static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s)?://)?[-a-zA-Z0-9@:%_+~#=]{2,32}(?<!\\.)\\.(?!\\.)[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+~#?&/=]*(?<!\\.)\\.?(?!\\.))*");
     public static final Pattern VALID_LEGACY_REGEX = Pattern.compile("&[0-9a-fA-F]");
@@ -446,30 +448,35 @@ public class MessageUtils {
      * @return True if the message can be colored.
      */
     public static boolean canColor(RosePlayer sender, String str, PermissionArea area) {
-        Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
-        Matcher hexMatcher = HEX_REGEX.matcher(str);
-        Matcher gradientMatcher = GRADIENT_PATTERN.matcher(str);
-        Matcher rainbowMatcher = RAINBOW_PATTERN.matcher(str);
+        RoseMessage message = RoseMessage.forLocation(sender, area);
+        message.setPlayerInput(str);
+        MessageTokenizerResults components = MessageParser.roseChat().parse(message, sender, "{message}");
+        return components.outputs().getMissingPermissions().isEmpty();
 
-        String location = area.toString().toLowerCase();
-        boolean hasColor = colorMatcher.find();
-        boolean usePerColorPerms = Settings.USE_PER_COLOR_PERMISSIONS.get();
-        boolean hasLocationPermission = sender.hasPermission("rosechat.color." + location);
-        boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." +
-                ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
-        boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
-        boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + location);
-        boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + location);
-        boolean canGradient = !gradientMatcher.find() || sender.hasPermission("rosechat.gradient." + location);
-        boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + location);
-
-        boolean canBold = !str.contains("&l") || sender.hasPermission("rosechat.bold." + location);
-        boolean canUnderline = !str.contains("&n") || sender.hasPermission("rosechat.underline." + location);
-        boolean canStrikethrough = !str.contains("&m") || sender.hasPermission("rosechat.strikethrough." + location);
-        boolean canItalic = !str.contains("&o") || sender.hasPermission("rosechat.italic." + location);
-        boolean canFormat = canBold && canUnderline && canStrikethrough && canItalic;
-
-        return canColor && canMagic && canFormat && canHex && canGradient && canRainbow;
+//        Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
+//        Matcher hexMatcher = HEX_REGEX.matcher(str);
+//        Matcher gradientMatcher = GRADIENT_PATTERN.matcher(str);
+//        Matcher rainbowMatcher = RAINBOW_PATTERN.matcher(str);
+//
+//        String location = area.toString().toLowerCase();
+//        boolean hasColor = colorMatcher.find();
+//        boolean usePerColorPerms = Settings.USE_PER_COLOR_PERMISSIONS.get();
+//        boolean hasLocationPermission = sender.hasPermission("rosechat.color." + location);
+//        boolean hasColorPermission = hasColor && sender.hasPermission("rosechat." +
+//                ChatColor.getByChar(Character.toLowerCase(colorMatcher.group().charAt(1))).getName().toLowerCase() + "." + location);
+//        boolean canColor = !hasColor || (usePerColorPerms ? hasColorPermission && hasLocationPermission : hasLocationPermission);
+//        boolean canMagic = !str.contains("&k") || sender.hasPermission("rosechat.magic." + location);
+//        boolean canHex = !hexMatcher.find() || sender.hasPermission("rosechat.hex." + location);
+//        boolean canGradient = !gradientMatcher.find() || sender.hasPermission("rosechat.gradient." + location);
+//        boolean canRainbow = !rainbowMatcher.find() || sender.hasPermission("rosechat.rainbow." + location);
+//
+//        boolean canBold = !str.contains("&l") || sender.hasPermission("rosechat.bold." + location);
+//        boolean canUnderline = !str.contains("&n") || sender.hasPermission("rosechat.underline." + location);
+//        boolean canStrikethrough = !str.contains("&m") || sender.hasPermission("rosechat.strikethrough." + location);
+//        boolean canItalic = !str.contains("&o") || sender.hasPermission("rosechat.italic." + location);
+//        boolean canFormat = canBold && canUnderline && canStrikethrough && canItalic;
+//
+//        return canColor && canMagic && canFormat && canHex && canGradient && canRainbow;
     }
 
     public static BaseComponent[] appendDeleteButton(RosePlayer sender, PlayerData playerData, String messageId, String messageJson) {

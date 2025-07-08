@@ -1,17 +1,20 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
 import dev.rosewood.rosegarden.utils.HexUtils;
+import dev.rosewood.rosegarden.utils.NMSUtil;
 import java.awt.Color;
 import java.util.function.Function;
 import net.md_5.bungee.api.ChatColor;
 
-public record ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction, boolean solid) implements TokenDecorator {
+public record ShadowColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction, boolean solid) implements TokenDecorator {
 
-    public ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
+    private static final boolean VALID_VERSION = NMSUtil.getVersionNumber() > 21 || (NMSUtil.getVersionNumber() == 21 && NMSUtil.getMinorVersionNumber() >= 5);
+
+    public ShadowColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
         this(colorGeneratorFunction, false);
     }
 
-    public ColorDecorator(ChatColor chatColor) {
+    public ShadowColorDecorator(ChatColor chatColor) {
         this(x -> new SolidColorGenerator(chatColor), true);
     }
 
@@ -22,10 +25,15 @@ public record ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGen
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (newDecorator.getRoot() instanceof FormatDecorator formatDecorator)
+        if (newDecorator instanceof FormatDecorator formatDecorator)
             return formatDecorator.formatType() == FormatDecorator.FormatType.RESET;
 
         return TokenDecorator.super.isOverwrittenBy(newDecorator);
+    }
+
+    @Override
+    public boolean isMarker() {
+        return !VALID_VERSION;
     }
 
     @Override

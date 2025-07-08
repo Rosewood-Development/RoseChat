@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ShadowColorDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import net.kyori.adventure.text.Component;
 
@@ -23,6 +24,11 @@ public abstract class AdventureTokenDecorator<T extends TokenDecorator> implemen
         return this.decorator.getType();
     }
 
+    @Override
+    public TokenDecorator getRoot() {
+        return this.decorator;
+    }
+
     /**
      * Applies and returns a new component with the decorator applied.
      *
@@ -37,6 +43,7 @@ public abstract class AdventureTokenDecorator<T extends TokenDecorator> implemen
         return (AdventureTokenDecorator<T>) switch (decorator) {
             case ClickDecorator clickDecorator -> new AdventureClickDecorator(clickDecorator);
             case ColorDecorator colorDecorator -> new AdventureColorDecorator(colorDecorator);
+            case ShadowColorDecorator shadowColorDecorator -> new AdventureShadowColorDecorator(shadowColorDecorator);
             case FontDecorator fontDecorator -> new AdventureFontDecorator(fontDecorator);
             case FormatDecorator formatDecorator -> new AdventureFormatDecorator(formatDecorator);
             case HoverDecorator hoverDecorator -> new AdventureHoverDecorator(hoverDecorator);

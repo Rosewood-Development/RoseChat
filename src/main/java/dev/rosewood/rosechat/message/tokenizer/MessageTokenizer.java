@@ -201,7 +201,7 @@ public class MessageTokenizer {
     }
 
     public static int findDecoratorContentLength(Token source, TokenDecorator decorator) {
-        return findDecoratorContentLength(source.getHighestParent(), decorator, new AtomicBoolean());
+        return findDecoratorContentLength(source.getHighestParent(), decorator.getRoot(), new AtomicBoolean());
     }
 
     private static int findDecoratorContentLength(Token token, TokenDecorator decorator, AtomicBoolean counting) {

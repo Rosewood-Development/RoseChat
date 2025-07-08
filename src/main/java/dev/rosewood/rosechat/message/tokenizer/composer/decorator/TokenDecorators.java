@@ -31,11 +31,11 @@ public abstract class TokenDecorators<T extends TokenDecorator> {
         }
 
         for (TokenDecorator decorator : toAdd) {
-            if (!decorator.isMarker()) {
-                if (!this.wrappedType.isInstance(decorator)) {
-                    this.decorators.add(this.wrapperFunction.apply(decorator));
-                } else {
+            if (!decorator.getRoot().isMarker()) {
+                if (this.wrappedType.isInstance(decorator)) {
                     this.decorators.add(this.wrappedType.cast(decorator));
+                } else {
+                    this.decorators.add(this.wrapperFunction.apply(decorator));
                 }
             }
         }
@@ -43,7 +43,7 @@ public abstract class TokenDecorators<T extends TokenDecorator> {
 
     public boolean blocksTextStitching() {
         for (TokenDecorator decorator : this.decorators)
-            if (decorator.blocksTextStitching())
+            if (decorator.getRoot().blocksTextStitching())
                 return true;
 
         return false;

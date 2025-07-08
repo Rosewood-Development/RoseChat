@@ -15,17 +15,17 @@ public record FormatDecorator(FormatType formatType, boolean value) implements T
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (newDecorator instanceof FormatDecorator otherFormat) {
-            if (otherFormat.formatType == FormatType.RESET)
+        if (newDecorator.getRoot() instanceof FormatDecorator(FormatType type, boolean value)) {
+            if (type == FormatType.RESET)
                 return true;
 
-            if (otherFormat.formatType == this.formatType) {
-                return !otherFormat.value && this.value;
+            if (type == this.formatType) {
+                return !value && this.value;
             } else {
                 return false;
             }
         }
-        return newDecorator instanceof ColorDecorator;
+        return newDecorator.getRoot() instanceof ColorDecorator;
     }
 
     @Override
