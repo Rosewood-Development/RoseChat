@@ -88,4 +88,8 @@ public abstract class Tokenizer {
         }
     }
 
+    public Tokenizers.TokenizerBundle asBundle() {
+        return new Tokenizers.TokenizerBundle(this.name, this);
+    }
+
 }

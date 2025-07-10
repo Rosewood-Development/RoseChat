@@ -144,6 +144,8 @@ public class MessageTokenizer {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         List<Tokenizer> tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
+        if (!tokenizers.contains(Tokenizers.CHARACTER))
+            tokenizers.addLast(Tokenizers.CHARACTER);
         MessageOutputs outputs = new MessageOutputs();
         MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, direction, outputs, tokenizers);
 
