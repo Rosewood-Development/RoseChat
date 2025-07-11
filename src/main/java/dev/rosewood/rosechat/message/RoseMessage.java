@@ -1,12 +1,10 @@
-package dev.rosewood.rosechat.message.wrapper;
+package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.DebugManager;
-import dev.rosewood.rosechat.message.DeletableMessage;
-import dev.rosewood.rosechat.message.PermissionArea;
-import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.parser.MessageParser;
+import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
 
@@ -58,9 +56,9 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The discord id of the message, or null if not sent from discord.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    private MessageTokenizerResults parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
+    private MessageContents parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
         this.discordId = discordId;
 
         DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
@@ -77,9 +75,9 @@ public class RoseMessage {
      * This allows for the message to gain hover and click events, along with emojis and other features.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults parse(RosePlayer viewer, String format) {
+    public MessageContents parse(RosePlayer viewer, String format) {
         return this.parse(MessageParser.roseChat(), viewer, format, null);
     }
 
@@ -90,9 +88,9 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The id of the discord message. Used for deleting discord messages.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
+    public MessageContents parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
         return this.parse(MessageParser.fromDiscord(), viewer, format, discordId);
     }
 
@@ -102,9 +100,9 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for discord messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults parseMessageToDiscord(RosePlayer viewer, String format) {
+    public MessageContents parseMessageToDiscord(RosePlayer viewer, String format) {
         return this.parse(MessageParser.toDiscord(), viewer, format, null);
     }
 
@@ -114,9 +112,9 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for bungee messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults parseBungeeMessage(RosePlayer viewer, String format) {
+    public MessageContents parseBungeeMessage(RosePlayer viewer, String format) {
         return this.parse(MessageParser.bungeeProxy(), viewer, format, null);
     }
 

@@ -1,16 +1,17 @@
-package dev.rosewood.rosechat.message.tokenizer.composer.adventure;
+package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure.AdventureTokenDecorators;
 import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.BaseComponent;
 
-public class StylesOnlyAdventureTokenComposer extends FullyDecoratedAdventureTokenComposer {
+public class StylesOnlyAdventureChatComposer extends FullyDecoratedAdventureChatComposer {
 
-    public static final StylesOnlyAdventureTokenComposer INSTANCE = new StylesOnlyAdventureTokenComposer();
+    public static final StylesOnlyAdventureChatComposer INSTANCE = new StylesOnlyAdventureChatComposer();
 
-    private StylesOnlyAdventureTokenComposer() {
+    private StylesOnlyAdventureChatComposer() {
 
     }
 
@@ -25,13 +26,46 @@ public class StylesOnlyAdventureTokenComposer extends FullyDecoratedAdventureTok
     }
 
     @Override
-    public Component composeLegacyText(String text) {
+    public Component composeLegacy(String text) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public Component composeJson(String json) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
+     * Not implemented.
+     * @throws UnsupportedOperationException always
+     */
+    @Override
+    public Component composeBungee(BaseComponent[] components) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public ChatComposer.Adventure<Component> composeAdventure() {
+        return Adventure.INSTANCE;
+    }
+
+    public static final class Adventure implements ChatComposer.Adventure<Component> {
+
+        private static final Adventure INSTANCE = new Adventure();
+
+        private Adventure() {
+
+        }
+
+        /**
+         * Not implemented.
+         * @throws UnsupportedOperationException always
+         */
+        @Override
+        public Component compose(Component component) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
     }
 
     private static class StyledTokenDecorators extends AdventureTokenDecorators {

@@ -2,7 +2,7 @@ package dev.rosewood.rosechat.api.event.message;
 
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 
 public class PreParseMessageEvent extends MessageEvent {
 

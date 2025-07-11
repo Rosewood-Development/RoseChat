@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.chat.channel;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 import java.util.UUID;
 
 public record ChannelMessageOptions(RosePlayer sender, String message, String format,

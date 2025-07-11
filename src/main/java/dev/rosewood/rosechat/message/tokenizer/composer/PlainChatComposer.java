@@ -11,11 +11,11 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class PlainTokenComposer implements TokenComposer<String> {
+public class PlainChatComposer implements ChatComposer<String> {
 
-    public static final PlainTokenComposer INSTANCE = new PlainTokenComposer();
+    public static final PlainChatComposer INSTANCE = new PlainChatComposer();
 
-    private PlainTokenComposer() {
+    private PlainChatComposer() {
 
     }
 
@@ -39,7 +39,7 @@ public class PlainTokenComposer implements TokenComposer<String> {
     }
 
     @Override
-    public String composeLegacyText(String text) {
+    public String composeLegacy(String text) {
         return ChatColor.stripColor(text);
     }
 
@@ -52,6 +52,31 @@ public class PlainTokenComposer implements TokenComposer<String> {
             BaseComponent[] components = ComponentSerializer.parse(json);
             return ChatColor.stripColor(TextComponent.toLegacyText(components));
         }
+    }
+
+    @Override
+    public String composeBungee(BaseComponent[] components) {
+        return TextComponent.toPlainText(components);
+    }
+
+    @Override
+    public ChatComposer.Adventure<String> composeAdventure() {
+        return Adventure.INSTANCE;
+    }
+
+    public static final class Adventure implements ChatComposer.Adventure<String> {
+
+        private static final Adventure INSTANCE = new Adventure();
+
+        private Adventure() {
+
+        }
+
+        @Override
+        public String compose(Component component) {
+            return PlainTextComponentSerializer.plainText().serialize(component);
+        }
+
     }
 
 }

@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.message.wrapper;
+package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.api.event.message.MessageBlockedEvent;
@@ -6,9 +6,6 @@ import dev.rosewood.rosechat.api.event.message.MessageFilteredEvent;
 import dev.rosewood.rosechat.chat.FilterWarning;
 import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.message.MessageUtils;
-import dev.rosewood.rosechat.message.PermissionArea;
-import dev.rosewood.rosechat.message.RosePlayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

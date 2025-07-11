@@ -1,8 +1,8 @@
 package dev.rosewood.rosechat.message.parser;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 
 public interface MessageParser {
 
@@ -11,9 +11,9 @@ public interface MessageParser {
      * @param message The {@link RoseMessage} to be parsed.
      * @param viewer The {@link RosePlayer} who is viewing the message.
      * @param format The format to parse into.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    MessageTokenizerResults parse(RoseMessage message, RosePlayer viewer, String format);
+    MessageContents parse(RoseMessage message, RosePlayer viewer, String format);
 
     static MessageParser roseChat() {
         return RoseChatParser.INSTANCE;

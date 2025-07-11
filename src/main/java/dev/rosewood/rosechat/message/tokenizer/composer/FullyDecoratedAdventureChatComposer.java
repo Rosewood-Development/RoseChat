@@ -1,18 +1,19 @@
-package dev.rosewood.rosechat.message.tokenizer.composer.adventure;
+package dev.rosewood.rosechat.message.tokenizer.composer;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
 import dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure.AdventureTokenDecorators;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
 
-public class FullyDecoratedAdventureTokenComposer implements TokenComposer<Component> {
+public class FullyDecoratedAdventureChatComposer implements ChatComposer<Component> {
 
-    public static final FullyDecoratedAdventureTokenComposer INSTANCE = new FullyDecoratedAdventureTokenComposer();
+    public static final FullyDecoratedAdventureChatComposer INSTANCE = new FullyDecoratedAdventureChatComposer();
 
-    protected FullyDecoratedAdventureTokenComposer() {
+    protected FullyDecoratedAdventureChatComposer() {
 
     }
 
@@ -77,13 +78,38 @@ public class FullyDecoratedAdventureTokenComposer implements TokenComposer<Compo
     }
 
     @Override
-    public Component composeLegacyText(String text) {
+    public Component composeLegacy(String text) {
         return LegacyComponentSerializer.legacySection().deserialize(text);
     }
 
     @Override
     public Component composeJson(String json) {
         return GsonComponentSerializer.gson().deserialize(json);
+    }
+
+    @Override
+    public Component composeBungee(BaseComponent[] components) {
+        return BungeeComponentSerializer.get().deserialize(components);
+    }
+
+    @Override
+    public ChatComposer.Adventure<Component> composeAdventure() {
+        return Adventure.INSTANCE;
+    }
+
+    public static final class Adventure implements ChatComposer.Adventure<Component> {
+
+        private static final Adventure INSTANCE = new Adventure();
+
+        private Adventure() {
+
+        }
+
+        @Override
+        public Component compose(Component component) {
+            return component;
+        }
+
     }
 
 }

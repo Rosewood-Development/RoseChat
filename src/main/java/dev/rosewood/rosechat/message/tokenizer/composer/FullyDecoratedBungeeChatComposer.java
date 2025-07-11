@@ -3,16 +3,18 @@ package dev.rosewood.rosechat.message.tokenizer.composer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
 import dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee.BungeeTokenDecorators;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComponent[]> {
+public class FullyDecoratedBungeeChatComposer implements ChatComposer<BaseComponent[]> {
 
-    public static final FullyDecoratedBungeeTokenComposer INSTANCE = new FullyDecoratedBungeeTokenComposer();
+    public static final FullyDecoratedBungeeChatComposer INSTANCE = new FullyDecoratedBungeeChatComposer();
 
-    protected FullyDecoratedBungeeTokenComposer() {
+    protected FullyDecoratedBungeeChatComposer() {
 
     }
 
@@ -81,13 +83,38 @@ public class FullyDecoratedBungeeTokenComposer implements TokenComposer<BaseComp
     }
 
     @Override
-    public BaseComponent[] composeLegacyText(String text) {
+    public BaseComponent[] composeLegacy(String text) {
         return TextComponent.fromLegacyText(text);
     }
 
     @Override
     public BaseComponent[] composeJson(String json) {
         return ComponentSerializer.parse(json);
+    }
+
+    @Override
+    public BaseComponent[] composeBungee(BaseComponent[] components) {
+        return components;
+    }
+
+    @Override
+    public ChatComposer.Adventure<BaseComponent[]> composeAdventure() {
+        return Adventure.INSTANCE;
+    }
+
+    public static final class Adventure implements ChatComposer.Adventure<BaseComponent[]> {
+
+        private static final Adventure INSTANCE = new Adventure();
+
+        private Adventure() {
+
+        }
+
+        @Override
+        public BaseComponent[] compose(Component component) {
+            return BungeeComponentSerializer.get().serialize(component);
+        }
+
     }
 
 }

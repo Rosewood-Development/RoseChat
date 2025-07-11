@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -23,7 +23,7 @@ public class BungeeHoverDecorator extends BungeeTokenDecorator<HoverDecorator> {
         switch (this.decorator.action()) {
             case SHOW_TEXT -> {
                 Token token = this.decorator.getContentToken();
-                BaseComponent[] hover = TokenComposer.styles().compose(token);
+                BaseComponent[] hover = ChatComposer.styles().compose(token);
 
                 ComponentBuilder componentBuilder = new ComponentBuilder();
                 ComponentStyle styleAccumulator = new ComponentStyle();

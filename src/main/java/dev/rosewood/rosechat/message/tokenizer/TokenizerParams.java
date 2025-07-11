@@ -4,7 +4,7 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Set;
 

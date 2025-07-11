@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.api.event.player;
 
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 
 public class PlayerSendMessageEvent extends PlayerMessageEvent {
 

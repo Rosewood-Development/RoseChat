@@ -13,14 +13,13 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -214,7 +213,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(ChatComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 
@@ -252,7 +251,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(ChatComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 
@@ -323,7 +322,7 @@ public class FilterTokenizer extends Tokenizer {
         replacement = this.applySignFix(params, filter, replacement);
 
         if (filter.matchLength()) {
-            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(TokenComposer.plain());
+            String colorless = RoseChatAPI.getInstance().parse(params.getSender(), params.getReceiver(), content).build(ChatComposer.plain());
             replacement = this.matchContentLength(replacement, colorless.length());
         }
 

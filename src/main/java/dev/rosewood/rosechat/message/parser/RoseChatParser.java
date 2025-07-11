@@ -5,8 +5,8 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 
 public class RoseChatParser implements MessageParser {
 
@@ -17,7 +17,7 @@ public class RoseChatParser implements MessageParser {
     }
 
     @Override
-    public MessageTokenizerResults parse(RoseMessage message, RosePlayer viewer, String format) {
+    public MessageContents parse(RoseMessage message, RosePlayer viewer, String format) {
         if (Settings.USE_MARKDOWN_FORMATTING.get()) {
             return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.PLAYER_TO_SERVER,
                     Tokenizers.DISCORD_EMOJI_BUNDLE,

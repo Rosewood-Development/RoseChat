@@ -1,28 +1,19 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.HashMap;
 import java.util.Map;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -170,36 +161,17 @@ public class SignListener implements Listener {
     }
 
     private void updateSign(Player player, Sign sign, String[] lines) {
-        DyeColor signColor = sign.getColor();
-        if (signColor == null)
-            return;
-
-        Color color = signColor.getColor();
-        String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() / (sign.getLightLevel() * 0.1)),
-                (int) (color.getGreen() / (sign.getLightLevel() * 0.1)), (int) (color.getBlue() / (sign.getLightLevel() * 0.1)));
-
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.isEmpty())
                 continue;
 
-            MessageTokenizerResults components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
-            String plainLine = components.build(TokenComposer.plain());
+            MessageContents components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
+            String plainLine = components.build(ChatComposer.plain());
             if (plainLine.isBlank())
                 continue;
 
-            if (NMSUtil.isPaper()) {
-                sign.line(i, Component.textOfChildren(components.build(TokenComposer.adventure().decorated())).colorIfAbsent(TextColor.fromHexString(hexColor)));
-            } else {
-                ComponentBuilder builder = new ComponentBuilder();
-                for (BaseComponent component : components.buildComponents()) {
-                    builder.append(component);
-                    if (component.getColorRaw() == null)
-                        builder.color(ChatColor.of(hexColor));
-                }
-
-                sign.setLine(i, TextComponent.toLegacyText(builder.create()));
-            }
+            components.setSignText(sign, i);
         }
 
         sign.update();
@@ -229,7 +201,7 @@ public class SignListener implements Listener {
         return true;
     }
 
-    private MessageTokenizerResults parseLine(RosePlayer player, String text, PermissionArea area) {
+    private MessageContents parseLine(RosePlayer player, String text, PermissionArea area) {
         RoseMessage message = RoseMessage.forLocation(player, area);
         message.setPlayerInput(text);
         message.setUsePlayerChatColor(false);

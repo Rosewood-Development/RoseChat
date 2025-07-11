@@ -11,8 +11,8 @@ import dev.rosewood.rosechat.manager.DiscordEmojiManager;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosechat.placeholder.DiscordEmbedPlaceholder;
@@ -66,7 +66,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         if (embedPlaceholder != null) {
             this.sendMessageEmbed(roseMessage, textChannel, embedPlaceholder, placeholders);
         } else {
-            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), group.getSettings().getFormats().get("minecraft-to-discord")).build(TokenComposer.markdown());
+            String text = roseMessage.parseMessageToDiscord(roseMessage.getSender(), group.getSettings().getFormats().get("minecraft-to-discord")).build(ChatComposer.markdown());
             if (text == null)
                 return;
 
@@ -96,7 +96,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 null;
 
         if (title != null)
-            title = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).build(TokenComposer.markdown());
+            title = roseMessage.parseMessageToDiscord(roseMessage.getSender(), title).build(ChatComposer.markdown());
 
         // Description
         placeholderCondition = embedPlaceholder.get("description");
@@ -105,7 +105,7 @@ public class DiscordSRVProvider implements DiscordChatProvider {
                 null;
 
         if (description != null)
-            description = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).build(TokenComposer.markdown());
+            description = roseMessage.parseMessageToDiscord(roseMessage.getSender(), description).build(ChatComposer.markdown());
 
         PostParseDiscordMessageEvent postParseDiscordMessageEvent = new PostParseDiscordMessageEvent(roseMessage, channel,
                 title != null && title.contains("{message}") ? title : description);

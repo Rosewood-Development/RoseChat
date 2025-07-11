@@ -9,10 +9,14 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
-public class MarkdownTokenComposer implements TokenComposer<String> {
+public class MarkdownChatComposer implements ChatComposer<String> {
 
-    public static final MarkdownTokenComposer INSTANCE = new MarkdownTokenComposer();
+    public static final MarkdownChatComposer INSTANCE = new MarkdownChatComposer();
 
     private static final Map<FormatDecorator.FormatType, String> FORMAT_TO_MARKDOWN = new HashMap<>() {{
         this.put(FormatDecorator.FormatType.BOLD, "**");
@@ -21,7 +25,7 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         this.put(FormatDecorator.FormatType.STRIKETHROUGH, "~~");
     }};
 
-    private MarkdownTokenComposer() {
+    private MarkdownChatComposer() {
 
     }
 
@@ -92,14 +96,55 @@ public class MarkdownTokenComposer implements TokenComposer<String> {
         return format.toString();
     }
 
+    /**
+     * Not implemented.
+     * @throws UnsupportedOperationException always
+     */
     @Override
-    public String composeLegacyText(String text) {
+    public String composeLegacy(String text) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
+     * Not implemented.
+     * @throws UnsupportedOperationException always
+     */
+    @Override
+    public String composeJson(String json) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
+     * Not implemented.
+     * @throws UnsupportedOperationException always
+     */
+    @Override
+    public String composeBungee(BaseComponent[] components) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public String composeJson(String json) {
-        throw new UnsupportedOperationException("Not implemented");
+    public ChatComposer.Adventure<String> composeAdventure() {
+        return Adventure.INSTANCE;
+    }
+
+    public static final class Adventure implements ChatComposer.Adventure<String> {
+
+        private static final Adventure INSTANCE = new Adventure();
+
+        private Adventure() {
+
+        }
+
+        /**
+         * Not implemented.
+         * @throws UnsupportedOperationException always
+         */
+        @Override
+        public String compose(Component component) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
     }
 
 }

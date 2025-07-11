@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A mutable object that represents outputs from parsing a message
+ */
 public class MessageOutputs {
 
     private final List<UUID> taggedPlayers;

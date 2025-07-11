@@ -8,15 +8,13 @@ import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.command.framework.Argument;
 import dev.rosewood.rosegarden.command.framework.ArgumentHandler;
 import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.InputIterator;
-import dev.rosewood.rosegarden.utils.HexUtils;
-import net.md_5.bungee.api.ChatColor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +49,8 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
 
         RosePlayer player = new RosePlayer(context.getSender());
         RoseMessage message = RoseMessage.forLocation(player, this.permissionArea);
-        MessageTokenizerResults components = MessageTokenizer.tokenize(message, player, input, MessageDirection.PLAYER_TO_SERVER, Tokenizers.COLORS_BUNDLE);
-        String plainText = components.build(TokenComposer.plain());
+        MessageContents components = MessageTokenizer.tokenize(message, player, input, MessageDirection.PLAYER_TO_SERVER, Tokenizers.COLORS_BUNDLE);
+        String plainText = components.build(ChatComposer.plain());
 
         // Return if the colorized string contains no color.
         if (plainText.equalsIgnoreCase(input) || !plainText.isBlank() || input.contains("&r"))

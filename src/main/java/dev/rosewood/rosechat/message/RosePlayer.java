@@ -10,12 +10,10 @@ import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
 import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
-import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -160,7 +158,7 @@ public class RosePlayer {
             this.name = displayName;
     }
 
-    public void setDisplayName(MessageTokenizerResults message) {
+    public void setDisplayName(MessageContents message) {
         if (message == null) {
             this.setDisplayName((String) null);
             return;
@@ -169,7 +167,7 @@ public class RosePlayer {
         if (this.isPlayer())
             message.setDisplayName(this.asPlayer());
         else
-            this.name = message.build(TokenComposer.plain());
+            this.name = message.build(ChatComposer.plain());
     }
 
     /**
@@ -217,7 +215,7 @@ public class RosePlayer {
     /**
      * @return Components containing the parsed nickname.
      */
-    public MessageTokenizerResults getParsedNickname() {
+    public MessageContents getParsedNickname() {
         String nickname = this.getNickname();
         String name = nickname == null ? this.name : nickname;
         RoseMessage message = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
@@ -227,7 +225,7 @@ public class RosePlayer {
     /**
      * @param callback A callback containing the player's saved nickname, after being parsed.
      */
-    public void getParsedNickname(Consumer<MessageTokenizerResults> callback) {
+    public void getParsedNickname(Consumer<MessageContents> callback) {
         if (this.isConsole() || this.isPlayer()) {
             callback.accept(this.getParsedNickname());
             return;
@@ -238,7 +236,7 @@ public class RosePlayer {
             String nickname = this.getNickname();
             String name = nickname == null ? this.name : nickname;
             RoseMessage message = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
-            MessageTokenizerResults components = message.parse(this, name);
+            MessageContents components = message.parse(this, name);
             callback.accept(components);
         });
     }
@@ -324,7 +322,7 @@ public class RosePlayer {
         }
 
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            MessageTokenizerResults parsedNickname = this.getParsedNickname();
+            MessageContents parsedNickname = this.getParsedNickname();
             this.setDisplayName(parsedNickname);
 
             if (RoseChat.getInstance().getNicknameProvider() != null)
@@ -334,7 +332,7 @@ public class RosePlayer {
             if (Settings.UPDATE_PLAYER_LIST.get() && this.isPlayer())
                 this.asPlayer().setPlayerListName(name);
 
-            this.getPlayerData().setStrippedDisplayName(parsedNickname.build(TokenComposer.plain()));
+            this.getPlayerData().setStrippedDisplayName(parsedNickname.build(ChatComposer.plain()));
         });
     }
 
@@ -491,11 +489,11 @@ public class RosePlayer {
      * Sends a message to the RosePlayer.
      * @param message The message to send.
      */
-    public void send(MessageTokenizerResults message) {
+    public void send(MessageContents message) {
         if (this.isPlayer())
             message.sendMessage(this.asPlayer());
         else if (this.isConsole()) {
-            this.logToConsole(message.build(TokenComposer.plain()));
+            this.logToConsole(message.build(ChatComposer.plain()));
             message.sendMessage(Bukkit.getConsoleSender());
         }
     }

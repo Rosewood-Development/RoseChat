@@ -1,15 +1,13 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Arrays;
@@ -205,27 +203,15 @@ public class SidedSignListener implements Listener {
             if (line.isEmpty())
                 continue;
 
-            MessageTokenizerResults components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
+            MessageContents components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
             if (components == null)
                 continue;
 
-            String plainLine = components.build(TokenComposer.plain());
+            String plainLine = components.build(ChatComposer.plain());
             if (plainLine.isBlank())
                 continue;
 
-            if (NMSUtil.isPaper()) {
-                // TODO: Not sure if I can put this into the MessageTokenizerResults like sendMessage and setDisplayName are
-                // Would it cause classloader issues on versions where SidedSign doesn't exist?
-                side.line(i, Component.textOfChildren(components.build(TokenComposer.adventure().decorated())).colorIfAbsent(TextColor.fromHexString(hexColor)));
-            } else {
-                ComponentBuilder builder = new ComponentBuilder();
-                for (BaseComponent component : components.buildComponents()) {
-                    builder.append(component);
-                    if (component.getColorRaw() == null)
-                        builder.color(ChatColor.of(hexColor));
-                }
-                side.setLine(i, TextComponent.toLegacyText(builder.build()));
-            }
+            components.sidedSigns().setSignText(sign, side, i);
         }
 
         sign.update();
@@ -255,7 +241,7 @@ public class SidedSignListener implements Listener {
         return true;
     }
 
-    private MessageTokenizerResults parseLine(RosePlayer player, String text, PermissionArea area) {
+    private MessageContents parseLine(RosePlayer player, String text, PermissionArea area) {
         RoseMessage message = RoseMessage.forLocation(player, area);
         message.setPlayerInput(text);
         message.setUsePlayerChatColor(false);

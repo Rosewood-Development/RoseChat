@@ -7,14 +7,10 @@ import dev.rosewood.rosechat.api.event.player.PlayerSendMessageEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.parser.MessageParser;
-import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules.RuleOutputs;
+import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
@@ -27,7 +23,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -205,7 +200,7 @@ public class MessageUtils {
         }
 
         // Parse the message for the console
-        MessageTokenizerResults parsedMessage = roseMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get());
+        MessageContents parsedMessage = roseMessage.parse(messageTarget, Settings.CONSOLE_MESSAGE_FORMAT.get());
 
         // If the console is not the target of the message, send the console message format. Otherwise, send the received message format later.
         if (!targetName.equalsIgnoreCase("Console") && !sender.isConsole())
@@ -224,7 +219,7 @@ public class MessageUtils {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                MessageTokenizerResults parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
+                MessageContents parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
                 parsedSpyMessage.sendMessage(spy);
             });
         }
@@ -236,9 +231,9 @@ public class MessageUtils {
 
         // Parse the message for the sender and the receiver.
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            MessageTokenizerResults parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get());
+            MessageContents parsedSentMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SENT_FORMAT.get());
 
-            MessageTokenizerResults receivedMessageOutput = roseMessage.parse(messageTarget,
+            MessageContents receivedMessageOutput = roseMessage.parse(messageTarget,
                     Settings.MESSAGE_RECEIVED_FORMAT.get());
 
             if (target == null) {
@@ -248,7 +243,7 @@ public class MessageUtils {
                     receivedMessageOutput.sendMessage(Bukkit.getConsoleSender());
                 } else {
                     boolean keepFormat = Settings.KEEP_MESSAGE_FORMAT.get();
-                    String bungeeMessage = keepFormat ? receivedMessageOutput.build(TokenComposer.json()) : null;
+                    String bungeeMessage = keepFormat ? receivedMessageOutput.build(ChatComposer.json()) : null;
 
                     RoseChatAPI.getInstance().getBungeeManager()
                             .sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
@@ -275,7 +270,7 @@ public class MessageUtils {
                     return;
 
                 // If the target is online, send the message.
-                messageTarget.send(receivedMessageOutput);
+                messageTarget.send(receiveEvent.getContents());
 
                 if (messageTarget.isPlayer()) {
                     Player targetPlayer = messageTarget.asPlayer();
@@ -294,7 +289,7 @@ public class MessageUtils {
         String nickname = sender.getPlayerData().getNickname();
         if (Settings.UPDATE_DISPLAY_NAMES.get() && nickname != null && !sender.getDisplayName().equals(sender.getPlayerData().getNickname())) {
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                MessageTokenizerResults components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME)
+                MessageContents components = RoseMessage.forLocation(sender, PermissionArea.NICKNAME)
                         .parse(sender, sender.getPlayerData().getNickname());
                 sender.setDisplayName(components);
 
@@ -340,20 +335,20 @@ public class MessageUtils {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-                MessageTokenizerResults parsedSpyMessage = consoleMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
+                MessageContents parsedSpyMessage = consoleMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
                 parsedSpyMessage.sendMessage(spy);
             });
         }
 
         String jsonMessage = applyJSONPlaceholders(roseMessage.getPlayerInput());
-        MessageTokenizerResults parsedMessage = parseJSONMessage(messageTarget, jsonMessage);
+        MessageContents parsedMessage = parseJSONMessage(messageTarget, jsonMessage);
 
         PlayerReceiveMessageEvent receiveEvent = new PlayerReceiveMessageEvent(sender, messageTarget, roseMessage, parsedMessage);
         Bukkit.getPluginManager().callEvent(receiveEvent);
         if (receiveEvent.isCancelled())
             return;
 
-        messageTarget.send(parsedMessage);
+        messageTarget.send(receiveEvent.getContents());
         PlayerData data = messageTarget.getPlayerData();
         if (data != null && data.hasMessageSounds() && Settings.MESSAGE_SOUND.get() != null)
             target.playSound(target.getLocation(), Settings.MESSAGE_SOUND.get(), 1.0f, 1.0f);
@@ -371,9 +366,9 @@ public class MessageUtils {
         return output;
     }
 
-    public static MessageTokenizerResults parseJSONMessage(RosePlayer receiver, String json) {
+    public static MessageContents parseJSONMessage(RosePlayer receiver, String json) {
         String parsedJson = receiver.isPlayer() ? PlaceholderAPIHook.applyPlaceholders(receiver.asPlayer(), json) : json;
-        return MessageTokenizerResults.fromJson(parsedJson);
+        return MessageContents.fromJson(parsedJson);
     }
 
     /**
@@ -450,7 +445,7 @@ public class MessageUtils {
     public static boolean canColor(RosePlayer sender, String str, PermissionArea area) {
         RoseMessage message = RoseMessage.forLocation(sender, area);
         message.setPlayerInput(str);
-        MessageTokenizerResults components = MessageParser.roseChat().parse(message, sender, "{message}");
+        MessageContents components = MessageParser.roseChat().parse(message, sender, "{message}");
         return components.outputs().getMissingPermissions().isEmpty();
 
 //        Matcher colorMatcher = VALID_LEGACY_REGEX.matcher(str);
@@ -483,7 +478,7 @@ public class MessageUtils {
         ComponentBuilder builder = new ComponentBuilder();
         String placeholder = Settings.DELETE_CLIENT_MESSAGE_FORMAT.get();
 
-        MessageTokenizerResults results = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
+        MessageContents results = RoseChatAPI.getInstance().parse(new RosePlayer(Bukkit.getConsoleSender()), sender, placeholder,
                 DefaultPlaceholders.getFor(sender, sender)
                         .add("id", messageId)
                         .add("type", "client").build());

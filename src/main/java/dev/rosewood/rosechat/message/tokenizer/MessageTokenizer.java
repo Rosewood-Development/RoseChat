@@ -5,12 +5,12 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.manager.DebugManager;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.composer.TokenComposer;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayDeque;
@@ -128,8 +128,8 @@ public class MessageTokenizer {
         }
     }
 
-    public static MessageTokenizerResults tokenize(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
-                                                   Tokenizers.TokenizerBundle... tokenizerBundles) {
+    public static MessageContents tokenize(RoseMessage roseMessage, RosePlayer viewer, String format, MessageDirection direction,
+                                           Tokenizers.TokenizerBundle... tokenizerBundles) {
         if (format == null) {
             if (roseMessage.getPlayerInput() != null) {
                 new RuntimeException("A null format was passed to the MessageTokenizer. The format has been replaced with {message} instead. " +
@@ -153,14 +153,14 @@ public class MessageTokenizer {
         tokenizer.tokenize(token);
 
         if (DEBUG_MANAGER.isEnabled()) {
-            String plainText = TokenComposer.plain().compose(token);
+            String plainText = ChatComposer.plain().compose(token);
             DEBUG_MANAGER.addMessage(() ->
                     "Completed Tokenizing: " + plainText + "\n"
                     + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
                             "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.parses + " times \n");
         }
 
-        return new MessageTokenizerResults(token, outputs);
+        return MessageContents.fromToken(token, outputs);
     }
 
     private static int countTokens(Token token) {
