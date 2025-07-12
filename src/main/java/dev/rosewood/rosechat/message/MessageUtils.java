@@ -23,7 +23,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.chat.ChatVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
+import net.md_5.bungee.chat.VersionedComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.bukkit.Bukkit;
@@ -49,6 +51,15 @@ public class MessageUtils {
     public static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
     public static final Pattern GRADIENT_PATTERN = Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>");
 
+    private static final boolean HAS_VERSIONED_SERIALIZER;
+    static {
+        boolean versioned = false;
+        try {
+            Class.forName("net.md_5.bungee.chat.VersionedComponentSerializer");
+            versioned = true;
+        } catch (ClassNotFoundException ignored) { }
+        HAS_VERSIONED_SERIALIZER = versioned;
+    }
     /**
      * Removes the accents from a string.
      * @param string The string to use.
@@ -485,19 +496,35 @@ public class MessageUtils {
 
         BaseComponent[] deleteClientButton = results.buildComponents();
         if (deleteClientButton == null || deleteClientButton.length == 0) {
-            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true, null));
+            playerData.getMessageLog().addDeletableMessage(new DeletableMessage(UUID.randomUUID(), messageJson, true));
             return null;
         }
 
         if (Settings.DELETE_MESSAGE_SUFFIX.get()) {
-            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+            builder.append(ChatComposer.decorated().composeJson(messageJson), ComponentBuilder.FormatRetention.NONE);
             builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
         } else {
             builder.append(deleteClientButton, ComponentBuilder.FormatRetention.NONE);
-            builder.append(ComponentSerializer.parse(messageJson), ComponentBuilder.FormatRetention.NONE);
+            builder.append(ChatComposer.decorated().composeJson(messageJson), ComponentBuilder.FormatRetention.NONE);
         }
 
         return builder.create();
+    }
+
+    public static String bungeeToJson(BaseComponent[] components) {
+        if (HAS_VERSIONED_SERIALIZER) {
+            return VersionedComponentSerializer.forVersion(ChatVersion.V1_21_5).toString(components);
+        } else {
+            return ComponentSerializer.toString(components);
+        }
+    }
+
+    public static BaseComponent[] jsonToBungee(String json) {
+        if (HAS_VERSIONED_SERIALIZER) {
+            return VersionedComponentSerializer.forVersion(ChatVersion.V1_21_5).parse(json);
+        } else {
+            return ComponentSerializer.parse(json);
+        }
     }
 
 }

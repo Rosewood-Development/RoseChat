@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
 import dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee.BungeeTokenDecorators;
@@ -8,7 +9,6 @@ import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 public class FullyDecoratedBungeeChatComposer implements ChatComposer<BaseComponent[]> {
 
@@ -89,7 +89,7 @@ public class FullyDecoratedBungeeChatComposer implements ChatComposer<BaseCompon
 
     @Override
     public BaseComponent[] composeJson(String json) {
-        return ComponentSerializer.parse(json);
+        return MessageUtils.jsonToBungee(json);
     }
 
     @Override

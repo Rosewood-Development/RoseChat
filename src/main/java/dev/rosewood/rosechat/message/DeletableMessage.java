@@ -12,13 +12,8 @@ public class DeletableMessage {
     private String channel;
     private boolean isClient;
 
-    public DeletableMessage(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     public DeletableMessage(UUID uuid, String json, boolean isClient) {
-        this(uuid);
-
+        this.uuid = uuid;
         this.json = json;
         this.isClient = isClient;
     }

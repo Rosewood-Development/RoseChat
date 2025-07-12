@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 
@@ -145,7 +144,7 @@ public final class RoseChatAPI {
                 BaseComponent[] withDeleteButton = MessageUtils.appendDeleteButton(player, player.getPlayerData(), uuid.toString(), json);
 
                 if (withDeleteButton != null) {
-                    messageToDelete.setJson(ComponentSerializer.toString(withDeleteButton));
+                    messageToDelete.setJson(ChatComposer.json().composeBungee(withDeleteButton));
                 } else {
                     // If the delete button doesn't exist, just use the 'Deleted Message' message.
                     messageToDelete.setJson(json);
@@ -168,7 +167,7 @@ public final class RoseChatAPI {
 
         // Resend the messages!
         for (DeletableMessage message : player.getPlayerData().getMessageLog().getDeletableMessages())
-            player.send(ComponentSerializer.parse(message.getJson()));
+            player.send(ChatComposer.decorated().composeJson(message.getJson()));
 
         // If the message is not a client message, delete it from Discord too.
         if (!messageToDelete.isClient()) {

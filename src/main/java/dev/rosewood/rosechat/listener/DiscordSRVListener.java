@@ -13,6 +13,7 @@ import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.MessageRules;
 import dev.rosewood.rosechat.message.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
@@ -33,8 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -241,7 +240,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
                                     channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).buildComponents();
                             components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
-                            deletableMessage.setJson(ComponentSerializer.toString(components));
+                            deletableMessage.setJson(ChatComposer.json().composeBungee(components));
 
                             // Set original to null for the new delete button.
                             deletableMessage.setOriginal(null);
@@ -255,7 +254,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                             player.sendMessage("\n");
 
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
-                            player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+                            player.spigot().sendMessage(ChatComposer.decorated().composeJson(deletableMessage.getJson()));
                     }
 
                     if (consoleComponents != null)
@@ -282,7 +281,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                         .add("type", message.isClient() ? "client" : "server")
                         .add("channel", message.getChannel())
                         .add("original", message.getOriginal() == null ?
-                                null : TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build()).buildComponents();
+                                null : ChatComposer.legacy().composeJson(message.getOriginal())).build()).buildComponents();
 
         ComponentBuilder builder = new ComponentBuilder();
         builder.append(components, ComponentBuilder.FormatRetention.NONE);

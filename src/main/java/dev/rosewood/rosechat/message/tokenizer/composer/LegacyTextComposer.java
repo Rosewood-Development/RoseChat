@@ -1,14 +1,13 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 public class LegacyTextComposer implements ChatComposer<String> {
 
@@ -40,7 +39,7 @@ public class LegacyTextComposer implements ChatComposer<String> {
             Component component = GsonComponentSerializer.gson().deserialize(json);
             return LegacyComponentSerializer.legacySection().serialize(component);
         } else {
-            BaseComponent[] components = ComponentSerializer.parse(json);
+            BaseComponent[] components = MessageUtils.jsonToBungee(json);
             return TextComponent.toLegacyText(components);
         }
     }

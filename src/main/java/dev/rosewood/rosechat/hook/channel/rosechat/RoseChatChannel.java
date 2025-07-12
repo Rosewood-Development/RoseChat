@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -235,7 +234,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 receiver.send(parsedMessage);
                 if (receiver.getPlayerData() != null)
                     receiver.getPlayerData().getMessageLog().addDeletableMessage(
-                            new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage.outputs()),
+                            new DeletableMessage(message.getUUID(), ChatComposer.json().composeBungee(parsedMessage.buildComponents()),
                                     false, null, this.getId()));
             } else {
                 PreParseMessageEvent preParseEvent = new PreParseMessageEvent(message, receiver, direction);

@@ -125,10 +125,7 @@ public class RoseMessage {
      * @return The deletable message.
      */
     public DeletableMessage createDeletableMessage(String json, String discordId) {
-        DeletableMessage deletableMessage = new DeletableMessage(this.getUUID());
-        deletableMessage.setJson(json);
-        deletableMessage.setClient(false);
-        deletableMessage.setDiscordId(discordId);
+        DeletableMessage deletableMessage = new DeletableMessage(this.getUUID(), json, false, discordId);
 
         if (!this.sender.isConsole())
             deletableMessage.setSender(this.sender.getUUID());

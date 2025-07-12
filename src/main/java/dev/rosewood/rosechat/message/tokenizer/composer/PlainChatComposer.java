@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.TokenType;
 import dev.rosewood.rosegarden.utils.NMSUtil;
@@ -9,7 +10,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 public class PlainChatComposer implements ChatComposer<String> {
 
@@ -49,7 +49,7 @@ public class PlainChatComposer implements ChatComposer<String> {
             Component component = GsonComponentSerializer.gson().deserialize(json);
             return PlainTextComponentSerializer.plainText().serialize(component);
         } else {
-            BaseComponent[] components = ComponentSerializer.parse(json);
+            BaseComponent[] components = MessageUtils.jsonToBungee(json);
             return ChatColor.stripColor(TextComponent.toLegacyText(components));
         }
     }

@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.composer;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,7 @@ public class JsonComposer implements ChatComposer<String> {
             return GsonComponentSerializer.gson().serialize(component);
         } else {
             BaseComponent[] components = ChatComposer.decorated().compose(token);
-            return ComponentSerializer.toString(components);
+            return MessageUtils.bungeeToJson(components);
         }
     }
 
@@ -36,7 +37,7 @@ public class JsonComposer implements ChatComposer<String> {
             return GsonComponentSerializer.gson().serialize(component);
         } else {
             BaseComponent[] components = TextComponent.fromLegacyText(text);
-            return ComponentSerializer.toString(components);
+            return MessageUtils.bungeeToJson(components);
         }
     }
 
@@ -47,7 +48,7 @@ public class JsonComposer implements ChatComposer<String> {
 
     @Override
     public String composeBungee(BaseComponent[] components) {
-        return ComponentSerializer.toString(components);
+        return MessageUtils.bungeeToJson(components);
     }
 
     @Override
