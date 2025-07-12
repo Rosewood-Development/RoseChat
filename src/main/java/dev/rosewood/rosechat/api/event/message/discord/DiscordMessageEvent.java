@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.api.event.message.discord;
 
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;

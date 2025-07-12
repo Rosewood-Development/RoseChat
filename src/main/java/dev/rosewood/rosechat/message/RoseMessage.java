@@ -1,19 +1,12 @@
-package dev.rosewood.rosechat.message.wrapper;
+package dev.rosewood.rosechat.message;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.manager.DebugManager;
-import dev.rosewood.rosechat.message.DeletableMessage;
-import dev.rosewood.rosechat.message.PermissionArea;
-import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.BungeeParser;
-import dev.rosewood.rosechat.message.parser.FromDiscordParser;
 import dev.rosewood.rosechat.message.parser.MessageParser;
-import dev.rosewood.rosechat.message.parser.RoseChatParser;
-import dev.rosewood.rosechat.message.parser.ToDiscordParser;
+import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.UUID;
-import net.md_5.bungee.api.chat.BaseComponent;
 
 /**
  * A wrapper for chat messages which can be used to parse a message for a given receiver.
@@ -63,9 +56,9 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The discord id of the message, or null if not sent from discord.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public <T> MessageTokenizerResults<T> parse(MessageParser<T> parser, RosePlayer viewer, String format, String discordId) {
+    private MessageContents parse(MessageParser parser, RosePlayer viewer, String format, String discordId) {
         this.discordId = discordId;
 
         DebugManager debugManager = RoseChat.getInstance().getManager(DebugManager.class);
@@ -82,11 +75,10 @@ public class RoseMessage {
      * This allows for the message to gain hover and click events, along with emojis and other features.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults<BaseComponent[]> parse(RosePlayer viewer, String format) {
-        RoseChatParser parser = new RoseChatParser();
-        return this.parse(parser, viewer, format, null);
+    public MessageContents parse(RosePlayer viewer, String format) {
+        return this.parse(MessageParser.roseChat(), viewer, format, null);
     }
 
     /**
@@ -96,11 +88,10 @@ public class RoseMessage {
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
      * @param discordId The id of the discord message. Used for deleting discord messages.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults<BaseComponent[]> parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
-        FromDiscordParser parser = new FromDiscordParser();
-        return this.parse(parser, viewer, format, discordId);
+    public MessageContents parseMessageFromDiscord(RosePlayer viewer, String format, String discordId) {
+        return this.parse(MessageParser.fromDiscord(), viewer, format, discordId);
     }
 
     /**
@@ -109,11 +100,10 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for discord messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults<String> parseMessageToDiscord(RosePlayer viewer, String format) {
-        ToDiscordParser parser = new ToDiscordParser();
-        return this.parse(parser, viewer, format, null);
+    public MessageContents parseMessageToDiscord(RosePlayer viewer, String format) {
+        return this.parse(MessageParser.toDiscord(), viewer, format, null);
     }
 
     /**
@@ -122,11 +112,10 @@ public class RoseMessage {
      * This applies a parser to parse with specific settings for bungee messages.
      * @param viewer The {@link RosePlayer} who will be viewing the message.
      * @param format The chat format for the message. If null, the message will be parsed without a format.
-     * @return A {@link MessageTokenizerResults} containing the parsed message.
+     * @return A {@link MessageContents} containing the parsed message.
      */
-    public MessageTokenizerResults<BaseComponent[]> parseBungeeMessage(RosePlayer viewer, String format) {
-        BungeeParser parser = new BungeeParser();
-        return this.parse(parser, viewer, format, null);
+    public MessageContents parseBungeeMessage(RosePlayer viewer, String format) {
+        return this.parse(MessageParser.bungeeProxy(), viewer, format, null);
     }
 
     /**
@@ -136,10 +125,7 @@ public class RoseMessage {
      * @return The deletable message.
      */
     public DeletableMessage createDeletableMessage(String json, String discordId) {
-        DeletableMessage deletableMessage = new DeletableMessage(this.getUUID());
-        deletableMessage.setJson(json);
-        deletableMessage.setClient(false);
-        deletableMessage.setDiscordId(discordId);
+        DeletableMessage deletableMessage = new DeletableMessage(this.getUUID(), json, false, discordId);
 
         if (!this.sender.isConsole())
             deletableMessage.setSender(this.sender.getUUID());

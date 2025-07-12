@@ -14,8 +14,8 @@ import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Collections;
 import java.util.List;
@@ -77,7 +77,7 @@ public class GroupChannel extends Channel {
                 continue;
 
             RoseChat.MESSAGE_THREAD_POOL.execute(() ->
-                    member.send(message.parse(member, format).content()));
+                    member.send(message.parse(member, format)));
         }
 
         // Send the message to the spies.
@@ -92,7 +92,7 @@ public class GroupChannel extends Channel {
 
             RosePlayer rosePlayer = new RosePlayer(player);
             RoseChat.MESSAGE_THREAD_POOL.execute(() ->
-                    rosePlayer.send(message.parse(rosePlayer, Settings.GROUP_SPY_FORMAT.get()).content()));
+                    rosePlayer.send(message.parse(rosePlayer, Settings.GROUP_SPY_FORMAT.get())));
         }
     }
 

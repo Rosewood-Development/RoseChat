@@ -5,14 +5,19 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
-import net.md_5.bungee.api.chat.BaseComponent;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 
-public class BungeeParser implements MessageParser<BaseComponent[]> {
+public class BungeeProxyParser implements MessageParser {
+
+    public static final MessageParser INSTANCE = new BungeeProxyParser();
+
+    private BungeeProxyParser() {
+
+    }
 
     @Override
-    public MessageTokenizerResults<BaseComponent[]> parse(RoseMessage message, RosePlayer viewer, String format) {
+    public MessageContents parse(RoseMessage message, RosePlayer viewer, String format) {
         if (Settings.USE_MARKDOWN_FORMATTING.get()) {
             return MessageTokenizer.tokenize(message, viewer, format, MessageDirection.SERVER_TO_SERVER,
                     Tokenizers.DISCORD_EMOJI_BUNDLE,
@@ -24,11 +29,6 @@ public class BungeeParser implements MessageParser<BaseComponent[]> {
                     Tokenizers.DISCORD_EMOJI_BUNDLE,
                     Tokenizers.BUNGEE_BUNDLE);
         }
-    }
-
-    @Override
-    public MessageDirection getMessageDirection() {
-        return MessageDirection.SERVER_TO_SERVER;
     }
 
 }

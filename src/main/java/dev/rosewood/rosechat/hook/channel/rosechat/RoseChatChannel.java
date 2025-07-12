@@ -15,16 +15,15 @@ import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -220,7 +219,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             // If the message is a JSON message, parse it before sending.
             if (direction == MessageDirection.SERVER_TO_SERVER_RAW) {
                 String jsonMessage = MessageUtils.applyJSONPlaceholders(message.getPlayerInput());
-                MessageTokenizerResults<BaseComponent[]> parsedMessage = MessageUtils.parseJSONMessage(receiver, jsonMessage);
+                MessageContents parsedMessage = MessageUtils.parseJSONMessage(receiver, jsonMessage);
 
                 PostParseMessageEvent event = new PostParseMessageEvent(message, receiver,
                         MessageDirection.SERVER_TO_SERVER_RAW, parsedMessage);
@@ -229,13 +228,13 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 if (event.isCancelled())
                     return;
 
-                parsedMessage = event.getComponents();
-                outputs = event.getComponents().outputs();
+                parsedMessage = event.getContents();
+                outputs = event.getContents().outputs();
 
-                receiver.send(parsedMessage.content());
+                receiver.send(parsedMessage);
                 if (receiver.getPlayerData() != null)
                     receiver.getPlayerData().getMessageLog().addDeletableMessage(
-                            new DeletableMessage(message.getUUID(), ComponentSerializer.toString(parsedMessage.outputs()),
+                            new DeletableMessage(message.getUUID(), ChatComposer.json().composeBungee(parsedMessage.buildComponents()),
                                     false, null, this.getId()));
             } else {
                 PreParseMessageEvent preParseEvent = new PreParseMessageEvent(message, receiver, direction);
@@ -244,7 +243,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 if (preParseEvent.isCancelled())
                     return;
 
-                MessageTokenizerResults<BaseComponent[]> components = discordId == null ?
+                MessageContents components = discordId == null ?
                         message.parse(receiver, format) : message.parseMessageFromDiscord(receiver, format, discordId);
 
                 PostParseMessageEvent postParseEvent = new PostParseMessageEvent(message, receiver, direction, components);
@@ -253,12 +252,12 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
                 if (postParseEvent.isCancelled())
                     return;
 
-                outputs = postParseEvent.getComponents().outputs();
+                outputs = postParseEvent.getContents().outputs();
 
-                receiver.send(postParseEvent.getComponents().content());
+                receiver.send(postParseEvent.getContents());
 
                 DeletableMessage deletableMessage = message.createDeletableMessage(
-                        ComponentSerializer.toString(postParseEvent.getComponents().content()), discordId);
+                        postParseEvent.getContents().build(ChatComposer.json()), discordId);
 
                 if (receiver.getPlayerData() != null)
                     receiver.getPlayerData().getMessageLog().addDeletableMessage(deletableMessage);
@@ -321,9 +320,8 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             if (this.keepFormatOverBungee) {
                 RoseChat.MESSAGE_THREAD_POOL.execute(() ->
                         api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(), message.getUUID(), true,
-                                ComponentSerializer.
-                                        toString(message.parseBungeeMessage(message.getSender(),
-                                                this.getSettings().getFormats().get("chat")).content())));
+                                message.parseBungeeMessage(message.getSender(),
+                                                this.getSettings().getFormats().get("chat")).build(ChatComposer.json())));
             } else {
                 api.getBungeeManager().sendChannelMessage(message.getSender(), server, this.getId(),
                         message.getUUID(), false, message.getPlayerInput());
@@ -342,7 +340,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
         if (preParseEvent.isCancelled())
             return;
 
-        MessageTokenizerResults<BaseComponent[]> components = direction == MessageDirection.PLAYER_TO_SERVER ?
+        MessageContents components = direction == MessageDirection.PLAYER_TO_SERVER ?
                 message.parse(console, format) :
                 message.parseMessageFromDiscord(console, format, discordId);
 
@@ -351,9 +349,9 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
         if (postParseEvent.isCancelled())
             return;
 
-        components = postParseEvent.getComponents();
+        components = postParseEvent.getContents();
 
-        console.send(components.content());
+        console.send(components);
     }
 
     private void sendToVisibleAnywhere(RoseMessage message, MessageDirection direction, String format, String discordId) {

@@ -41,7 +41,7 @@ public record Filter(String id,
     }
 
     public Filter cloneAsTag() {
-        String prefix = this.matches.get(0);
+        String prefix = this.matches.getFirst();
         String suffix = prefix.charAt(0)  + "/" + prefix.substring(1);
 
         return new Filter(this.id + "-tag",

@@ -8,7 +8,11 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 
-public class DefaultPlaceholders {
+public final class DefaultPlaceholders {
+
+    private DefaultPlaceholders() {
+
+    }
 
     /**
      * @param sender The {@link RosePlayer} who will send these placeholders.

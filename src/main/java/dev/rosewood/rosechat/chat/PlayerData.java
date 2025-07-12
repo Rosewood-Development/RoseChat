@@ -257,7 +257,7 @@ public class PlayerData {
      * Sets the current display name and strips it.
      * @param displayName The display name.
      */
-    public void setDisplayName(String displayName) {
+    public void setStrippedDisplayName(String displayName) {
         this.strippedDisplayName = ChatColor.stripColor(HexUtils.colorify(displayName));
     }
 

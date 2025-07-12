@@ -237,10 +237,14 @@ public class Token {
         }
 
         public Builder ignoreFilter(Filter filter) {
+            return this.ignoreFilter(filter.id());
+        }
+
+        public Builder ignoreFilter(String filterId) {
             if (this.ignoredFilters == null)
                 this.ignoredFilters = new HashSet<>();
 
-            this.ignoredFilters.add(filter.id());
+            this.ignoredFilters.add(filterId);
             return this;
         }
 

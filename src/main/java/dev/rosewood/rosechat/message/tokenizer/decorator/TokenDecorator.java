@@ -1,25 +1,13 @@
 package dev.rosewood.rosechat.message.tokenizer.decorator;
 
-import dev.rosewood.rosechat.message.tokenizer.MessageTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
-import net.md_5.bungee.api.chat.BaseComponent;
 
-public abstract class TokenDecorator {
-
-    private final DecoratorType type;
-
-    protected TokenDecorator(DecoratorType type) {
-        this.type = type;
-    }
+public interface TokenDecorator {
 
     /**
-     * Applies this decorator to the given component.
-     *
-     * @param component The component to apply this decorator to
-     * @param tokenizer The tokenizer
-     * @param parent The parent token
+     * @return the type of this decorator
      */
-    public abstract void apply(BaseComponent component, MessageTokenizer tokenizer, Token parent);
+    DecoratorType getType();
 
     /**
      * Checks if this decorator is overwritten by the given decorator.
@@ -28,8 +16,12 @@ public abstract class TokenDecorator {
      * @param newDecorator The decorator to check compatibility with
      * @return true if this decorator is overwritten by the given decorator
      */
-    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return this.getClass() == newDecorator.getClass();
+    default boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        return this.getRoot().getClass() == newDecorator.getRoot().getClass();
+    }
+
+    default TokenDecorator getRoot() {
+        return this;
     }
 
     /**
@@ -38,7 +30,7 @@ public abstract class TokenDecorator {
      *
      * @return true if this decorator is a marker decorator
      */
-    protected boolean isMarker() {
+    default boolean isMarker() {
         return false;
     }
 
@@ -48,15 +40,30 @@ public abstract class TokenDecorator {
      *
      * @return true if this decorator blocks text stitching
      */
-    public boolean blocksTextStitching() {
+    default boolean blocksTextStitching() {
         return false;
     }
 
     /**
-     * @return the type of this decorator
+     * @return the content of this Token as a builder if {@link #getType()} is {@code CONTENT}, nullable, will be tokenized
      */
-    public DecoratorType getType() {
-        return this.type;
+    default Token.Builder getContent() {
+        return null;
+    }
+
+    /**
+     * Set the tokenized content of this token if {@link #getType()} is {@code CONTENT}, does nothing otherwise
+     * @param content the tokenized content to set
+     */
+    default void setContentToken(Token content) {
+
+    }
+
+    /**
+     * @return the content token, if set
+     */
+    default Token getContentToken() {
+        return null;
     }
 
 }

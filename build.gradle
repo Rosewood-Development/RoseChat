@@ -10,8 +10,6 @@ group = 'dev.rosewood'
 version = 'Beta-32'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     disableAutoTargetJvm()
 }
@@ -26,6 +24,7 @@ repositories {
 
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://repo.rosewooddev.io/repository/public/' }
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://repo.codemc.org/repository/maven-public' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url = 'https://nexus.scarsz.me/content/groups/public/' }
@@ -46,21 +45,22 @@ repositories {
 }
 
 dependencies {
-    api 'dev.rosewood:rosegarden:1.4.7'
+    api 'dev.rosewood:rosegarden:1.5.2'
     api 'org.apache.commons:commons-text:1.12.0'
 
-    compileOnly 'org.spigotmc:spigot-api:1.21.5-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
+    compileOnly 'com.github.milkbowl:vault:1.7.3'
     compileOnly 'com.discordsrv:discordsrv:1.27.0'
     compileOnly 'net.dv8tion:JDA:4.3.0_349'
-    compileOnly 'net.kyori:adventure-platform-bukkit:4.1.0'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT'
 
     // Plugin Support
     compileOnly 'com.palmergames.bukkit.towny:towny:0.100.3.0'
     compileOnly 'com.gmail.nossr50.mcMMO:mcMMO:2.2.012'
-    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0'
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.0', {
+        exclude group: 'org.bukkit'
+    }
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.3.0'
     compileOnly 'net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.19.2'
     compileOnly 'com.massivecraft:Factions:1.6.9.5-U0.6.29'
@@ -69,8 +69,10 @@ dependencies {
     compileOnly 'com.bgsoftware:SuperiorSkyblockAPI:2024.1'
     compileOnly 'com.songoda:skyblock:2.5.0'
     compileOnly 'at.pcgamingfreaks:MarriageMaster-API-Bukkit:2.7.5'
-    compileOnly 'net.essentialsx:EssentialsX:2.20.1'
-    compileOnly 'net.william278.husktowns:husktowns-bukkit:3.0.6'
+    compileOnly 'net.essentialsx:EssentialsX:2.20.1', {
+        exclude group: 'org.spigotmc'
+    }
+    compileOnly 'net.william278.husktowns:husktowns-bukkit:3.1.4'
 }
 
 processResources {

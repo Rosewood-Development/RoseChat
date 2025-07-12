@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
 
 public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
@@ -80,17 +78,15 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
         String click = roseChatPlaceholder.get("click") == null ?
                 null : placeholders.apply(roseChatPlaceholder.get("click").parseToString(params.getSender(), receiver, placeholders));
-        ClickEvent.Action clickAction = roseChatPlaceholder.get("click") == null ?
+        ClickDecorator.Action clickAction = roseChatPlaceholder.get("click") == null ?
                 null : roseChatPlaceholder.get("click").getClickAction();
-        HoverEvent.Action hoverAction = roseChatPlaceholder.get("hover") == null ?
-                null : roseChatPlaceholder.get("hover").getHoverAction();
 
         Token.Builder tokenBuilder = Token.group(content);
         if (!formattedHover.isEmpty())
-            tokenBuilder.decorate(HoverDecorator.of(hoverAction, formattedHover));
+            tokenBuilder.decorate(new HoverDecorator(formattedHover));
 
         if (click != null)
-            tokenBuilder.decorate(ClickDecorator.of(clickAction, click));
+            tokenBuilder.decorate(new ClickDecorator(clickAction, click));
 
         if (params.containsPlayerInput())
             tokenBuilder.encapsulate();

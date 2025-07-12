@@ -1,22 +1,21 @@
 package dev.rosewood.rosechat.command.command;
 
 import dev.rosewood.rosechat.RoseChat;
-import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.manager.DataManager;
-import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.parser.RoseChatParser;
+import dev.rosewood.rosechat.message.parser.MessageParser;
 import dev.rosewood.rosechat.message.tokenizer.MessageOutputs;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.MessageRules.RuleOutputs;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.framework.ArgumentCondition;
 import dev.rosewood.rosegarden.command.framework.ArgumentsDefinition;
@@ -26,8 +25,6 @@ import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -139,10 +136,10 @@ public class NicknameCommand extends RoseChatCommand {
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
             if (!Settings.ALLOW_DUPLICATE_NAMES.get()) {
                 RoseMessage message = RoseMessage.forLocation(player, PermissionArea.NICKNAME);
-                MessageTokenizerResults<BaseComponent[]> components = message.parse(target, nickname);
+                MessageContents components = message.parse(target, nickname);
 
-                String displayName = TextComponent.toLegacyText(components.content());
-                if (RoseChat.getInstance().getManager(DataManager.class).containsNickname(target.getUUID(), ChatColor.stripColor(HexUtils.colorify(displayName).toLowerCase()))) {
+                String displayName = components.build(ChatComposer.plain()).toLowerCase();
+                if (RoseChat.getInstance().getManager(DataManager.class).containsNickname(target.getUUID(), displayName)) {
                     player.sendLocaleMessage("command-nickname-taken");
                     return;
                 }
@@ -199,8 +196,7 @@ public class NicknameCommand extends RoseChatCommand {
         }
 
         // Parse the nickname to make sure the player isn't missing any permissions.
-        MessageTokenizerResults<BaseComponent[]> results = new RoseChatParser().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER);
-        MessageOutputs outputs = results.outputs();
+        MessageOutputs outputs = MessageParser.roseChat().parse(message, target, RoseChatPlaceholderTokenizer.MESSAGE_PLACEHOLDER).outputs();
         if (!outputs.getMissingPermissions().isEmpty()) {
             player.sendLocaleMessage("no-permission");
             return false;

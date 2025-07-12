@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.hook.discord;
 
 import dev.rosewood.rosechat.chat.channel.Channel;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 import java.util.List;
 import java.util.UUID;
 
