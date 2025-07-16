@@ -56,7 +56,7 @@ public class TokenizerParams {
         return this.usePlayerChatColor;
     }
 
-    public String getPlayerInput() {
+    public String getPlayerMessage() {
         return this.message.getPlayerInput();
     }
 

@@ -454,6 +454,9 @@ public class MessageUtils {
      * @return True if the message can be colored.
      */
     public static boolean canColor(RosePlayer sender, String str, PermissionArea area) {
+        if (str.isBlank())
+            return true;
+
         RoseMessage message = RoseMessage.forLocation(sender, area);
         message.setPlayerInput(str);
         MessageContents components = MessageParser.roseChat().parse(message, sender, "{message}");

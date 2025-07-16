@@ -48,17 +48,18 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         // Hardcoded special {message} placeholder to inject the player's message
         // Do not let the {message} placeholder be used if the message contains player input
         if (placeholder.equals(MESSAGE_PLACEHOLDER) && !params.containsPlayerInput()) {
-            String playerInput = params.getPlayerInput();
+            String playerInput = params.getPlayerMessage();
             if (playerInput == null || playerInput.isEmpty()) {
-                RoseChat.getInstance().getLogger().warning("Parsed " + MESSAGE_PLACEHOLDER + " with no player input. This is likely a configuration error.");
+                RoseChat.getInstance().getLogger().warning("Parsed " + placeholder + " with no player message. This is likely a configuration error. Printing a stacktrace for help.");
+                new RuntimeException().printStackTrace();
                 return new TokenizerResult(Token.text(""), matcher.group().length());
             }
 
             if (params.getSender().getPlayerData() == null)
-                return new TokenizerResult(Token.group(params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
+                return new TokenizerResult(Token.group(params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length());
 
             String color = params.shouldUsePlayerChatColor() ? params.getSender().getPlayerData().getColor() : "";
-            return new TokenizerResult(Token.group(color + params.getPlayerInput()).containsPlayerInput().build(), matcher.group().length());
+            return new TokenizerResult(Token.group(color + params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length());
         }
 
         CustomPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
