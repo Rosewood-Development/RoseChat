@@ -20,7 +20,7 @@ import dev.rosewood.rosechat.message.tokenizer.markdown.MarkdownUnderlineTokeniz
 import dev.rosewood.rosechat.message.tokenizer.placeholder.PAPIPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.TokenPlaceholderTokenizer;
-import dev.rosewood.rosechat.message.tokenizer.replacement.FilterTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.filter.FilterTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.ColorTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.style.FormatTokenizer;

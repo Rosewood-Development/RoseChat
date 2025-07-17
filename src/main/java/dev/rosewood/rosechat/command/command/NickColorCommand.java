@@ -85,11 +85,11 @@ public class NickColorCommand extends RoseChatCommand {
     }
 
     private void setColor(RosePlayer player, RosePlayer target, String color) {
-        // Allow color replacements.
+        // Allow color filters.
         Filter filter = this.getAPI().getFilterById(color);
         if (filter != null) {
             if (!filter.hasPermission(player)
-                    || !player.hasPermission("rosechat.replacements.nickname")) {
+                    || !player.hasPermission("rosechat.filters.nickname")) {
                 player.sendLocaleMessage("no-permission");
                 return;
             }

@@ -43,11 +43,11 @@ permissions:
       rosechat.caps: true
       rosechat.links: true
       rosechat.placeholders: true
-      rosechat.replacements: true
+      rosechat.filters: true
       rosechat.chat: true
       rosechat.message: true
       rosechat.reply: true
-      rosechat.replacement: true
+      rosechat.filter: true
       rosechat.spy: true
       rosechat.togglemessage: true
       rosechat.togglesound: true
@@ -184,16 +184,16 @@ permissions:
   rosechat.placeholder:
     description: Allows using a specific placeholder.
     default: op
-  rosechat.replacements:
-    description: Allows using replacements.
+  rosechat.filters:
+    description: Allows using filters.
     default: op
     children:
-      rosechat.replacements.message: true
-      rosechat.replacements.channel: true
-      rosechat.replacements.group: true
-      rosechat.replacements.nickname: true
-  rosechat.replacement:
-    description: Allows using a specific replacement.
+      rosechat.filters.message: true
+      rosechat.filters.channel: true
+      rosechat.filters.group: true
+      rosechat.filters.nickname: true
+  rosechat.filter:
+    description: Allows using a specific filter.
     default: op
   rosechat.message:
     description: Allows using the message command.
@@ -375,7 +375,7 @@ permissions:
       description: Allows using the realname command.
       default: op
     rosechat.helditem:
-      description: Allows using the held item replacement.
+      description: Allows using the held item filter.
       default: op
     rosechat.url:
       description: Allows using url markdown to Discord.

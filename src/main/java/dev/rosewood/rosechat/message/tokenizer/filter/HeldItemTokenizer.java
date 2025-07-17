@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.message.tokenizer.replacement;
+package dev.rosewood.rosechat.message.tokenizer.filter;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.filter.Filter;
@@ -37,7 +37,7 @@ public class HeldItemTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        Filter filter = this.api.getFilterById(Settings.HELD_ITEM_REPLACEMENT.get());
+        Filter filter = this.api.getFilterById(Settings.HELD_ITEM_FILTER.get());
         if (filter == null)
             return null;
 

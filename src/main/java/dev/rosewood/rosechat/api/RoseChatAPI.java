@@ -250,23 +250,23 @@ public final class RoseChatAPI {
 
     /**
      * @param id The ID to use.
-     * @return The replacement found, or null if it doesn't exist.
+     * @return The filter found, or null if it doesn't exist.
      */
     public Filter getFilterById(String id) {
         return this.getFilterManager().getFilter(id);
     }
 
     /**
-     * @return A list of all replacements.
+     * @return A list of all filters.
      */
     public List<Filter> getFilters() {
         return new ArrayList<>(this.getFilterManager().getFilters().values());
     }
 
     /**
-     * @return A list of all replacement IDs.
+     * @return A list of all filter IDs.
      */
-    public List<String> getReplacementIDs() {
+    public List<String> getFilterIDs() {
         return new ArrayList<>(this.getFilterManager().getFilters().keySet());
     }
 
@@ -387,7 +387,7 @@ public final class RoseChatAPI {
 
 
     /**
-     * @return An instance of the replacement manager.
+     * @return An instance of the filter manager.
      */
     public FilterManager getFilterManager() {
         return this.plugin.getManager(FilterManager.class);

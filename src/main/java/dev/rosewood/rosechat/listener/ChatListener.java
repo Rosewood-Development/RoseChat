@@ -56,9 +56,9 @@ public class ChatListener implements Listener {
         }
 
         // Don't send the message if the player is using [item] and isn't holding an item.
-        String heldItemReplacement = Settings.HELD_ITEM_REPLACEMENT.get();
-        if (heldItemReplacement != null && player.isPlayer()) {
-            Filter filter = this.api.getFilterById(heldItemReplacement);
+        String heldItemFilter = Settings.HELD_ITEM_FILTER.get();
+        if (heldItemFilter != null && player.isPlayer()) {
+            Filter filter = this.api.getFilterById(heldItemFilter);
             if (filter != null) {
                 for (String match : filter.matches()) {
                     if (message.contains(match)) {

@@ -1,6 +1,6 @@
 # Chat channels are different chats that players can use to communicate.
 # These can be accessed with /channel, /c, or a custom command.
-# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#channelsyml
+# Check the wiki for more information: https://wiki.rosewooddev.io/RoseChat/configuration-files/#channelsyml
 
 # The ID of the channel, the player can use this to join the channel.
 # For example, '/c global'

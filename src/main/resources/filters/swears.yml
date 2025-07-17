@@ -1,7 +1,7 @@
 # This file allows specific words and phrases to be filtered.
 # These can be used to block messages, replace words, add emojis, and more!
 # These can also be used with custom placeholders from custom-placeholders.yml
-# Check the wiki for more information: https://github.com/Rosewood-Development/RoseChat/wiki/Configuration-Files#replacementsyml
+# Check the wiki for more information: https://wiki.rosewooddev.io/RoseChat/configuration-files/#filtersyml
 
 # This filter matches both 'crap' and 'damn' and warns the player for using them.
 bannable-words:

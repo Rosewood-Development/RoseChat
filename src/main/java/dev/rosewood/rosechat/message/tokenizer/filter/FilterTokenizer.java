@@ -1,4 +1,4 @@
-package dev.rosewood.rosechat.message.tokenizer.replacement;
+package dev.rosewood.rosechat.message.tokenizer.filter;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
@@ -16,6 +16,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -70,7 +71,8 @@ public class FilterTokenizer extends Tokenizer {
                 return this.handlePrefixMatch(params, filter, matcher.group());
             }
 
-            if (!this.matches(filter, filter.prefix(), input))
+            String foundMatch = this.matches(filter, filter.prefix(), input);
+            if (foundMatch == null)
                 continue;
 
             if (filter.suffix() != null) {
@@ -82,7 +84,7 @@ public class FilterTokenizer extends Tokenizer {
             } else {
 
                 // Filter does not have a suffix, content is after the prefix.
-                return this.handlePrefixMatch(params, filter, filter.prefix());
+                return this.handlePrefixMatch(params, filter, foundMatch);
             }
         }
 
@@ -110,28 +112,36 @@ public class FilterTokenizer extends Tokenizer {
             }
 
             for (String match : filter.matches()) {
-                if (!this.matches(filter, match, input))
+                String foundMatch = this.matches(filter, match, input);
+                if (foundMatch == null)
                     continue;
 
                 // Found a normal match.
-                return this.handleMatch(params, filter, input, match);
+                return this.handleMatch(params, filter, input, foundMatch);
             }
         }
 
         return null;
     }
 
-    private boolean matches(Filter filter, String match, String input) {
+    private String matches(Filter filter, String match, String input) {
         if (filter.sensitivity() == 0)
-            return input.startsWith(match);
+            return input.startsWith(match) ? match : null;
 
-        for (String word : input.split(" ")) {
-            double difference = MessageUtils.getLevenshteinDistancePercent(word, match);
-            if ((1 - difference) <= filter.sensitivity() / 100.0)
-                return true;
+        String strippedMessage = ChatColor.stripColor(HexUtils.colorify(MessageUtils.stripAccents(input.toLowerCase())));
+        String[] splitMessage = input.split(" ");
+        String[] splitMessageStripped = strippedMessage.split(" ");
+        for (int i = 0; i < splitMessageStripped.length; i++) {
+            String word = splitMessage[i];
+            String wordStripped = splitMessageStripped[i];
+
+            double difference = MessageUtils.getLevenshteinDistancePercent(wordStripped, match);
+            if ((1 - difference) <= filter.sensitivity() / 100.0) {
+                return input.substring(input.indexOf(word), input.indexOf(word) + word.length());
+            }
         }
 
-        return false;
+        return null;
     }
 
     private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String input, String match) {
@@ -341,7 +351,7 @@ public class FilterTokenizer extends Tokenizer {
     }
 
     private TokenizerResult validateRemoval(String match) {
-        return Settings.REMOVE_REPLACEMENTS.get() ?
+        return Settings.REMOVE_FILTERS.get() ?
                 new TokenizerResult(Token.text(" "), match.length()) :
                 null;
     }

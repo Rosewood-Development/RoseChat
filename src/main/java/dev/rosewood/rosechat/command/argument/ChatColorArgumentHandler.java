@@ -102,7 +102,7 @@ public class ChatColorArgumentHandler extends ArgumentHandler<String> {
             suggestions.add("<g:#FFFFFF:#000000>");
 
         if (this.permissionString == null ||
-                context.getSender().hasPermission("rosechat.replacements." + this.permissionString.toLowerCase())) {
+                context.getSender().hasPermission("rosechat.filters." + this.permissionString.toLowerCase())) {
             for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
                 if (filter.colorRetention()
                         && filter.hasPermission(new RosePlayer(context.getSender())))

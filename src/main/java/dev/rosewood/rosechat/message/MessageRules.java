@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.api.event.message.MessageFilteredEvent;
 import dev.rosewood.rosechat.chat.FilterWarning;
 import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -156,7 +157,7 @@ public class MessageRules {
     }
 
     private void filterLanguage(RoseMessage message, RuleOutputs outputs) {
-        String strippedMessage = MessageUtils.stripAccents(outputs.getFilteredMessage().toLowerCase());
+        String strippedMessage = ChatColor.stripColor(HexUtils.colorify(MessageUtils.stripAccents(outputs.getFilteredMessage().toLowerCase())));
 
         for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
             if (!filter.block() || !filter.hasPermission(message.getSender()))

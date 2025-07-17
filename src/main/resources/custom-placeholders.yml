@@ -233,10 +233,6 @@ item:
     more: "&7» &e%amount%x %item_name% &7«"
     equal: "&7» &e%item_name% &7«"
     less: ""
-  hover:
-    action: SHOW_ITEM
-    default:
-      - "%item%"
 
 # Discord placeholders:
 # %user_nickname% - The user's nickname.

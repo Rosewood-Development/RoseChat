@@ -92,11 +92,11 @@ public class ChatColorCommand extends RoseChatCommand {
         PlayerData targetData = target.getPlayerData();
         String colorStr = color;
 
-        // Allow color replacements.
+        // Allow color filters.
         Filter filter = this.getAPI().getFilterById(color);
         if (filter != null) {
             if (!filter.hasPermission(player)
-                    || !player.hasPermission("rosechat.replacements.chatcolor")) {
+                    || !player.hasPermission("rosechat.filters.chatcolor")) {
                 player.sendLocaleMessage("no-permission");
                 return;
             }

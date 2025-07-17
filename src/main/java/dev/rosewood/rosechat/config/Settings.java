@@ -132,18 +132,18 @@ public final class Settings implements SettingHolder {
                         "Enabling this allows for temporary group chats. Owners can still use /group promote to select a new owner.");
     public static final RoseSetting<Boolean> REMOVE_COLOR_CODES = create(CHAT_SETTINGS, "remove-color-codes", BOOLEAN, false,
             "Should color codes be removed if a player attempts to send colors without having permission?");
-    public static final RoseSetting<Boolean> REMOVE_REPLACEMENTS = create(CHAT_SETTINGS, "remove-replacements", BOOLEAN, false,
-            "Should replacements be removed if a player attempts to send a replacement without having permission?");
+    public static final RoseSetting<Boolean> REMOVE_FILTERS = create(CHAT_SETTINGS, "remove-filters", BOOLEAN, false,
+            "Should filters be removed if a player attempts to send a filter without having permission?");
     public static final RoseSetting<Boolean> ALLOW_NO_HELD_ITEM = create(CHAT_SETTINGS, "allow-no-held-item", BOOLEAN, true,
-            "Should players be allowed to use the held item replacement if they are not holding an item?",
+            "Should players be allowed to use the held item filter if they are not holding an item?",
                         "If false, the 'no-held-item' locale message will be sent.");
     public static final RoseSetting<Boolean> ALLOW_CHAT_SUGGESTIONS = create(CHAT_SETTINGS, "allow-chat-suggestions", BOOLEAN, true,
-            "Can players use tab to display emoji, replacement, and placeholder suggestions in chat?",
-                        "This allows players to see their available replacements when sending a message in chat. Requires 1.19+");
+            "Can players use tab to display emoji, filters, and placeholder suggestions in chat?",
+                        "This allows players to see their available filters when sending a message in chat. Requires 1.19+");
     public static final RoseSetting<Boolean> ENABLE_ON_SIGNS = create(CHAT_SETTINGS, "enable-on-signs", BOOLEAN, false,
             "Can players use RoseChat features on signs?",
-                        "Players will require the sign permissions. For example, 'rosechat.replacements.sign', to use replacements on signs.",
-                        "Players will also need the individual permissions, such as 'rosechat.replacement.heart'.");
+                        "Players will require the sign permissions. For example, 'rosechat.filters.sign', to use filters on signs.",
+                        "Players will also need the individual permissions, such as 'rosechat.filters.heart'.");
 
     public static final RoseSetting<ConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,
@@ -204,8 +204,8 @@ public final class Settings implements SettingHolder {
     public static final RoseSetting<String> DELETED_MESSAGE_FORMAT = create(CHAT_FORMATS, "deleted-message", STRING, "{deleted-message}",
             "The format of a previously deleted message.",
                         "Requires ProtocolLib");
-    public static final RoseSetting<String> HELD_ITEM_REPLACEMENT = create(CHAT_FORMATS, "held-item-replacement", STRING, "item",
-            "The ID of the replacement, found in replacements.yml, for held items in chat.");
+    public static final RoseSetting<String> HELD_ITEM_FILTER = create(CHAT_FORMATS, "held-item-filter", STRING, "item",
+            "The ID of the filter, found in filters/fun.yml by default, for held items in chat.");
     public static final RoseSetting<String> EDITED_DISCORD_MESSAGE_FORMAT = create(CHAT_FORMATS, "edited-discord-message", STRING, "{edited}",
             "The format of an edited discord message.");
 
