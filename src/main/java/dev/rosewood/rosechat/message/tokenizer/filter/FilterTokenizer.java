@@ -117,7 +117,7 @@ public class FilterTokenizer extends Tokenizer {
                     continue;
 
                 // Found a normal match.
-                return this.handleMatch(params, filter, input, foundMatch);
+                return this.handleMatch(params, filter, foundMatch);
             }
         }
 
@@ -144,7 +144,10 @@ public class FilterTokenizer extends Tokenizer {
         return null;
     }
 
-    private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String input, String match) {
+    private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String match) {
+        if (!params.getInput().startsWith(match))
+            return null;
+
         if (params.getIgnoredFilters().contains(filter.id()))
             return null;
 
@@ -163,6 +166,8 @@ public class FilterTokenizer extends Tokenizer {
 
     private TokenizerResult handleRegexMatch(TokenizerParams params, Filter filter, Matcher matcher) {
         String match = matcher.group();
+        if (!params.getInput().startsWith(match))
+            return null;
 
         if (params.getIgnoredFilters().contains(filter.id()))
             return null;
@@ -210,6 +215,9 @@ public class FilterTokenizer extends Tokenizer {
         match = input.substring(0, endIndex);
         content = input.substring(prefix.length(), endIndex);
 
+        if (!input.startsWith(match))
+            return null;
+
         if (params.getIgnoredFilters().contains(filter.id()))
             return null;
 
@@ -248,6 +256,9 @@ public class FilterTokenizer extends Tokenizer {
         String match = input.substring(0, endIndex);
         String content = input.substring(prefix.length(), input.lastIndexOf(suffix));
 
+        if (!input.startsWith(match))
+            return null;
+
         if (params.getIgnoredFilters().contains(filter.id()))
             return null;
 
@@ -282,6 +293,9 @@ public class FilterTokenizer extends Tokenizer {
         String originalContent = matcher.group();
         String content = matcher.group(1);
         String inline = matcher.group(2);
+
+        if (!params.getInput().startsWith(originalContent))
+            return null;
 
         if (filter.useRegex()) {
             boolean matchesContent = false;
