@@ -8,7 +8,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public record ShadowColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction, boolean solid) implements TokenDecorator {
 
-    private static final boolean VALID_VERSION = NMSUtil.getVersionNumber() > 21 || (NMSUtil.getVersionNumber() == 21 && NMSUtil.getMinorVersionNumber() >= 5);
+    public static final boolean VALID_VERSION = NMSUtil.getVersionNumber() > 21 || (NMSUtil.getVersionNumber() == 21 && NMSUtil.getMinorVersionNumber() >= 5);
 
     public ShadowColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGeneratorFunction) {
         this(colorGeneratorFunction, false);

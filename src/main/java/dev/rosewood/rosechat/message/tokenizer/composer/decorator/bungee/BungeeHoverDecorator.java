@@ -3,6 +3,8 @@ package dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ShadowColorDecorator;
+import java.awt.Color;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -52,6 +54,7 @@ public class BungeeHoverDecorator extends BungeeTokenDecorator<HoverDecorator> {
         if (styleAccumulator.isItalicRaw() != null && component.isItalicRaw() == null) component.setItalic(false);
         if (styleAccumulator.isUnderlinedRaw() != null && component.isUnderlinedRaw() == null) component.setUnderlined(false);
         if (styleAccumulator.isStrikethroughRaw() != null && component.isStrikethroughRaw() == null) component.setStrikethrough(false);
+        if (ShadowColorDecorator.VALID_VERSION && styleAccumulator.getShadowColor() != null && component.getShadowColorRaw() == null) component.setShadowColor(Color.DARK_GRAY); // this is wrong, but I don't really care, should be 75% the brightness of the chat color with 25% the opacity
 
         if (component.getColorRaw() != null) styleAccumulator.setColor(component.getColorRaw());
         if (component.getFontRaw() != null) styleAccumulator.setFont(component.getFontRaw());
@@ -60,6 +63,7 @@ public class BungeeHoverDecorator extends BungeeTokenDecorator<HoverDecorator> {
         if (component.isItalicRaw() != null) styleAccumulator.setItalic(component.isItalicRaw());
         if (component.isUnderlinedRaw() != null) styleAccumulator.setUnderlined(component.isUnderlinedRaw());
         if (component.isStrikethroughRaw() != null) styleAccumulator.setStrikethrough(component.isStrikethroughRaw());
+        if (ShadowColorDecorator.VALID_VERSION && component.getShadowColorRaw() != null) styleAccumulator.setShadowColor(component.getShadowColor());
     }
 
 }

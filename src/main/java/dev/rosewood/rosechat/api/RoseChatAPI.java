@@ -33,6 +33,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 
@@ -131,14 +133,26 @@ public final class RoseChatAPI {
                 DefaultPlaceholders.getFor(player, player)
                         .add("id", uuid.toString())
                         .add("type", messageToDelete.isClient() ? "client" : "server")
-                        .add("original", ChatComposer.legacy().composeJson(messageToDelete.getOriginal()))
                         .build());
 
         String plainText = format.build(ChatComposer.plain());
 
         boolean updated = false;
         if (!plainText.isEmpty()) {
-            String json = format.build(ChatComposer.json());
+            String json;
+            if (player.hasPermission("rosechat.deletemessages.see")) {
+                ComponentBuilder builder = new ComponentBuilder();
+                BaseComponent[] messageComponents = format.build(ChatComposer.decorated());
+                builder.append(messageComponents, ComponentBuilder.FormatRetention.NONE);
+                if (builder.getCurrentComponent().getHoverEvent() == null) {
+                    builder.getCurrentComponent().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComposer.decorated().composeJson(messageToDelete.getOriginal())));
+                    json = ChatComposer.json().composeBungee(new BaseComponent[]{builder.build()});
+                } else {
+                    json = ChatComposer.json().composeBungee(messageComponents);
+                }
+            } else {
+                json = format.build(ChatComposer.json());
+            }
 
             if (player.hasPermission("rosechat.deletemessages.client")) {
                 BaseComponent[] withDeleteButton = MessageUtils.appendDeleteButton(player, player.getPlayerData(), uuid.toString(), json);

@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -279,13 +280,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         BaseComponent[] edited = RoseChatAPI.getInstance().parse(viewer, viewer, Settings.EDITED_DISCORD_MESSAGE_FORMAT.get(),
                 DefaultPlaceholders.getFor(sender, viewer)
                         .add("type", message.isClient() ? "client" : "server")
-                        .add("channel", message.getChannel())
-                        .add("original", message.getOriginal() == null ?
-                                null : ChatComposer.legacy().composeJson(message.getOriginal())).build()).buildComponents();
+                        .add("channel", message.getChannel()).build()).buildComponents();
 
         ComponentBuilder builder = new ComponentBuilder();
         builder.append(components, ComponentBuilder.FormatRetention.NONE);
         builder.append(edited);
+        if (builder.getCurrentComponent().getHoverEvent() == null && viewer.hasPermission("rosechat.editedmessages.see"))
+            builder.getCurrentComponent().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComposer.decorated().composeJson(message.getOriginal())));
 
         return builder.create();
     }

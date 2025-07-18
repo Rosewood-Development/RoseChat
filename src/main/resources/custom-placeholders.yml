@@ -159,24 +159,19 @@ delete-message:
 # This custom placeholder is used when a message is deleted.
 # This custom placeholder can be removed and no message will be shown when a message is deleted.
 # This custom placeholder does not need conditions.
-# The %original% placeholder is used for the original message that was deleted.
+# The default hover will include the deleted message content if the player has the rosechat.deletemessages.see permission
 deleted-message:
   text:
     condition: "%type%"
     client: ""
     server: "&7&oMessage Deleted"
-  hover:
-    condition: "%player_has_permission_rosechat.deletemessages.see%"
-    true:
-      - "%original%"
 
+# This custom placeholder is used when a discord message is edited.
+# This custom placeholder can be removed and no message will be shown when a message is deleted.
+# The default hover will include the original message content if the player has the rosechat.editedmessages.see permission
 edited:
   text:
     default: " &8(edited)"
-  hover:
-    condition: "%player_has_permission_rosechat.editedmessages.see%"
-    true:
-      - "%original%"
 
 # These custom placeholders are used for tags.
 # The %tagged% placeholder is used for the thing that was tagged.
