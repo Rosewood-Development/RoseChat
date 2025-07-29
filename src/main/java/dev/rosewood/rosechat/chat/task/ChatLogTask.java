@@ -2,8 +2,6 @@ package dev.rosewood.rosechat.chat.task;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.chat.log.ConsoleMessageLog;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ChatLogTask extends BukkitRunnable {
 

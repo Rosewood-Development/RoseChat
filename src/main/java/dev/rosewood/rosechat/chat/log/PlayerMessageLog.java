@@ -3,13 +3,12 @@ package dev.rosewood.rosechat.chat.log;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public class PlayerMessageLog extends ConsoleMessageLog {
 
@@ -70,7 +69,7 @@ public class PlayerMessageLog extends ConsoleMessageLog {
         if (this.deletableMessages.isEmpty())
             return null;
 
-        BaseComponent[] one = ComponentSerializer.parse(json);
+        BaseComponent[] one = ChatComposer.decorated().composeJson(json);
         if (one.length == 0)
             return null;
         BaseComponent componentOne = one[0];
@@ -78,7 +77,7 @@ public class PlayerMessageLog extends ConsoleMessageLog {
         for (int i = this.deletableMessages.size() - 1; i >= 0; i--) {
             DeletableMessage message = this.deletableMessages.get(i);
 
-            BaseComponent[] two = ComponentSerializer.parse(message.getJson());
+            BaseComponent[] two = ChatComposer.decorated().composeJson(message.getJson());
             if (two.length == 0)
                 continue;
 

@@ -1,23 +1,26 @@
 package dev.rosewood.rosechat.chat.channel;
 
+import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.log.ChannelMessageLog;
 import dev.rosewood.rosechat.chat.PlayerData;
+import dev.rosewood.rosechat.chat.log.ChannelMessageLog;
 import dev.rosewood.rosechat.chat.task.SlowmodeTask;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public abstract class Channel {
 
@@ -122,11 +125,25 @@ public abstract class Channel {
         MessageRules rules = new MessageRules().applyAllFilters();
         MessageRules.RuleOutputs outputs = rules.apply(message, input);
 
-        if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
-                outputs.getWarning().send(message.getSender());
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+        Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
+            for (String command : outputs.getServerCommands())
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replace("%player%", message.getSender().getRealName()));
+
+            for (String command : outputs.getPlayerCommands())
+                Bukkit.dispatchCommand(message.getSender().isPlayer() ? message.getSender().asPlayer() : Bukkit.getConsoleSender(),
+                        command.replace("%player%", message.getSender().getRealName()));
+        });
+
+        if (outputs.isBlocked()) {
+            if (outputs.getWarningMessage() != null) {
+                message.getSender().send(outputs.getWarningMessage());
+            } else if (outputs.getWarning() != null) {
+                outputs.getWarning().send(message.getSender());
+            }
+
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(player);
@@ -234,6 +251,16 @@ public abstract class Channel {
      * @return A list of UUIDs for the members of the channel.
      */
     public abstract List<UUID> getMembers();
+
+    public Set<Player> getIntendedRecipients(RosePlayer sender, boolean includeSpies) {
+        Set<Player> recipients = new HashSet<>();
+        this.getMembers().forEach(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline())
+                recipients.add(player);
+        });
+        return recipients;
+    }
 
     /**
      * @return The amount of members in the channel, this is not always the amount of {@link Channel#getMembers()}.

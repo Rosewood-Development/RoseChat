@@ -43,11 +43,11 @@ permissions:
       rosechat.caps: true
       rosechat.links: true
       rosechat.placeholders: true
-      rosechat.replacements: true
+      rosechat.filters: true
       rosechat.chat: true
       rosechat.message: true
       rosechat.reply: true
-      rosechat.replacement: true
+      rosechat.filter: true
       rosechat.spy: true
       rosechat.togglemessage: true
       rosechat.togglesound: true
@@ -184,16 +184,16 @@ permissions:
   rosechat.placeholder:
     description: Allows using a specific placeholder.
     default: op
-  rosechat.replacements:
-    description: Allows using replacements.
+  rosechat.filters:
+    description: Allows using filters.
     default: op
     children:
-      rosechat.replacements.message: true
-      rosechat.replacements.channel: true
-      rosechat.replacements.group: true
-      rosechat.replacements.nickname: true
-  rosechat.replacement:
-    description: Allows using a specific replacement.
+      rosechat.filters.message: true
+      rosechat.filters.channel: true
+      rosechat.filters.group: true
+      rosechat.filters.nickname: true
+  rosechat.filter:
+    description: Allows using a specific filter.
     default: op
   rosechat.message:
     description: Allows using the message command.
@@ -217,7 +217,7 @@ permissions:
     description: Allows using the togglemessage command.
     default: op
   rosechat.togglemessage.bypass:
-    description: Allows bypassing a toggle message.
+    description: Allows bypassing a canToggle message.
     default: op
   rosechat.togglesound:
     description: Allows using the togglesound command.
@@ -259,7 +259,7 @@ permissions:
     description: Allows using the chat info command.
     default: op
   rosechat.chat.toggle:
-    description: Allows using the chat toggle command.
+    description: Allows using the chat canToggle command.
     default: op
   rosechat.chatcolor:
     description: Allows using the chatcolor command.
@@ -375,7 +375,7 @@ permissions:
       description: Allows using the realname command.
       default: op
     rosechat.helditem:
-      description: Allows using the held item replacement.
+      description: Allows using the held item filter.
       default: op
     rosechat.url:
       description: Allows using url markdown to Discord.

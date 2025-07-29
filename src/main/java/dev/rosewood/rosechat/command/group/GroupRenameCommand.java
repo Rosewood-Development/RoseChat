@@ -7,8 +7,8 @@ import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.MessageRules.RuleOutputs;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.command.argument.ArgumentHandlers;
 import dev.rosewood.rosegarden.command.framework.ArgumentCondition;
@@ -56,10 +56,15 @@ public class GroupRenameCommand extends RoseChatCommand {
         MessageRules rules = new MessageRules().applyLanguageFilter().applyCapsFilter().applyAllFilters();
         RuleOutputs outputs = rules.apply(player, PermissionArea.GROUP, name);
         if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
-                outputs.getWarning().send(player);
+            if (outputs.getWarning() != null) {
+                if (outputs.getWarningMessage() != null) {
+                    player.send(outputs.getWarningMessage());
+                } else {
+                    outputs.getWarning().send(player);
+                }
+            }
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
                     if (staffPlayer.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(staffPlayer);

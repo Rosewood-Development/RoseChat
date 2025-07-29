@@ -1,0 +1,27 @@
+# This file allows specific words and phrases to be filtered.
+# These can be used to block messages, replace words, add emojis, and more!
+# These can also be used with custom placeholders from custom-placeholders.yml
+# Check the wiki for more information: https://wiki.rosewooddev.io/RoseChat/configuration-files/#filtersyml
+
+# This filter matches both 'crap' and 'damn' and warns the player for using them.
+bannable-words:
+  matches:
+    - damn
+  # The sensitivity determines how similar this word can be to other words.
+  # For example, this will match cráp, but not crop.
+  sensitivity: 20
+  # Blocking the message stops it from being sent.
+  block: true
+  commands:
+    server:
+      - warn %player% Swearing
+
+replaceable-words:
+  matches:
+    - crap
+  sensitivity: 20
+  replacement: 'cr*p'
+  # A bypass permission is used to allow certain players to not be caught by this filter.
+  # This differs from a use permission which allows a player to use the filter.
+  permission:
+    bypass: "rosechat.admin"

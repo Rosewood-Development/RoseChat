@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.command.argument;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.command.framework.Argument;
@@ -42,32 +42,26 @@ public class ContentArgumentHandler extends ArgumentHandler<String> {
 
         List<String> arguments = new ArrayList<>();
         if (this.onlyEmoji) {
-            for (Replacement replacement : this.api.getReplacements()) {
-                if (!replacement.getInput().isEmoji())
+            for (Filter filter : this.api.getFilters()) {
+                if (!filter.isEmoji())
                     continue;
 
-                String permission = replacement.getInput().getPermission() == null ?
-                        "rosechat.replacement." + replacement.getId() : replacement.getInput().getPermission();
-                if (!player.hasPermission(permission))
+                if (!filter.hasPermission(player))
                     continue;
 
-                if (replacement.getInput().getText() == null)
-                    continue;
-
-                arguments.add(replacement.getInput().getText());
+                arguments.addAll(filter.matches());
+                arguments.add(filter.prefix());
             }
         } else {
-            for (Replacement replacement : this.api.getReplacements()) {
-                String permission = replacement.getInput().getPermission() == null ?
-                        "rosechat.replacement." + replacement.getId() : replacement.getInput().getPermission();
-                if (!player.hasPermission(permission))
+            for (Filter filter : this.api.getFilters()) {
+                if (!filter.hasPermission(player))
                     continue;
 
-                if (replacement.getInput().isRegex() || (replacement.getInput().getText() == null && replacement.getInput().getPrefix() == null))
+                if (filter.matches().isEmpty())
                     continue;
 
-                arguments.add(replacement.getInput().getText() != null ?
-                        replacement.getInput().getText() : replacement.getInput().getPrefix());
+                arguments.addAll(filter.matches());
+                arguments.add(filter.prefix());
             }
 
             for (CustomPlaceholder placeholder : this.api.getPlaceholderManager().getPlaceholders().values()) {

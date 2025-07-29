@@ -7,6 +7,9 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,9 +23,6 @@ import org.kingdoms.events.general.KingdomDisbandEvent;
 import org.kingdoms.events.members.KingdomJoinEvent;
 import org.kingdoms.events.members.KingdomKickEvent;
 import org.kingdoms.events.members.KingdomLeaveEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class KingdomsXChannel extends RoseChatChannel implements Listener {
 

@@ -3,8 +3,6 @@ package dev.rosewood.rosechat.manager;
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
-import java.util.function.Supplier;
-import org.bukkit.Bukkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -12,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.function.Supplier;
+import org.bukkit.Bukkit;
 
 public class DebugManager extends Manager {
 

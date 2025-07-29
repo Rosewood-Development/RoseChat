@@ -1,16 +1,14 @@
 package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.api.event.channel.ChannelChangeEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.NMSUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,14 +56,18 @@ public class ChatListener implements Listener {
         }
 
         // Don't send the message if the player is using [item] and isn't holding an item.
-        String heldItemReplacement = Settings.HELD_ITEM_REPLACEMENT.get();
-        if (heldItemReplacement != null && player.isPlayer()) {
-            Replacement replacement = this.api.getReplacementById(heldItemReplacement);
-            if (replacement != null && message.contains(replacement.getInput().getText())) {
-                ItemStack stack = player.asPlayer().getInventory().getItemInMainHand();
-                if (stack.getAmount() == 0 && !Settings.ALLOW_NO_HELD_ITEM.get()) {
-                    player.sendLocaleMessage("no-held-item");
-                    return;
+        String heldItemFilter = Settings.HELD_ITEM_FILTER.get();
+        if (heldItemFilter != null && player.isPlayer()) {
+            Filter filter = this.api.getFilterById(heldItemFilter);
+            if (filter != null) {
+                for (String match : filter.matches()) {
+                    if (message.contains(match)) {
+                        ItemStack stack = player.asPlayer().getInventory().getItemInMainHand();
+                        if (stack.getAmount() == 0 && !Settings.ALLOW_NO_HELD_ITEM.get()) {
+                            player.sendLocaleMessage("no-held-item");
+                            return;
+                        }
+                    }
                 }
             }
         }

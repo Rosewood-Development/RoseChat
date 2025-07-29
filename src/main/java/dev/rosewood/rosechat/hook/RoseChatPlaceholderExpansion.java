@@ -5,7 +5,7 @@ import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
 import dev.rosewood.rosechat.manager.GroupManager;
 import dev.rosewood.rosechat.manager.PlaceholderManager;
@@ -44,10 +44,10 @@ public class RoseChatPlaceholderExpansion extends PlaceholderExpansion {
             }
         }
 
-        if (placeholder.startsWith("replacement_")) {
-            for (Replacement replacement : RoseChatAPI.getInstance().getReplacements()) {
-                if (placeholder.equalsIgnoreCase("replacement_" + replacement.getId())) {
-                    return replacement.getOutput().getText();
+        if (placeholder.startsWith("filter_")) {
+            for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+                if (placeholder.equalsIgnoreCase("filter_" + filter.id())) {
+                    return filter.replacement();
                 }
             }
         }

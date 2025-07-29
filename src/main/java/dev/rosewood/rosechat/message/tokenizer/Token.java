@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.ArrayList;
@@ -19,9 +20,10 @@ public class Token {
     private final StringPlaceholders placeholders;
     private final boolean encapsulate;
     private final Set<Tokenizer> ignoredTokenizers;
+    private final Set<String> ignoredFilters;
 
     private Token(TokenType type, String content, List<Token> children, List<TokenDecorator> decorators, boolean containsPlayerInput,
-                  StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers) {
+                  StringPlaceholders placeholders, boolean encapsulate, Set<Tokenizer> ignoredTokenizers, Set<String> ignoredFilters) {
         this.type = type;
         this.content = content;
         this.children = children;
@@ -30,6 +32,7 @@ public class Token {
         this.placeholders = placeholders;
         this.encapsulate = encapsulate;
         this.ignoredTokenizers = ignoredTokenizers;
+        this.ignoredFilters = ignoredFilters;
     }
 
     /**
@@ -111,6 +114,17 @@ public class Token {
     }
 
     /**
+     * @return the ignored filters
+     */
+    public Set<String> getIgnoredFilters() {
+        Set<String> ignoredFilters = new HashSet<>(this.ignoredFilters);
+        if (this.parent != null)
+            ignoredFilters.addAll(this.parent.getIgnoredFilters());
+
+        return ignoredFilters;
+    }
+
+    /**
      * @return the highest level parent Token that this Token ultimately belongs to
      */
     protected Token getHighestParent() {
@@ -123,10 +137,10 @@ public class Token {
 
     public StringPlaceholders getPlaceholders() {
         StringPlaceholders.Builder builder = StringPlaceholders.builder();
-        builder.addAll(this.placeholders);
         if (this.parent != null)
             builder.addAll(this.parent.getPlaceholders());
 
+        builder.addAll(this.placeholders);
         return builder.build();
     }
 
@@ -160,6 +174,7 @@ public class Token {
         private StringPlaceholders.Builder placeholders;
         private boolean encapsulate;
         private Set<Tokenizer> ignoredTokenizers;
+        private Set<String> ignoredFilters;
 
         private Builder(TokenType tokenType, String content) {
             this.tokenType = tokenType;
@@ -208,11 +223,28 @@ public class Token {
             return this;
         }
 
+        public Builder encapsulate(boolean encapsulate) {
+            this.encapsulate = encapsulate;
+            return this;
+        }
+
         public Builder ignoreTokenizer(Tokenizer tokenizer) {
             if (this.ignoredTokenizers == null)
                 this.ignoredTokenizers = new HashSet<>();
 
             this.ignoredTokenizers.add(tokenizer);
+            return this;
+        }
+
+        public Builder ignoreFilter(Filter filter) {
+            return this.ignoreFilter(filter.id());
+        }
+
+        public Builder ignoreFilter(String filterId) {
+            if (this.ignoredFilters == null)
+                this.ignoredFilters = new HashSet<>();
+
+            this.ignoredFilters.add(filterId);
             return this;
         }
 
@@ -225,7 +257,8 @@ public class Token {
                     this.containsPlayerInput,
                     this.placeholders == null ? StringPlaceholders.empty() : this.placeholders.build(),
                     this.encapsulate,
-                    this.ignoredTokenizers == null ? Set.of() : this.ignoredTokenizers
+                    this.ignoredTokenizers == null ? Set.of() : this.ignoredTokenizers,
+                    this.ignoredFilters == null ? Set.of() : this.ignoredFilters
             );
         }
 

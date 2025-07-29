@@ -4,8 +4,9 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.MessageDirection;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Set;
 
 public class TokenizerParams {
 
@@ -16,16 +17,19 @@ public class TokenizerParams {
     private final Token parentToken;
     private final boolean usePlayerChatColor;
     private final MessageDirection direction;
+    private final Set<String> ignoredFilters;
 
     public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, Token parentToken,
-                           boolean usePlayerChatColor, MessageDirection direction) {
-        this.outputs = new MessageOutputs();
+                           boolean usePlayerChatColor, MessageDirection direction, MessageOutputs outputs,
+                           Set<String> ignoredFilters) {
+        this.outputs = outputs;
         this.message = message;
         this.receiver = receiver;
         this.input = input;
         this.parentToken = parentToken;
         this.usePlayerChatColor = usePlayerChatColor;
         this.direction = direction;
+        this.ignoredFilters = ignoredFilters;
     }
 
     public MessageOutputs getOutputs() {
@@ -52,7 +56,7 @@ public class TokenizerParams {
         return this.usePlayerChatColor;
     }
 
-    public String getPlayerInput() {
+    public String getPlayerMessage() {
         return this.message.getPlayerInput();
     }
 
@@ -77,6 +81,10 @@ public class TokenizerParams {
 
     public MessageDirection getDirection() {
         return this.direction;
+    }
+
+    public Set<String> getIgnoredFilters() {
+        return this.ignoredFilters;
     }
 
 }

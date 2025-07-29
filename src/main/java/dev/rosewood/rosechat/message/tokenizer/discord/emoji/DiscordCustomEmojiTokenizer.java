@@ -22,7 +22,7 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
         if (!input.startsWith(":"))
             return null;
 
-        if (!this.hasTokenPermission(params, "rosechat.replacements"))
+        if (!this.hasTokenPermission(params, "rosechat.filters"))
             return null;
 
         Matcher matcher = PATTERN.matcher(input);
@@ -30,7 +30,7 @@ public class DiscordCustomEmojiTokenizer extends Tokenizer {
             return null;
 
         String content = matcher.group(1);
-        if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + content))
+        if (!this.hasExtendedTokenPermission(params, "rosechat.filters", "rosechat.filter." + content))
             return null;
 
         content = RoseChatAPI.getInstance().getDiscord().getCustomEmoji(content);

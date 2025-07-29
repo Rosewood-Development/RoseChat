@@ -1,0 +1,274 @@
+# This file allows specific words and phrases to be filtered.
+# These can be used to block messages, replace words, add emojis, and more!
+# These can also be used with custom placeholders from custom-placeholders.yml
+# Check the wiki for more information: https://wiki.rosewooddev.io/RoseChat/configuration-files/#filtersyml
+
+black:
+  matches:
+    - "<black>"
+  is-tag: true
+  replacement: "&0"
+  color-retention: true
+  permission:
+    use: rosechat.filter.black
+
+dark_blue:
+  matches:
+    - "<dark_blue>"
+  is-tag: true
+  replacement: "&1"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_blue
+
+dark_green:
+  matches:
+    - "<dark_green>"
+  is-tag: true
+  replacement: "&2"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_green
+
+dark_aqua:
+  matches:
+    - "<dark_aqua>"
+  is-tag: true
+  replacement: "&3"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_aqua
+
+dark_red:
+  matches:
+    - "<dark_red>"
+  is-tag: true
+  replacement: "&4"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_red
+
+dark_purple:
+  matches:
+    - "<dark_purple>"
+  is-tag: true
+  replacement: "&5"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_purple
+
+gold:
+  matches:
+    - "<gold>"
+  is-tag: true
+  replacement: "&6"
+  color-retention: true
+  permission:
+    use: rosechat.filter.gold
+
+gray:
+  matches:
+    - "<gray>"
+  is-tag: true
+  replacement: "&7"
+  color-retention: true
+  permission:
+    use: rosechat.filter.gray
+
+dark_gray:
+  matches:
+    - "<dark_gray>"
+  is-tag: true
+  replacement: "&8"
+  color-retention: true
+  permission:
+    use: rosechat.filter.dark_gray
+
+blue:
+  matches:
+    - "<blue>"
+  is-tag: true
+  replacement: "&9"
+  color-retention: true
+  permission:
+    use: rosechat.filter.blue
+
+green:
+  matches:
+    - "<green>"
+  is-tag: true
+  replacement: "&a"
+  color-retention: true
+  permission:
+    use: rosechat.filter.green
+
+aqua:
+  matches:
+    - "<aqua>"
+  is-tag: true
+  replacement: "&b"
+  color-retention: true
+  permission:
+    use: rosechat.filter.aqua
+
+red:
+  matches:
+    - "<red>"
+  is-tag: true
+  replacement: "&c"
+  color-retention: true
+  permission:
+    use: rosechat.filter.red
+
+light_purple:
+  matches:
+    - "<light_purple>"
+  is-tag: true
+  replacement: "&d"
+  color-retention: true
+  permission:
+    use: rosechat.filter.light_purple
+
+yellow:
+  matches:
+    - "<yellow>"
+  is-tag: true
+  replacement: "&e"
+  color-retention: true
+  permission:
+    use: rosechat.filter.yellow
+
+white:
+  matches:
+    - "<white>"
+  is-tag: true
+  replacement: "&f"
+  color-retention: true
+  permission:
+    use: rosechat.filter.white
+
+olive:
+  matches:
+    - "<olive>"
+  is-tag: true
+  replacement: "#808000"
+  color-retention: true
+  permission:
+    use: rosechat.filter.olive
+
+obfuscated:
+  matches:
+    - "<obfuscated>"
+  is-tag: true
+  replacement: "&k"
+  color-retention: true
+  permission:
+    use: rosechat.filter.obfuscated
+
+bold:
+  matches:
+    - "<bold>"
+  is-tag: true
+  replacement: "&l"
+  color-retention: true
+  permission:
+    use: rosechat.filter.bold
+
+strikethrough:
+  matches:
+    - "<strikethrough>"
+  is-tag: true
+  replacement: "&m"
+  color-retention: true
+  permission:
+    use: rosechat.filter.strikethrough
+
+underlined:
+  matches:
+    - "<underlined>"
+  is-tag: true
+  replacement: "&n"
+  color-retention: true
+  permission:
+    use: rosechat.filter.underlined
+
+italic:
+  matches:
+    - "<italic>"
+  is-tag: true
+  replacement: "&o"
+  color-retention: true
+  permission:
+    use: rosechat.filter.italic
+
+pride:
+  matches:
+    - "<pride>"
+  is-tag: true
+  replacement: "<g:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.pride
+
+progress:
+  matches:
+    - "<progress>"
+  is-tag: true
+  replacement: "<g:#FFFFFF:#FFAFC7:#73D7EE:#613915:#000000:#E50000:#FF7D00:#FFEE00:#028121:#004CFF:#770088>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.progress
+
+trans:
+  matches:
+    - "<trans>"
+  is-tag: true
+  replacement: "<g:#5BCFFB:#F5ABB9:#FFFFFF:#F5ABB8:#5BCFFB>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.trans
+
+bi:
+  matches:
+    - "<bi>"
+  is-tag: true
+  replacement: "<g:#D60270:#9B4F96:#0037A7>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.bi
+
+pan:
+  matches:
+    - "<pan>"
+  is-tag: true
+  replacement: "<g:#FF1C8D:#FFD700:#1AB3FF>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.pan
+
+nb:
+  matches:
+    - "<nb>"
+  is-tag: true
+  replacement: "<g:#FCF431:#FCFCFC:#9D59D2:#282828>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.nb
+
+lesbian:
+  matches:
+    - "<lesbian>"
+  is-tag: true
+  replacement: "<g:#D62800:#FF9B56:#FFFFFF:#D462A6:#A40062>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.lesbian
+
+ace:
+  matches:
+    - "<ace>"
+  is-tag: true
+  replacement: "<g:#000000:#A4A4A4:#FFFFFF:#810081>"
+  color-retention: true
+  permission:
+    use: rosechat.filter.ace

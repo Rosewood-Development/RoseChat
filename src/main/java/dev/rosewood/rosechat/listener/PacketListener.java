@@ -17,18 +17,18 @@ import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import java.lang.reflect.Field;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class PacketListener {
 
@@ -113,10 +113,10 @@ public class PacketListener {
                     if (deleteClientButton == null)
                         return;
 
-                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true, null);
+                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true);
                     deletableMessage.setOriginal(messageJson);
 
-                    messageJson = ComponentSerializer.toString(deleteClientButton);
+                    messageJson = ChatComposer.json().composeBungee(deleteClientButton);
                     deletableMessage.setJson(messageJson);
                     data.getMessageLog().addDeletableMessage(deletableMessage);
 
@@ -151,7 +151,7 @@ public class PacketListener {
                     // Workaround for https://hub.spigotmc.org/jira/browse/SPIGOT-7563
                     BaseComponent[] components = null;
                     try {
-                        components = messageJson == null ? null : ComponentSerializer.parse(messageJson);
+                        components = messageJson == null ? null : ChatComposer.decorated().composeJson(messageJson);
                     } catch (JsonSyntaxException ignored) {}
 
                     if (components == null || components.length == 0 || components[0].toPlainText().trim().isEmpty())
@@ -187,10 +187,10 @@ public class PacketListener {
                     if (deleteClientButton == null)
                         return;
 
-                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true, null);
+                    DeletableMessage deletableMessage = new DeletableMessage(messageId, messageJson, true);
                     deletableMessage.setOriginal(messageJson);
 
-                    messageJson = ComponentSerializer.toString(deleteClientButton);
+                    messageJson = ChatComposer.json().composeBungee(deleteClientButton);
                     deletableMessage.setJson(messageJson);
                     data.getMessageLog().addDeletableMessage(deletableMessage);
 
@@ -205,7 +205,7 @@ public class PacketListener {
             permissionsCache.put(player.getUUID(), player.hasPermission("rosechat.deletemessages.client"));
 
         if (!permissionsCache.getIfPresent(player.getUUID())) {
-            player.getPlayerData().getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true, null));
+            player.getPlayerData().getMessageLog().addDeletableMessage(new DeletableMessage(messageId, messageJson, true));
             return true;
         }
 
@@ -238,7 +238,7 @@ public class PacketListener {
     }
 
     private String getServerMessageJson(DeletableMessage message, RosePlayer viewer) {
-        BaseComponent[] components = ComponentSerializer.parse(message.getJson());
+        BaseComponent[] components = ChatComposer.decorated().composeJson(message.getJson());
         if (components == null || components.length == 0 || viewer.isConsole())
             return null;
 
@@ -250,7 +250,7 @@ public class PacketListener {
             return null;
 
         BaseComponent[] appended = this.appendDeleteButton(components, message, viewer, format);
-        return ComponentSerializer.toString(appended);
+        return ChatComposer.json().composeBungee(appended);
     }
 
     private BaseComponent[] appendDeleteButton(BaseComponent[] components, DeletableMessage message, RosePlayer viewer, String placeholder) {
@@ -280,7 +280,7 @@ public class PacketListener {
                         .add("id", message.getUUID().toString())
                         .add("type", "server")
                         .add("channel", message.getChannel())
-                        .build());
+                        .build()).buildComponents();
     }
 
     // Thanks, Nicole!
@@ -297,7 +297,7 @@ public class PacketListener {
                     }
                 }
 
-                return ComponentSerializer.toString((BaseComponent[]) componentsArrayField.get(packet.getHandle()));
+                return ChatComposer.json().composeBungee((BaseComponent[]) componentsArrayField.get(packet.getHandle()));
             } catch (Exception ignored) {}
 
             // Welp, that didn't work

@@ -19,7 +19,8 @@ public class StringPlaceholderCondition extends PlaceholderCondition {
             String parsed;
 
             if (placeholder.contains("||")) {
-                parsed = String.valueOf(new CompoundPlaceholderCondition(this.section, placeholder).parseValues().parseToBoolean(sender, viewer, placeholders));
+                parsed = String.valueOf(new CompoundPlaceholderCondition(this.section, placeholder).parseValues()
+                        .parseToBoolean(sender, viewer, placeholders));
             } else {
                 Player player = this.condition.startsWith("%other_") ? viewer.asPlayer() : sender.asPlayer();
                 String condition = placeholder.replace("other_", "");
@@ -35,7 +36,8 @@ public class StringPlaceholderCondition extends PlaceholderCondition {
 
             boolean hasCondition = false;
             for (String conditionValue : this.values.keySet()) {
-                hasCondition = conditionValue.toLowerCase().contains(ChatColor.stripColor(resultBuilder.toString().toLowerCase() + parsed.toLowerCase()));
+                hasCondition = conditionValue.toLowerCase()
+                        .contains(ChatColor.stripColor(resultBuilder.toString().toLowerCase() + parsed.toLowerCase()));
                 if (hasCondition)
                     break;
             }

@@ -7,6 +7,8 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.List;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
@@ -19,8 +21,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SimpleClansChannel extends RoseChatChannel implements Listener {
 

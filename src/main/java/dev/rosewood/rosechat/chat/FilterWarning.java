@@ -32,4 +32,8 @@ public enum FilterWarning {
         this.send(new RosePlayer(player));
     }
 
+    public String getWarning() {
+        return this.warning;
+    }
+
 }

@@ -1,15 +1,12 @@
 package dev.rosewood.rosechat.message.tokenizer.discord.emoji;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
-import dev.rosewood.rosechat.message.tokenizer.decorator.FontDecorator;
-import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
-import net.md_5.bungee.api.chat.HoverEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,24 +29,25 @@ public class DiscordEmojiTokenizer extends Tokenizer {
             return null;
 
         String content = matcher.group(1);
-        for (Replacement emoji : RoseChatAPI.getInstance().getReplacements()) {
-            if (emoji.getInput().getText() == null)
+        for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
+            if (filter.matches().isEmpty())
                 continue;
 
-            if (!emoji.getInput().getText().equalsIgnoreCase(content))
-                continue;
+            for (String match : filter.matches()) {
+                if (!match.equals(content))
+                    continue;
 
-            if (!this.hasExtendedTokenPermission(params, "rosechat.replacements", "rosechat.replacement." + emoji.getId()))
-                return null;
+                if (filter.usePermission() != null) {
+                    if (!this.hasExtendedTokenPermission(params, "rosechat.filters", filter.usePermission()))
+                        return null;
+                }
 
-            content = emoji.getOutput().getText();
-
-            return new TokenizerResult(Token.group(content)
-                    .decorate(FontDecorator.of(emoji.getOutput().getFont()))
-                    .decorate(HoverDecorator.of(HoverEvent.Action.SHOW_TEXT, emoji.getOutput().getHover()))
-                    .ignoreTokenizer(this)
-                    .ignoreTokenizer(Tokenizers.REPLACEMENT)
-                    .build(), matcher.group().length());
+                content = filter.replacement();
+                return new TokenizerResult(Token.group(content)
+                        .ignoreTokenizer(this)
+                        .ignoreTokenizer(Tokenizers.FILTER)
+                        .build(), matcher.group().length());
+            }
         }
 
         return new TokenizerResult(Token.text(matcher.group(1)), matcher.group().length());

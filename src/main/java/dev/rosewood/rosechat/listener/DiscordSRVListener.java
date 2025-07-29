@@ -11,8 +11,9 @@ import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.DeletableMessage;
 import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import github.scarsz.discordsrv.DiscordSRV;
@@ -26,19 +27,18 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
@@ -239,9 +239,9 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
 
                             messageWrapper.setUUID(deletableMessage.getUUID());
                             BaseComponent[] components = messageWrapper.parseMessageFromDiscord(new RosePlayer(player),
-                                    channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).content();
+                                    channel.getSettings().getFormats().get("discord-to-minecraft"), message.getId()).buildComponents();
                             components = this.appendEdited(components, deletableMessage, new RosePlayer(player));
-                            deletableMessage.setJson(ComponentSerializer.toString(components));
+                            deletableMessage.setJson(ChatComposer.json().composeBungee(components));
 
                             // Set original to null for the new delete button.
                             deletableMessage.setOriginal(null);
@@ -255,7 +255,7 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
                             player.sendMessage("\n");
 
                         for (DeletableMessage deletableMessage : playerData.getMessageLog().getDeletableMessages())
-                            player.spigot().sendMessage(ComponentSerializer.parse(deletableMessage.getJson()));
+                            player.spigot().sendMessage(ChatComposer.decorated().composeJson(deletableMessage.getJson()));
                     }
 
                     if (consoleComponents != null)
@@ -280,13 +280,13 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
         BaseComponent[] edited = RoseChatAPI.getInstance().parse(viewer, viewer, Settings.EDITED_DISCORD_MESSAGE_FORMAT.get(),
                 DefaultPlaceholders.getFor(sender, viewer)
                         .add("type", message.isClient() ? "client" : "server")
-                        .add("channel", message.getChannel())
-                        .add("original", message.getOriginal() == null ?
-                                null : TextComponent.toLegacyText(ComponentSerializer.parse(message.getOriginal()))).build());
+                        .add("channel", message.getChannel()).build()).buildComponents();
 
         ComponentBuilder builder = new ComponentBuilder();
         builder.append(components, ComponentBuilder.FormatRetention.NONE);
         builder.append(edited);
+        if (builder.getCurrentComponent().getHoverEvent() == null && viewer.hasPermission("rosechat.editedmessages.see"))
+            builder.getCurrentComponent().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComposer.decorated().composeJson(message.getOriginal())));
 
         return builder.create();
     }
@@ -294,9 +294,6 @@ public class DiscordSRVListener extends ListenerAdapter implements Listener {
     public static String getColor(Member member) {
         if (member.getColor() != null)
             return Integer.toHexString(member.getColorRaw());
-
-        if (member.getRoles().isEmpty())
-            return "FFFFFF";
 
         for (Role role : member.getRoles()) {
             if (role.getColor() != null)

@@ -8,7 +8,11 @@ import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 
-public class DefaultPlaceholders {
+public final class DefaultPlaceholders {
+
+    private DefaultPlaceholders() {
+
+    }
 
     /**
      * @param sender The {@link RosePlayer} who will send these placeholders.
@@ -75,7 +79,8 @@ public class DefaultPlaceholders {
      * @param extra More {@link StringPlaceholders} to use.
      * @return A {@link StringPlaceholders.Builder} containing default placeholders for a sender and viewer.
      */
-    public static StringPlaceholders.Builder getFor(RosePlayer sender, RosePlayer viewer, Channel channel, StringPlaceholders extra) {
+    public static StringPlaceholders.Builder getFor(RosePlayer sender, RosePlayer viewer,
+                                                    Channel channel, StringPlaceholders extra) {
         StringPlaceholders.Builder builder;
         if (channel == null)
             builder = getFor(sender, viewer);

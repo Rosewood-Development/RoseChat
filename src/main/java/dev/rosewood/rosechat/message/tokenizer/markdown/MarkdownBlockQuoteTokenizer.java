@@ -14,8 +14,8 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String playerInput = params.getPlayerInput();
-        if (playerInput == null || !params.getPlayerInput().startsWith("> "))
+        String playerInput = params.getPlayerMessage();
+        if (playerInput == null || !params.getPlayerMessage().startsWith("> "))
             return null;
 
         String input = params.getInput();

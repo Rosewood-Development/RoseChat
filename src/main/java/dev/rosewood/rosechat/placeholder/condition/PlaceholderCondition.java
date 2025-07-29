@@ -3,25 +3,27 @@ package dev.rosewood.rosechat.placeholder.condition;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.manager.LocaleManager;
 import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PlaceholderCondition {
 
     protected final ConfigurationSection section;
     protected final String condition;
     protected final Map<String, List<String>> values;
-    protected ClickEvent.Action clickAction;
-    protected HoverEvent.Action hoverAction;
+    protected HoverDecorator.Action hoverAction;
+    protected ClickDecorator.Action clickAction;
 
     /**
      * Creates a new placeholder condition.
@@ -104,26 +106,19 @@ public class PlaceholderCondition {
                 continue;
 
             try {
-                if (valueId.equalsIgnoreCase("action")) {
-                    if (this.section.getName().equalsIgnoreCase("hover")) {
-                        this.hoverAction = HoverEvent.Action.valueOf(this.section.getString(valueId));
-                    } else if (this.section.getName().equalsIgnoreCase("click")) {
-                        this.clickAction = ClickEvent.Action.valueOf(this.section.getString(valueId));
-                    }
-
+                if (valueId.equalsIgnoreCase("action") && this.section.getName().equalsIgnoreCase("click")) {
+                    this.clickAction = ClickDecorator.Action.valueOf(this.section.getString(valueId));
                     continue;
                 }
             } catch (IllegalArgumentException e) {
                 LocaleManager localeManager = RoseChatAPI.getInstance().getLocaleManager();
-                localeManager.sendCustomMessage(Bukkit.getConsoleSender(), localeManager.getLocaleMessage("prefix") +
+                localeManager.sendCustomMessage(Bukkit.getConsoleSender(),
+                        localeManager.getLocaleMessage("prefix") +
                         "&eThe " + this.section.getString(valueId) + " action is not a valid Click or Hover Event!");
             }
 
-            if (valueId.equalsIgnoreCase("hover") && this.hoverAction == null)
-                this.hoverAction = HoverEvent.Action.SHOW_TEXT;
-
             if (valueId.equalsIgnoreCase("click") && this.clickAction == null)
-                this.clickAction = ClickEvent.Action.SUGGEST_COMMAND;
+                this.clickAction = ClickDecorator.Action.SUGGEST_COMMAND;
 
             List<String> value = this.section.isList(valueId) ?
                     this.section.getStringList(valueId) : Collections.singletonList(this.section.getString(valueId));
@@ -133,11 +128,7 @@ public class PlaceholderCondition {
         return this;
     }
 
-    public HoverEvent.Action getHoverAction() {
-        return this.hoverAction;
-    }
-
-    public ClickEvent.Action getClickAction() {
+    public ClickDecorator.Action getClickAction() {
         return this.clickAction;
     }
 

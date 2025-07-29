@@ -7,6 +7,9 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,9 +24,6 @@ import world.bentobox.bentobox.api.events.team.TeamKickEvent;
 import world.bentobox.bentobox.api.events.team.TeamLeaveEvent;
 import world.bentobox.bentobox.database.objects.Island;
 import world.bentobox.bentobox.managers.RanksManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class BentoBoxChannel extends RoseChatChannel implements Listener {
 

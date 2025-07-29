@@ -7,13 +7,13 @@ import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.RosePlugin;
 import dev.rosewood.rosegarden.manager.Manager;
-import java.util.concurrent.ConcurrentHashMap;
-import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import org.bukkit.Bukkit;
 
 public class PlayerDataManager extends Manager {
 

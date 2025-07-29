@@ -1,11 +1,11 @@
 package dev.rosewood.rosechat.chat.channel;
 
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.configuration.ConfigurationSection;
 
 public class ChannelSettings {
 

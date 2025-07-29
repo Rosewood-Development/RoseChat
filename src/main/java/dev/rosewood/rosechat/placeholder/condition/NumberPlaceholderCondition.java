@@ -2,9 +2,9 @@ package dev.rosewood.rosechat.placeholder.condition;
 
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import java.util.List;
 
 /**
  * A placeholder condition for number values.

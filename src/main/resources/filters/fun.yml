@@ -1,0 +1,103 @@
+# This file allows specific words and phrases to be filtered.
+# These can be used to block messages, replace words, add emojis, and more!
+# These can also be used with custom placeholders from custom-placeholders.yml
+# Check the wiki for more information: https://wiki.rosewooddev.io/RoseChat/configuration-files/#filtersyml
+
+star:
+  matches:
+    - ':star:'
+  replacement: "✸"
+  permission:
+    use: rosechat.filter.star
+
+rosewood:
+  matches:
+    - ":rosewood:"
+  hover: "&b&o:rosewood:"
+  replacement: "\uE000"
+  permission:
+    use: rosechat.filter.rosewood
+
+heart:
+  matches:
+    - "<3"
+  is-emoji: true
+  # This setting allows the user to toggle auto-formatting of this filter.
+  can-toggle: true
+  replacement: "❤"
+  permission:
+    use: rosechat.filter.heart
+
+rainbow:
+  matches:
+    - "&h"
+  replacement: "<r:0.5>"
+  # This setting allows a color to be passed to the following text.
+  color-retention: true
+  # A use permission is used for allowing specifically players to use this filter.
+  # This differs from a bypass permission which disables the filter for that player.
+  permission:
+    use: "rosechat.filter.rainbow"
+
+discord:
+  matches:
+    - '!discord'
+  block: true
+  notify-staff-on-block: false
+  message: "Join our discord: https://discord.gg/MgUsTBK"
+  permission:
+    use: "rosechat.discord"
+
+item:
+  matches:
+    - "[item]"
+  replacement: "{item}"
+
+spoiler:
+  prefix: "<spoiler>"
+  suffix: "</spoiler>"
+  replacement: "{spoiler-tag}"
+  # This setting changes the length of the replacement to be the same as what is inside the spoiler tags.
+  # A four-letter word will become ⬛⬛⬛⬛.
+  match-length: true
+  permission:
+    use: rosechat.filter.spoiler
+
+regex-url:
+  # Regex matches can also be used.
+  matches:
+    - '(?:http(?:s){0,1}://){0,1}[-a-zA-Z0-9@:%._\+~#=]{2,32}\.[a-zA-Z0-9()]{2,16}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
+  use-regex: true
+  replacement: "{url}"
+  permission:
+    use: rosechat.filter.url
+
+player-tag:
+  # A prefix match looks if the text is used at the start of a word.
+  prefix: "@"
+  # A stop allows for text between the prefix and the stop to be matched.
+  stop: '[\p{P}\p{S}]'
+  # If a player is found within the text, it will change the text to their display name.
+  tag-players: true
+  # This setting plays a sound to the viewer.
+  # When combined with 'tag-online-players', only the tagged player will hear the sound.
+  sound: minecraft:block.note_block.pling
+  replacement: '{player-tag}'
+  permission:
+    use: rosechat.filter.tag
+
+# This filter matches words that start with [ and end with ].
+# At the same time, it matches words that start with ( and end with ), if the inline-regex is found.
+# This allows messages to be input as [Click Me!](www.example.com), checking for a url between the ().
+# The replacement then handles how it is displayed.
+url:
+  prefix: '['
+  suffix: ']'
+  inline-matches:
+    - '(?:http(?:s){0,1}://){0,1}[-a-zA-Z0-9@:%._\+~#=]{2,32}\.[a-zA-Z0-9()]{2,16}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)'
+  use-regex: true
+  inline-prefix: '('
+  inline-suffix: ')'
+  replacement: "{url}"
+  permission:
+    use: rosechat.filter.inline_url

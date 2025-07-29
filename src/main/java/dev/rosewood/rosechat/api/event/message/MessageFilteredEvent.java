@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.api.event.message;
 
-import dev.rosewood.rosechat.message.wrapper.MessageRules.RuleOutputs;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.MessageRules.RuleOutputs;
+import dev.rosewood.rosechat.message.RoseMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

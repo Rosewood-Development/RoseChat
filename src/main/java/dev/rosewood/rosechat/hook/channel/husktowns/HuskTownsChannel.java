@@ -7,6 +7,10 @@ import dev.rosewood.rosechat.hook.channel.ChannelProvider;
 import dev.rosewood.rosechat.hook.channel.rosechat.RoseChatChannel;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import net.william278.husktowns.api.BukkitHuskTownsAPI;
 import net.william278.husktowns.events.MemberJoinEvent;
 import net.william278.husktowns.events.MemberLeaveEvent;
@@ -19,10 +23,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public class HuskTownsChannel extends RoseChatChannel implements Listener {
 

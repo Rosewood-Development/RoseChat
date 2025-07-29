@@ -1,12 +1,12 @@
 package dev.rosewood.rosechat.hook.channel.rosechat;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public interface Spyable {
 

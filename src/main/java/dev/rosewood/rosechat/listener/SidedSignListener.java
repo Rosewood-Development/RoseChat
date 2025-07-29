@@ -4,11 +4,18 @@ import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.wrapper.MessageRules;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.MessageRules;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -32,10 +39,6 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SidedSignListener implements Listener {
 
@@ -200,18 +203,15 @@ public class SidedSignListener implements Listener {
             if (line.isEmpty())
                 continue;
 
-            MessageTokenizerResults<BaseComponent[]> components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
-            if (components == null || components.content().length == 0)
+            MessageContents components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
+            if (components == null)
                 continue;
 
-            ComponentBuilder builder = new ComponentBuilder();
-            for (BaseComponent component : components.content()) {
-                builder.append(component);
-                if (component.getColorRaw() == null)
-                    builder.color(ChatColor.of(hexColor));
-            }
+            String plainLine = components.build(ChatComposer.plain());
+            if (plainLine.isBlank())
+                continue;
 
-            side.setLine(i, TextComponent.toLegacyText(builder.build()));
+            components.sidedSigns().setSignText(sign, side, i);
         }
 
         sign.update();
@@ -241,7 +241,7 @@ public class SidedSignListener implements Listener {
         return true;
     }
 
-    private MessageTokenizerResults<BaseComponent[]>  parseLine(RosePlayer player, String text, PermissionArea area) {
+    private MessageContents parseLine(RosePlayer player, String text, PermissionArea area) {
         RoseMessage message = RoseMessage.forLocation(player, area);
         message.setPlayerInput(text);
         message.setUsePlayerChatColor(false);
@@ -250,10 +250,15 @@ public class SidedSignListener implements Listener {
         MessageRules.RuleOutputs outputs = rules.apply(message, text);
 
         if (outputs.isBlocked()) {
-            if (outputs.getWarning() != null)
-                outputs.getWarning().send(player);
+            if (outputs.getWarning() != null) {
+                if (outputs.getWarningMessage() != null) {
+                    player.send(outputs.getWarningMessage());
+                } else {
+                    outputs.getWarning().send(player);
+                }
+            }
 
-            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get()) {
+            if (Settings.SEND_BLOCKED_MESSAGES_TO_STAFF.get() && outputs.shouldNotifyStaff()) {
                 for (Player staffPlayer : Bukkit.getOnlinePlayers()) {
                     if (staffPlayer.hasPermission("rosechat.seeblocked")) {
                         RosePlayer rosePlayer = new RosePlayer(staffPlayer);

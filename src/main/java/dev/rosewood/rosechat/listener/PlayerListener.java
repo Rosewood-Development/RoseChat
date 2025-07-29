@@ -11,6 +11,10 @@ import dev.rosewood.rosechat.manager.PlayerDataManager;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -24,10 +28,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.TabCompleteEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
@@ -52,7 +52,7 @@ public class PlayerListener implements Listener {
             if (playerData.getNickname() != null)
                 player.updateDisplayName();
             else
-                playerData.setDisplayName(event.getPlayer().getDisplayName());
+                playerData.setStrippedDisplayName(event.getPlayer().getDisplayName());
 
             // If the current channel is not a group channel, put the player in the right channel.
             if (!playerData.isCurrentChannelGroupChannel() || playerData.getCurrentChannel() == null) {

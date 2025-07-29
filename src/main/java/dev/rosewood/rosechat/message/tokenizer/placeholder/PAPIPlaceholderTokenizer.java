@@ -6,12 +6,12 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 public class PAPIPlaceholderTokenizer extends Tokenizer {
 
@@ -42,7 +42,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
             OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(params.getReceiver().getRealName());
-            if (offlineReceiver == null || !offlineReceiver.hasPlayedBefore()) {
+            if (!offlineReceiver.isOnline() && !offlineReceiver.hasPlayedBefore()) {
                 content = originalContent;
             } else {
                 content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));

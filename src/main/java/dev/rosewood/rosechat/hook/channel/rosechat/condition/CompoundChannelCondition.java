@@ -3,9 +3,9 @@ package dev.rosewood.rosechat.hook.channel.rosechat.condition;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.placeholder.condition.PlaceholderCondition;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
-import org.bukkit.configuration.ConfigurationSection;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.configuration.ConfigurationSection;
 
 public class CompoundChannelCondition extends ChannelCondition {
 

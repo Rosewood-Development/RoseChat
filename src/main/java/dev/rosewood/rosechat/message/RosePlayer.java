@@ -7,14 +7,21 @@ import dev.rosewood.rosechat.api.event.player.PlayerNicknameEvent;
 import dev.rosewood.rosechat.chat.PlayerData;
 import dev.rosewood.rosechat.chat.channel.Channel;
 import dev.rosewood.rosechat.chat.channel.ChannelMessageOptions;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.channel.rosechat.GroupChannel;
-import dev.rosewood.rosechat.message.wrapper.MessageTokenizerResults;
-import dev.rosewood.rosechat.message.wrapper.RoseMessage;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
+import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosechat.placeholder.CustomPlaceholder;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -24,13 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Class for managing players and console messages.
@@ -86,11 +86,13 @@ public class RosePlayer {
         if (player != null) {
             this.offlinePlayer = player;
             this.name = player.getName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(player);
+            this.group = this.api.getVault() == null ?
+                    "default" : this.api.getVault().getPrimaryGroup(player);
         } else {
             this.offlinePlayer = offlinePlayer;
             this.name = offlinePlayer.getName();
-            this.group = this.api.getVault() == null ? "default" : this.api.getVault().getPrimaryGroup(null, offlinePlayer);
+            this.group = this.api.getVault() == null ?
+                    "default" : this.api.getVault().getPrimaryGroup(null, offlinePlayer);
         }
     }
 
@@ -156,6 +158,18 @@ public class RosePlayer {
             this.name = displayName;
     }
 
+    public void setDisplayName(MessageContents message) {
+        if (message == null) {
+            this.setDisplayName((String) null);
+            return;
+        }
+
+        if (this.isPlayer())
+            message.setDisplayName(this.asPlayer());
+        else
+            this.name = message.build(ChatComposer.plain());
+    }
+
     /**
      * @return A nickname or display name if the player is online. If not, then the player's username.
      */
@@ -201,21 +215,17 @@ public class RosePlayer {
     /**
      * @return Components containing the parsed nickname.
      */
-    public BaseComponent[] getParsedNickname() {
+    public MessageContents getParsedNickname() {
         String nickname = this.getNickname();
-        if (nickname == null)
-            return TextComponent.fromLegacyText(this.getName());
-
+        String name = nickname == null ? this.name : nickname;
         RoseMessage message = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
-        MessageTokenizerResults<BaseComponent[]> components = message.parse(this, nickname);
-
-        return components.content();
+        return message.parse(this, name);
     }
 
     /**
      * @param callback A callback containing the player's saved nickname, after being parsed.
      */
-    public void getParsedNickname(Consumer<BaseComponent[]> callback) {
+    public void getParsedNickname(Consumer<MessageContents> callback) {
         if (this.isConsole() || this.isPlayer()) {
             callback.accept(this.getParsedNickname());
             return;
@@ -223,20 +233,11 @@ public class RosePlayer {
 
         // If the player is offline, get the nickname from the database.
         this.api.getPlayerData(this.offlinePlayer.getUniqueId(), (data) -> {
-            if (data == null) {
-                callback.accept(TextComponent.fromLegacyText(this.name));
-                return;
-            }
-
-            String nickname = data.getNickname();
-            if (nickname == null) {
-                callback.accept(TextComponent.fromLegacyText(this.name));
-                return;
-            }
-
-            RoseMessage nicknameMessage = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
-            MessageTokenizerResults<BaseComponent[]> components = nicknameMessage.parse(this, nickname);
-            callback.accept(components.content());
+            String nickname = this.getNickname();
+            String name = nickname == null ? this.name : nickname;
+            RoseMessage message = RoseMessage.forLocation(this, PermissionArea.NICKNAME);
+            MessageContents components = message.parse(this, name);
+            callback.accept(components);
         });
     }
 
@@ -314,15 +315,15 @@ public class RosePlayer {
             if (Settings.UPDATE_PLAYER_LIST.get() && this.isPlayer())
                 this.asPlayer().setPlayerListName(null);
 
-            this.setDisplayName(null);
+            this.setDisplayName((String) null);
 
-            this.getPlayerData().setDisplayName(this.getRealName());
+            this.getPlayerData().setStrippedDisplayName(this.getRealName());
             return;
         }
 
         RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
-            String name = TextComponent.toLegacyText(this.getParsedNickname());
-            this.setDisplayName(name);
+            MessageContents parsedNickname = this.getParsedNickname();
+            this.setDisplayName(parsedNickname);
 
             if (RoseChat.getInstance().getNicknameProvider() != null)
                 RoseChat.getInstance().getNicknameProvider()
@@ -331,7 +332,7 @@ public class RosePlayer {
             if (Settings.UPDATE_PLAYER_LIST.get() && this.isPlayer())
                 this.asPlayer().setPlayerListName(name);
 
-            this.getPlayerData().setDisplayName(name);
+            this.getPlayerData().setStrippedDisplayName(parsedNickname.build(ChatComposer.plain()));
         });
     }
 
@@ -402,17 +403,20 @@ public class RosePlayer {
 
         List<String> completions = new ArrayList<>();
 
-        for (Replacement replacement : api.getReplacements()) {
-            if (replacement.getInput().isRegex() || replacement.getInput().isInlineRegex())
+        for (Filter filter : api.getFilters()) {
+            if (filter.useRegex() || filter.matches().isEmpty())
                 continue;
 
-            String text = replacement.getInput().getText() == null ?
-                    replacement.getInput().getPrefix() : replacement.getInput().getText();
+            if (!filter.addToSuggestions())
+                continue;
 
-            String permission = replacement.getInput().getPermission() == null ?
-                    "rosechat.replacement." + replacement.getId() : replacement.getInput().getPermission();
-            if (this.hasPermission(permission))
-                completions.add(text);
+            for (String match : filter.matches()) {
+                if (filter.hasPermission(this))
+                    completions.add(match);
+            }
+
+            if (filter.prefix() != null && filter.hasPermission(this))
+                completions.add(filter.prefix());
         }
 
         for (CustomPlaceholder placeholder : api.getPlaceholderManager().getPlaceholders().values()) {
@@ -478,6 +482,19 @@ public class RosePlayer {
         else if (this.isConsole()) {
             this.logToConsole(TextComponent.toPlainText(message));
             Bukkit.getConsoleSender().spigot().sendMessage(message);
+        }
+    }
+
+    /**
+     * Sends a message to the RosePlayer.
+     * @param message The message to send.
+     */
+    public void send(MessageContents message) {
+        if (this.isPlayer())
+            message.sendMessage(this.asPlayer());
+        else if (this.isConsole()) {
+            this.logToConsole(message.build(ChatComposer.plain()));
+            message.sendMessage(Bukkit.getConsoleSender());
         }
     }
 

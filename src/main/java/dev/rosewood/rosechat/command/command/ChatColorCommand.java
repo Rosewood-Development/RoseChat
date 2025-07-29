@@ -1,7 +1,7 @@
 package dev.rosewood.rosechat.command.command;
 
 import dev.rosewood.rosechat.chat.PlayerData;
-import dev.rosewood.rosechat.chat.replacement.Replacement;
+import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.command.RoseChatCommand;
 import dev.rosewood.rosechat.command.argument.RoseChatArgumentHandlers;
 import dev.rosewood.rosechat.message.MessageUtils;
@@ -92,19 +92,16 @@ public class ChatColorCommand extends RoseChatCommand {
         PlayerData targetData = target.getPlayerData();
         String colorStr = color;
 
-        // Allow color replacements.
-        Replacement replacement = this.getAPI().getReplacementById(color);
-        if (replacement != null) {
-            String permission = replacement.getInput().getPermission() == null ? "rosechat.replacement." + replacement.getId() :
-                    replacement.getInput().getPermission();
-
-            if (!player.hasPermission(permission)
-                    || !player.hasPermission("rosechat.replacements.chatcolor")) {
+        // Allow color filters.
+        Filter filter = this.getAPI().getFilterById(color);
+        if (filter != null) {
+            if (!filter.hasPermission(player)
+                    || !player.hasPermission("rosechat.filters.chatcolor")) {
                 player.sendLocaleMessage("no-permission");
                 return;
             }
 
-            color = replacement.getInput().getText();
+            color = filter.replacement();
         }
 
         targetData.setColor(color);
@@ -114,7 +111,7 @@ public class ChatColorCommand extends RoseChatCommand {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-rainbow");
         } else if (colorStr.startsWith("<g")) {
             colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-gradient");
-        } else if (replacement == null) {
+        } else if (filter == null) {
             if (colorStr.contains("#")) {
                 colorStr = (colorStr.contains("<") || colorStr.contains("{")) ?
                         colorStr.substring(2, colorStr.length() - 1) : colorStr.substring(1);
