@@ -37,7 +37,7 @@ public class RoseChatCommand extends BaseRoseCommand {
             return new RosePlayer(player);
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-        if (!offlinePlayer.hasPlayedBefore())
+        if (!offlinePlayer.isOnline() && !offlinePlayer.hasPlayedBefore())
             return null;
 
         return new RosePlayer(offlinePlayer);

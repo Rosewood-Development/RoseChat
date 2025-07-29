@@ -38,12 +38,11 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         if (!this.hasExtendedTokenPermission(params, "rosechat.placeholders", "rosechat.placeholder." + placeholderPermission))
             return null;
 
-        System.out.println("papi parse me");
         String originalContent = matcher.group();
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
             OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(params.getReceiver().getRealName());
-            if (offlineReceiver == null || !offlineReceiver.hasPlayedBefore()) {
+            if (!offlineReceiver.isOnline() && !offlineReceiver.hasPlayedBefore()) {
                 content = originalContent;
             } else {
                 content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
