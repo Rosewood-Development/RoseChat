@@ -50,7 +50,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = legacyToken.content().length();
             boolean canUseColors = this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "color");
             boolean hasColorPerm = !Settings.USE_PER_COLOR_PERMISSIONS.get()
-                    || this.hasTokenPermission(params, "rosechat." + legacyToken.color().getName().toLowerCase());
+                    || this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + legacyToken.color().getName().toLowerCase());
 
             return canUseColors && hasColorPerm
                     ? new TokenizerResult(Token.decorator(this.decorator(legacyToken.color(), shadow)), length + this.length(shadow))
