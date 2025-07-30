@@ -68,7 +68,7 @@ public class RainbowTokenizer extends Tokenizer {
         String content = matcher.group();
         return this.hasTokenPermission(params, "rosechat." + (shadow ? "shadow." : "") + "rainbow")
                 ? new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), content.length() + (shadow ? 1 : 0))
-                : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length());
+                : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), content.length() + (shadow ? 1 : 0));
     }
 
 }

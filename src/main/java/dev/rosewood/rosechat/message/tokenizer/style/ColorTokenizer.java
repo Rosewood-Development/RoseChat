@@ -42,7 +42,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = spigotHexToken.content().length();
             return (this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "color"))
                     ? new TokenizerResult(Token.decorator(this.decorator(spigotHexToken.color(), shadow)), length + this.length(shadow))
-                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : spigotHexToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + spigotHexToken.content()), length + this.length(shadow));
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
@@ -54,7 +54,7 @@ public class ColorTokenizer extends Tokenizer {
 
             return canUseColors && hasColorPerm
                     ? new TokenizerResult(Token.decorator(this.decorator(legacyToken.color(), shadow)), length + this.length(shadow))
-                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : legacyToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + legacyToken.content()), length + this.length(shadow));
         }
 
         ColorToken hexToken = this.parseMatcher(MessageUtils.HEX_REGEX, input);
@@ -62,7 +62,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = hexToken.content().length();
             return this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "hex")
                     ? new TokenizerResult(Token.decorator(this.decorator(hexToken.color(), shadow)), length + this.length(shadow))
-                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : hexToken.content()), length);
+                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + hexToken.content()), length + this.length(shadow));
         }
 
         // Don't continue from here, they are pre-parsed colors, of which there is no format for shadows
