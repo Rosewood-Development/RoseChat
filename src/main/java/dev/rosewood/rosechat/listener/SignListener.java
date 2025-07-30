@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.contents.MessageContents;
 import dev.rosewood.rosechat.message.RoseMessage;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -152,27 +154,34 @@ public class SignListener implements Listener {
 
         // Store the unformatted lines in PDC to edit later.
         Sign sign = (Sign) event.getBlock().getState();
-        sign.getPersistentDataContainer().set(LINES_KEY,
-                PersistentDataType.STRING, StringUtils.join(sign.getLines(), "\n"));
-
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
             this.updateSign(event.getPlayer(), sign, event.getLines());
         }, 0L);
     }
 
     private void updateSign(Player player, Sign sign, String[] lines) {
+        boolean blocked = false;
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.isEmpty())
                 continue;
 
             MessageContents components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
+            if (components == null) {
+                blocked = true;
+                continue;
+            }
+
             String plainLine = components.build(ChatComposer.plain());
             if (plainLine.isBlank())
                 continue;
 
             components.setSignText(sign, i);
         }
+
+        if (!blocked)
+            sign.getPersistentDataContainer().set(LINES_KEY,
+                    PersistentDataType.STRING, StringUtils.join(sign.getLines(), "\n"));
 
         sign.update();
     }

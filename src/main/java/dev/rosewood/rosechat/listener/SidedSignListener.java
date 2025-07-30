@@ -2,26 +2,19 @@ package dev.rosewood.rosechat.listener;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.config.Settings;
-import dev.rosewood.rosechat.message.PermissionArea;
-import dev.rosewood.rosechat.message.RosePlayer;
-import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.MessageRules;
-import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.PermissionArea;
 import dev.rosewood.rosechat.message.RoseMessage;
+import dev.rosewood.rosechat.message.RosePlayer;
+import dev.rosewood.rosechat.message.contents.MessageContents;
+import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosegarden.utils.NMSUtil;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -164,7 +157,8 @@ public class SidedSignListener implements Listener {
             Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
                 Sign updatedSign = (Sign) event.getClickedBlock().getState();
                 SignSide updatedSide = updatedSign.getTargetSide(player);
-                this.updateSign(player, updatedSign, updatedSide.getLines());
+                boolean isFrontSide = (updatedSide == updatedSign.getSide(Side.FRONT));
+                this.updateSign(player, updatedSign, isFrontSide ? Side.FRONT : Side.BACK, updatedSide.getLines());
             }, 0L);
 
             return;
@@ -180,39 +174,40 @@ public class SidedSignListener implements Listener {
 
         // Store the unformatted lines in PDC to edit later.
         Sign sign = (Sign) event.getBlock().getState();
-        sign.getPersistentDataContainer().set(event.getSide() == Side.FRONT ? FRONT_LINES_KEY : BACK_LINES_KEY,
-                PersistentDataType.LIST.strings(), Arrays.asList(event.getLines()));
 
         Bukkit.getScheduler().runTaskLater(RoseChat.getInstance(), () -> {
-            this.updateSign(event.getPlayer(), sign, event.getLines());
+            this.updateSign(event.getPlayer(), sign, event.getSide(), event.getLines());
         }, 0L);
     }
 
-    private void updateSign(Player player, Sign sign, String[] lines) {
-        SignSide side = sign.getTargetSide(player);
-        DyeColor signColor = side.getColor();
+    private void updateSign(Player player, Sign sign, Side side, String[] lines) {
+        SignSide signSide = sign.getSide(side);
+        DyeColor signColor = signSide.getColor();
         if (signColor == null)
             return;
 
-        Color color = signColor.getColor();
-        String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() / (sign.getLightLevel() * 0.1)),
-                (int) (color.getGreen() / (sign.getLightLevel() * 0.1)), (int) (color.getBlue() / (sign.getLightLevel() * 0.1)));
-
+        boolean blocked = false;
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             if (line.isEmpty())
                 continue;
 
             MessageContents components = this.parseLine(new RosePlayer(player), line, PermissionArea.SIGN);
-            if (components == null)
+            if (components == null) {
+                blocked = true;
                 continue;
+            }
 
             String plainLine = components.build(ChatComposer.plain());
             if (plainLine.isBlank())
                 continue;
 
-            components.sidedSigns().setSignText(sign, side, i);
+            components.sidedSigns().setSignText(sign, signSide, i);
         }
+
+        if (!blocked)
+            sign.getPersistentDataContainer().set(side == Side.FRONT ? FRONT_LINES_KEY : BACK_LINES_KEY,
+                    PersistentDataType.LIST.strings(), Arrays.asList(lines));
 
         sign.update();
     }
