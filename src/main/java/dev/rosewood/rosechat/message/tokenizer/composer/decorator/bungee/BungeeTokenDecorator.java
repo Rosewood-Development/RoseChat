@@ -25,8 +25,37 @@ public abstract class BungeeTokenDecorator<T extends TokenDecorator> implements 
     }
 
     @Override
-    public TokenDecorator getRoot() {
-        return this.decorator;
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        if (newDecorator instanceof BungeeTokenDecorator<?> bungeeTokenDecorator) {
+            return this.decorator.isOverwrittenBy(bungeeTokenDecorator.decorator);
+        } else {
+            return this.decorator.isOverwrittenBy(newDecorator);
+        }
+    }
+
+    @Override
+    public boolean isMarker() {
+        return this.decorator.isMarker();
+    }
+
+    @Override
+    public boolean blocksTextStitching() {
+        return this.decorator.blocksTextStitching();
+    }
+
+    @Override
+    public Token.Builder getContent() {
+        return this.decorator.getContent();
+    }
+
+    @Override
+    public void setContentToken(Token content) {
+        throw new IllegalStateException("Immutable");
+    }
+
+    @Override
+    public Token getContentToken() {
+        return this.decorator.getContentToken();
     }
 
     /**

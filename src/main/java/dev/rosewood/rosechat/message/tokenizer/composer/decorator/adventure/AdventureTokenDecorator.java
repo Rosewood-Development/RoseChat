@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer.composer.decorator.adventure;
 
 import dev.rosewood.rosechat.message.tokenizer.Token;
+import dev.rosewood.rosechat.message.tokenizer.composer.decorator.bungee.BungeeTokenDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ClickDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.ColorDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.DecoratorType;
@@ -25,8 +26,37 @@ public abstract class AdventureTokenDecorator<T extends TokenDecorator> implemen
     }
 
     @Override
-    public TokenDecorator getRoot() {
-        return this.decorator;
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        if (newDecorator instanceof AdventureTokenDecorator<?> bungeeTokenDecorator) {
+            return this.decorator.isOverwrittenBy(bungeeTokenDecorator.decorator);
+        } else {
+            return this.decorator.isOverwrittenBy(newDecorator);
+        }
+    }
+
+    @Override
+    public boolean isMarker() {
+        return this.decorator.isMarker();
+    }
+
+    @Override
+    public boolean blocksTextStitching() {
+        return this.decorator.blocksTextStitching();
+    }
+
+    @Override
+    public Token.Builder getContent() {
+        return this.decorator.getContent();
+    }
+
+    @Override
+    public void setContentToken(Token content) {
+        throw new IllegalStateException("Immutable");
+    }
+
+    @Override
+    public Token getContentToken() {
+        return this.decorator.getContentToken();
     }
 
     /**

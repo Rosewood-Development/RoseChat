@@ -28,7 +28,7 @@ public record ShadowColorDecorator(Function<Integer, HexUtils.ColorGenerator> co
         if (newDecorator instanceof FormatDecorator formatDecorator)
             return formatDecorator.formatType() == FormatDecorator.FormatType.RESET;
 
-        return TokenDecorator.super.isOverwrittenBy(newDecorator);
+        return newDecorator instanceof ShadowColorDecorator;
     }
 
     @Override

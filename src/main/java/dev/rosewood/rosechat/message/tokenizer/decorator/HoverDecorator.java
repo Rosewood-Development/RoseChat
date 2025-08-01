@@ -36,6 +36,11 @@ public final class HoverDecorator implements TokenDecorator {
     }
 
     @Override
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        return newDecorator instanceof HoverDecorator;
+    }
+
+    @Override
     public Token.Builder getContent() {
         return Token.group(String.join("\n", this.content));
     }

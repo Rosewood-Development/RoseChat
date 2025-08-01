@@ -15,7 +15,7 @@ public record FormatDecorator(FormatType formatType, boolean value) implements T
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (newDecorator.getRoot() instanceof FormatDecorator(FormatType type, boolean value)) {
+        if (newDecorator instanceof FormatDecorator(FormatType type, boolean value)) {
             if (type == FormatType.RESET)
                 return true;
 
@@ -25,7 +25,7 @@ public record FormatDecorator(FormatType formatType, boolean value) implements T
                 return false;
             }
         }
-        return newDecorator.getRoot() instanceof ColorDecorator;
+        return newDecorator instanceof ColorDecorator;
     }
 
     @Override

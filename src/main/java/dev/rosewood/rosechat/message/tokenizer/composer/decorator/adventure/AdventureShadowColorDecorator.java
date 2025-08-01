@@ -18,8 +18,12 @@ public class AdventureShadowColorDecorator extends AdventureTokenDecorator<Shado
 
     @Override
     public Component apply(Component component, Token parent) {
-        if (this.colorGenerator == null && this.decorator.colorGeneratorFunction() != null)
-            this.colorGenerator = this.decorator.colorGeneratorFunction().apply(MessageTokenizer.findDecoratorContentLength(parent, this));
+        if (this.colorGenerator == null && this.decorator.colorGeneratorFunction() != null) {
+            int contentLength = 0;
+            if (this.decorator.blocksTextStitching())
+                contentLength = MessageTokenizer.findDecoratorContentLength(parent, this.decorator);
+            this.colorGenerator = this.decorator.colorGeneratorFunction().apply(contentLength);
+        }
 
         if (!this.decorator.isMarker() && this.colorGenerator != null && (!(component instanceof TextComponent textComponent) || !textComponent.content().isBlank()))
             return component.shadowColor(ShadowColor.shadowColor(this.colorGenerator.nextChatColor().getColor().getRGB()));

@@ -11,18 +11,11 @@ public interface TokenDecorator {
 
     /**
      * Checks if this decorator is overwritten by the given decorator.
-     * Default implementation checks if the given decorator is the same class.
      *
      * @param newDecorator The decorator to check compatibility with
      * @return true if this decorator is overwritten by the given decorator
      */
-    default boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        return this.getRoot().getClass() == newDecorator.getRoot().getClass();
-    }
-
-    default TokenDecorator getRoot() {
-        return this;
-    }
+    boolean isOverwrittenBy(TokenDecorator newDecorator);
 
     /**
      * Checks if this decorator is a marker decorator.

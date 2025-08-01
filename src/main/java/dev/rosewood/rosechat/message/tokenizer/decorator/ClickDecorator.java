@@ -17,6 +17,11 @@ public record ClickDecorator(Action action, String value) implements TokenDecora
         return DecoratorType.ACTION;
     }
 
+    @Override
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        return newDecorator instanceof ClickDecorator;
+    }
+
     public enum Action {
         OPEN_URL,
         OPEN_FILE,

@@ -7,4 +7,9 @@ public record FontDecorator(String font) implements TokenDecorator {
         return DecoratorType.STYLING;
     }
 
+    @Override
+    public boolean isOverwrittenBy(TokenDecorator newDecorator) {
+        return newDecorator instanceof FontDecorator;
+    }
+
 }

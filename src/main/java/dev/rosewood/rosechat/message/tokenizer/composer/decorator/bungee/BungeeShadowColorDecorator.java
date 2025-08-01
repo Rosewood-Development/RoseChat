@@ -17,8 +17,12 @@ public class BungeeShadowColorDecorator extends BungeeTokenDecorator<ShadowColor
 
     @Override
     public void apply(BaseComponent component, Token parent) {
-        if (this.colorGenerator == null && this.decorator.colorGeneratorFunction() != null)
-            this.colorGenerator = this.decorator.colorGeneratorFunction().apply(MessageTokenizer.findDecoratorContentLength(parent, this));
+        if (this.colorGenerator == null && this.decorator.colorGeneratorFunction() != null) {
+            int contentLength = 0;
+            if (this.decorator.blocksTextStitching())
+                contentLength = MessageTokenizer.findDecoratorContentLength(parent, this.decorator);
+            this.colorGenerator = this.decorator.colorGeneratorFunction().apply(contentLength);
+        }
 
         if (!this.decorator.isMarker() && this.colorGenerator != null && (!(component instanceof TextComponent textComponent) || !textComponent.getText().isBlank()))
             component.setShadowColor(this.colorGenerator.nextChatColor().getColor());

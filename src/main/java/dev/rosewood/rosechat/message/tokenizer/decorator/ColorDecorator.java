@@ -22,10 +22,10 @@ public record ColorDecorator(Function<Integer, HexUtils.ColorGenerator> colorGen
 
     @Override
     public boolean isOverwrittenBy(TokenDecorator newDecorator) {
-        if (newDecorator.getRoot() instanceof FormatDecorator formatDecorator)
+        if (newDecorator instanceof FormatDecorator formatDecorator)
             return formatDecorator.formatType() == FormatDecorator.FormatType.RESET;
 
-        return TokenDecorator.super.isOverwrittenBy(newDecorator);
+        return newDecorator instanceof ColorDecorator;
     }
 
     @Override

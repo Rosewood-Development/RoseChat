@@ -31,7 +31,7 @@ public abstract class TokenDecorators<T extends TokenDecorator> {
         }
 
         for (TokenDecorator decorator : toAdd) {
-            if (!decorator.getRoot().isMarker()) {
+            if (!decorator.isMarker()) {
                 if (this.wrappedType.isInstance(decorator)) {
                     this.decorators.add(this.wrappedType.cast(decorator));
                 } else {
@@ -43,7 +43,7 @@ public abstract class TokenDecorators<T extends TokenDecorator> {
 
     public boolean blocksTextStitching() {
         for (TokenDecorator decorator : this.decorators)
-            if (decorator.getRoot().blocksTextStitching())
+            if (decorator.blocksTextStitching())
                 return true;
 
         return false;
