@@ -4,6 +4,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,7 @@ public class ToDiscordURLTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("["))
             return null;
@@ -29,7 +30,7 @@ public class ToDiscordURLTokenizer extends Tokenizer {
             return null;
 
         String markdown = matcher.group();
-        return new TokenizerResult(Token.text(markdown), markdown.length());
+        return List.of(new TokenizerResult(Token.text(markdown), 0, markdown.length()));
     }
 
 }

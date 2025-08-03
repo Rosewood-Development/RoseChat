@@ -1,6 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
-import dev.rosewood.rosechat.message.tokenizer.character.CharacterTokenizer;
+import dev.rosewood.rosechat.message.tokenizer.character.TextTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.ToDiscordURLTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.FromDiscordChannelTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.discord.channel.ToDiscordChannelTokenizer;
@@ -58,7 +58,7 @@ public class Tokenizers {
     public static final Tokenizer PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(false);
     public static final Tokenizer BUNGEE_PAPI_PLACEHOLDER = new PAPIPlaceholderTokenizer(true);
     public static final Tokenizer FILTER = new FilterTokenizer();
-    public static final Tokenizer CHARACTER = new CharacterTokenizer();
+    public static final Tokenizer CHARACTER = new TextTokenizer();
 
     public static final TokenizerBundle DEFAULT_BUNDLE = new TokenizerBundle("default",
             ROSECHAT_PLACEHOLDER,

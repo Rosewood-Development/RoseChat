@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +20,7 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("<"))
             return null;
@@ -36,14 +37,16 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
         String serverId = discord.getServerId();
         String content = Settings.DISCORD_FORMAT_CHANNEL.get();
 
-        return this.hasTokenPermission(params, "rosechat.discordchannel") ?
-                new TokenizerResult(Token.group(content)
-                .placeholder("server_id", serverId)
-                .placeholder("channel_id", matcher.group(1))
-                .placeholder("channel_name", channelName)
-                .ignoreTokenizer(this)
-                .build(), matcher.group().length())
-                : new TokenizerResult(Token.text(matcher.group()), matcher.group().length());
+        if (this.hasTokenPermission(params, "rosechat.discordchannel")) {
+            return List.of(new TokenizerResult(Token.group(content)
+                    .placeholder("server_id", serverId)
+                    .placeholder("channel_id", matcher.group(1))
+                    .placeholder("channel_name", channelName)
+                    .ignoreTokenizer(this)
+                    .build(), 0, matcher.group().length()));
+        } else {
+            return List.of(new TokenizerResult(Token.text(matcher.group()), 0, matcher.group().length()));
+        }
     }
 
 }

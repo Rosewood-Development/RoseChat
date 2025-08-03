@@ -9,6 +9,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ public class FromDiscordTagTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("<"))
             return null;
@@ -96,14 +97,14 @@ public class FromDiscordTagTokenizer extends Tokenizer {
                 RosePlayer player = new RosePlayer(offlinePlayer);
 
                 if (player.isOffline())
-                    return new TokenizerResult(Token.text(prefix + discord.getUserFromId(content)), originalContent.length());
+                    return List.of(new TokenizerResult(Token.text(prefix + discord.getUserFromId(content)), 0, originalContent.length()));
 
                 token = Token.group(prefix + player.getName());
             }
         }
 
         token.encapsulate();
-        return new TokenizerResult(token.build(), originalContent.length());
+        return List.of(new TokenizerResult(token.build(), 0, originalContent.length()));
     }
 
 }

@@ -17,11 +17,9 @@ public class TokenizerParams {
     private final Token parentToken;
     private final boolean usePlayerChatColor;
     private final MessageDirection direction;
-    private final Set<String> ignoredFilters;
 
     public TokenizerParams(RoseMessage message, RosePlayer receiver, String input, Token parentToken,
-                           boolean usePlayerChatColor, MessageDirection direction, MessageOutputs outputs,
-                           Set<String> ignoredFilters) {
+                           boolean usePlayerChatColor, MessageDirection direction, MessageOutputs outputs) {
         this.outputs = outputs;
         this.message = message;
         this.receiver = receiver;
@@ -29,7 +27,6 @@ public class TokenizerParams {
         this.parentToken = parentToken;
         this.usePlayerChatColor = usePlayerChatColor;
         this.direction = direction;
-        this.ignoredFilters = ignoredFilters;
     }
 
     public MessageOutputs getOutputs() {
@@ -84,7 +81,7 @@ public class TokenizerParams {
     }
 
     public Set<String> getIgnoredFilters() {
-        return this.ignoredFilters;
+        return this.parentToken.getIgnoredFilters();
     }
 
 }

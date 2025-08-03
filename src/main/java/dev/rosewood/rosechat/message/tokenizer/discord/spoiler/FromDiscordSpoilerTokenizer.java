@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import java.util.List;
 
 public class FromDiscordSpoilerTokenizer extends Tokenizer {
 
@@ -13,7 +14,7 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("||"))
             return null;
@@ -36,7 +37,7 @@ public class FromDiscordSpoilerTokenizer extends Tokenizer {
         String format = Settings.MARKDOWN_FORMAT_SPOILER.get();
         content = format.contains("%input_1%") ? format.replace("%input_1%", content) : format + content;
 
-        return new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), originalContent.length());
+        return List.of(new TokenizerResult(Token.group(content).ignoreTokenizer(this).build(), 0, originalContent.length()));
     }
 
 }

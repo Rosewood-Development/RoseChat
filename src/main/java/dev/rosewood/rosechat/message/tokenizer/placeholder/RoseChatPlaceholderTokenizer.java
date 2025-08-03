@@ -27,7 +27,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("{"))
             return null;
@@ -52,14 +52,14 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             if (playerInput == null || playerInput.isEmpty()) {
                 RoseChat.getInstance().getLogger().warning("Parsed " + placeholder + " with no player message. This is likely a configuration error. Printing a stacktrace for help.");
                 new RuntimeException().printStackTrace();
-                return new TokenizerResult(Token.text(""), matcher.group().length());
+                return List.of(new TokenizerResult(Token.text(""), 0, matcher.group().length()));
             }
 
             if (params.getSender().getPlayerData() == null)
-                return new TokenizerResult(Token.group(params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length());
+                return List.of(new TokenizerResult(Token.group(params.getPlayerMessage()).containsPlayerInput().build(), 0, matcher.group().length()));
 
             String color = params.shouldUsePlayerChatColor() ? params.getSender().getPlayerData().getColor() : "";
-            return new TokenizerResult(Token.group(color + params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length());
+            return List.of(new TokenizerResult(Token.group(color + params.getPlayerMessage()).containsPlayerInput().build(), 0, matcher.group().length()));
         }
 
         CustomPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
@@ -97,7 +97,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             tokenBuilder.ignoreTokenizer(this);
         }
 
-        return new TokenizerResult(tokenBuilder.build(), placeholder.length());
+        return List.of(new TokenizerResult(tokenBuilder.build(), 0, placeholder.length()));
     }
 
 }

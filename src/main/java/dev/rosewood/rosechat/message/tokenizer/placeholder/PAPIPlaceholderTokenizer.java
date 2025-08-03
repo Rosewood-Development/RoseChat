@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +25,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("%"))
             return null;
@@ -56,7 +57,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         // If we haven't changed, don't allow tokenizing this text anymore
         if (Objects.equals(content, originalContent))
-            return new TokenizerResult(Token.text(content), originalContent.length());
+            return List.of(new TokenizerResult(Token.text(content), 0, originalContent.length()));
 
         // Encapsulate if the placeholder only contains a colour or ends with a colour
         boolean encapsulate = true;
@@ -103,7 +104,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         if (encapsulate)
             token.encapsulate();
 
-        return new TokenizerResult(token.build(), originalContent.length());
+        return List.of(new TokenizerResult(token.build(), 0, originalContent.length()));
     }
 
 }

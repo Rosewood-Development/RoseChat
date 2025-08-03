@@ -8,6 +8,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
+import java.util.List;
 import java.util.regex.Matcher;
 import net.md_5.bungee.api.ChatColor;
 
@@ -18,7 +19,7 @@ public class FormatTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         if (!params.getInput().startsWith("&"))
             return null;
 
@@ -31,21 +32,21 @@ public class FormatTokenizer extends Tokenizer {
         char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
         boolean hasPermission = this.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
         if (!hasPermission)
-            return new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length());
+            return List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), 0, content.length()));
 
         ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
         boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
         if (formatCode == ChatColor.RESET) {
             if (!enableFormat) // Full format reset
-                return new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, false)), content.length());
+                return List.of(new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, false)), 0, content.length()));
 
             // Reset reapplies the player's chat color
             PlayerData playerData = params.getSender().getPlayerData();
             String chatColor = playerData != null && params.containsPlayerInput() ? playerData.getColor() : "";
-            return new TokenizerResult(Token.group("&R" + chatColor).build(), content.length());
+            return List.of(new TokenizerResult(Token.group("&R" + chatColor).build(), 0, content.length()));
         }
 
-        return new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, enableFormat)), content.length());
+        return List.of(new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, enableFormat)), 0, content.length()));
     }
 
     public String getPermissionForFormat(char format) {

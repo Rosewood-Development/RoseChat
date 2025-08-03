@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +20,7 @@ public class DiscordEmojiTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("<"))
             return null;
@@ -43,14 +44,14 @@ public class DiscordEmojiTokenizer extends Tokenizer {
                 }
 
                 content = filter.replacement();
-                return new TokenizerResult(Token.group(content)
+                return List.of(new TokenizerResult(Token.group(content)
                         .ignoreTokenizer(this)
                         .ignoreTokenizer(Tokenizers.FILTER)
-                        .build(), matcher.group().length());
+                        .build(), 0, matcher.group().length()));
             }
         }
 
-        return new TokenizerResult(Token.text(matcher.group(1)), matcher.group().length());
+        return List.of(new TokenizerResult(Token.text(matcher.group(1)), 0, matcher.group().length()));
     }
 
 }

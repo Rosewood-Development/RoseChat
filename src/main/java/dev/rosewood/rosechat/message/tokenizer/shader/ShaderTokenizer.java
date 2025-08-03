@@ -24,7 +24,7 @@ public class ShaderTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("#"))
             return null;
@@ -41,7 +41,7 @@ public class ShaderTokenizer extends Tokenizer {
             return null;
 
         String freeHex = findFreeHex(match.substring(1));
-        return new TokenizerResult(Token.group("#" + freeHex).build(), match.length());
+        return List.of(new TokenizerResult(Token.group("#" + freeHex).build(), 0, match.length()));
     }
 
     public static String findFreeHex(String hex) {

@@ -6,6 +6,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +19,7 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!input.startsWith("__"))
             return null;
@@ -38,16 +39,16 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
             return null;
 
         if (!format.contains("%input_1%")) {
-            return new TokenizerResult(Token.group(
+            return List.of(new TokenizerResult(Token.group(
                     Token.group(format).ignoreTokenizer(this).build(),
                     Token.group(content).ignoreTokenizer(this).containsPlayerInput().build()
-            ).build(), originalContent.length());
+            ).build(), 0, originalContent.length()));
         }
 
-        return new TokenizerResult(Token.group(format)
+        return List.of(new TokenizerResult(Token.group(format)
                 .placeholder("input_1", content)
                 .ignoreTokenizer(this)
-                .build(), originalContent.length());
+                .build(), 0, originalContent.length()));
     }
 
 }

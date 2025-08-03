@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageTokenizer {
@@ -65,43 +66,9 @@ public class MessageTokenizer {
                     tokens.stream().map(t -> t.getType().name() + ":" + t.getContent()).collect(Collectors.joining(" -> ")));
         }
 
-        String content = token.getContent();
-
-        outer:
-        while (!content.isEmpty()) {
-            for (Tokenizer tokenizer : this.tokenizers) {
-                if (token.getIgnoredTokenizers().contains(tokenizer))
-                    continue;
-
-                long startTime = System.nanoTime();
-                String originalContent = content;
-                this.parses++;
-
-                TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, token,
-                        this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs,
-                        token.getIgnoredFilters());
-                TokenizerResult result = tokenizer.tokenize(params);
-                if (result == null)
-                    continue;
-
-                Token child = result.token();
-                token.getChildren().add(child);
-                token.getChildren().forEach(x -> x.parent = token); // Make sure all children have their parent assigned
-                content = content.substring(result.consumed());
-
-                if (DEBUG_MANAGER.isEnabled() && tokenizer != Tokenizers.CHARACTER) {
-                    String finalContent = content;
-                    DEBUG_MANAGER.addMessage(() ->
-                            "[" + tokenizer.getClass().getSimpleName() + "] Tokenized: " + originalContent + " -> " +
-                                    (child.getType() == TokenType.DECORATOR ? finalContent : child.getContent() + finalContent) + " in " +
-                                    NUMBER_FORMAT.format((System.nanoTime() - startTime) / 1000000.0) + "ms");
-                }
-
-                continue outer;
-            }
-
-            throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
-        }
+        List<Token> children = this.tokenizeContent(token.getContent(), token, depth);
+        token.getChildren().addAll(children);
+        token.getChildren().forEach(x -> x.parent = token); // Make sure all children have their parent assigned
 
         this.tokenizeContentDecorators(token, depth);
 
@@ -110,6 +77,54 @@ public class MessageTokenizer {
             if (child.getType() == TokenType.GROUP)
                 this.tokenize(child, depth + 1);
         }
+    }
+
+    private List<Token> tokenizeContent(String content, Token parentToken, int depth) {
+        if (content.isEmpty())
+            return List.of();
+
+        TokenizerParams params = new TokenizerParams(this.roseMessage, this.viewer, content, parentToken,
+                this.roseMessage.shouldUsePlayerChatColor(), this.direction, this.outputs);
+        for (Tokenizer tokenizer : this.tokenizers) {
+            if (parentToken.getIgnoredTokenizers().contains(tokenizer))
+                continue;
+
+            long startTime = System.nanoTime();
+            this.parses++;
+
+            List<TokenizerResult> results = tokenizer.tokenize(params);
+            if (results == null || results.isEmpty())
+                continue;
+
+            // Match, build tokens from matched content and then tokenize the content between matches
+            List<Token> children = new ArrayList<>();
+            int currentIndex = 0;
+            for (TokenizerResult result : results) {
+                if (result.index() > currentIndex) {
+                    // Content before the match, tokenize
+                    children.addAll(this.tokenizeContent(content.substring(currentIndex, result.index()), parentToken, depth));
+                    currentIndex = result.index();
+                }
+                children.add(result.token());
+                currentIndex += result.consumed();
+            }
+
+            if (currentIndex < content.length()) {
+                // Content after the match, tokenize
+                children.addAll(this.tokenizeContent(content.substring(currentIndex), parentToken, depth + 1));
+            }
+
+            if (DEBUG_MANAGER.isEnabled() && tokenizer != Tokenizers.CHARACTER) {
+                DEBUG_MANAGER.addMessage(() ->
+                        "[" + tokenizer.getClass().getSimpleName() + "] Tokenized: " + content + " -> " +
+                                parentToken.getChildren().stream().filter(x -> x.getType() != TokenType.DECORATOR).map(Token::getContent).collect(Collectors.joining()) + " in " +
+                                NUMBER_FORMAT.format((System.nanoTime() - startTime) / 1000000.0) + "ms");
+            }
+
+            return children;
+        }
+
+        throw new IllegalStateException(String.format("No tokenizer was able to tokenize the content: [%s]", content));
     }
 
     private void tokenizeContentDecorators(Token token, int depth) {

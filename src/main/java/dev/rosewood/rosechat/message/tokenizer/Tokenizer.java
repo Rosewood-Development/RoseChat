@@ -1,6 +1,7 @@
 package dev.rosewood.rosechat.message.tokenizer;
 
 import dev.rosewood.rosechat.message.PermissionArea;
+import java.util.List;
 import java.util.regex.Matcher;
 
 public abstract class Tokenizer {
@@ -12,13 +13,12 @@ public abstract class Tokenizer {
     }
 
     /**
-     * Tokenizes the input.
-     * This method is called extremely frequently and should break out as early as possible if the input is not valid.
+     * Tokenizes the input and outputs a list of matches.
      *
      * @param params The {@link TokenizerParams} for this tokenization.
-     * @return A {@link TokenizerResult} or null if the input is invalid.
+     * @return A List of {@link TokenizerResult} or null (or an empty list) if the input is invalid.
      */
-    public abstract TokenizerResult tokenize(TokenizerParams params);
+    public abstract List<TokenizerResult> tokenize(TokenizerParams params);
 
     /**
      * @return The name of this tokenizer.

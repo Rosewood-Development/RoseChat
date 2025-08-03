@@ -10,6 +10,7 @@ import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.decorator.HoverDecorator;
 import dev.rosewood.rosegarden.utils.NMSUtil;
+import java.util.List;
 import org.apache.commons.text.WordUtils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,7 +37,7 @@ public class HeldItemTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         Filter filter = this.api.getFilterById(Settings.HELD_ITEM_FILTER.get());
         if (filter == null)
             return null;
@@ -49,14 +50,14 @@ public class HeldItemTokenizer extends Tokenizer {
             if (!params.getSender().isPlayer()
                     || !this.hasTokenPermission(params, "rosechat.helditem")
                     || params.getSender().asPlayer().getEquipment() == null)
-                return new TokenizerResult(Token.text(input), input.length());
+                return List.of(new TokenizerResult(Token.text(input), 0, input.length()));
 
             try {
                 ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
                 ItemMeta itemMeta = item.getItemMeta();
                 if (itemMeta == null)
-                    return new TokenizerResult(Token.text(input), input.length());
+                    return List.of(new TokenizerResult(Token.text(input), 0, input.length()));
 
                 int amount = item.getAmount();
                 String json = itemMeta.getAsString();
@@ -70,7 +71,7 @@ public class HeldItemTokenizer extends Tokenizer {
                     itemName = WordUtils.capitalize(item.getType().name().toLowerCase().replace("_", " "));
                 }
 
-                return new TokenizerResult(Token.group(filter.replacement())
+                return List.of(new TokenizerResult(Token.group(filter.replacement())
                         .decorate(new HoverDecorator(item, json))
                         .placeholder("item_name", itemName)
                         .placeholder("item", json)
@@ -78,7 +79,7 @@ public class HeldItemTokenizer extends Tokenizer {
                         .ignoreTokenizer(this)
                         .ignoreTokenizer(Tokenizers.FILTER)
                         .encapsulate()
-                        .build(), match.length());
+                        .build(), 0, match.length()));
             } catch (Exception e) {
                 return null;
             }

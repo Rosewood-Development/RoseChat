@@ -7,6 +7,7 @@ import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
+import java.util.List;
 
 public class ToDiscordTagTokenizer extends Tokenizer {
 
@@ -15,7 +16,7 @@ public class ToDiscordTagTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String input = params.getInput();
         if (!Settings.CAN_TAG_MEMBERS.get())
             return null;
@@ -31,7 +32,7 @@ public class ToDiscordTagTokenizer extends Tokenizer {
         if (member == null)
             return null;
 
-        return new TokenizerResult(Token.text(member.mention()), member.consumedTextLength() + 1);
+        return List.of(new TokenizerResult(Token.text(member.mention()), 0, member.consumedTextLength() + 1));
     }
 
 }
