@@ -42,12 +42,8 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
             OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(params.getReceiver().getRealName());
-            if (!offlineReceiver.isOnline() && !offlineReceiver.hasPlayedBefore()) {
-                content = originalContent;
-            } else {
-                content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
-                content = PlaceholderAPIHook.applyPlaceholders(offlineReceiver, content.replaceFirst("other_", ""));
-            }
+            content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
+            content = PlaceholderAPIHook.applyPlaceholders(offlineReceiver, content.replaceFirst("other_", ""));
         } else {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(params.getSender().getRealName());
             content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent);

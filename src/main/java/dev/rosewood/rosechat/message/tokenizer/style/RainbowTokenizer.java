@@ -22,7 +22,7 @@ public class RainbowTokenizer extends Tokenizer {
     public TokenizerResult tokenize(TokenizerParams params) {
         String input = params.getInput();
         boolean shadow;
-        if (input.charAt(0) == MessageUtils.SHADOW_PREFIX && input.length() >= 3) {
+        if (ShadowColorDecorator.VALID_VERSION && input.charAt(0) == MessageUtils.SHADOW_PREFIX && input.length() >= 3) {
             input = input.substring(1);
             shadow = true;
         } else shadow = false;
