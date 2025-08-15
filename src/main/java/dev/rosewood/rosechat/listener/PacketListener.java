@@ -260,10 +260,10 @@ public class PacketListener {
         if (Settings.DELETE_MESSAGE_SUFFIX.get()) {
             builder.append(components, ComponentBuilder.FormatRetention.NONE);
 
-            if (button != null)
+            if (button != null && button.length > 0)
                 builder.append(button);
         } else {
-            if (button != null)
+            if (button != null && button.length > 0)
                 builder.append(button);
 
             builder.append(components, ComponentBuilder.FormatRetention.NONE);
