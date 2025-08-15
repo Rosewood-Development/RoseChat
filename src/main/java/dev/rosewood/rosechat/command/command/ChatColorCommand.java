@@ -93,9 +93,9 @@ public class ChatColorCommand extends RoseChatCommand {
         String colorStr = color;
 
         // Allow color filters.
-        Filter filter = this.getAPI().getFilterById(color);
+        Filter filter = this.getAPI().getFilterByInput(color);
         if (filter != null) {
-            if (!filter.hasPermission(player)
+            if (!filter.colorRetention() || !filter.hasPermission(player)
                     || !player.hasPermission("rosechat.filters.chatcolor")) {
                 player.sendLocaleMessage("no-permission");
                 return;

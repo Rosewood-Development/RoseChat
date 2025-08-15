@@ -271,6 +271,19 @@ public final class RoseChatAPI {
     }
 
     /**
+     * @param input The text to search for.
+     * @return The filter containing the input, or null if it doesn't exist.
+     */
+    public Filter getFilterByInput(String input) {
+        for (Filter filter : this.getFilters()) {
+            if (filter.matches().contains(input))
+                return filter;
+        }
+
+        return null;
+    }
+
+    /**
      * @return A list of all filters.
      */
     public List<Filter> getFilters() {
