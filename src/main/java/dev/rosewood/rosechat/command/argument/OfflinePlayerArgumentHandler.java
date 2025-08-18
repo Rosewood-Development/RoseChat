@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import org.bukkit.entity.Player;
 
 public class OfflinePlayerArgumentHandler extends ArgumentHandler<String> {
 
@@ -26,6 +27,11 @@ public class OfflinePlayerArgumentHandler extends ArgumentHandler<String> {
     @Override
     public String handle(CommandContext context, Argument argument, InputIterator inputIterator) throws HandledArgumentException {
         String input = inputIterator.next();
+        if (MessageUtils.getPlayerExact(input) == null) {
+            Player player = MessageUtils.getPlayer(input);
+            if (player != null)
+                return player.getName();
+        }
 
         if (input.trim().isEmpty()) {
             throw new ArgumentHandler.HandledArgumentException("argument-handler-string");
@@ -38,7 +44,7 @@ public class OfflinePlayerArgumentHandler extends ArgumentHandler<String> {
     public List<String> suggest(CommandContext context, Argument argument, String[] args) {
         List<String> suggestions = new ArrayList<>(Bukkit.getOnlinePlayers().stream()
                 .filter(Predicate.not(MessageUtils::isPlayerVanished))
-                .map(p -> ChatColor.stripColor(p.getDisplayName()))
+                .map(p -> p.getDisplayName().contains(" ") ? p.getName() : ChatColor.stripColor(p.getDisplayName()))
                 .toList());
 
         if (this.withBungeePlayers && RoseChatAPI.getInstance().isBungee()) {
