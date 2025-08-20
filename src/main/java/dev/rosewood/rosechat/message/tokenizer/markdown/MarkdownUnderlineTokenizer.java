@@ -19,7 +19,11 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("__"))
             return null;
 
@@ -33,6 +37,9 @@ public class MarkdownUnderlineTokenizer extends Tokenizer {
         String originalContent = input.substring(0, matcher.end());
         String content = originalContent.substring(2, originalContent.length() - 2);
         String format = Settings.MARKDOWN_FORMAT_UNDERLINE.get();
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(originalContent), originalContent.length() + 1);
 
         if (MessageUtils.getPlayer("__" + content + "__") != null)
             return null;

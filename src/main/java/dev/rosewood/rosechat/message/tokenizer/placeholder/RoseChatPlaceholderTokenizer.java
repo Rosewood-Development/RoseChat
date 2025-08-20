@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.placeholder;
 
 import dev.rosewood.rosechat.RoseChat;
 import dev.rosewood.rosechat.api.RoseChatAPI;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.RosePlayer;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
@@ -28,7 +29,11 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("{"))
             return null;
 
@@ -65,6 +70,9 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
         CustomPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
         if (roseChatPlaceholder == null)
             return null;
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(placeholder), placeholder.length() + 1);
 
         StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), receiver, params.getChannel(), params.getPlaceholders()).build();
         String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), receiver, placeholders));

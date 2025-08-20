@@ -25,7 +25,11 @@ public class ShaderTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("#"))
             return null;
 
@@ -39,6 +43,9 @@ public class ShaderTokenizer extends Tokenizer {
 
         if (!this.shaderColors.contains(match.toLowerCase()))
             return null;
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(match), match.length() + 1);
 
         String freeHex = findFreeHex(match.substring(1));
         return new TokenizerResult(Token.group("#" + freeHex).build(), match.length());

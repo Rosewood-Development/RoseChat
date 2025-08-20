@@ -33,7 +33,11 @@ public class FilterTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (params.getLocation() != PermissionArea.CHANNEL && !params.getSender().hasPermission("rosechat.filters." + params.getLocationPermission()))
             return null;
 
@@ -50,7 +54,10 @@ public class FilterTokenizer extends Tokenizer {
             if (!matcher.find() || matcher.start() != 0)
                 continue;
 
-            return this.handleInlineMatch(params, filter, matcher);
+            if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+
+            return this.handleInlineMatch(params, filter, input, matcher);
         }
 
         for (Filter filter : RoseChatAPI.getInstance().getFilters()) {
@@ -68,7 +75,10 @@ public class FilterTokenizer extends Tokenizer {
                 if (!matcher.find() || matcher.start() != 0)
                     continue;
 
-                return this.handlePrefixMatch(params, filter, matcher.group());
+                if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+
+                return this.handlePrefixMatch(params, filter, input, matcher.group());
             }
 
             String foundMatch = this.matches(filter, filter.prefix(), input);
@@ -79,12 +89,17 @@ public class FilterTokenizer extends Tokenizer {
                 if (!input.contains(filter.suffix()))
                     continue;
 
+                if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+
                 // Filter has a suffix, content is within.
-                return this.handlePrefixSuffixMatch(params, filter);
+                return this.handlePrefixSuffixMatch(params, filter, input);
             } else {
+                if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
 
                 // Filter does not have a suffix, content is after the prefix.
-                return this.handlePrefixMatch(params, filter, foundMatch);
+                return this.handlePrefixMatch(params, filter, input, foundMatch);
             }
         }
 
@@ -104,8 +119,11 @@ public class FilterTokenizer extends Tokenizer {
                     if (!matcher.find() || matcher.start() != 0)
                         continue;
 
+                    if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                        return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+
                     // Found a regex match.
-                    return this.handleRegexMatch(params, filter, matcher);
+                    return this.handleRegexMatch(params, filter, input, matcher);
                 }
 
                 continue;
@@ -116,8 +134,11 @@ public class FilterTokenizer extends Tokenizer {
                 if (foundMatch == null || foundMatch.isEmpty())
                     continue;
 
+                if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+
                 // Found a normal match.
-                return this.handleMatch(params, filter, foundMatch);
+                return this.handleMatch(params, filter, input, foundMatch);
             }
         }
 
@@ -144,8 +165,8 @@ public class FilterTokenizer extends Tokenizer {
         return null;
     }
 
-    private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String match) {
-        if (!params.getInput().startsWith(match))
+    private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String input, String match) {
+        if (!input.startsWith(match))
             return null;
 
         if (params.getIgnoredFilters().contains(filter.id()))
@@ -164,9 +185,9 @@ public class FilterTokenizer extends Tokenizer {
         return new TokenizerResult(token.build(), match.length());
     }
 
-    private TokenizerResult handleRegexMatch(TokenizerParams params, Filter filter, Matcher matcher) {
+    private TokenizerResult handleRegexMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
         String match = matcher.group();
-        if (!params.getInput().startsWith(match))
+        if (!input.startsWith(match))
             return null;
 
         if (params.getIgnoredFilters().contains(filter.id()))
@@ -203,8 +224,7 @@ public class FilterTokenizer extends Tokenizer {
         return new TokenizerResult(token.build(), match.length());
     }
 
-    private TokenizerResult handlePrefixMatch(TokenizerParams params, Filter filter, String prefix) {
-        String input = params.getInput();
+    private TokenizerResult handlePrefixMatch(TokenizerParams params, Filter filter, String input, String prefix) {
         int endIndex = input.indexOf(" ");
         String match;
         String content;
@@ -247,11 +267,10 @@ public class FilterTokenizer extends Tokenizer {
         return new TokenizerResult(token.build(), match.length());
     }
 
-    private TokenizerResult handlePrefixSuffixMatch(TokenizerParams params, Filter filter) {
+    private TokenizerResult handlePrefixSuffixMatch(TokenizerParams params, Filter filter, String input) {
         String prefix = filter.prefix();
         String suffix = filter.suffix();
 
-        String input = params.getInput();
         int endIndex = input.lastIndexOf(suffix) + suffix.length();
         String match = input.substring(0, endIndex);
         String content = input.substring(prefix.length(), input.lastIndexOf(suffix));
@@ -289,12 +308,12 @@ public class FilterTokenizer extends Tokenizer {
         return new TokenizerResult(token.build(), match.length());
     }
 
-    public TokenizerResult handleInlineMatch(TokenizerParams params, Filter filter, Matcher matcher) {
+    public TokenizerResult handleInlineMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
         String originalContent = matcher.group();
         String content = matcher.group(1);
         String inline = matcher.group(2);
 
-        if (!params.getInput().startsWith(originalContent))
+        if (!input.startsWith(originalContent))
             return null;
 
         if (filter.useRegex()) {

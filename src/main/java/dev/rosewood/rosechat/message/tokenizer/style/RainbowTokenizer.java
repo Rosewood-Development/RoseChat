@@ -20,7 +20,11 @@ public class RainbowTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         boolean shadow;
         if (ShadowColorDecorator.VALID_VERSION && input.charAt(0) == MessageUtils.SHADOW_PREFIX && input.length() >= 3) {
             input = input.substring(1);
@@ -66,6 +70,12 @@ public class RainbowTokenizer extends Tokenizer {
         };
 
         String content = matcher.group();
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
+            if (shadow)
+                content = MessageUtils.SHADOW_PREFIX + content;
+            return new TokenizerResult(Token.text(content), content.length() + (shadow ? 2 : 1));
+        }
+
         return this.hasTokenPermission(params, "rosechat." + (shadow ? "shadow." : "") + "rainbow")
                 ? new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), content.length() + (shadow ? 1 : 0))
                 : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), content.length() + (shadow ? 1 : 0));

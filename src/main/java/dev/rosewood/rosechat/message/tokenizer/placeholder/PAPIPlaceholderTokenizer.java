@@ -25,7 +25,11 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("%"))
             return null;
 
@@ -52,7 +56,11 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         // If we haven't changed, don't allow tokenizing this text anymore
         if (Objects.equals(content, originalContent))
-            return new TokenizerResult(Token.text(content), originalContent.length());
+            return new TokenizerResult(Token.text(rawInput.length() > input.length() ? rawInput : input),
+                    Math.max(rawInput.length(), input.length()));
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(originalContent), originalContent.length() + 1);
 
         // Encapsulate if the placeholder only contains a colour or ends with a colour
         boolean encapsulate = true;

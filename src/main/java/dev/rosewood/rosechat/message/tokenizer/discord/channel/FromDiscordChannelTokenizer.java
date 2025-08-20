@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.discord.channel;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -20,7 +21,11 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
 
     @Override
     public TokenizerResult tokenize(TokenizerParams params) {
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("<"))
             return null;
 
@@ -36,6 +41,8 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
         String serverId = discord.getServerId();
         String content = Settings.DISCORD_FORMAT_CHANNEL.get();
 
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(input), input.length() + 1);
         return this.hasTokenPermission(params, "rosechat.discordchannel") ?
                 new TokenizerResult(Token.group(content)
                 .placeholder("server_id", serverId)

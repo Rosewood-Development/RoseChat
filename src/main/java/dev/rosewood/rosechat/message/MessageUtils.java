@@ -36,6 +36,7 @@ import org.bukkit.metadata.MetadataValue;
 @SuppressWarnings("deprecation")
 public class MessageUtils {
 
+    public static final char ESCAPE_CHAR = '\\';
     public static final char SHADOW_PREFIX = '$';
     public static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}]";
     public static final Pattern URL_PATTERN = Pattern.compile("(http(s)?://)?[-a-zA-Z0-9@:%_+~#=]{2,32}(?<!\\.)\\.(?!\\.)[a-zA-Z0-9()]{2,6}\\b([-a-zA-Z0-9()@:%_+~#?&/=]*(?<!\\.)\\.?(?!\\.))*");
