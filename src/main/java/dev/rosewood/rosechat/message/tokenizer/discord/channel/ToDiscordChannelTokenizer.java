@@ -2,6 +2,7 @@ package dev.rosewood.rosechat.message.tokenizer.discord.channel;
 
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -15,8 +16,12 @@ public class ToDiscordChannelTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("#"))
             return null;
 
@@ -28,7 +33,10 @@ public class ToDiscordChannelTokenizer extends Tokenizer {
         if (channel == null)
             return null;
 
-        return List.of(new TokenizerResult(Token.text(channel.mention()), 0, input.length()));
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(input), input.length() + 1);
+
+        return new TokenizerResult(Token.text(channel.mention()), input.length());
     }
 
 }

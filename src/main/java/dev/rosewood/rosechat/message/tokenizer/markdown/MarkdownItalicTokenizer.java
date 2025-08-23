@@ -19,8 +19,12 @@ public class MarkdownItalicTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("*") && !input.startsWith("_"))
             return null;
 
@@ -37,6 +41,9 @@ public class MarkdownItalicTokenizer extends Tokenizer {
 
         if (MessageUtils.getPlayer("_" + content + "_") != null)
             return null;
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(originalContent), originalContent.length() + 1);
 
         if (!format.contains("%input_1%")) {
             return List.of(new TokenizerResult(Token.group(

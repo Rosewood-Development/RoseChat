@@ -1,5 +1,6 @@
 package dev.rosewood.rosechat.message.tokenizer.discord;
 
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -17,8 +18,12 @@ public class ToDiscordURLTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("["))
             return null;
 
@@ -28,6 +33,9 @@ public class ToDiscordURLTokenizer extends Tokenizer {
         Matcher matcher = PATTERN.matcher(input);
         if (!matcher.find() || matcher.start() != 0)
             return null;
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(input), input.length() + 1);
 
         String markdown = matcher.group();
         return List.of(new TokenizerResult(Token.text(markdown), 0, markdown.length()));

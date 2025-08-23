@@ -404,7 +404,7 @@ public class RosePlayer {
         List<String> completions = new ArrayList<>();
 
         for (Filter filter : api.getFilters()) {
-            if (filter.useRegex() || filter.matches().isEmpty())
+            if (filter.useRegex() || filter.matches().isEmpty() || filter.block())
                 continue;
 
             if (!filter.addToSuggestions())

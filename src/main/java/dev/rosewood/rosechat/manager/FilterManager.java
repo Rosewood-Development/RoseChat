@@ -65,6 +65,7 @@ public class FilterManager extends Manager {
                 section.getBoolean("tag-players"),section.getBoolean("match-length"),
                 section.getBoolean("notify-staff"),
                 !section.contains("add-to-suggestions") || section.getBoolean("add-to-suggestions"),
+                section.getBoolean("escapable"),
                 section.getString("permission.bypass"), section.getString("permission.use"),
                 section.getString("hover"), section.getString("font"),
                 section.getString("replacement"), section.getString("discord-output"),

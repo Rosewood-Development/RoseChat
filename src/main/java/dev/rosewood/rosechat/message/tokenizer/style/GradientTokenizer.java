@@ -22,10 +22,14 @@ public class GradientTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         boolean shadow;
-        if (input.charAt(0) == MessageUtils.SHADOW_PREFIX && input.length() >= 3) {
+        if (ShadowColorDecorator.VALID_VERSION && input.charAt(0) == MessageUtils.SHADOW_PREFIX && input.length() >= 3) {
             input = input.substring(1);
             shadow = true;
         } else shadow = false;
@@ -63,11 +67,15 @@ public class GradientTokenizer extends Tokenizer {
         };
 
         String content = matcher.group();
-        if (this.hasTokenPermission(params, "rosechat." + (shadow ? "shadow." : "") + "gradient")) {
-            return List.of(new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), 0, content.length() + (shadow ? 1 : 0)));
-        } else {
-            return List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), 0, content.length() + (shadow ? 1 : 0)));
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
+            if (shadow)
+                content = MessageUtils.SHADOW_PREFIX + content;
+            return new TokenizerResult(Token.text(content), content.length() + (shadow ? 2 : 1));
         }
+
+        return this.hasTokenPermission(params, "rosechat." + (shadow ? "shadow." : "") + "gradient")
+                ? new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), content.length() + (shadow ? 1 : 0))
+                : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), content.length() + (shadow ? 1 : 0));
     }
 
 }

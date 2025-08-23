@@ -25,8 +25,12 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!input.startsWith("%"))
             return null;
 
@@ -43,12 +47,8 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
         String content;
         if (originalContent.startsWith("%other_") && !this.isBungee) {
             OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(params.getReceiver().getRealName());
-            if (!offlineReceiver.isOnline() && !offlineReceiver.hasPlayedBefore()) {
-                content = originalContent;
-            } else {
-                content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
-                content = PlaceholderAPIHook.applyPlaceholders(offlineReceiver, content.replaceFirst("other_", ""));
-            }
+            content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent.replaceFirst("other_", ""));
+            content = PlaceholderAPIHook.applyPlaceholders(offlineReceiver, content.replaceFirst("other_", ""));
         } else {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(params.getSender().getRealName());
             content = PlaceholderAPIHook.applyRelationalPlaceholders(params.getSender().asPlayer(), params.getReceiver().asPlayer(), originalContent);
@@ -57,7 +57,11 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         // If we haven't changed, don't allow tokenizing this text anymore
         if (Objects.equals(content, originalContent))
-            return List.of(new TokenizerResult(Token.text(content), 0, originalContent.length()));
+            return new TokenizerResult(Token.text(rawInput.length() > input.length() ? rawInput : input),
+                    Math.max(rawInput.length(), input.length()));
+
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(originalContent), originalContent.length() + 1);
 
         // Encapsulate if the placeholder only contains a colour or ends with a colour
         boolean encapsulate = true;

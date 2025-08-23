@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'dev.rosewood'
-version = 'Beta-35'
+version = 'Beta-37'
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))

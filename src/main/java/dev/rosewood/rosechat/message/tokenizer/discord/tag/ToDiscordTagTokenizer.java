@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.discord.tag;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.config.Settings;
 import dev.rosewood.rosechat.hook.discord.DiscordChatProvider;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -16,8 +17,12 @@ public class ToDiscordTagTokenizer extends Tokenizer {
     }
 
     @Override
-    public List<TokenizerResult> tokenize(TokenizerParams params) {
-        String input = params.getInput();
+    public TokenizerResult tokenize(TokenizerParams params) {
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         if (!Settings.CAN_TAG_MEMBERS.get())
             return null;
 
@@ -32,7 +37,10 @@ public class ToDiscordTagTokenizer extends Tokenizer {
         if (member == null)
             return null;
 
-        return List.of(new TokenizerResult(Token.text(member.mention()), 0, member.consumedTextLength() + 1));
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+            return new TokenizerResult(Token.text(input), input.length() + 1);
+
+        return new TokenizerResult(Token.text(member.mention()), member.consumedTextLength() + 1);
     }
 
 }

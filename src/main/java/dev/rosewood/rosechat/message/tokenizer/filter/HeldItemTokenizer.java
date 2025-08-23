@@ -3,6 +3,7 @@ package dev.rosewood.rosechat.message.tokenizer.filter;
 import dev.rosewood.rosechat.api.RoseChatAPI;
 import dev.rosewood.rosechat.chat.filter.Filter;
 import dev.rosewood.rosechat.config.Settings;
+import dev.rosewood.rosechat.message.MessageUtils;
 import dev.rosewood.rosechat.message.tokenizer.Token;
 import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
@@ -42,7 +43,11 @@ public class HeldItemTokenizer extends Tokenizer {
         if (filter == null)
             return null;
 
-        String input = params.getInput();
+        String rawInput = params.getInput();
+        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
+        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
+            return null;
+
         for (String match : filter.matches()) {
             if (!input.startsWith(match))
                 return null;
@@ -53,6 +58,9 @@ public class HeldItemTokenizer extends Tokenizer {
                 return List.of(new TokenizerResult(Token.text(input), 0, input.length()));
 
             try {
+                if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
+                    return new TokenizerResult(Token.text(match), match.length() + 1);
+
                 ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
                 ItemMeta itemMeta = item.getItemMeta();

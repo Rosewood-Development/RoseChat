@@ -308,7 +308,7 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
             if (outputs.getMessage() != null)
                 receiver.send(outputs.getMessage());
 
-            if (message.getSender().getUUID().equals(receiver.getUUID())) {
+            if (message.getSender().getUUID() != null && message.getSender().getUUID().equals(receiver.getUUID())) {
                 Bukkit.getScheduler().runTask(RoseChat.getInstance(), () -> {
                     for (String command : outputs.getServerCommands())
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
@@ -344,6 +344,11 @@ public class RoseChatChannel extends ConditionalChannel implements Spyable {
         RoseChatAPI api = RoseChatAPI.getInstance();
         if (api.getDiscord() == null || this.getSettings().getDiscord() == null || !Settings.USE_DISCORD.get())
             return;
+
+        if (this.settings.getFormats().get("minecraft-to-discord") == null ) {
+            RoseChat.getInstance().getLogger().warning("Unable to send message to Discord. 'minecraft-to-discord' format could not be found for channel '" + this.getId() + "'");
+            return;
+        }
 
         RoseChat.MESSAGE_THREAD_POOL.execute(() ->
                 api.getDiscord().sendMessage(message, this, this.getSettings().getDiscord()));

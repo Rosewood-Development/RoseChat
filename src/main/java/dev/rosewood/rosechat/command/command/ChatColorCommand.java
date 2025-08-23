@@ -14,6 +14,7 @@ import dev.rosewood.rosegarden.command.framework.CommandContext;
 import dev.rosewood.rosegarden.command.framework.CommandInfo;
 import dev.rosewood.rosegarden.command.framework.annotation.RoseExecutable;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
+import java.util.regex.Matcher;
 import org.bukkit.ChatColor;
 
 public class ChatColorCommand extends RoseChatCommand {
@@ -90,12 +91,13 @@ public class ChatColorCommand extends RoseChatCommand {
 
     private void setColor(RosePlayer player, RosePlayer target, String color) {
         PlayerData targetData = target.getPlayerData();
-        String colorStr = color;
+        String colorStr = color.startsWith("<") && color.endsWith(">") ?
+                color.substring(1, color.length() - 1).replace('_', ' ') : MessageUtils.ESCAPE_CHAR + color;
 
         // Allow color filters.
-        Filter filter = this.getAPI().getFilterById(color);
+        Filter filter = this.getAPI().getFilterByInput(color);
         if (filter != null) {
-            if (!filter.hasPermission(player)
+            if (!filter.colorRetention() || !filter.hasPermission(player)
                     || !player.hasPermission("rosechat.filters.chatcolor")) {
                 player.sendLocaleMessage("no-permission");
                 return;
@@ -107,22 +109,14 @@ public class ChatColorCommand extends RoseChatCommand {
         targetData.setColor(color);
         targetData.save();
 
-        if (colorStr.startsWith("<r")) {
-            colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-rainbow");
-        } else if (colorStr.startsWith("<g")) {
-            colorStr = this.getLocaleManager().getLocaleMessage("command-chatcolor-gradient");
-        } else if (filter == null) {
-            if (colorStr.contains("#")) {
-                colorStr = (colorStr.contains("<") || colorStr.contains("{")) ?
-                        colorStr.substring(2, colorStr.length() - 1) : colorStr.substring(1);
-
-                if (colorStr.startsWith("#"))
-                    colorStr = colorStr.substring(1);
-            } else {
-                colorStr = colorStr.substring(1);
-            }
-        } else {
-            colorStr = colorStr.replace('_', ' ');
+        if (color.startsWith("<r")) {
+            Matcher matcher = MessageUtils.RAINBOW_PATTERN.matcher(color);
+            if (matcher.find())
+                colorStr = this.getLocaleManager().getMessage("command-chatcolor-rainbow");
+        } else if (color.startsWith("<g")) {
+            Matcher matcher = MessageUtils.GRADIENT_PATTERN.matcher(color);
+            if (matcher.find())
+                colorStr = this.getLocaleManager().getMessage("command-chatcolor-gradient");
         }
 
         if (player.getUUID() == null || !player.getUUID().equals(target.getUUID()))

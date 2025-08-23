@@ -9,6 +9,7 @@ star:
   replacement: "✸"
   permission:
     use: rosechat.filter.star
+  escapable: true
 
 rosewood:
   matches:
@@ -17,6 +18,7 @@ rosewood:
   replacement: "\uE000"
   permission:
     use: rosechat.filter.rosewood
+  escapable: true
 
 heart:
   matches:
@@ -27,6 +29,7 @@ heart:
   replacement: "❤"
   permission:
     use: rosechat.filter.heart
+  escapable: true
 
 rainbow:
   matches:
