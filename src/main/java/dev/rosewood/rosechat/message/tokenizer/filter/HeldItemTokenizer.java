@@ -55,17 +55,17 @@ public class HeldItemTokenizer extends Tokenizer {
             if (!params.getSender().isPlayer()
                     || !this.hasTokenPermission(params, "rosechat.helditem")
                     || params.getSender().asPlayer().getEquipment() == null)
-                return List.of(new TokenizerResult(Token.text(input), 0, input.length()));
+                return List.of(new TokenizerResult(Token.text(input), input.length()));
 
             try {
                 if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                    return new TokenizerResult(Token.text(match), match.length() + 1);
+                    return List.of(new TokenizerResult(Token.text(match), match.length() + 1));
 
                 ItemStack item = params.getSender().asPlayer().getEquipment().getItemInMainHand();
 
                 ItemMeta itemMeta = item.getItemMeta();
                 if (itemMeta == null)
-                    return List.of(new TokenizerResult(Token.text(input), 0, input.length()));
+                    return List.of(new TokenizerResult(Token.text(input), input.length()));
 
                 int amount = item.getAmount();
                 String json = itemMeta.getAsString();
@@ -87,7 +87,7 @@ public class HeldItemTokenizer extends Tokenizer {
                         .ignoreTokenizer(this)
                         .ignoreTokenizer(Tokenizers.FILTER)
                         .encapsulate()
-                        .build(), 0, match.length()));
+                        .build(), match.length()));
             } catch (Exception e) {
                 return null;
             }

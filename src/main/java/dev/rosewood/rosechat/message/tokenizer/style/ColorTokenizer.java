@@ -25,7 +25,7 @@ public class ColorTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -46,12 +46,12 @@ public class ColorTokenizer extends Tokenizer {
             int length = spigotHexToken.content().length();
             if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
                 String content = shadow ? MessageUtils.SHADOW_PREFIX + spigotHexToken.content() : spigotHexToken.content;
-                return new TokenizerResult(Token.text(content), length + 1 + this.length(shadow));
+                return List.of(new TokenizerResult(Token.text(content), length + 1 + this.length(shadow)));
             }
 
             return (this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "color"))
-                    ? new TokenizerResult(Token.decorator(this.decorator(spigotHexToken.color(), shadow)), length + this.length(shadow))
-                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + spigotHexToken.content()), length + this.length(shadow));
+                    ? List.of(new TokenizerResult(Token.decorator(this.decorator(spigotHexToken.color(), shadow)), length + this.length(shadow)))
+                    : List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + spigotHexToken.content()), length + this.length(shadow)));
         }
 
         ColorToken legacyToken = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX, input);
@@ -59,7 +59,7 @@ public class ColorTokenizer extends Tokenizer {
             int length = legacyToken.content().length();
             if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
                 String content = shadow ? MessageUtils.SHADOW_PREFIX + legacyToken.content() : legacyToken.content;
-                return new TokenizerResult(Token.text(content), length + 1 + this.length(shadow));
+                return List.of(new TokenizerResult(Token.text(content), length + 1 + this.length(shadow)));
             }
 
             boolean canUseColors = this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "color");
@@ -67,9 +67,9 @@ public class ColorTokenizer extends Tokenizer {
                     || this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + legacyToken.color().getName().toLowerCase());
 
             if (canUseColors && hasColorPerm) {
-                return List.of(new TokenizerResult(Token.decorator(this.decorator(legacyToken.color(), shadow)), 0, length + this.length(shadow)));
+                return List.of(new TokenizerResult(Token.decorator(this.decorator(legacyToken.color(), shadow)), length + this.length(shadow)));
             } else {
-                return List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + legacyToken.content()), 0, length + this.length(shadow)));
+                return List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + legacyToken.content()), length + this.length(shadow)));
             }
         }
 
@@ -78,12 +78,12 @@ public class ColorTokenizer extends Tokenizer {
             int length = hexToken.content().length();
             if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
                 String content = shadow ? MessageUtils.SHADOW_PREFIX + hexToken.content() : hexToken.content;
-                return new TokenizerResult(Token.text(content), length + 1 + this.length(shadow));
+                return List.of(new TokenizerResult(Token.text(content), length + 1 + this.length(shadow)));
             }
 
             return this.hasTokenPermission(params, "rosechat." + this.shadow(shadow) + "hex")
-                    ? new TokenizerResult(Token.decorator(this.decorator(hexToken.color(), shadow)), length + this.length(shadow))
-                    : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + hexToken.content()), length + this.length(shadow));
+                    ? List.of(new TokenizerResult(Token.decorator(this.decorator(hexToken.color(), shadow)), length + this.length(shadow)))
+                    : List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + hexToken.content()), length + this.length(shadow)));
         }
 
         // Don't continue from here, they are pre-parsed colors, of which there is no format for shadows
@@ -93,12 +93,12 @@ public class ColorTokenizer extends Tokenizer {
         // Handle color codes that are already parsed
         ColorToken legacyTokenParsed = this.parseMatcher(MessageUtils.VALID_LEGACY_REGEX_PARSED, input);
         if (legacyTokenParsed != null)
-            return List.of(new TokenizerResult(Token.decorator(new ColorDecorator(legacyTokenParsed.color())), 0, legacyTokenParsed.content().length()));
+            return List.of(new TokenizerResult(Token.decorator(new ColorDecorator(legacyTokenParsed.color())), legacyTokenParsed.content().length()));
 
         // Handle hex codes that are already parsed
         ColorToken spigotHexTokenParsed = this.parseMatcher(MessageUtils.SPIGOT_HEX_REGEX_PARSED, input);
         if (spigotHexTokenParsed != null)
-            return List.of(new TokenizerResult(Token.decorator(new ColorDecorator(spigotHexTokenParsed.color())), 0, spigotHexTokenParsed.content().length()));
+            return List.of(new TokenizerResult(Token.decorator(new ColorDecorator(spigotHexTokenParsed.color())), spigotHexTokenParsed.content().length()));
 
         return null;
     }

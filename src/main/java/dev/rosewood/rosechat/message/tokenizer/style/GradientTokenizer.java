@@ -22,7 +22,7 @@ public class GradientTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -70,12 +70,12 @@ public class GradientTokenizer extends Tokenizer {
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR) {
             if (shadow)
                 content = MessageUtils.SHADOW_PREFIX + content;
-            return new TokenizerResult(Token.text(content), content.length() + (shadow ? 2 : 1));
+            return List.of(new TokenizerResult(Token.text(content), content.length() + (shadow ? 2 : 1)));
         }
 
         return this.hasTokenPermission(params, "rosechat." + (shadow ? "shadow." : "") + "gradient")
-                ? new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), content.length() + (shadow ? 1 : 0))
-                : new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), content.length() + (shadow ? 1 : 0));
+                ? List.of(new TokenizerResult(Token.decorator(!shadow ? new ColorDecorator(generatorGenerator) : new ShadowColorDecorator(generatorGenerator)), content.length() + (shadow ? 1 : 0)))
+                : List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : (shadow ? MessageUtils.SHADOW_PREFIX : "") + content), content.length() + (shadow ? 1 : 0)));
     }
 
 }

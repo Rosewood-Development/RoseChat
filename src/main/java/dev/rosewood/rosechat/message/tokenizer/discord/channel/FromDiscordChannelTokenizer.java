@@ -21,7 +21,7 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -43,15 +43,16 @@ public class FromDiscordChannelTokenizer extends Tokenizer {
         String content = Settings.DISCORD_FORMAT_CHANNEL.get();
 
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return new TokenizerResult(Token.text(input), input.length() + 1);
+            return List.of(new TokenizerResult(Token.text(input), input.length() + 1));
+
         return this.hasTokenPermission(params, "rosechat.discordchannel") ?
-                new TokenizerResult(Token.group(content)
+                List.of(new TokenizerResult(Token.group(content)
                 .placeholder("server_id", serverId)
                 .placeholder("channel_id", matcher.group(1))
                 .placeholder("channel_name", channelName)
                 .ignoreTokenizer(this)
-                .build(), matcher.group().length())
-                : new TokenizerResult(Token.text(matcher.group()), matcher.group().length());
+                .build(), matcher.group().length()))
+                : List.of(new TokenizerResult(Token.text(matcher.group()), matcher.group().length()));
     }
 
 }

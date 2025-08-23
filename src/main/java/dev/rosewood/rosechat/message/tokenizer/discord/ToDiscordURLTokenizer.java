@@ -18,7 +18,7 @@ public class ToDiscordURLTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -35,10 +35,10 @@ public class ToDiscordURLTokenizer extends Tokenizer {
             return null;
 
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return new TokenizerResult(Token.text(input), input.length() + 1);
+            return List.of(new TokenizerResult(Token.text(input), input.length() + 1));
 
         String markdown = matcher.group();
-        return List.of(new TokenizerResult(Token.text(markdown), 0, markdown.length()));
+        return List.of(new TokenizerResult(Token.text(markdown), markdown.length()));
     }
 
 }

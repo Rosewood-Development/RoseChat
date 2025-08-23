@@ -51,7 +51,7 @@ public class TokenPlaceholderTokenizer extends Tokenizer {
         if (ignoreSelf)
             builder.ignoreTokenizer(this);
 
-        return List.of(new TokenizerResult(builder.build(), 0, rawPlaceholder.length()));
+        return List.of(new TokenizerResult(builder.build(), rawPlaceholder.length()));
     }
 
 }

@@ -35,19 +35,19 @@ public class MarkdownBlockQuoteTokenizer extends Tokenizer {
         String format = Settings.MARKDOWN_FORMAT_BLOCK_QUOTES.get();
 
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return new TokenizerResult(Token.text(input), input.length() + 1);
+            return List.of(new TokenizerResult(Token.text(input), input.length() + 1));
 
         if (!format.contains("%input_1%")) {
             return List.of(new TokenizerResult(Token.group(
                     Token.group(format).ignoreTokenizer(this).build(),
                     Token.group(content).ignoreTokenizer(this).containsPlayerInput().build()
-            ).build(), 0, input.length()));
+            ).build(), input.length()));
         }
 
         return List.of(new TokenizerResult(Token.group(format)
                 .placeholder("input_1", content)
                 .ignoreTokenizer(this)
-                .build(), 0, input.length()));
+                .build(), input.length()));
     }
 
 }

@@ -28,7 +28,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -57,14 +57,14 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             if (playerInput == null || playerInput.isEmpty()) {
                 RoseChat.getInstance().getLogger().warning("Parsed " + placeholder + " with no player message. This is likely a configuration error. Printing a stacktrace for help.");
                 new RuntimeException().printStackTrace();
-                return List.of(new TokenizerResult(Token.text(""), 0, matcher.group().length()));
+                return List.of(new TokenizerResult(Token.text(""), matcher.group().length()));
             }
 
             if (params.getSender().getPlayerData() == null)
-                return List.of(new TokenizerResult(Token.group(params.getPlayerMessage()).containsPlayerInput().build(), 0, matcher.group().length()));
+                return List.of(new TokenizerResult(Token.group(params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length()));
 
             String color = params.shouldUsePlayerChatColor() ? params.getSender().getPlayerData().getColor() : "";
-            return List.of(new TokenizerResult(Token.group(color + params.getPlayerMessage()).containsPlayerInput().build(), 0, matcher.group().length()));
+            return List.of(new TokenizerResult(Token.group(color + params.getPlayerMessage()).containsPlayerInput().build(), matcher.group().length()));
         }
 
         CustomPlaceholder roseChatPlaceholder = RoseChatAPI.getInstance().getPlaceholderManager().getPlaceholder(placeholderValue);
@@ -72,7 +72,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             return null;
 
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return new TokenizerResult(Token.text(placeholder), placeholder.length() + 1);
+            return List.of(new TokenizerResult(Token.text(placeholder), placeholder.length() + 1));
 
         StringPlaceholders placeholders = DefaultPlaceholders.getFor(params.getSender(), receiver, params.getChannel(), params.getPlaceholders()).build();
         String content = placeholders.apply(roseChatPlaceholder.get("text").parseToString(params.getSender(), receiver, placeholders));
@@ -105,7 +105,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
             tokenBuilder.ignoreTokenizer(this);
         }
 
-        return List.of(new TokenizerResult(tokenBuilder.build(), 0, placeholder.length()));
+        return List.of(new TokenizerResult(tokenBuilder.build(), placeholder.length()));
     }
 
 }

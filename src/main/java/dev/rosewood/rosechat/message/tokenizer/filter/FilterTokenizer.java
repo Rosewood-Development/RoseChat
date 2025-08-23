@@ -32,7 +32,7 @@ public class FilterTokenizer extends Tokenizer {
     }
 
     @Override
-    public TokenizerResult tokenize(TokenizerParams params) {
+    public List<TokenizerResult> tokenize(TokenizerParams params) {
         String rawInput = params.getInput();
         String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
         if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
@@ -55,7 +55,7 @@ public class FilterTokenizer extends Tokenizer {
                 continue;
 
             if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
             return this.handleInlineMatch(params, filter, input, matcher);
         }
@@ -76,7 +76,7 @@ public class FilterTokenizer extends Tokenizer {
                     continue;
 
                 if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                    return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
                 return this.handlePrefixMatch(params, filter, input, matcher.group());
             }
@@ -90,13 +90,13 @@ public class FilterTokenizer extends Tokenizer {
                     continue;
 
                 if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                    return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
                 // Filter has a suffix, content is within.
                 return this.handlePrefixSuffixMatch(params, filter, input);
             } else {
                 if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                    return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
                 // Filter does not have a suffix, content is after the prefix.
                 return this.handlePrefixMatch(params, filter, input, foundMatch);
@@ -120,7 +120,7 @@ public class FilterTokenizer extends Tokenizer {
                         continue;
 
                     if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                        return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                        return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
                     // Found a regex match.
                     return this.handleRegexMatch(params, filter, input, matcher);
@@ -135,7 +135,7 @@ public class FilterTokenizer extends Tokenizer {
                     continue;
 
                 if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-                    return filter.escapable() ? new TokenizerResult(Token.text(input), input.length() + 1) : null;
+                    return filter.escapable() ? List.of(new TokenizerResult(Token.text(input), input.length() + 1)) : null;
 
                 // Found a normal match.
                 return this.handleMatch(params, filter, input, foundMatch);
@@ -165,7 +165,7 @@ public class FilterTokenizer extends Tokenizer {
         return null;
     }
 
-    private TokenizerResult handleMatch(TokenizerParams params, Filter filter, String input, String match) {
+    private List<TokenizerResult> handleMatch(TokenizerParams params, Filter filter, String input, String match) {
         if (!input.startsWith(match))
             return null;
 
@@ -182,10 +182,10 @@ public class FilterTokenizer extends Tokenizer {
         content = this.applySignFix(params, filter, content);
 
         Token.Builder token = this.createFilterToken(params, filter, content);
-        return List.of(new TokenizerResult(token.build(), 0, match.length()));
+        return List.of(new TokenizerResult(token.build(), match.length()));
     }
 
-    private TokenizerResult handleRegexMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
+    private List<TokenizerResult> handleRegexMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
         String match = matcher.group();
         if (!input.startsWith(match))
             return null;
@@ -221,10 +221,10 @@ public class FilterTokenizer extends Tokenizer {
 
         token.ignoreTokenizer(this);
 
-        return List.of(new TokenizerResult(token.build(), 0, match.length()));
+        return List.of(new TokenizerResult(token.build(), match.length()));
     }
 
-    private TokenizerResult handlePrefixMatch(TokenizerParams params, Filter filter, String input, String prefix) {
+    private List<TokenizerResult> handlePrefixMatch(TokenizerParams params, Filter filter, String input, String prefix) {
         int endIndex = input.indexOf(" ");
         String match;
         String content;
@@ -264,10 +264,10 @@ public class FilterTokenizer extends Tokenizer {
                 .placeholder("group_0", match)
                 .placeholder("group_1", content);
 
-        return List.of(new TokenizerResult(token.build(), 0, match.length()));
+        return List.of(new TokenizerResult(token.build(), match.length()));
     }
 
-    private TokenizerResult handlePrefixSuffixMatch(TokenizerParams params, Filter filter, String input) {
+    private List<TokenizerResult> handlePrefixSuffixMatch(TokenizerParams params, Filter filter, String input) {
         String prefix = filter.prefix();
         String suffix = filter.suffix();
 
@@ -305,10 +305,10 @@ public class FilterTokenizer extends Tokenizer {
 
         token.encapsulate(true);
 
-        return List.of(new TokenizerResult(token.build(), 0, match.length()));
+        return List.of(new TokenizerResult(token.build(), match.length()));
     }
 
-    public TokenizerResult handleInlineMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
+    public List<TokenizerResult> handleInlineMatch(TokenizerParams params, Filter filter, String input, Matcher matcher) {
         String originalContent = matcher.group();
         String content = matcher.group(1);
         String inline = matcher.group(2);
@@ -380,12 +380,12 @@ public class FilterTokenizer extends Tokenizer {
 
         token.encapsulate(true);
 
-        return List.of(new TokenizerResult(token.build(), 0, originalContent.length()));
+        return List.of(new TokenizerResult(token.build(), originalContent.length()));
     }
 
     private List<TokenizerResult> validateRemoval(String match) {
         return Settings.REMOVE_FILTERS.get() ?
-                List.of(new TokenizerResult(Token.text(" "), 0, match.length())) :
+                List.of(new TokenizerResult(Token.text(" "), match.length())) :
                 null;
     }
     
