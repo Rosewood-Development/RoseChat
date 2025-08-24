@@ -8,8 +8,12 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizer;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerParams;
 import dev.rosewood.rosechat.message.tokenizer.TokenizerResult;
 import dev.rosewood.rosechat.message.tokenizer.decorator.FormatDecorator;
+import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.md_5.bungee.api.ChatColor;
 
 public class FormatTokenizer extends Tokenizer {
@@ -20,54 +24,69 @@ public class FormatTokenizer extends Tokenizer {
 
     @Override
     public List<TokenizerResult> tokenize(TokenizerParams params) {
-        if (true) return null;
-        String rawInput = params.getInput();
-        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
-        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
-            return null;
+        List<TokenizerResult> results = new ArrayList<>();
 
-        if (!input.startsWith("&"))
-            return null;
+        this.collectMatches(MessageUtils.LEGACY_REGEX_FORMATTING, params, results, true, true);
+        this.collectMatches(MessageUtils.LEGACY_REGEX_FORMATTING_PARSED, params, results, false, false);
 
-        Matcher matcher = MessageUtils.VALID_LEGACY_REGEX_FORMATTING.matcher(input);
-        if (!matcher.find() || matcher.start() != 0)
-            return null;
-
-        String content = matcher.group();
-        char formatCharacter = content.charAt(1);
-        char formatCharacterLowercase = Character.toLowerCase(formatCharacter);
-        boolean hasPermission = this.hasTokenPermission(params, this.getPermissionForFormat(formatCharacterLowercase));
-        if (!hasPermission)
-            return List.of(new TokenizerResult(Token.text(Settings.REMOVE_COLOR_CODES.get() ? "" : content), content.length()));
-
-        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return List.of(new TokenizerResult(Token.text(content), content.length() + 1));
-
-        ChatColor formatCode = ChatColor.getByChar(formatCharacterLowercase);
-        boolean enableFormat = Character.isLowerCase(formatCharacter); // Lowercase = enable format, uppercase = disable format
-        if (formatCode == ChatColor.RESET) {
-            if (!enableFormat) // Full format reset
-                return List.of(new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, false)), content.length()));
-
-            // Reset reapplies the player's chat color
-            PlayerData playerData = params.getSender().getPlayerData();
-            String chatColor = playerData != null && params.containsPlayerInput() ? playerData.getColor() : "";
-            return List.of(new TokenizerResult(Token.group("&R" + chatColor).build(), content.length()));
-        }
-
-        return List.of(new TokenizerResult(Token.decorator(new FormatDecorator(formatCode, enableFormat)), content.length()));
+        Collections.sort(results);
+        return results;
     }
 
-    public String getPermissionForFormat(char format) {
-        return switch (format) {
-            case 'l' -> "rosechat.bold";
-            case 'n' -> "rosechat.underline";
-            case 'm' -> "rosechat.strikethrough";
-            case 'o' -> "rosechat.italic";
-            case 'k' -> "rosechat.magic";
-            default -> null;
-        };
+    private void collectMatches(Pattern pattern, TokenizerParams params, List<TokenizerResult> results, boolean checkPermission, boolean parseShadow) {
+        String input = params.getInput();
+        Matcher matcher = pattern.matcher(input);
 
+        while (matcher.find()) {
+            int start = matcher.start();
+            int end = matcher.end();
+            String match = matcher.group();
+
+            boolean escape = (start > 0) && input.charAt(start - 1) == MessageUtils.ESCAPE_CHAR && params.getSender().hasPermission("rosechat.escape");
+
+            int offset = (escape ? 1 : 0);
+            int realStart = start - offset;
+            int consumed = match.length() + offset;
+            if (escape) {
+                String rawInput = input.substring(realStart + 1, end);
+                results.add(new TokenizerResult(Token.text(rawInput), realStart, consumed));
+                continue;
+            }
+
+            char formatChar = match.charAt(1);
+            char formatCharLower = Character.toLowerCase(formatChar);
+            boolean enableFormat = formatChar == formatCharLower;
+            ChatColor formatCode = ChatColor.getByChar(formatCharLower);
+
+            if (checkPermission && !this.hasTokenPermission(params, "rosechat." + this.getFormatName(formatCharLower))) {
+                String text = Settings.REMOVE_COLOR_CODES.get() ? "" : input.substring(realStart, end);
+                results.add(new TokenizerResult(Token.text(text), realStart, consumed));
+                continue;
+            }
+
+            // &r reapplies the player's chat color
+            if (formatChar == 'r') {
+                PlayerData playerData = params.getSender().getPlayerData();
+                String chatColor = playerData != null && params.containsPlayerInput() ? playerData.getColor() : "";
+                results.add(new TokenizerResult(Token.group("&R" + chatColor).build(), realStart, consumed));
+                continue;
+            }
+
+            TokenDecorator decorator = new FormatDecorator(formatCode, enableFormat);
+            results.add(new TokenizerResult(Token.decorator(decorator), realStart, consumed));
+        }
+    }
+
+    private String getFormatName(char format) {
+        return switch (format) {
+            case 'k' -> "magic";
+            case 'l' -> "bold";
+            case 'm' -> "strikethrough";
+            case 'n' -> "underline";
+            case 'o' -> "italic";
+            case 'r' -> "reset";
+            default -> throw new IllegalStateException("Unhandled format code: " + format);
+        };
     }
 
 }

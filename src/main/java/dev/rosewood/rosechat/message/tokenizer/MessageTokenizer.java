@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class MessageTokenizer {
 
     private static final DebugManager DEBUG_MANAGER = RoseChat.getInstance().getManager(DebugManager.class);
-    private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("#.##");
+    private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("#.###");
 
     private final List<Tokenizer> tokenizers;
     private final RoseMessage roseMessage;
@@ -178,7 +178,7 @@ public class MessageTokenizer {
             DEBUG_MANAGER.addMessage(() ->
                     "Completed Tokenizing: " + plainText + "\n"
                     + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
-                            "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.totalParses + " times with " + tokenizer.tokenMatches + " successful parses");
+                            "ms to create " + countTokens(token) + " tokens with " + tokenizer.totalParses + " parses and " + tokenizer.tokenMatches + " token matches");
         }
 
         return MessageContents.fromToken(token, outputs);

@@ -11,7 +11,7 @@ import dev.rosewood.rosechat.message.tokenizer.decorator.ShadowColorDecorator;
 import dev.rosewood.rosechat.message.tokenizer.decorator.TokenDecorator;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,14 +29,14 @@ public class ColorTokenizer extends Tokenizer {
 
         // Handle hex and legacy color codes
         this.collectMatches(MessageUtils.SPIGOT_HEX_REGEX, params, results, "color", false, true);
-        this.collectMatches(MessageUtils.VALID_LEGACY_REGEX, params, results, "color", true, true);
+        this.collectMatches(MessageUtils.LEGACY_REGEX, params, results, "color", Settings.USE_PER_COLOR_PERMISSIONS.get(), true);
         this.collectMatches(MessageUtils.HEX_REGEX, params, results, "hex", false, true);
 
         // Handle colors that are already parsed
         this.collectMatches(MessageUtils.SPIGOT_HEX_REGEX_PARSED, params, results, null, false, false);
-        this.collectMatches(MessageUtils.VALID_LEGACY_REGEX_PARSED, params, results, null, false, false);
+        this.collectMatches(MessageUtils.LEGACY_REGEX_PARSED, params, results, null, false, false);
 
-        results.sort(Comparator.comparingInt(TokenizerResult::index));
+        Collections.sort(results);
         return results;
     }
 
@@ -46,8 +46,9 @@ public class ColorTokenizer extends Tokenizer {
 
         while (matcher.find()) {
             int start = matcher.start();
+            int end = matcher.end();
             String match = matcher.group();
-            if (this.overlaps(results, start, matcher.end()))
+            if (TokenizerResult.overlaps(results, start, end))
                 continue;
 
             boolean shadow = parseShadow && ShadowColorDecorator.VALID_VERSION && start > 0 && input.charAt(start - 1) == MessageUtils.SHADOW_PREFIX;
@@ -57,7 +58,7 @@ public class ColorTokenizer extends Tokenizer {
             int realStart = start - offset;
             int consumed = match.length() + offset;
             if (escape) {
-                String rawInput = input.substring(realStart + 1, matcher.end());
+                String rawInput = input.substring(realStart + 1, end);
                 results.add(new TokenizerResult(Token.text(rawInput), realStart, consumed));
                 continue;
             }
@@ -69,7 +70,7 @@ public class ColorTokenizer extends Tokenizer {
                 boolean canUseColors = this.hasTokenPermission(params, "rosechat." + shadowPrefix + colorPermission);
                 boolean hasColorPerm = !perColorPermission || this.hasTokenPermission(params, "rosechat." + shadowPrefix + chatColor.getName());
                 if (!canUseColors || !hasColorPerm) {
-                    String text = Settings.REMOVE_COLOR_CODES.get() ? "" : input.substring(realStart, matcher.end());
+                    String text = Settings.REMOVE_COLOR_CODES.get() ? "" : input.substring(realStart, end);
                     results.add(new TokenizerResult(Token.text(text), realStart, consumed));
                     continue;
                 }
@@ -78,16 +79,6 @@ public class ColorTokenizer extends Tokenizer {
             TokenDecorator decorator = shadow ? new ShadowColorDecorator(chatColor) : new ColorDecorator(chatColor);
             results.add(new TokenizerResult(Token.decorator(decorator), realStart, consumed));
         }
-    }
-
-    private boolean overlaps(List<TokenizerResult> results, int start, int end) {
-        for (TokenizerResult result : results) {
-            int resultStart = result.index();
-            int resultEnd = resultStart + result.consumed();
-            if (end > resultStart && start < resultEnd)
-                return true;
-        }
-        return false;
     }
 
     private ChatColor fromString(String string) {

@@ -69,7 +69,7 @@ public class PAPIPlaceholderTokenizer extends Tokenizer {
 
         // Ignore everything that definitely isn't a colour.
         if (content.contains(ChatColor.COLOR_CHAR + "") || content.contains("&") || content.contains("#") || content.contains("<") || content.contains("{")) {
-            Matcher legacyMatcher = MessageUtils.VALID_LEGACY_REGEX_COMBINED.matcher(content);
+            Matcher legacyMatcher = MessageUtils.LEGACY_REGEX_COMBINED.matcher(content);
 
             while (legacyMatcher.find()) {
                 if (content.trim().equalsIgnoreCase(legacyMatcher.group()) || content.trim().endsWith(legacyMatcher.group())) {

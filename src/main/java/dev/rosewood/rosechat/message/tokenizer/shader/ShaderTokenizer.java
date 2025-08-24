@@ -17,39 +17,32 @@ public class ShaderTokenizer extends Tokenizer {
     public ShaderTokenizer() {
         super("shader");
 
-        this.shaderColors = new ArrayList<>();
-        for (String color : Settings.CORE_SHADER_COLORS.get()) {
-            this.shaderColors.add(color.toLowerCase());
-        }
+        this.shaderColors = Settings.CORE_SHADER_COLORS.get().stream().map(String::toLowerCase).toList();
     }
 
     @Override
     public List<TokenizerResult> tokenize(TokenizerParams params) {
-        if (true) return null;
-        String rawInput = params.getInput();
-        String input = rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR ? rawInput.substring(1) : rawInput;
-        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR && !params.getSender().hasPermission("rosechat.escape"))
-            return null;
-
-        if (!input.startsWith("#"))
-            return null;
-
+        String input = params.getInput();
         Matcher matcher = MessageUtils.HEX_REGEX.matcher(input);
-        if (!matcher.find() || matcher.start() != 0)
-            return null;
 
-        String match = input.substring(0, matcher.end());
-        if (!input.startsWith(match))
-            return null;
+        List<TokenizerResult> results = new ArrayList<>();
 
-        if (!this.shaderColors.contains(match.toLowerCase()))
-            return null;
+        while (matcher.find()) {
+            int start = matcher.start();
+            String match = matcher.group();
 
-        if (rawInput.charAt(0) == MessageUtils.ESCAPE_CHAR)
-            return List.of(new TokenizerResult(Token.text(match), match.length() + 1));
+            boolean escape = (start > 0) && input.charAt(start - 1) == MessageUtils.ESCAPE_CHAR && params.getSender().hasPermission("rosechat.escape");
+            if (escape)
+                continue;
 
-        String freeHex = findFreeHex(match.substring(1));
-        return List.of(new TokenizerResult(Token.group("#" + freeHex).build(), match.length()));
+            if (!this.shaderColors.contains(match.toLowerCase()))
+                continue;
+
+            String freeHex = findFreeHex(match.substring(1));
+            results.add(new TokenizerResult(Token.group("#" + freeHex).build(), start, match.length()));
+        }
+
+        return results;
     }
 
     public static String findFreeHex(String hex) {
