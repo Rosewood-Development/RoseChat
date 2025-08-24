@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MessageTokenizer {
@@ -35,7 +34,8 @@ public class MessageTokenizer {
     private final RosePlayer viewer;
     private final MessageDirection direction;
     private final MessageOutputs outputs;
-    private int parses = 0;
+    private int totalParses = 0;
+    private int tokenMatches = 0;
 
     private MessageTokenizer(RoseMessage roseMessage, RosePlayer viewer, MessageDirection direction, MessageOutputs outputs,
                              List<Tokenizer> tokenizers) {
@@ -90,11 +90,15 @@ public class MessageTokenizer {
                 continue;
 
             long startTime = System.nanoTime();
-            this.parses++;
+            this.totalParses++;
 
             List<TokenizerResult> results = tokenizer.tokenize(params);
             if (results == null || results.isEmpty())
                 continue;
+
+            double endTimeMs = (System.nanoTime() - startTime) / 1000000.0;
+            if (tokenizer != Tokenizers.CHARACTER)
+                this.tokenMatches++;
 
             // Match, build tokens from matched content and then tokenize the content between matches
             List<Token> children = new ArrayList<>();
@@ -117,8 +121,8 @@ public class MessageTokenizer {
             if (DEBUG_MANAGER.isEnabled() && tokenizer != Tokenizers.CHARACTER) {
                 DEBUG_MANAGER.addMessage(() ->
                         "[" + tokenizer.getClass().getSimpleName() + "] Tokenized: " + content + " -> " +
-                                parentToken.getChildren().stream().filter(x -> x.getType() != TokenType.DECORATOR).map(Token::getContent).collect(Collectors.joining()) + " in " +
-                                NUMBER_FORMAT.format((System.nanoTime() - startTime) / 1000000.0) + "ms");
+                                children.stream().filter(x -> x.getType() != TokenType.DECORATOR).map(Token::getContent).collect(Collectors.joining()) + " in " +
+                                NUMBER_FORMAT.format(endTimeMs) + "ms");
             }
 
             return children;
@@ -128,17 +132,18 @@ public class MessageTokenizer {
     }
 
     private void tokenizeContentDecorators(Token token, int depth) {
-        if (token.getType() != TokenType.TEXT) {
-            for (TokenDecorator decorator : token.getDecorators()) {
-                if (decorator.getType() == DecoratorType.CONTENT && decorator.getContent() != null) {
-                    Token.Builder decoratorContent = decorator.getContent();
-                    decoratorContent.placeholders(token.getPlaceholders());
-                    token.getIgnoredTokenizers().forEach(decoratorContent::ignoreTokenizer);
-                    token.getIgnoredFilters().forEach(decoratorContent::ignoreFilter);
-                    Token decoratorToken = decoratorContent.build();
-                    this.tokenize(decoratorToken, depth + 1);
-                    decorator.setContentToken(decoratorToken);
-                }
+        if (token.getType() == TokenType.TEXT)
+            return;
+
+        for (TokenDecorator decorator : token.getDecorators()) {
+            if (decorator.getType() == DecoratorType.CONTENT && decorator.getContent() != null) {
+                Token.Builder decoratorContent = decorator.getContent();
+                decoratorContent.placeholders(token.getPlaceholders());
+                token.getIgnoredTokenizers().forEach(decoratorContent::ignoreTokenizer);
+                token.getIgnoredFilters().forEach(decoratorContent::ignoreFilter);
+                Token decoratorToken = decoratorContent.build();
+                this.tokenize(decoratorToken, depth + 1);
+                decorator.setContentToken(decoratorToken);
             }
         }
     }
@@ -161,6 +166,7 @@ public class MessageTokenizer {
         List<Tokenizer> tokenizers = zipperMerge(Arrays.stream(tokenizerBundles).map(Tokenizers.TokenizerBundle::tokenizers).toList());
         if (!tokenizers.contains(Tokenizers.CHARACTER))
             tokenizers.addLast(Tokenizers.CHARACTER);
+
         MessageOutputs outputs = new MessageOutputs();
         MessageTokenizer tokenizer = new MessageTokenizer(roseMessage, viewer, direction, outputs, tokenizers);
 
@@ -172,7 +178,7 @@ public class MessageTokenizer {
             DEBUG_MANAGER.addMessage(() ->
                     "Completed Tokenizing: " + plainText + "\n"
                     + "Took " + NUMBER_FORMAT.format(stopwatch.elapsed(TimeUnit.NANOSECONDS) / 1000000.0) +
-                            "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.parses + " times \n");
+                            "ms to tokenize " + countTokens(token) + " tokens " + tokenizer.totalParses + " times with " + tokenizer.tokenMatches + " successful parses");
         }
 
         return MessageContents.fromToken(token, outputs);
@@ -194,7 +200,7 @@ public class MessageTokenizer {
             return new ArrayList<>();
 
         if (listOfLists.size() == 1)
-            return listOfLists.get(0);
+            return listOfLists.getFirst();
 
         Set<T> allValues = new HashSet<>(); // used to disallow duplicates in the final List
         List<T> mergedList = new ArrayList<>();

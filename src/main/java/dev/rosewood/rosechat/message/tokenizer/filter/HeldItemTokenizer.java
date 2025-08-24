@@ -39,6 +39,7 @@ public class HeldItemTokenizer extends Tokenizer {
 
     @Override
     public List<TokenizerResult> tokenize(TokenizerParams params) {
+        if (true) return null;
         Filter filter = this.api.getFilterById(Settings.HELD_ITEM_FILTER.get());
         if (filter == null)
             return null;

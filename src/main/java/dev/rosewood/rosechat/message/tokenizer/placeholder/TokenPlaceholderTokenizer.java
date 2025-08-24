@@ -21,6 +21,7 @@ public class TokenPlaceholderTokenizer extends Tokenizer {
 
     @Override
     public List<TokenizerResult> tokenize(TokenizerParams params) {
+        if (true) return null;
         String input = params.getInput();
         if (!input.startsWith("%"))
             return null;

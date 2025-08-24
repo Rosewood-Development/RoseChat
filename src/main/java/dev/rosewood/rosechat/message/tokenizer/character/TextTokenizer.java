@@ -14,8 +14,7 @@ public class TextTokenizer extends Tokenizer {
 
     @Override
     public List<TokenizerResult> tokenize(TokenizerParams params) {
-        return List.of(new TokenizerResult(Token.text(String.valueOf(params.getInput().charAt(0))), 1));
-        //return List.of(new TokenizerResult(Token.text(params.getInput()), 0, params.getInput().length()));
+        return List.of(new TokenizerResult(Token.text(params.getInput()), 0, params.getInput().length()));
     }
 
 }
