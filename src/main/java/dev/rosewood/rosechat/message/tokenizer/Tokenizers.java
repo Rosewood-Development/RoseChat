@@ -40,8 +40,8 @@ public class Tokenizers {
     public static final Tokenizer FROM_DISCORD_TAG = new FromDiscordTagTokenizer();
     public static final Tokenizer TO_DISCORD_CHANNEL = new ToDiscordChannelTokenizer();
     public static final Tokenizer FROM_DISCORD_CHANNEL = new FromDiscordChannelTokenizer();
-    public static final Tokenizer MARKDOWN_CODE_BLOCK = new MarkdownCodeBlockTokenizer();
     public static final Tokenizer MARKDOWN_CODE = new MarkdownCodeTokenizer();
+    public static final Tokenizer MARKDOWN_CODE_BLOCK = new MarkdownCodeBlockTokenizer();
     public static final Tokenizer MARKDOWN_BLOCK_QUOTE = new MarkdownBlockQuoteTokenizer();
     public static final Tokenizer DISCORD_CUSTOM_EMOJI = new DiscordCustomEmojiTokenizer();
     public static final Tokenizer MARKDOWN_BOLD = new MarkdownBoldTokenizer();

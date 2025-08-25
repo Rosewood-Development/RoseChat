@@ -70,7 +70,7 @@ public class RoseChatPlaceholderTokenizer extends Tokenizer {
                 return null;
 
             if (matcher.start() != 0 && input.charAt(matcher.start() - 1) == MessageUtils.ESCAPE_CHAR && params.getSender().hasPermission("rosechat.escape")) {
-                results.add(new TokenizerResult(Token.text(placeholder), matcher.start() - 1, matcher.end()));
+                results.add(new TokenizerResult(Token.text(placeholder), matcher.start() - 1, placeholder.length() + 1));
                 continue;
             }
 

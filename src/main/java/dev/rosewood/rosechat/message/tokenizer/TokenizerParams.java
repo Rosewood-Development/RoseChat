@@ -80,6 +80,10 @@ public class TokenizerParams {
         return this.direction;
     }
 
+    public Set<Tokenizer> getIgnoredTokenizers() {
+        return this.parentToken.getIgnoredTokenizers();
+    }
+
     public Set<String> getIgnoredFilters() {
         return this.parentToken.getIgnoredFilters();
     }
