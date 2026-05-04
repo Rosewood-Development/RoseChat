@@ -5,6 +5,7 @@ import dev.rosewood.rosechat.manager.BungeeManager;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +94,29 @@ public class BungeeListener implements PluginMessageListener {
                 case "delete_message" -> {
                     UUID messageId = UUID.fromString(data.readUTF());
                     bungeeManager.receiveMessageDeletion(messageId);
+                }
+                case "vanish_check" -> {
+                    String sender = data.readUTF();
+                    bungeeManager.receiveVanishCheck(player, sender);
+                }
+                case "confirm_vanish" -> {
+                    boolean isVanished = data.readBoolean();
+                    String sender = data.readUTF();
+                    bungeeManager.receiveVanishCheckConfirmation(sender, isVanished);
+                }
+                case "request_players" -> {
+                    String server = data.readUTF();
+                    bungeeManager.receivePlayerRequest(server);
+                }
+                case "filtered_players" -> {
+                    String server = data.readUTF();
+                    int size = data.readInt();
+
+                    List<String> players = new ArrayList<>();
+                    for (int i = 0; i < size; i++)
+                        players.add(data.readUTF());
+
+                    bungeeManager.receiveFilteredPlayers(server, players);
                 }
             }
         } catch (IOException e) {

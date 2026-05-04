@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
@@ -30,12 +31,14 @@ public class BungeeManager extends Manager {
 
     private final Multimap<String, String> bungeePlayers;
     private final List<String> checkPluginPlayers;
+    private final List<String> checkVanishPlayers;
 
     public BungeeManager(RosePlugin rosePlugin) {
         super(rosePlugin);
 
         this.bungeePlayers = ArrayListMultimap.create();
         this.checkPluginPlayers = new ArrayList<>();
+        this.checkVanishPlayers = new ArrayList<>();
 
         if (RoseChatAPI.getInstance().isBungee() && Settings.ALLOW_BUNGEECORD_MESSAGES.get()) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(rosePlugin, () -> {
@@ -91,11 +94,71 @@ public class BungeeManager extends Manager {
      * @param server The server to use.
      */
     public void getPlayers(String server) {
-        this.send("PlayerList", server, null, null, null);
+        if (Settings.ALLOW_MESSAGING_VANISHED_PLAYERS.get()) {
+            this.send("PlayerList", server, null, null, null);
+        } else {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(outputStream);
+
+            try {
+                out.writeUTF(server);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            this.send("Forward", server, "rosechat:request_players", outputStream, out);
+
+            // Add the players on this server too.
+            List<String> players = new ArrayList<>();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
+                players.add(player.getName());
+            }
+
+            this.bungeePlayers.putAll(server, players);
+        }
     }
 
     public void receivePlayers(String server, String[] players) {
         this.bungeePlayers.putAll(server, Arrays.asList(players));
+    }
+
+    public void receivePlayerRequest(String server) {
+        this.sendFilteredPlayers(server);
+    }
+
+    public void sendFilteredPlayers(String server) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(outputStream);
+
+        try {
+            out.writeUTF(server);
+
+            List<String> players = new ArrayList<>();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (MessageUtils.isPlayerVanished(player))
+                    continue;
+
+               players.add(player.getName());
+            }
+
+            out.writeInt(players.size());
+
+            for (String player : players)
+                out.writeUTF(player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.send("Forward", server, "rosechat:filtered_players", outputStream, out);
+    }
+
+    public void receiveFilteredPlayers(String server, List<String> players) {
+        this.bungeePlayers.putAll(server, players);
     }
 
     //
@@ -314,6 +377,69 @@ public class BungeeManager extends Manager {
     public void receivePluginCheckConfirmation(String player, boolean hasPlugin) {
         if (hasPlugin)
             this.checkPluginPlayers.add(player);
+    }
+
+    //
+    // Vanish Check
+    //
+
+    public void sendMessageWithVanishCheck(RosePlayer sender, String receiver, String json, String message, Consumer<Boolean> callback) {
+        this.sendVanishCheck(sender.getRealName(), receiver, (vanished) -> {
+            if (!vanished)
+                this.sendDirectMessage(sender, receiver, json, message, callback);
+            else
+                callback.accept(false);
+        });
+    }
+
+    public void sendVanishCheck(String sender, String receiver, Consumer<Boolean> callback) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(outputStream);
+
+        try {
+            out.writeUTF(sender);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.send("ForwardToPlayer", receiver, "rosechat:vanish_check", outputStream, out);
+
+        Bukkit.getScheduler().runTaskAsynchronously(this.rosePlugin, () -> {
+            int timeout = Settings.BUNGEECORD_MESSAGE_TIMEOUT.get();
+            long startTime = System.currentTimeMillis();
+            while (startTime + timeout > System.currentTimeMillis()) {
+                if (this.checkVanishPlayers.contains(sender)) {
+                    this.checkVanishPlayers.remove(sender);
+                    callback.accept(true);
+                    return;
+                }
+            }
+
+            callback.accept(false);
+        });
+    }
+
+    public void receiveVanishCheck(Player player, String sender) {
+        this.sendVanishCheckConfirmation(sender, MessageUtils.isPlayerVanished(player));
+    }
+
+    public void sendVanishCheckConfirmation(String sender, boolean vanished) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(outputStream);
+
+        try {
+            out.writeBoolean(vanished);
+            out.writeUTF(sender);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.send("ForwardToPlayer", sender, "rosechat:confirm_vanish", outputStream, out);
+    }
+
+    public void receiveVanishCheckConfirmation(String sender, boolean vanished) {
+        if (vanished)
+            this.checkVanishPlayers.add(sender);
     }
 
     //

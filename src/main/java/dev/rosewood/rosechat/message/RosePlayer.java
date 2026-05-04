@@ -398,6 +398,25 @@ public class RosePlayer {
     }
 
     /**
+     * Removes a players spy if they no longer have permission.
+     */
+    public void validatePermissions() {
+        if (!this.isPlayer())
+            return;
+
+        Player player = this.asPlayer();
+        boolean hasBaseSpyPermission = player.hasPermission("rosechat.spy");
+        if (!hasBaseSpyPermission || !player.hasPermission("rosechat.spy.message"))
+            this.getPlayerData().setMessageSpy(false);
+
+        if (!hasBaseSpyPermission || !player.hasPermission("rosechat.spy.channel"))
+            this.getPlayerData().setChannelSpy(false);
+
+        if (!hasBaseSpyPermission || !player.hasPermission("rosechat.spy.group"))
+            this.getPlayerData().setGroupSpy(false);
+    }
+
+    /**
      * Removes and re-adds the chat completions for the player.
      */
     public void validateChatCompletion() {

@@ -13,7 +13,6 @@ import dev.rosewood.rosechat.message.tokenizer.Tokenizers;
 import dev.rosewood.rosechat.message.tokenizer.composer.ChatComposer;
 import dev.rosewood.rosechat.message.tokenizer.placeholder.RoseChatPlaceholderTokenizer;
 import dev.rosewood.rosechat.message.tokenizer.shader.ShaderTokenizer;
-import dev.rosewood.rosechat.placeholder.DefaultPlaceholders;
 import dev.rosewood.rosegarden.hook.PlaceholderAPIHook;
 import dev.rosewood.rosegarden.utils.HexUtils;
 import dev.rosewood.rosegarden.utils.StringPlaceholders;
@@ -25,7 +24,6 @@ import java.util.regex.Pattern;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.chat.ChatVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.chat.VersionedComponentSerializer;
@@ -238,6 +236,9 @@ public class MessageUtils {
             if (spy == null)
                 continue;
 
+            RosePlayer roseSpy = new RosePlayer(spy);
+            roseSpy.validatePermissions();
+
             RoseChat.MESSAGE_THREAD_POOL.execute(() -> {
                 MessageContents parsedSpyMessage = roseMessage.parse(messageTarget, Settings.MESSAGE_SPY_FORMAT.get());
                 parsedSpyMessage.sendMessage(spy);
@@ -265,19 +266,33 @@ public class MessageUtils {
                     boolean keepFormat = Settings.KEEP_MESSAGE_FORMAT.get();
                     String bungeeMessage = keepFormat ? receivedMessageOutput.build(ChatComposer.json()) : null;
 
-                    RoseChatAPI.getInstance().getBungeeManager()
-                            .sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
-                        if (success) {
-                            // If the message was received successfully, send the sent message to the sender.
-                            sender.send(parsedSentMessage);
-                        } else {
-                            // If the message was not received successfully, then the player is assumed to not be online.
-                            sender.sendLocaleMessage("invalid-argument",
-                                    StringPlaceholders.of("message",
-                                            RoseChatAPI.getInstance().getLocaleManager()
-                                                    .getLocaleMessage("argument-handler-player")));
-                        }
-                    });
+                    if (!Settings.ALLOW_MESSAGING_VANISHED_PLAYERS.get() && !sender.hasPermission("rosechat.messagebypass")) {
+                        RoseChatAPI.getInstance().getBungeeManager()
+                                .sendMessageWithVanishCheck(sender, targetName, bungeeMessage, message, (success) -> {
+                                    if (success) {
+                                        sender.send(parsedSentMessage);
+                                    } else {
+                                        sender.sendLocaleMessage("invalid-argument",
+                                                StringPlaceholders.of("message",
+                                                        RoseChatAPI.getInstance().getLocaleManager()
+                                                                .getLocaleMessage("argument-handler-player")));
+                                    }
+                                });
+                    } else {
+                        RoseChatAPI.getInstance().getBungeeManager()
+                                .sendDirectMessage(sender, targetName, bungeeMessage, message, (success) -> {
+                                    if (success) {
+                                        // If the message was received successfully, send the sent message to the sender.
+                                        sender.send(parsedSentMessage);
+                                    } else {
+                                        // If the message was not received successfully, then the player is assumed to not be online.
+                                        sender.sendLocaleMessage("invalid-argument",
+                                                StringPlaceholders.of("message",
+                                                        RoseChatAPI.getInstance().getLocaleManager()
+                                                                .getLocaleMessage("argument-handler-player")));
+                                    }
+                                });
+                    }
                 }
             } else {
                 // The sender should receive the message first.
@@ -453,6 +468,9 @@ public class MessageUtils {
     }
 
     public static boolean isPlayerVanished(Player player) {
+        if (player == null)
+            return false;
+
         for (MetadataValue value : player.getMetadata("vanished"))
             if (value.asBoolean())
                 return true;

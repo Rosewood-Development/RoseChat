@@ -83,6 +83,7 @@ command-ignorelist-separator: "&7, &e"
 # Message Command
 command-message-description: "私聊某玩家"
 console-sender-name: "&c控制台"
+command-message-vanished-player: "&c此玩家不在线！"
 
 # Mute Command
 command-mute-description: "禁言某玩家"

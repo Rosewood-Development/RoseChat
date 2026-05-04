@@ -83,6 +83,7 @@ command-ignorelist-separator: "&7, &e"
 # Команда сообщения
 command-message-description: "Отправить личное сообщение игроку"
 console-sender-name: "&cконсоль"
+command-message-vanished-player: "&cЭтот игрок не в сети!"
 
 # Команда заглушения
 command-mute-description: "Заглушить игрока"

@@ -83,6 +83,7 @@ command-ignorelist-separator: "&7, &e"
 # メッセージ・コマンド
 command-message-description: "プレイヤーにメッセージします"
 console-sender-name: "&cコンソールちゃん"
+command-message-vanished-player: "&cこのプレイヤーはオンラインではありません！"
 
 # ミュート・コマンド
 command-mute-description: 'プレイヤーをミュートします'

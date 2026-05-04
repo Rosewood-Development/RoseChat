@@ -77,6 +77,7 @@ public class PlayerListener implements Listener {
             }
 
             player.validateChatColor();
+            player.validatePermissions();
         });
     }
 

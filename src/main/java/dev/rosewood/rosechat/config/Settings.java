@@ -158,6 +158,8 @@ public final class Settings implements SettingHolder {
             "The number of seconds chat permissions will be cached for after sending a message.",
                         "This helps prevent permissions from being checked too frequently.",
                         "Requires a server restart to change, set to 0 to disable.");
+    public static final RoseSetting<Boolean> ALLOW_MESSAGING_VANISHED_PLAYERS = create(CHAT_SETTINGS, "allow-messaging-vanished-players", BOOLEAN, true,
+            "Can players be messaged when they are vanished?");
 
     public static final RoseSetting<ConfigurationSection> DISCORD_SETTINGS = create("discord-settings", "Discord Settings", "Requires DiscordSRV");
     public static final RoseSetting<Boolean> USE_DISCORD = create(DISCORD_SETTINGS, "use-discord", BOOLEAN, true,

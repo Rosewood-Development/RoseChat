@@ -72,6 +72,14 @@ public class MessageCommand extends RoseChatCommand {
                 });
             }
 
+            if (target != null && target.isPlayer()) {
+                if (MessageUtils.isPlayerVanished(target.asPlayer()) && !Settings.ALLOW_MESSAGING_VANISHED_PLAYERS.get()
+                        && !player.hasPermission("rosechat.messagebypass")) {
+                    player.sendLocaleMessage("command-message-vanished-player");
+                    return;
+                }
+            }
+
             if (!canBeMessaged.get()) {
                 player.sendLocaleMessage("command-togglemessage-cannot-message");
                 return;
