@@ -122,7 +122,7 @@ public class PlaceholderCondition {
 
             List<String> value = this.section.isList(valueId) ?
                     this.section.getStringList(valueId) : Collections.singletonList(this.section.getString(valueId));
-            this.values.put(valueId, value);
+            this.values.put(valueId.toLowerCase(), value);
         }
 
         return this;
