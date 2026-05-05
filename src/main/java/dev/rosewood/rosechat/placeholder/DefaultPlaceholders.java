@@ -28,7 +28,8 @@ public final class DefaultPlaceholders {
         if (viewer != null) {
             builder.add("other_player_name", viewer.getRealName())
                     .add("other_player_displayname", viewer.getDisplayName())
-                    .add("other_player_nickname", viewer.getName());
+                    .add("other_player_nickname", viewer.getName())
+                    .add("is_console", viewer.isConsole());
         }
 
         Permission vault = RoseChatAPI.getInstance().getVault();
