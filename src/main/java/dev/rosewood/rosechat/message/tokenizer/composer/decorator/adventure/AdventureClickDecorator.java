@@ -27,7 +27,7 @@ public class AdventureClickDecorator extends AdventureTokenDecorator<ClickDecora
         if (this.decorator.action() == ClickDecorator.Action.OPEN_URL && !ClickDecorator.PATTERN.matcher(value).find())
             value = "https://" + value;
 
-        return component.clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(this.clickEventAction, value));
+        return component.clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(this.clickEventAction, ClickEvent.Payload.string(value)));
     }
 
 }
