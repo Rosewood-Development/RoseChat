@@ -354,6 +354,8 @@ public class DiscordSRVProvider implements DiscordChatProvider {
         for (String accountId : this.discord.getAccountLinkManager().getLinkedAccounts().keySet()) {
             UUID uuid = this.discord.getAccountLinkManager().getLinkedAccounts().get(accountId);
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            if (!player.hasPlayedBefore())
+                return null;
 
             int matchLength = this.getMatchLength(input, player.getName());
             if (matchLength != -1) {
