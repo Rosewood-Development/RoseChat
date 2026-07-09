@@ -66,6 +66,8 @@ public class ChannelManager extends Manager {
     public void disable() {
         if (this.worldGuardTask != null)
             this.worldGuardTask.cancel();
+
+        this.channels.clear();
     }
 
     /**
@@ -101,7 +103,6 @@ public class ChannelManager extends Manager {
      * Uses the registered {@link ChannelProvider}s to decide channel configuration.
      */
     public void generateChannels() {
-        this.channels.clear();
         this.defaultChannel = null;
 
         // Create the channels that should be created by the providers.
